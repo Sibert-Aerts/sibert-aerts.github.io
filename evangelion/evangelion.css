@@ -1,0 +1,110 @@
+
+body{
+    background-color: black;
+    color: white;
+}
+.holder {
+    display: inline-block;
+    margin-left: 30px;
+    margin-top: 20px;
+    border: 1px solid #222;
+}
+    .holder.controls{
+        padding: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+ul {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+input{
+    border: 1px solid #040404;
+    background-color: #111;
+    padding: 4px;
+    color: white;
+    size: 80;
+}
+
+.credit{
+    position: fixed;
+    color: #222;
+    bottom: 10px;
+    left: 40px;
+    font-weight: bold;
+    font-size: 18px;
+
+    transform-origin: 0 0; /* W3C */
+    -webkit-transform:scale(0.7, 1); /* Safari and Chrome */
+    -moz-transform:scale(0.7, 1); /* Firefox */
+    -ms-transform:scale(0.7, 1); /* IE 9 */
+    -o-transform:scale(0.7, 1); /* Opera */
+    transform: scale(0.7, 1); /* W3C */
+}
+    .credit > span {
+        margin-right: 100px;
+    }
+
+    .credit > a{
+        color: #222;
+    }
+
+.text {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: 70px;
+    font-weight: bold;
+    text-shadow: 0 0 4px white, 0 0 8px gray, 0px -1px 7px #F20;
+}
+
+.nge {
+    font-family: 'Times New Roman', Times, serif;
+    text-transform: uppercase;
+
+    transform-origin: 0 0; /* W3C */
+    -webkit-transform:scale(0.66, 1); /* Safari and Chrome */
+    -moz-transform:scale(0.66, 1); /* Firefox */
+    -ms-transform:scale(0.66, 1); /* IE 9 */
+    -o-transform:scale(0.66, 1); /* Opera */
+    transform: scale(0.66, 1); /* W3C */
+}
+
+.neon-genesis {
+    font-size: 90px;
+    line-height: 80%;
+}
+
+.evangelion {
+    font-size: 140px;
+    line-height: 80%;
+}
+
+.episode {
+    font-family: Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-size: 48px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    
+    transform-origin: 0 0; /* W3C */
+    -webkit-transform:scale(0.72, 1); /* Safari and Chrome */
+    -moz-transform:scale(0.72, 1); /* Firefox */
+    -ms-transform:scale(0.72, 1); /* IE 9 */
+    -o-transform:scale(0.72, 1); /* Opera */
+    transform: scale(0.72, 1); /* W3C */
+}
+
+.title{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 52px;
+    line-height: 100%;
+    
+    transform-origin: 0 0; /* W3C */
+    -webkit-transform:scale(0.68, 1); /* Safari and Chrome */
+    -moz-transform:scale(0.68, 1); /* Firefox */
+    -ms-transform:scale(0.68, 1); /* IE 9 */
+    -o-transform:scale(0.68, 1); /* Opera */
+    transform: scale(0.68, 1); /* W3C */
+}

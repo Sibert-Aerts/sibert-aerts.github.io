@@ -1,88 +1,74 @@
+<doctype HTML>
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
 
-<style>
-    body {
-        background-color: black;
-        color: white;
-    }
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
+    
+    <!-- mine -->
+    <link rel="stylesheet" href="evangelion.css">
 
-    .text {
-        margin-top: 40px;
-        margin-left: 60px;
-        font-weight: bold;
-        text-shadow: 0 0 4px white, 0 0 8px gray, 0px -1px 7px #F20;
-    }
+    <!-- favicon -->
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 
-    .nge {
-        font-family: 'Times New Roman', Times, serif;
-        text-transform: uppercase;
-
-        transform-origin: 0 0; /* W3C */
-        -webkit-transform:scale(0.66, 1); /* Safari and Chrome */
-        -moz-transform:scale(0.66, 1); /* Firefox */
-        -ms-transform:scale(0.66, 1); /* IE 9 */
-        -o-transform:scale(0.66, 1); /* Opera */
-        transform: scale(0.66, 1); /* W3C */
-    }
-
-    .neon-genesis {
-        font-size: 90px;
-        line-height: 80%;
-    }
-
-    .evangelion {
-        font-size: 140px;
-        line-height: 80%;
-    }
-
-    .episode {
-        font-family: Arial, Helvetica, sans-serif;
-        text-transform: uppercase;
-        font-size: 48px;
-        margin-top: 8px;
-        margin-bottom: 12px;
-        
-        transform-origin: 0 0; /* W3C */
-        -webkit-transform:scale(0.72, 1); /* Safari and Chrome */
-        -moz-transform:scale(0.72, 1); /* Firefox */
-        -ms-transform:scale(0.72, 1); /* IE 9 */
-        -o-transform:scale(0.72, 1); /* Opera */
-        transform: scale(0.72, 1); /* W3C */
-    }
-
-    .title{
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 52px;
-        line-height: 100%;
-        
-        transform-origin: 0 0; /* W3C */
-        -webkit-transform:scale(0.68, 1); /* Safari and Chrome */
-        -moz-transform:scale(0.68, 1); /* Firefox */
-        -ms-transform:scale(0.68, 1); /* IE 9 */
-        -o-transform:scale(0.68, 1); /* Opera */
-        transform: scale(0.68, 1); /* W3C */
-    }
-
-</style>
+    <title>Evangelion Title Card Generator</title>
 </head>
 
 <body>
-
-    <div class="text">
-        <div class="nge neon-genesis">
-            Neon <br> 
-            Genesis <br>
-        </div>
-        <div class="nge evangelion">
-            evangelion
-        </div>
-        <div class="episode">
-            Episode: 15
-        </div>
-        <div class="title">
-            Those women longed for the touch of<br>
-            others´ lips, and thus invited their kisses.
+    <div class="holder">
+        <div class="text">
+            <div class="nge neon-genesis">
+                <span id="neon">neon</span><br><span id="genesis">genesis</span>
+            </div>
+            <div class="nge evangelion" id="evangelion">
+                evangelion
+            </div>
+            <div class="episode" id="episode">
+                Episode: 15
+            </div>
+            <div class="title">
+                <span id="title-1">Those women longed for the touch of</span><br>
+                <span id="title-2">others´ lips, and thus invited their kisses.</span>
+            </div>
         </div>
     </div>
-    
+    <br>
+    <div class="holder controls">
+        <ul id="inputs" class="list-unstyled">
+            <li>
+                <input type="text" size=50 target="neon" value="neon">
+            </li>
+            <li>
+                <input type="text" size=50 target="genesis" value="genesis">
+            </li>
+            <li>
+                <input type="text" size=50 target="evangelion" value="evangelion">
+            </li>
+            <li>
+                <input type="text" size=50 target="episode" value="episode: 15">
+            </li>
+            <li>
+                <input type="text" size=50 target="title-1" value="Those women longed for the touch of">
+            </li>
+            <li>
+                <input type="text" size=50 target="title-2" value="others´ lips, and thus invited their kisses.">
+            </li>
+        </ul>
+    </div>
+
+    <div class="credit">
+        It looks best in Google Chrome™<span></span>
+        Made by <a href="http://twitter.com/rezuaq">Rezuaq</a> (<a href="http://github.com/sibert-aerts">Sibert Aerts</a>) <span></span>
+        Neon Genesis Evangelion created by uhhhh <span></span> my boy Hideaki Anno <span></span>
+        <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/evangelion">Check out the source code on github</a>
+    </div>
 </body>
+
+<script>
+    $(document).ready( function() {
+        // i love jquery
+        $('#inputs > li > input').on('input', function(){ $('#' + $(this).attr("target")).text($(this).val()) });
+    });
+</script>
