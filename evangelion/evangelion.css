@@ -20,12 +20,21 @@ ul {
     padding-left: 0px;
 }
 
-input{
+#inputs input{
     border: 1px solid #040404;
     background-color: #111;
     padding: 4px;
     color: white;
     size: 80;
+}
+
+#inputs button{
+    padding: 4px;
+    width: 100%;
+    background-color: #222;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid black;
 }
 
 .credit{
@@ -35,6 +44,8 @@ input{
     left: 40px;
     font-weight: bold;
     font-size: 18px;
+
+    width: 130%;
 
     transform-origin: 0 0; /* W3C */
     -webkit-transform:scale(0.7, 1); /* Safari and Chrome */
@@ -85,7 +96,7 @@ input{
     font-family: Arial, Helvetica, sans-serif;
     text-transform: uppercase;
     font-size: 48px;
-    margin-top: 8px;
+    margin-top: 12px;
     margin-bottom: 12px;
     
     transform-origin: 0 0; /* W3C */

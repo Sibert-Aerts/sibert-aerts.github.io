@@ -1,4 +1,6 @@
-<doctype HTML>
+<!DOCTYPE html>
+<html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8">
@@ -8,10 +10,13 @@
     
     <!-- mine -->
     <link rel="stylesheet" href="evangelion.css">
+    <script type="text/javascript" src="evangelion.js"></script>
 
     <!-- favicon -->
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
-    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+
+    
 
     <title>Evangelion Title Card Generator</title>
 </head>
@@ -26,11 +31,11 @@
                 evangelion
             </div>
             <div class="episode" id="episode">
-                Episode: 15
+                Episode:
             </div>
             <div class="title">
-                <span id="title-1">Those women longed for the touch of</span><br>
-                <span id="title-2">others´ lips, and thus invited their kisses.</span>
+                <span id="title-1"></span><br>
+                <span id="title-2"></span>
             </div>
         </div>
     </div>
@@ -47,13 +52,16 @@
                 <input type="text" size=50 target="evangelion" value="evangelion">
             </li>
             <li>
-                <input type="text" size=50 target="episode" value="episode: 15">
+                <input type="text" size=50 target="episode" value="episode:">
             </li>
             <li>
-                <input type="text" size=50 target="title-1" value="Those women longed for the touch of">
+                <input type="text" size=50 target="title-1" value="">
             </li>
             <li>
-                <input type="text" size=50 target="title-2" value="others´ lips, and thus invited their kisses.">
+                <input type="text" size=50 target="title-2" value="">
+            </li>
+            <li>
+                <button onclick=randomize()>Random</button>
             </li>
         </ul>
     </div>
@@ -62,13 +70,9 @@
         It looks best in Google Chrome™<span></span>
         Made by <a href="http://twitter.com/rezuaq">Rezuaq</a> (<a href="http://github.com/sibert-aerts">Sibert Aerts</a>) <span></span>
         Neon Genesis Evangelion created by uhhhh <span></span> my boy Hideaki Anno <span></span>
-        <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/evangelion">Check out the source code on github</a>
+        <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/evangelion">Check out the source code on github</a><span></span>
+        Current randomness: <span id=randomness></span>.
     </div>
 </body>
 
-<script>
-    $(document).ready( function() {
-        // i love jquery
-        $('#inputs > li > input').on('input', function(){ $('#' + $(this).attr("target")).text($(this).val()) });
-    });
-</script>
+</html>
