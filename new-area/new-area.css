@@ -1,0 +1,182 @@
+@font-face {
+    font-family: OptimusPrinceps;
+    src: url(OptimusPrinceps.ttf);
+}
+
+body {
+    background-image: url(http://i.imgur.com/1IBkmYc.jpg);
+    font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+    color: white;
+}
+
+.unselectable {
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.content {
+    margin-left: 5%;
+    margin-top: 8%;
+    width: 90%;
+    background-color: rgba(0, 8, 8, 0.7);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+    .content#main {
+        margin-bottom: 40px;
+    }
+
+    .content.greenscreen {
+        background-color: rgba(0, 255, 0, 1);
+    }
+
+    .content.lesser {
+        margin-top: 20px;
+        margin-left: 0px;
+        margin-right: 40px;
+        float: left;
+        width: auto;
+    }
+
+    .content h4 {
+        margin-top: 0;
+    }
+
+#name {
+    width: 100%;
+    float: left;
+    text-align: center;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+}
+
+.underline {
+    float: left;
+    position: relative;
+    top: -31px;
+    margin-left: 7%;
+    margin-top: 20px;
+    width: 80%;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    opacity: 0.9;
+}
+
+    @media screen and (max-width: 720px) {
+        #name {
+            font-size: 30px;
+            height: 40px;
+        }
+        .underline {
+            border-top: 2px solid white;
+        }
+    }
+
+    @media screen and (min-width: 720px) {
+        #name {
+            font-size: 40px;
+            height: 50px;
+        }
+        .underline {
+            border-top: 3px solid white;
+        }
+    }
+
+    @media screen and (min-width: 1000px) {
+        #name {
+            font-size: 55px;
+            height: 65px;
+        }
+    }
+
+    @media screen and (min-width: 1300px) {
+        #name {
+            font-size: 70px;
+            height: 80px;
+        }
+        .underline {
+            border-top: 4px solid white;
+        }
+    }
+
+#name-underline-wrapper {
+    -webkit-transition: opacity 2s ease;
+    transition: opacity 2s ease;
+    opacity: 1;
+}
+
+    #name-underline-wrapper.faded-out {
+        opacity: 0;
+    }
+
+#generate-button {
+    opacity: 0.9;
+    float: right;
+    font-family: Tahoma, Arial;
+    color: #DDEEEE;
+    font-size: 20px;
+}
+
+.option-button {
+    opacity: 0.9;
+    font-size: 12px;
+    font-family: Tahoma, Arial;
+    color: #FFDDDD;
+    float: right;
+    padding: 2px;
+    display: table-cell;
+}
+
+label {
+    cursor: pointer;
+    font-weight: normal;
+    opacity: 0.9;
+    margin-right: 20px;
+}
+
+    label.special {
+        color: #88BBDD;
+    }
+    label.custom {
+        color: #ffaaaa;
+    }
+    #main label {
+        min-width: 110px;
+    }
+
+.help {
+    font-family: Arial;
+    font-size: 11px;
+    opacity: 0.6;
+    padding-left: 20px;
+}
+
+textarea, input {
+    background-color: #ddeeff;
+    font-family: Dejavu Sans Mono, Courier New;
+    color: black;
+}
+
+.credits {
+    position: fixed;
+    right: 30px;
+    bottom: 20px;
+    font-family: Tahoma, Arial;
+    font-size: 16px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+    .credits > a {
+        text-decoration: underline;
+        color: white;
+        opacity: 0.6;
+    }
+        .credits > a:hover {
+            opacity: 1;
+        }
+    
+    .credits > .dash
