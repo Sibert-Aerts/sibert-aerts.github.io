@@ -5,7 +5,7 @@ var soundArray = new Array(maxSounds);
 var index = 0;
 var muted = false;
 for(var i = 0; i < maxSounds; i++)
-    soundArray[i] = new Audio("http://puu.sh/k1OGY.mp3");
+    soundArray[i] = new Audio("https://puu.sh/k1OGY.mp3");
 
 $(document).ready(function () {
     $('#custom-text').keyup(function (e) {
