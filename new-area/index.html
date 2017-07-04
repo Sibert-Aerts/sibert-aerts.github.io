@@ -15,6 +15,7 @@
 
 	<!-- mine -->
 	<link rel="stylesheet" href="new-area.css">
+	<script type="text/javascript" src="areas.js"></script>
 	<script type="text/javascript" src="new-area.js"></script>
 
 	<title>Enhanced Area Name Generator</title>
@@ -23,8 +24,12 @@
 </head>
 
 <body>
+	<div id="background-layer" class="background-layer faded"></div>
+	<div id="world-layer" class="background-layer faded"></div>
 
 	<div id="main" class="content">
+		
+		<div id="stars" class="unselectable">&nbsp;</div>
 
 		<div id="name-underline-wrapper" class="faded-out">
 			<div id="name"></div>
@@ -32,44 +37,45 @@
 		</div>
 
 		<div style="width: 100%">
-			<div style="width: 55%; margin-right: 5%; display: inline-block">
-				<button id="generate-button" class="btn btn-primary" onClick="generate()">Take me somewhere else</button>
+			<div id="generate-button-wrapper">
+				<button id="generate-button" class="btn btn-primary" onClick="generate()">Travel somewhere else</button>
 			</div>
-			<div style="width: 30%; display: inline-block">
-				<label><input id="check1" checked type="checkbox"></input> Dark Souls 1</label>
-				<label><input id="check2" checked type="checkbox"></input> Dark Souls 2</label>
-				<label><input id="check3" checked type="checkbox"></input> Dark Souls 3</label>
+			<div id="checkboxes-wrapper">
+				<label><input target="Dark1" checked type="checkbox"></input> Dark Souls 1</label>
+				<label><input target="Dark2" checked type="checkbox"></input> Dark Souls 2</label>
+				<label><input target="Dark3" checked type="checkbox"></input> Dark Souls 3</label>
 
-				<label class="special"><input id="check0" type="checkbox"></input> Demon's Souls</label>
-				<label class="special"><input id="checkbb" type="checkbox"></input> Bloodborne</label>
-				<label class="custom"><input id="checkcustom" type="checkbox"></input> Custom</label>
+				<label class="special"><input target="Demons" type="checkbox"></input> Demon's Souls</label>
+				<label class="special"><input target="Blood" type="checkbox"></input> Bloodborne</label>
+				<label class="custom"><input target="Custom" type="checkbox"></input> Custom</label>
 			</div>
 		</div>
 
 		<button id="muteButton" style="margin-top:-15px" class="btn btn-danger option-button" onClick="mute()">mute</button>
-		<button id="greenButton" style="margin-top:-15px" class="btn btn-success option-button" onClick="greenToggle()">green</button>
+		<button id="chromaButton" style="margin-top:-15px" class="btn btn-success option-button" onClick="chromaToggle()">chroma</button>
 	</div>
+
 
 	<div id="lesser-content-wrapper" style="margin-left:5%;">
 
-		<div class="lesser content">
-			<h4 style="display:inline">Custom input:</h4> <span class="help">Use semicolons to separate individual bits, a trailing semicolon is required!</span>
+		<div id="custom-input" class="lesser content hidden">
+			<h4>Custom input:</h4> <span class="help">Use semicolons to separate individual bits, a trailing semicolon is required!</span>
 			<br>
 			<div class="help">(Doesn't actually save on refresh, so you'll want to keep these in a text file somewhere)</div>
 			<br>
 
-			<b>Prefixes:</b><span class="help"> e.g. "Painted;Heide's;High;Blight|;"</span> <span class="help">No trailing or leading spaces, but add a | (bar) if you want to concatenate!</span><br>
+			<span class="input-title">Prefixes:</span> <span class="example">e.g. "Painted;Heide's;High;Blight|;"</span> <span class="help">No trailing or leading spaces, but add a | (bar) if you want to concatenate!</span><br>
 			<textarea id="custom-prefixes" cols="90" rows="2"></textarea><br><br>
 
-			<b>Places:</b><span class="help"> e.g. "World;Tower;Wall;"</span> <span class="help">No trailing or leading spaces!</span><br>
+			<span class="input-title">Places:</span> <span class="example">e.g. "World;Tower;Wall;"</span> <span class="help">No trailing or leading spaces!</span><br>
 			<textarea id="custom-places" cols="90" rows="2"></textarea><br><br>
 
-			<b>Suffixes:</b><span class="help"> e.g. "of Ariamis;of Flame;of Lothric;"</span> <span class="help">No trailing or leading spaces!</span><br>
+			<span class="input-title">Suffixes:</span> <span class="example">e.g. "of Ariamis;of Flame;of Lothric;"</span> <span class="help">No trailing or leading spaces!</span><br>
 			<textarea id="custom-suffixes" cols="90" rows="2"></textarea>
 		</div>
 
-		<div class="lesser content">
-			<h4 style="display:inline">Custom text:</h4> <span class="help">Prints whatever text you put in.</span>
+		<div class="lesser content streamer-feature hidden">
+			<h4>Custom text:</h4> <span class="help">Prints whatever text you put in.</span>
 			<br><br>
 
 			<button id="customButton" class="btn btn-primary" onClick="customGenerate()">OVERRIDE</button>
@@ -77,7 +83,7 @@
 		</div>
 
 
-		<div class="lesser content">
+		<div class="lesser content streamer-feature hidden">
 			<h4>Fading:</h4>
 
 			<button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
@@ -90,17 +96,20 @@
 
 			<br>
 
-			<label><input id="fade-out-check" type="checkbox"></input> Auto-Fade</label><br>
+			<label><input id="fade-out-check" type="checkbox"></input> Auto Fade-Out</label><br>
 			<label>Seconds before fade out &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
 		</div>
 
 	</div>
 
-	<div class="credits" style="left: 20px;opacity: 0.5;font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;">
-		The Ringed City Edition™
+	<div class="bottom-fade"></div>
+
+	<div class="credits left">
+		The Ringed City Edition™<br>
+		Enable Streamer Features: <input type=checkbox target="streamer-features">
 	</div>
 
-	<div class="credits">
+	<div class="credits right">
 		<a ref="http://rezuaq.tumblr.com">
 			Made by Rezuaq
 		</a>

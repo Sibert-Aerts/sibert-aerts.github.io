@@ -3,8 +3,81 @@
     src: url(OptimusPrinceps.ttf);
 }
 
+/* reactive stuff */
+@media screen and (max-width: 720px) {
+    #name {
+        font-size: 30px;
+        height: 40px;
+    }
+    .underline {
+        border-top: 2px solid white;
+    }
+    #generate-button {
+        font-size: 12px;
+        padding: 2px;
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+    #checkboxes-wrapper {
+        width: 65%;
+    }
+}
+
+@media screen and (min-width: 720px) {
+    #name {
+        font-size: 40px;
+        height: 50px;
+    }
+    .underline {
+        border-top: 3px solid white;
+    }
+    #generate-button {
+        font-size: 15px;
+        padding: 4px;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+    #checkboxes-wrapper {
+        width: 60%;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    #name {
+        font-size: 55px;
+        height: 65px;
+    }
+    #generate-button-wrapper{
+        width: 35%;
+    }
+    #checkboxes-wrapper {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 1300px) {
+    #name {
+        font-size: 70px;
+        height: 80px;
+    }
+    .underline {
+        border-top: 4px solid white;
+    }
+    #generate-button {
+        padding: 6px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 20px;
+    }
+    #generate-button-wrapper{
+        width: 55%;
+    }
+    #checkboxes-wrapper {
+        width: 36%;
+    }
+}
+
 body {
-    background-image: url(https://i.imgur.com/1IBkmYc.jpg);
     font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;
     color: white;
 }
@@ -32,8 +105,8 @@ body {
         margin-bottom: 40px;
     }
 
-    .content.greenscreen {
-        background-color: rgba(0, 255, 0, 1);
+    .content.chroma {
+        background-color: #00f;
     }
 
     .content.lesser {
@@ -46,6 +119,26 @@ body {
 
     .content h4 {
         margin-top: 0;
+        display: inline-block;
+        margin-right: 20px;
+    }
+
+#stars {
+    text-align: right;
+    word-wrap: break-word;
+    font-size: 10px;
+    text-shadow: 0px 0px 8px;
+    letter-spacing: 10px;
+    opacity: 0.9;
+}
+    #stars .area {
+        color: #FFFFFF;
+    }
+    #stars .easter-egg{
+        color: #AACCFF;
+    }
+    .chroma #stars{
+        visibility: hidden;
     }
 
 #name {
@@ -59,49 +152,12 @@ body {
     float: left;
     position: relative;
     top: -31px;
-    margin-left: 7%;
+    margin-left: 10%;
     margin-top: 20px;
     width: 80%;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     opacity: 0.9;
 }
-
-    @media screen and (max-width: 720px) {
-        #name {
-            font-size: 30px;
-            height: 40px;
-        }
-        .underline {
-            border-top: 2px solid white;
-        }
-    }
-
-    @media screen and (min-width: 720px) {
-        #name {
-            font-size: 40px;
-            height: 50px;
-        }
-        .underline {
-            border-top: 3px solid white;
-        }
-    }
-
-    @media screen and (min-width: 1000px) {
-        #name {
-            font-size: 55px;
-            height: 65px;
-        }
-    }
-
-    @media screen and (min-width: 1300px) {
-        #name {
-            font-size: 70px;
-            height: 80px;
-        }
-        .underline {
-            border-top: 4px solid white;
-        }
-    }
 
 #name-underline-wrapper {
     -webkit-transition: opacity 2s ease;
@@ -113,12 +169,21 @@ body {
         opacity: 0;
     }
 
+#checkboxes-wrapper{
+    display: inline-block;
+    max-width: 450px;
+}
+
+#generate-button-wrapper{
+    display: inline-block;
+    margin-right: 5%;
+}
+
 #generate-button {
     opacity: 0.9;
     float: right;
     font-family: Tahoma, Arial;
     color: #DDEEEE;
-    font-size: 20px;
 }
 
 .option-button {
@@ -148,11 +213,24 @@ label {
         min-width: 110px;
     }
 
+.input-title{
+    display: inline-block;
+    min-width: 60px;
+}
+
+.example {
+    display: inline-block;
+    min-width: 300px;
+    font-family: Dejavu Sans Mono, Courier New;
+    font-size: 12px;
+    opacity: 0.6;
+    padding-left: 20px;
+}
+
 .help {
     font-family: Arial;
     font-size: 11px;
     opacity: 0.6;
-    padding-left: 20px;
 }
 
 textarea, input {
@@ -163,20 +241,65 @@ textarea, input {
 
 .credits {
     position: fixed;
-    right: 30px;
     bottom: 20px;
+    opacity: 0.9;
     font-family: Tahoma, Arial;
     font-size: 16px;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 1px black, 0px 0px 20px #111, 0px 0px 20px #111;
 }
+    .credits.left {
+        left: 20px;
+        font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+    }
+    .credits.right {
+        right: 30px;
+    }
 
     .credits > a {
         text-decoration: underline;
         color: white;
-        opacity: 0.6;
     }
         .credits > a:hover {
             opacity: 1;
         }
     
-    .credits > .dash
+    .credits > .dash {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+.bottom-fade {
+    width: 100%;
+    height: 80px;
+    position: fixed;
+    bottom: 0px;
+    
+    background: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
+    background: -o-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
+    background: -moz-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
+    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
+}
+
+.background-layer {
+    z-index: -1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    -webkit-transition: opacity 0s ease;
+    transition: opacity 0s ease;
+}
+    .background-layer.faded {
+        opacity: 0;
+        -webkit-transition: opacity 3s ease;
+        transition: opacity 3s ease;
+    }
+
+#world-layer {
+    -webkit-transition: opacity 1s ease;
+    transition: opacity 1s ease;
+    background-color: white;
+    background-blend-mode: difference;
+}

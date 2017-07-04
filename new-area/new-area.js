@@ -7,248 +7,156 @@ var muted = false;
 for(var i = 0; i < maxSounds; i++)
     soundArray[i] = new Audio("https://puu.sh/k1OGY.mp3");
 
+var itemGetSound = new Audio("https://my.mixtape.moe/gmtxtg.mp3");
+
+var backgrounds = [
+    "http://i.imgur.com/cURcsam.jpg",
+    "http://i.imgur.com/uNuqPte.jpg",
+    "http://i.imgur.com/d8thQaE.jpg",
+    "http://i.imgur.com/ic9I2Uu.jpg",
+    "http://i.imgur.com/hjPuO8N.jpg",
+    "http://i.imgur.com/9gX5pBB.jpg",
+    "http://i.imgur.com/qEk3cZa.jpg",
+    "http://i.imgur.com/7qzGveQ.jpg",
+    "http://i.imgur.com/ej8kxIW.jpg",
+    "http://i.imgur.com/baIPonl.jpg",
+    "http://i.imgur.com/kfTzoWv.jpg",
+];
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var currentBackground = "";
+
+async function randomBackground(fade=true) {
+    if(fade){
+        $("#background-layer").css("background-image", $("body").css("background-image"));
+        $("#background-layer").removeClass("faded");
+        await sleep(100);
+        $("#background-layer").addClass("faded");
+    }
+    $("body").css("background-image", `url(${choose(backgrounds)})`);
+}
+
+// Set an elements hidden state.
+function setHidden(selector, hidden){
+    if (hidden)
+        $(selector).addClass("hidden");
+    else
+        $(selector).removeClass("hidden")
+}
+
 $(document).ready(function () {
-    $('#custom-text').keyup(function (e) {
-        if (e.keyCode == 13) {
-            customGenerate();
-            $(this).val("");
-        }
-    });
+    randomBackground(false);
+
+    $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() });
+    
+    $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) });
+    $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) });
+
 });
 
-// Greenscreen
-var green = false;
-
-
-// Area parts:
-
-// Dark Souls 1
-
-    // I'm not sure where I originally got these
-var areas1 = ["The Abyss", "Anor Londo", "Ash Lake", "Battle of Stoicism", "Undead Parish",
-    "Blighttown", "Chasm of the Abyss", "Crystal Cave", "Darkroot Basin", "Darkroot Garden",
-    "Demon Ruins", "The Depths", "Firelink Altar", "Firelink Shrine", "Kiln of the First Flame",
-    "Lost Izalith", "New Londo Ruins", "Northern Undead Asylum", "Oolacile Sanctuary",
-    "Oolacile Township", "Oolacile Township Dungeon", "Painted World of Ariamis", "Quelaag's Domain",
-    "Royal Wood", "Sanctuary Garden", "Sen's Fortress", "The Catacombs", "The Duke's Archives", "The Great Hollow",
-    "Tomb of the Giants", "Undead Burg", "Valley of Drakes"];
-    
-    // pieces, minced from the above list by hand
-    
-    // capitalisation doesn't matter, since prefixes could happen (e.g. Blightcave)
-var locations1 = ["abyss", "londo", "lake", "town", "chasm", "cave", "basin", "garden", "ruins", "depths", "altar", "shrine",
-    "kiln", "ruins", "asylum", "sanctuary", "township", "dungeon", "world", "domain", "wood", "fortress", "catacombs", "archives",
-    "tomb", "burg", "valley", "parish"];
-    
-    // caps doesn't mater here since it's removed and re-applied
-    // the trailing space however DOES matter
-    // both of these are because of the special case where a prefix is glued to the word-spacing
-    // e.g. "Blightburg" vs. "Undead Burg"
-var prefixes1  = ["anor", "ash", "blight|", "crystal", "darkroot", "demon", "firelink", "lost", "new londo", "new",
-    "northern", "undead", "oolacile", "painted", "quelaag's", "royal", "sanctuary", "sen's", "the duke's", "great"];
-    
-    // no leading spaces required here, capitalisation IS required though
-var suffixes1  = ["ruins", "of the Abyss", "of the First Flame", "Dungeon", "of Ariamis", "of the Giants", "of Drakes"];
-
-
-// Dark Souls 2
-
-    // Area names professionally scrubbed from the wiki
-var areas2 = [ "Things Betwixt", "Majula", "Forest of Fallen Giants", "Heide's Tower of Flame", "Cathedral of Blue", "No-man's Wharf", 
-    "The Lost Bastille", "Belfry Luna", "Sinner's Rise", "Huntsman's Copse", "Undead Purgatory", "Harvest Valley", "Earthen Peak", 
-    "Iron Keep", "Belfry Sol", "Shaded Woods", "Doors of Pharros", "Brightstone Cove Tseldora", "Lord's Private Chamber", "The Pit", 
-    "Grave of Saints", "The Gutter", "Black Gulch", "Shrine of Winter", "Drangleic Castle", "King's Passage", "Shrine of Amana", 
-    "Undead Crypt", "Throne of Want", "Aldia's Keep", "Dragon Aerie", "Dragon Shrine", "Dark Chasm of Old", "Memory of Jeigh", 
-    "Memory of Orro", "Memory of Vammar", "Dragon Memories", "Memory of the King", "Shulva, Sanctum City", "Dragon's Sanctum", 
-    "Dragon's Rest", "Cave of the Dead", "Brume Tower", "Iron Passage", "Memory of the Old Iron King#", "Frozen Eleum Loyce", 
-    "Grand Cathedral", "The Old Chaos", "Frigid Outskirts"];
-    
-    // Q: is "things" or "betwixt" the prefix/suffix or location? 
-    // A: Yes.
-var locations2 = ["things", "betwixt" ,"majula","forest", "tower of flame", "cathedral", "wharf", "bastille", "belfry", "rise", "copse", "purgatory",
-    "valley", "peak", "keep", "woods", "doors", "cove", "tseldora", "chamber", "pit", "grave", "gutter", "gulch", "shrine", "castle",
-    "passage", "crypt", "throne", "aerie", "chasm", "memory", "memories", "sanctum city", "sanctum", "rest", "cave", "tower", "passage",
-    "Eleum Loyce", "chaos", "outskirts"];
-    
-    // shulva
-var shulva = [ "Shulva, " ];	
-    
-var prefixes2  = [ "Heide's", "No-Man's", "the lost", "Sinner's", "Huntsman's", "Undead", "Harvest", "Earthen", "Iron",
-    "Shaded", "Brightstone", "Brightstone cove", "Lord's private", "black", "drangleic", "king's", "Aldia's", "Dragon", "Dark", 
-    "Dragon's", "Brume", "Frozen", "Eleum", "Grand", "Old", "Frigid"];
-    
-var suffixes2  = [ "Betwixt", "of Fallen Giants", "of Flame", "of Blue", "Luna", "Sol", "of Pharros", "of Saints", "of Winter", "of Amana",
-    "of Want", "of Old", "of Jeigh", "of Orro", "of Vammar", "of the King", "Tseldora", "of the Dead", "of the Old Iron King", "Loyce", "Outskirts"];
-    
-    
-// Dark Souls 3
-
-    // Area names professionally scrubbed from the wiki
-var areas3 = [ "Cemetery of Ash", "Lothric Castle", "Anor Londo", "Catacombs of Carthus", "Profaned Capital", 
-    "Untended Graves", "High Wall of Lothric", "Farron Keep", "Irithyll of the Boreal Valley", "Cathedral of the Deep", 
-    "Road of Sacrifices", "Smouldering Lake", "Kiln of the First Flame", "Consumed King's Garden", "Undead Settlement", 
-    "Grand Archives", "Irithyll Dungeon", "Firelink Shrine", "Church of Yorshka", "Archdragon Peak", "Painted World of Ariandel", 
-    "The Dreg Heap", "The Ringed City"];
-    
-var locations3 = [ "cemetery", "castle", "londo", "catacombs", "capital", "graves", "wall", "high wall", "keep", "irithyll", "valley",
-    "cathedral", "road", "lake", "kiln", "garden", "settlement", "archives", "dungeon", "shrine", "church", "peak", "world", "heap", "city"];
-    
-var prefixes3  = [ "Lothric", "anor", "profaned", "untended", "high", "farron", "smouldering", "consumed king's", "undead",
-    "grand", "irithyll", "firelink", "archdragon", "boreal", "painted", "dreg", "ringed"];
-    
-var suffixes3  = ["of Ash", "of Carthus", "of Lothric", "of the Boreal Valley", "of the Deep", "of Sacrifices", "of the First Flame", 
-    "Dungeon", "Shrine", "of Yorshka", "of Ariandel"];
-    
-// Demon's Souls
-
-    // There aren't a lot of area names in this game
-var areas0 = [ "The Nexus", "Boletarian Palace", "Tower of Latria", "Valley of Defilement", "Stonefang Tunnel", "Shrine of Storms"];
-
-var locations0 = [ "Nexus", "Palace", "Tower", "Valley", "Tunnel", "Shrine"];
-
-var prefixes0 = [ "Boletarian", "Stonefang"];
-
-var suffixes0 = [ "of Latria", "of Defilement", "of Storms"];
-
-// Bloodborne
-
-var areasbb = [ "Hunter's Dream", "Central Yharnam", "Iosefka's Clinic", "Cathedral Ward", "Old Yharnam", "Healing Church Workshop", 
-    "Upper Cathedral Ward", "Altar of Despair", "Forbidden Woods", "Byrgenwerth", "Moonside Lake", "Hemwick Charnel Lane", 
-    "Abandoned Old Workshop", "Yahar'gul, Unseen Village", "Forsaken Cainhurst Castle", "Lecture Building", "Nightmare Frontier", 
-    "Nightmare of Mensis", "Hunter's Nightmare", "Fishing Hamlet"];
-
-var locationsbb = [ "Dream", "Yharnam", "Clinic", "Ward", "Church", "Workshop", "Cathedral", "Altar", "Woods", "werth", "Lake", "Lane",
-    "Village", "Castle", "Building", "Frontier", "Nightmare", "Hamlet"];
-
-var prefixesbb = [ "Hunter's", "Central", "Iosefka's", "Old", "Healing Church", "Upper", "Forbidden", "Byrgen|", "Moonside", "Hemwick Charnel",
-    "Abandoned", "Yahar'gul,", "Forsaken", "Cainhurst", "Lecture", "Nightmare", "Fishing"];
-
-var suffixesbb = [ "Ward", "of Despair", "of Mensis"];
-
 // Custom
+var Custom = {};
 
-var locationscustom = [];
-var suffixescustom = [];
-var prefixescustom = [];
+Custom.locations = [];
+Custom.suffixes = [];
+Custom.prefixes = [];
+
+var pools = {Dark1: Dark1, Dark2: Dark2, Dark3: Dark3, Demons: Demons, Blood: Blood, Custom: Custom};
 
 // (to be) Compiled pools
-
-var areas = areas0.concat(areas1).concat(areas2).concat(areas3).concat(areasbb);
+var Combined = {};
+Combined.areas = Object.keys(pools).reduce((tot, key) => tot.concat(pools[key].areas), []);
 var locations = [];
 var prefixes  = [];
 var suffixes  = [];
 
+// Reset and play the given sound unless muted.
 function playSound(a){
     if(muted) return;
     a.currentTime = 0;
     a.play();
 }
 
-// this one needs a special function since it's gotta cycle
+// Play the currently selected new area sound, and cycle to the next one.
 function playNewAreaSound(){
     playSound(soundArray[index]);
     index = (index+1)%maxSounds;
 }
 
+// Pauses all "new area" sounds.
 function pauseAllSounds(){
     for(var i = 0; i < maxSounds; i++)
         soundArray[i].pause();
 }
 
+// Toggles whether sounds are allowed to play.
 function mute(){
     pauseAllSounds();
     muted = !muted;
     document.getElementById("muteButton").innerHTML = muted? "unmute" : "mute";
 }
 
-function greenToggle(){
-    green = !green;
-    if(green)
-        $("#main").addClass("greenscreen");
+// chroma key background flag
+var chroma = false;
+
+function chromaToggle(){
+    chroma = !chroma;
+    if(chroma)
+        $("#main").addClass("chroma");
     else
-        $("#main").removeClass("greenscreen");
-    $("#greenButton").text(green? "no green" : "green")
+        $("#main").removeClass("chroma");
+    $("#chromaButton").text(chroma? "no chroma" : "chroma")
 }
 
-function chance( x, outof){
+function chance( x, outof=1 ){
     return (Math.random()*outof <= x);
 }
 
 function choose(list){
-    i = Math.floor( Math.random() * list.length);
-    return list[i];
+    return list[Math.floor(Math.random() * list.length)];
 }
 
-// Functions shamelessly ripped from StackOverflow, thanks!
 String.prototype.toProperCase = function () {
     return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
 function arrayContains(a, obj) {
     var i = a.length;
-    while (i--) {
-        if (a[i] === obj) {
+    while (i--)
+        if (a[i] === obj)
             return true;
-        }
-    }
     return false;
 }
 
 function refreshTooltips(){
     $('[data-toggle="tooltip"]').tooltip(); 
 }
-    
+
 function compileCustom(){
-    locationscustom = $("#custom-places").val().split(";").slice(0,-1);
-    prefixescustom = $("#custom-prefixes").val().split(";").slice(0,-1);
-    suffixescustom = $("#custom-suffixes").val().split(";").slice(0,-1);
+    Custom.locations = $("#custom-places").val().split(";").slice(0,-1);
+    Custom.prefixes = $("#custom-prefixes").val().split(";").slice(0,-1);
+    Custom.suffixes = $("#custom-suffixes").val().split(";").slice(0,-1);
 }
 
 function compilePools(){
-// clear pools
+    // clear pools
     locations = [];
-    prefixes  = [];	
+    prefixes  = [];
     suffixes  = [];
 
-// this part is idiotic forgive me lord
-    if($("#check1" ).prop("checked")){
-        locations.push(locations1);
-        prefixes.push(prefixes1);
-        suffixes.push(suffixes1);
-    }
-    
-    if($("#check2" ).prop("checked")){
-        locations.push(locations2);
-        prefixes.push(prefixes2);
-        suffixes.push(suffixes2);
-    }
-    
-    if($("#check3" ).prop("checked")){
-        locations.push(locations3);
-        prefixes.push(prefixes3);
-        suffixes.push(suffixes3);
-    }
-    
-    if($("#check0" ).prop("checked")){
-        locations.push(locations0);
-        prefixes.push(prefixes0);
-        suffixes.push(suffixes0);
-    }
-    
-    if($("#checkbb" ).prop("checked")){
-        locations.push(locationsbb);
-        prefixes.push(prefixesbb);
-        suffixes.push(suffixesbb);
-    }
-    
-    if($("#checkcustom" ).prop("checked")){
-        compileCustom();
-        if(locationscustom.length > 0)
-            locations.push(locationscustom);
-        if(prefixescustom.length > 0)
-            prefixes.push(prefixescustom);
-        if(suffixescustom.length > 0)
-            suffixes.push(suffixescustom);
+    for( key in pools ){
+        if( $(`input[target=${key}]`).prop("checked") ){
+            var pool = pools[key];
+            if (pool.locations.length)
+                locations.push(pool.locations);
+            if (pool.prefixes.length)
+                prefixes.push(pool.prefixes);
+            if (pool.suffixes.length)
+                suffixes.push(pool.suffixes);
+        }
     }
 }
 
@@ -260,32 +168,41 @@ function getPrefix(){
     return prefix + ' ';
 }
 
+function worldFunc(){
+    $("#world-layer").css("background-image", $("body").css("background-image"));
+    $("#world-layer").removeClass("faded");
+    setTimeout(()=>$("#world-layer").addClass("faded"), 5000);
+}
+
+var easterEggs = {
+    "The Wall"  : {audio: new Audio("https://my.mixtape.moe/alfgxc.mp3")},
+    "The World" : {audio: new Audio("https://my.mixtape.moe/lgvonw.mp3"), func: worldFunc},
+    "The Doors" : {audio: new Audio("https://my.mixtape.moe/kvpycq.mp3")},
+};
+
 function generateName(){
     name = "";
     
     compilePools();
     
     // if no checkboxes are checked, tell the user to do so
-    if(!(	$("#check1" ).prop("checked") || $("#check2" ).prop("checked") ||
-            $("#check3" ).prop("checked") || $("#check0" ).prop("checked") ||
-            $("#checkbb").prop("checked") || $("#checkcustom").prop("checked") ) )
-    {
-        return "Click one of the Checkboxes";
-    }
+    if( !Object.keys(pools).reduce((total, key) => total || $(`input[target=${key}]`).prop("checked"), false) )
+        return "Tick one of the Checkboxes";
     
     // double choose because the parts are hidden in lists within lists
     
     // 3 in 4 chance of adding an area prefix, 1 in 4 chance of adding an additional prefix
     if( chance(3,4) ){
         name += getPrefix();
-        if( chance(1,4) && name.slice(0,3) != "the") name = getPrefix() + name;
+        if(chance(1,4)) 
+            name += getPrefix();
     }
     
     // if Dark Souls 2 is enabled, 1 in 40 chance of prepending "Shulva, "
-    if($("#check2" ).prop("checked") && chance (1,40)) name = choose(shulva) + name;
+    if($("input[target=Dark2]").prop("checked") && chance (1,40)) name = choose(shulva) + name;
     
     // 100% chance of adding a main "location" piece
-    name+= choose(choose(locations));
+    name += choose(choose(locations));
     
     // Fix the case so "BlightTown" turns into "Blighttown"
     name = name.toProperCase();
@@ -298,28 +215,32 @@ function generateName(){
     // If it isn't already there: 
     // 1/6 chance to prefix "The" if longer than 10 characters
     // 5/6 chance to prefix "The" if shorter than 10 characters
-    if( name.slice(0,3) != "The" && ( chance(1,6) || (chance(4,5) && name.length < 10))) 
+    if( chance(1, 6) || (chance(4, 5) && name.length < 10))
         name = "The " + name;
     
     // If it generated an existing name: reward the user with a star and a sound, at a slight delay
-    if( arrayContains(areas, name)){
-        setTimeout( function(name){ 	// javascript was a mistake
-            return function(){			// why can't i just capture the value of 'name' like in a sane language 
-                $("#stars").prepend("<span class=\"area\" data-toggle=\"tooltip\" title=\"" + name + "\">★</span>");
+    if( arrayContains(Combined.areas, name)){
+        let theName = name;
+        setTimeout(
+            function(){
+                $("#stars").prepend( $("<span>", {class: "area", "data-toggle": "tooltip", title: theName}).text("★"));
                 refreshTooltips();
                 playSound(itemGetSound);
-            }
-        }(name), 800);
+            }, 800);
     }
 
-    // Easter egg: if it generated "The Wall": reward the user with a clip from Another Brick in the Wall Pt. 2
-    if( name === "The Wall" ){
-        pauseAllSounds();
-        playSound(theWallSound);
-        $("#stars").prepend("<span class=\"easter-egg\" data-toggle=\"tooltip\" title=\"" + name + "\">★</span>");
-        refreshTooltips();
+    // Check for easter eggs.
+    for(var egg in easterEggs){
+        if( egg == name ){
+            pauseAllSounds();
+            $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"));
+            refreshTooltips();
+            playSound(easterEggs[egg].audio);
+            if (easterEggs[egg].func)
+                easterEggs[egg].func();
+        }
     }
-    
+
     return name;
 }
 
@@ -331,26 +252,37 @@ var fadeOutID = 0;
 function smartFadeOut(){
     // grab the desired fadeOutTime
     fadeOutTime = parseFloat($("#fade-out-time").val());
-    // default to 6 seconds if fadeOutTime could not be parsed or is negative
-    fadeOutTime = fadeOutTime > 0? fadeOutTime * 1000 : 5000; 
-    setTimeout(	
-        function(){ 
-            if(this == fadeOutID && $("#fade-out-check").prop("checked"))
+    // default to 5 seconds if fadeOutTime could not be parsed or is negative
+    fadeOutTime = fadeOutTime > 0 ? fadeOutTime * 1000 : 5000;
+    // Increment the ID to cancel out any previous fade-outs
+    let thisId = ++fadeOutID;
+    setTimeout(
+        function(){
+            if(thisId == fadeOutID && $("#fade-out-check").prop("checked"))
                 $("#name-underline-wrapper").addClass("faded-out"); 
-        }.bind(++fadeOutID)
-        , fadeOutTime);
+        }, fadeOutTime);
 }
+
+var count = 0;
+var bgCooldown = 0;
 
 function generate(){
     playNewAreaSound();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").html(generateName());
+    $("#name").text(generateName());
     smartFadeOut();
+
+    count++;
+    bgCooldown++;
+    if(bgCooldown >= 30 || chance(0.04)){
+        bgCooldown = 0;
+        randomBackground();
+    } 
 }
 
 function customGenerate(){
     playNewAreaSound();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").html($("#custom-text").val());
+    $("#name").text($("#custom-text").val());
     smartFadeOut();
 }
