@@ -248,7 +248,7 @@ textarea, input {
     text-shadow: 1px 1px 1px black, 0px 0px 20px #111, 0px 0px 20px #111;
 }
     .credits.left {
-        left: 20px;
+        left: 30px;
         font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;
     }
     .credits.right {
