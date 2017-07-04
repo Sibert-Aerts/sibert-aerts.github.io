@@ -10,17 +10,17 @@ for(var i = 0; i < maxSounds; i++)
 var itemGetSound = new Audio("https://my.mixtape.moe/gmtxtg.mp3");
 
 var backgrounds = [
-    "http://i.imgur.com/cURcsam.jpg",
-    "http://i.imgur.com/uNuqPte.jpg",
-    "http://i.imgur.com/d8thQaE.jpg",
-    "http://i.imgur.com/ic9I2Uu.jpg",
-    "http://i.imgur.com/hjPuO8N.jpg",
-    "http://i.imgur.com/9gX5pBB.jpg",
-    "http://i.imgur.com/qEk3cZa.jpg",
-    "http://i.imgur.com/7qzGveQ.jpg",
-    "http://i.imgur.com/ej8kxIW.jpg",
-    "http://i.imgur.com/baIPonl.jpg",
-    "http://i.imgur.com/kfTzoWv.jpg",
+    "https://i.imgur.com/cURcsam.jpg",
+    "https://i.imgur.com/uNuqPte.jpg",
+    "https://i.imgur.com/d8thQaE.jpg",
+    "https://i.imgur.com/ic9I2Uu.jpg",
+    "https://i.imgur.com/hjPuO8N.jpg",
+    "https://i.imgur.com/9gX5pBB.jpg",
+    "https://i.imgur.com/qEk3cZa.jpg",
+    "https://i.imgur.com/7qzGveQ.jpg",
+    "https://i.imgur.com/ej8kxIW.jpg",
+    "https://i.imgur.com/baIPonl.jpg",
+    "https://i.imgur.com/kfTzoWv.jpg",
 ];
 
 function sleep(ms) {
@@ -234,6 +234,11 @@ function generateName(){
     // Check for easter eggs.
     for(var egg in easterEggs){
         if( egg == name ){
+
+            // 50% chance to just generate a new name, since easter eggs are fairly common
+            if(chance(0.5))
+                return generateName();
+
             pauseAllSounds();
             $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"));
             refreshTooltips();
