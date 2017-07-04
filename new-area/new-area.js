@@ -147,6 +147,8 @@ function compilePools(){
     prefixes  = [];
     suffixes  = [];
 
+    compileCustom();
+
     for( key in pools ){
         if( $(`input[target=${key}]`).prop("checked") ){
             var pool = pools[key];
@@ -194,7 +196,7 @@ function generateName(){
     // 3 in 4 chance of adding an area prefix, 1 in 4 chance of adding an additional prefix
     if( chance(3,4) ){
         name += getPrefix();
-        if(chance(1,4)) 
+        if(name[name.length-1] == ' ' && chance(1,4))
             name += getPrefix();
     }
     
