@@ -1,14 +1,53 @@
+/*
+    Script for the Dark Souls New Area Generator (https://sibert-aerts.github.io/new-area/)
+    Made by Sibert Aerts (Rezuaq), documented as well as I could.
+    If you have any questions/remarks about what's going on in this script, feel free to ask.
+*/
 
-// Initialise sound crap
-var maxSounds = 10;
-var soundArray = new Array(maxSounds);
-var index = 0;
+
+/*      Sound Stuff     */
+
+// Make a new MultiAudio object, made to be able to play multiple instances
+// of the same Audio simultaneously (i.e. overlapping).
+var MultiAudio = function(audioUrl, maxSounds = 10){
+    this.soundArray = new Array(maxSounds);
+    for(var i = 0; i < maxSounds; i++)
+        this.soundArray[i] = new Audio(audioUrl);
+    this.index = 0;
+};
+
+// Play the next sound in line.
+MultiAudio.prototype.play = function(){
+    playSound(this.soundArray[this.index]);
+    this.index = (this.index+1)%this.soundArray.length;
+}
+
+// Pauses all sounds
+MultiAudio.prototype.pause = function(){
+    for(var i in this.soundArray)
+        this.soundArray[i].pause();
+}
+
+// Reset and play the given sound unless muted.
+function playSound(a){
+    if(muted) return;
+    a.currentTime = 0;
+    a.play();
+}
+
+// Toggles whether sounds are allowed to play.
+function mute(){
+    newAreaSounds.pause();
+    muted = !muted;
+    $("#muteButton").text(muted? "unmute" : "mute");
+}
+
+
 var muted = false;
-for(var i = 0; i < maxSounds; i++)
-    soundArray[i] = new Audio("https://puu.sh/k1OGY.mp3");
-
+var newAreaSounds = new MultiAudio("https://puu.sh/k1OGY.mp3", 50);
 var itemGetSound = new Audio("https://my.mixtape.moe/gmtxtg.mp3");
 
+// List of backgrounds that's cycled through randomly
 var backgrounds = [
     "https://i.imgur.com/cURcsam.jpg",
     "https://i.imgur.com/uNuqPte.jpg",
@@ -23,12 +62,6 @@ var backgrounds = [
     "https://i.imgur.com/kfTzoWv.jpg",
 ];
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-var currentBackground = "";
-
 async function randomBackground(fade=true) {
     if(fade){
         $("#background-layer").css("background-image", $("body").css("background-image"));
@@ -39,65 +72,32 @@ async function randomBackground(fade=true) {
     $("body").css("background-image", `url(${choose(backgrounds)})`);
 }
 
-// Set an elements hidden state.
-function setHidden(selector, hidden){
-    if (hidden)
-        $(selector).addClass("hidden");
-    else
-        $(selector).removeClass("hidden")
-}
-
+// Called when the page is loaded.
 $(document).ready(function () {
+    // Put up a random background
     randomBackground(false);
 
+    // Bind the enter-key event to the custom-text input field
     $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() });
     
+    // Bind the two checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) });
     $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) });
 
 });
 
-// Custom
+// Custom pool
 var Custom = {};
-
 Custom.locations = [];
 Custom.suffixes = [];
 Custom.prefixes = [];
 
-var pools = {Dark1: Dark1, Dark2: Dark2, Dark3: Dark3, Demons: Demons, Blood: Blood, Custom: Custom};
+// All the pools together
+var allPools = {Dark1: Dark1, Dark2: Dark2, Dark3: Dark3, Demons: Demons, Blood: Blood, Custom: Custom};
+var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas), []);
 
-// (to be) Compiled pools
-var Combined = {};
-Combined.areas = Object.keys(pools).reduce((tot, key) => tot.concat(pools[key].areas), []);
-var locations = [];
-var prefixes  = [];
-var suffixes  = [];
-
-// Reset and play the given sound unless muted.
-function playSound(a){
-    if(muted) return;
-    a.currentTime = 0;
-    a.play();
-}
-
-// Play the currently selected new area sound, and cycle to the next one.
-function playNewAreaSound(){
-    playSound(soundArray[index]);
-    index = (index+1)%maxSounds;
-}
-
-// Pauses all "new area" sounds.
-function pauseAllSounds(){
-    for(var i = 0; i < maxSounds; i++)
-        soundArray[i].pause();
-}
-
-// Toggles whether sounds are allowed to play.
-function mute(){
-    pauseAllSounds();
-    muted = !muted;
-    document.getElementById("muteButton").innerHTML = muted? "unmute" : "mute";
-}
+// Selected pools
+var selected = [];
 
 // chroma key background flag
 var chroma = false;
@@ -111,19 +111,30 @@ function chromaToggle(){
     $("#chromaButton").text(chroma? "no chroma" : "chroma")
 }
 
-function chance( x, outof=1 ){
-    return (Math.random()*outof <= x);
-}
+/*      Utility functions     */
 
-function choose(list){
-    return list[Math.floor(Math.random() * list.length)];
-}
+// Has a p out of (outof) chance of returning true.
+var chance = (p, outof=1) => Math.random() * outof <= p;
 
-String.prototype.toProperCase = function () {
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+// Get a random element from the given list.
+var choose = list => list[Math.floor(Math.random() * list.length)];
+
+// Refresh bootstrap tooltips.
+var refreshTooltips = () => $('[data-toggle="tooltip"]').tooltip();
+
+// Await this to sleep a given number of milliseconds.
+var sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// Set an element's hidden state.
+var setHidden = (selector, hidden) => hidden? $(selector).addClass("hidden"): $(selector).removeClass("hidden");
+
+// Convert a string to proper case.
+function stringToProperCase(s) {
+    return s.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
-function arrayContains(a, obj) {
+// Returns true if the array contains an instance of obj.
+function arrayContains (a, obj) {
     var i = a.length;
     while (i--)
         if (a[i] === obj)
@@ -131,9 +142,8 @@ function arrayContains(a, obj) {
     return false;
 }
 
-function refreshTooltips(){
-    $('[data-toggle="tooltip"]').tooltip(); 
-}
+
+/*      Pools and stuff     */
 
 function compileCustom(){
     Custom.locations = $("#custom-places").val().split(";").slice(0,-1);
@@ -141,34 +151,30 @@ function compileCustom(){
     Custom.suffixes = $("#custom-suffixes").val().split(";").slice(0,-1);
 }
 
-function compilePools(){
-    // clear pools
-    locations = [];
-    prefixes  = [];
-    suffixes  = [];
-
+function selectPools(){
+    // clear selected
+    selected = [];
     compileCustom();
 
-    for( key in pools ){
-        if( $(`input[target=${key}]`).prop("checked") ){
-            var pool = pools[key];
-            if (pool.locations.length)
-                locations.push(pool.locations);
-            if (pool.prefixes.length)
-                prefixes.push(pool.prefixes);
-            if (pool.suffixes.length)
-                suffixes.push(pool.suffixes);
-        }
-    }
+    // Add all pools whose box is checked to the list of selected pools
+    for( key in allPools )
+        if( $(`input[target=${key}]`).prop("checked") )
+            selected.push(allPools[key]);
 }
 
-function getPrefix(){
-    var prefix = choose(choose(prefixes));
+// Get a random prefix from the list of selected pools
+function randomPrefix(){
+    var prefix = choose(choose(selected).prefixes);
     // Add a space if the prefix doesn't end with the special | character
     if (prefix[prefix.length-1] == '|')
         return prefix.slice(0, prefix.length-1);
     return prefix + ' ';
 }
+
+var randomLocation = () => choose(choose(selected).locations);
+var randomSuffix = () => ' ' + choose(choose(selected).suffixes);
+
+/*      Easter eggs     */
 
 function worldFunc(){
     $("#world-layer").css("background-image", $("body").css("background-image"));
@@ -176,52 +182,64 @@ function worldFunc(){
     setTimeout(()=>$("#world-layer").addClass("faded"), 5000);
 }
 
+// List of easter egg words, the audio they should play, and optionally the function they should call.
 var easterEggs = {
     "The Wall"  : {audio: new Audio("https://my.mixtape.moe/alfgxc.mp3")},
     "The World" : {audio: new Audio("https://my.mixtape.moe/lgvonw.mp3"), func: worldFunc},
     "The Doors" : {audio: new Audio("https://my.mixtape.moe/kvpycq.mp3")},
 };
 
+// Generate a random area name, and perform any easter eggs if needed.
 function generateName(){
     name = "";
+    allowThe = true;
+    var hasPrefix = false;
+    var hasSuffix = false;
     
-    compilePools();
+    selectPools();
     
     // if no checkboxes are checked, tell the user to do so
-    if( !Object.keys(pools).reduce((total, key) => total || $(`input[target=${key}]`).prop("checked"), false) )
+    if( !Object.keys(allPools).reduce((total, key) => total || $(`input[target=${key}]`).prop("checked"), false) )
         return "Tick one of the Checkboxes";
     
     // double choose because the parts are hidden in lists within lists
     
     // 3 in 4 chance of adding an area prefix, 1 in 4 chance of adding an additional prefix
     if( chance(3,4) ){
-        name += getPrefix();
+        hasPrefix = true;
+        name += randomPrefix();
         if(name[name.length-1] == ' ' && chance(1,4))
-            name += getPrefix();
+            name += randomPrefix();
     }
-    
+
     // if Dark Souls 2 is enabled, 1 in 40 chance of prepending "Shulva, "
-    if($("input[target=Dark2]").prop("checked") && chance (1,40)) name = choose(shulva) + name;
-    
+    if($("input[target=Dark2]").prop("checked") && chance (1, 30) && hasPrefix){ 
+        name = choose(shulva) + name;
+        allowThe = false;
+    }
+
     // 100% chance of adding a main "location" piece
-    name += choose(choose(locations));
-    
+    name += randomLocation();
+
     // Fix the case so "BlightTown" turns into "Blighttown"
-    name = name.toProperCase();
-    
+    name = stringToProperCase(name);
+
     // 1 in 15 chance to add an area suffix if the name is longer than 15 characters
     // 1 in 5 chance to add an area suffix if the name is shorter than 15 characters
-    if( chance( 1, 15 ) || (chance(4,15) && name.length < 15) )
-        name += " " + choose(choose(suffixes));
-    
-    // If it isn't already there: 
-    // 1/6 chance to prefix "The" if longer than 10 characters
-    // 5/6 chance to prefix "The" if shorter than 10 characters
-    if( chance(1, 6) || (chance(4, 5) && name.length < 10))
+    if( chance( 1, 15 ) || (chance(4,15) && !hasPrefix) ){
+        hasSuffix = true;
+        name += randomSuffix();
+    }
+
+    // 0% chance to prefix "The" if "Shulva, " is present
+    // 1/6 chance if the name is longer than 10 characters
+    // 5/6 chance if the name is shorter than 10 characters
+    // 100% chance if no prefix or suffix is present yet.
+    if( allowThe && (chance(1, 6) || (chance(4, 5) && name.length < 10) || (!hasPrefix && !hasSuffix)))
         name = "The " + name;
-    
+
     // If it generated an existing name: reward the user with a star and a sound, at a slight delay
-    if( arrayContains(Combined.areas, name)){
+    if( arrayContains(allAreas, name)){
         let theName = name;
         setTimeout(
             function(){
@@ -235,7 +253,7 @@ function generateName(){
     for(var egg in easterEggs){
         if( egg == name ){
 
-            // 50% chance to just generate a new name, since easter eggs are fairly common
+            // 50% chance to just generate a new name, since easter eggs are a bit too common otherwise
             if(chance(0.5))
                 return generateName();
 
@@ -273,22 +291,28 @@ function smartFadeOut(){
 var count = 0;
 var bgCooldown = 0;
 
+// Called by the main "Travel somewhere else" button.
 function generate(){
-    playNewAreaSound();
+    newAreaSounds.play();
     $("#name-underline-wrapper").removeClass("faded-out");
     $("#name").text(generateName());
     smartFadeOut();
 
     count++;
     bgCooldown++;
-    if(bgCooldown >= 30 || chance(0.04)){
+
+    // Never swap bg within 10 clicks of last swap
+    // Always swap bg after 30 clicks
+    // 4% chance per click of swapping bg between 10 and 30 clicks
+    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04))){
         bgCooldown = 0;
         randomBackground();
-    } 
+    }
 }
 
+// Called by the manual override button.
 function customGenerate(){
-    playNewAreaSound();
+    newAreaSounds.play();
     $("#name-underline-wrapper").removeClass("faded-out");
     $("#name").text($("#custom-text").val());
     smartFadeOut();

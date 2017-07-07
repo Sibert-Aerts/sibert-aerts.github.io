@@ -45,7 +45,7 @@ Dark2.areas = ["Things Betwixt", "Majula", "Forest of Fallen Giants", "Heide's T
     "Grave of Saints", "The Gutter", "Black Gulch", "Shrine of Winter", "Drangleic Castle", "King's Passage", "Shrine of Amana",
     "Undead Crypt", "Throne of Want", "Aldia's Keep", "Dragon Aerie", "Dragon Shrine", "Dark Chasm of Old", "Memory of Jeigh",
     "Memory of Orro", "Memory of Vammar", "Dragon Memories", "Memory of the King", "Shulva, Sanctum City", "Dragon's Sanctum",
-    "Dragon's Rest", "Cave of the Dead", "Brume Tower", "Iron Passage", "Memory of the Old Iron King#", "Frozen Eleum Loyce",
+    "Dragon's Rest", "Cave of the Dead", "Brume Tower", "Iron Passage", "Memory of the Old Iron King", "Frozen Eleum Loyce",
     "Grand Cathedral", "The Old Chaos", "Frigid Outskirts"];
 
 // Q: is "things" or "betwixt" the prefix/suffix or location? 
@@ -108,7 +108,7 @@ Blood.areas = ["Hunter's Dream", "Central Yharnam", "Iosefka's Clinic", "Cathedr
 Blood.locations = ["Dream", "Yharnam", "Clinic", "Ward", "Church", "Workshop", "Cathedral", "Altar", "Woods", "werth", "Lake", "Lane",
     "Village", "Castle", "Building", "Frontier", "Nightmare", "Hamlet"];
 
-Blood.prefixes = ["Hunter's", "Central", "Iosefka's", "Old", "Healing Church", "Upper", "Forbidden", "Byrgen|", "Moonside", "Hemwick Charnel",
+Blood.prefixes = ["Hunter's", "Central", "Iosefka's", "Old", "Healing Church", "Upper", "Forbidden", "Byrgen|", "Moonside", "Hemwick", "Charnel",
     "Abandoned", "Yahar'gul,", "Forsaken", "Cainhurst", "Lecture", "Nightmare", "Fishing"];
 
 Blood.suffixes = ["Ward", "of Despair", "of Mensis"];
