@@ -257,7 +257,7 @@ function generateName(){
             if(chance(0.5))
                 return generateName();
 
-            pauseAllSounds();
+            newAreaSounds.pause();
             $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"));
             refreshTooltips();
             playSound(easterEggs[egg].audio);
