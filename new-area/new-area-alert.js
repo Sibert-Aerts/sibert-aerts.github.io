@@ -21,7 +21,7 @@ var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[ke
 // Selected pools
 var selected = [];
 hardcodedSelected = {
-    Dark1: true, Dark2: true, Dark3: true, Demons: false, Blood: false, Custom: false
+    Dark1: true, Dark2: true, Dark3: true, Demons: false, Blood: false, Custom: true
 }
 
 
