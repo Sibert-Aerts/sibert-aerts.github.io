@@ -20,10 +20,6 @@ var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[ke
 
 // Selected pools
 var selected = [];
-hardcodedSelected = {
-    Dark1: true, Dark2: true, Dark3: true, Demons: false, Blood: false, Custom: true
-}
-
 
 /*      Utility functions     */
 
@@ -62,15 +58,14 @@ function compileCustom(){
     // Custom.suffixes = $("#custom-suffixes").val().split(";").slice(0,-1);
 }
 
-function selectPools(){
+function selectPools(selectedMap){
     // clear selected
     selected = [];
     compileCustom();
 
-    console.log(hardcodedSelected)
     // Add all pools whose box is checked to the list of selected pools
     for( key in allPools )
-        if( hardcodedSelected[key] )
+        if( selectedMap[key] )
             selected.push(allPools[key]);
 }
 
@@ -96,13 +91,13 @@ var easterEggs = {
 };
 
 // Generate a random area name, and perform any easter eggs if needed.
-function generateName(){
+function generateName(selectedMap){
     name = "";
     allowThe = true;
     var hasPrefix = false;
     var hasSuffix = false;
     
-    selectPools();
+    selectPools(selectedMap);
     
     // double choose because the parts are hidden in lists within lists
     
@@ -115,7 +110,7 @@ function generateName(){
     }
 
     // if Dark Souls 2 is enabled, 1 in 40 chance of prepending "Shulva, "
-    if(hardcodedSelected['Dark2'] && chance (1, 30) && hasPrefix){ 
+    if(selectedMap['Dark2'] && chance (1, 30) && hasPrefix){ 
         name = choose(shulva) + name;
         allowThe = false;
     }
@@ -151,7 +146,7 @@ function generateName(){
         if( egg == name ){
             // 50% chance to just generate a new name, since easter eggs are a bit too common otherwise
             if(chance(0.5))
-                return generateName();
+                return generateName(selectedMap);
             newAreaSound.pause();
             playSound(easterEggs[egg].audio);
         }
@@ -161,9 +156,9 @@ function generateName(){
 }
 
 // Called by the main "Travel somewhere else" button.
-async function generate(){
+async function generate(selectedMap){
     await sleep(200);
     newAreaSound.play();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").text(generateName());
+    $("#name").text(generateName(selectedMap));
 }
