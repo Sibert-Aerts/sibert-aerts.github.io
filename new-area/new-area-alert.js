@@ -52,16 +52,10 @@ function arrayContains (a, obj) {
 
 /*      Pools and stuff     */
 
-function compileCustom(){
-    // Custom.locations = $("#custom-places").val().split(";").slice(0,-1);
-    // Custom.prefixes = $("#custom-prefixes").val().split(";").slice(0,-1);
-    // Custom.suffixes = $("#custom-suffixes").val().split(";").slice(0,-1);
-}
-
-function selectPools(selectedMap){
+function selectPools(selectedMap, custom){
     // clear selected
     selected = [];
-    compileCustom();
+    allPools.Custom = custom;
 
     // Add all pools whose box is checked to the list of selected pools
     for( key in allPools )
@@ -91,13 +85,13 @@ var easterEggs = {
 };
 
 // Generate a random area name, and perform any easter eggs if needed.
-function generateName(selectedMap){
+function generateName(selectedMap, custom){
     name = "";
     allowThe = true;
     var hasPrefix = false;
     var hasSuffix = false;
     
-    selectPools(selectedMap);
+    selectPools(selectedMap, custom);
     
     // double choose because the parts are hidden in lists within lists
     
@@ -156,9 +150,9 @@ function generateName(selectedMap){
 }
 
 // Called by the main "Travel somewhere else" button.
-async function generate(selectedMap){
+async function generate(selectedMap, custom){
     await sleep(200);
     newAreaSound.play();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").text(generateName(selectedMap));
+    $("#name").text(generateName(selectedMap, custom));
 }
