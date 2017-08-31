@@ -67,6 +67,7 @@ function selectPools(){
     selected = [];
     compileCustom();
 
+    console.log(hardcodedSelected)
     // Add all pools whose box is checked to the list of selected pools
     for( key in allPools )
         if( hardcodedSelected[key] )
