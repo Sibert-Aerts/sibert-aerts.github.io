@@ -1,0 +1,43 @@
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+
+    <style>
+        body{
+            background-color: #222;
+        }
+
+        #images > img{
+            position: absolute;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        #checkboxes{
+            padding: 8px;
+            position: absolute;
+            background-color: rgba(0,0,0,0.4);
+        }
+    </style>
+</head>
+
+<div id="images"></div>
+<div id="checkboxes"></div>
+
+<script>
+    images = ["http://i.imgur.com/4mmExYB.png", "http://i.imgur.com/FcJ08uD.png", "http://i.imgur.com/ADSG7Z7.png", "http://i.imgur.com/qFPV0w2.png"];
+    
+    imageHolder = $('#images');
+    checkboxes = $('#checkboxes');
+
+
+    for(var i = 0; i < images.length; i++){
+        let elem = $('<img>', {src:images[i]});
+        imageHolder.append(elem);
+        let checkbox = $('<input>', {type:'checkbox'});
+        checkbox.prop('checked', true);
+        checkbox.on('click', c => checkbox.prop('checked') ? elem.show() : elem.hide());
+        checkboxes.append(checkbox);
+        images[i] = elem;
+    }
+
+</script>
