@@ -1,0 +1,34 @@
+#maze-container{
+    background-color: blue;
+    width: 100%;
+    height: 80vh;
+    line-height: 0px;
+}
+
+    #maze-container > .tile {
+        display: inline-block;
+    }
+    #maze-container > .tile.gray{
+        background-color: gray;
+    }
+    #maze-container > .tile.white{
+        background-color: white;
+    }
+    #maze-container > .tile.black{
+        background-color: black;
+    }
+    #maze-container > .tile.green{
+        background-color: #4f0;
+    }
+    #maze-container > .tile.yellow{
+        background-color: #fb0;
+    }
+    #maze-container > .tile.orange{
+        background-color: #f60;
+    }
+    #maze-container > .tile.red{
+        background-color: #f04;
+    }
+    #maze-container > .tile.glow{
+        box-shadow: 0 0 10px red;
+    }

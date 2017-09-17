@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap Stylesheet and Script -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- My stuff -->
+    <script src="util.js"></script>
+    <script src="script.js"></script>
+    <link href="style.css" rel="stylesheet">
+    
+</head>
+
+<body>
+
+    <div class="container col-md-8">
+        <div id="maze-container"></div>
+    </div>
+
+    <div class="container col-md-4">
+        <div id="controls">
+            <button id="reset-button">Generate</button>
+            <button id="validate-button">Validate</button>
+            <input type="text" value="50" id="width">
+            <input type="text" value="40" id="height">
+            <form style="max-width:200px">
+                <label for="speed">Speed:</label>
+                <input type="range" name="speed" id="speed-range" value="2" min="0.5" max="10" step="0.01" size="100px">
+            </form>
+            <form>
+                <label>Worm <input type='radio' id='worm' name='type'></label>
+                <label>Dungeon <input type='radio' id='dungeon' name='type' checked></label>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
