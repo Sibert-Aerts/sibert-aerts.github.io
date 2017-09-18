@@ -4,24 +4,46 @@
 
 var wormFunc = _ => 'black';
 
+var dungeonConfig = {
+    base: -0.3,
+    friendBias: 0.3,
+    vSpace: 4, vBias: 0.5,
+    hSpace: 4, hBias: 0.5,
+}
+
 var dungeonFunc = function(tile, grid){
+    var cfg = dungeonConfig;
     var whiteFriends = 0;
     var grayFriends = 0;
     var adjacent = grid.getAdjacent(tile);
     adjacent.forEach(t=>t.state=='white'?whiteFriends++:t.state=='gray'?grayFriends++:0);
-    var p = whiteFriends * 0.3 + grayFriends * 0.1 - (whiteFriends > 2 ? 10 : 0);
-    p += (tile.x % 4 == 0) * 0.5 + (tile.y % 4==0) * 0.5 - 0.3;
+    p = cfg.base;
+    p += (whiteFriends + grayFriends/3) * cfg.friendBias - (whiteFriends > 2 ? 10 : 0);
+    p += (tile.x % cfg.vSpace == 0) * cfg.vBias + (tile.y % cfg.hSpace==0) * cfg.hBias;
     return chance(p) ? 'white' : 'black';
-}
+};
+
+var modeMap = {
+    worm: wormFunc,
+    dungeon: dungeonFunc
+};
 
 async function reset(){
     var $maze = await $('#maze-container');
     var xtiles = parseInt($('#width').val());
     var ytiles = parseInt($('#height').val());
-    var func;
-    if($('#worm').prop('checked')) func = wormFunc;
-    if($('#worm2').prop('checked')) func = wormFunc2;
-    if($('#dungeon').prop('checked')) func = dungeonFunc;
+    var func = modeMap[$('input[name=mode]:checked').val()];
+    var $cfg = $('#dungeon-config');
+
+    dungeonConfig = {
+        base: parseFloat($cfg.find('#base').val()),
+        friendBias: parseFloat($cfg.find('#friendBias').val()),
+        vSpace: parseFloat($cfg.find('#vSpace').val()),
+        vBias: parseFloat($cfg.find('#vBias').val()),
+        hSpace: parseFloat($cfg.find('#hSpace').val()),
+        hBias: parseFloat($cfg.find('#hBias').val()),
+    }
+
     maze = new Maze($maze, xtiles, ytiles, func);
 }
 
@@ -37,19 +59,18 @@ $(document).ready(_=>ready())
 //                 Tile                 //
 //////////////////////////////////////////
 
-Tile = function($tile, x, y){
-    this.$tile = $tile;
+Tile = function(grid, x, y){
+    this.grid = grid;
+    this.ctx = this.grid.canvas.getContext('2d');
     this.x = x;
     this.y = y;
-    this.state = choose(['white', 'black', 'gray']);
-    this.state = 'gray';
-    this.$tile.addClass(this.state);
+    this.set('gray');
 }
 
 Tile.prototype.set = async function(state){
-    await this.$tile.removeClass(this.state);
     this.state = state;
-    await this.$tile.addClass(this.state);
+    this.ctx.fillStyle = state;
+    this.ctx.fillRect(this.x, this.y, 1, 1);
 }
 
 // Manhattan distance between 2 tiles.
@@ -57,13 +78,23 @@ Tile.prototype.dist = function(t){
     return Math.abs(this.x - t.x) + Math.abs(this.y - t.y);
 }
 
+Tile.stateSequence = ['white', 'gray', 'black']
+
+Tile.prototype.nextState = function(){
+    var i = Tile.stateSequence.indexOf(this.state);
+    var s = Tile.stateSequence[(i+1)%Tile.stateSequence.length];
+    this.set(s);
+}
+
 //////////////////////////////////////////
 //                 Grid                 //
 //////////////////////////////////////////
 
-Grid = function($cont, width=1, height=1){
-    this.$cont = $cont;
-    this.$cont.html('');
+// Width and height are the number of tiles
+Grid = function($canvas, width=1, height=1){
+    this.canvas = $canvas.get()[0];
+    this.canvas.width = width;
+    this.canvas.height = height;
     this.width = width;
     this.height = height;
     this.initialize();
@@ -72,17 +103,17 @@ Grid = function($cont, width=1, height=1){
 Grid.prototype.initialize = function(){
     this.tiles = [];
     for(var x=0; x < this.width; x++) this.tiles.push([]);
-    w = percentFormat(1/this.width);
-    h = percentFormat(1/this.height);
 
     for(var y=0; y < this.height; y++){
         for(var x=0; x < this.width; x++){
-            let $tile = $('<div>', {
-                class: 'tile ',
-                style: 'width:' + w + ';height:' + h
-            });
-            this.$cont.append($tile);
-            this.tiles[x].push(new Tile($tile, x, y));
+            // let $tile = $('<div>', {
+            //     class: 'tile ',
+            //     style: 'width:' + w + ';height:' + h
+            // });
+            let tile = new Tile(this, x, y);
+            // $tile.click(_=>tile.nextState());
+            // this.$cont.append($tile);
+            this.tiles[x].push(tile);
         }
     }
 }
@@ -158,7 +189,7 @@ Maze.prototype.reset = function(){
 
 Maze.prototype.generate = async function(){
     console.time('maze');
-    var speed = $('#speed-range').val();
+    var speed = 1000;
     var i = 0;
 
     this.explored = [];
@@ -178,8 +209,10 @@ Maze.prototype.generate = async function(){
             this.explored.push(tile);
             this.queue = this.queue.concat(this.grid.getAdjacent(tile).filter(t=>this.queue.indexOf(t)<0)).filter(t=>t.state=='gray');
         }
-        if(chance(speed/this.queue.length))
-            await sleep(0); // sleep(0) ~=~ sleep(3) because javascript
+        if(chance(speed/this.queue.length)){
+            speed = Math.pow($('#speed-range').val(), 2);
+            await sleep(speed/20); // sleep(0) ~=~ sleep(3) because javascript
+        }
     }
     console.timeEnd('maze');
 }
@@ -192,9 +225,9 @@ Maze.prototype.validate = async function(){
     );
 
     var solved = this.grid.getAdjacent(this.goal).reduce((b,t)=>b=b||t.state=='white', false)
-    if(solved)
+    if(solved){
         return true;
-
+    }
     var explored = this.explored.slice();
     var queue = this.queue.slice();
 
