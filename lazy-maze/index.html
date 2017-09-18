@@ -14,6 +14,8 @@
     <script src='util.js'></script>
     <script src='script.js'></script>
     <link href='style.css' rel='stylesheet'>
+
+    <title>Lazy Maze Generator</title>
 </head>
 
 <body>
@@ -30,28 +32,40 @@
         <div id='controls'>
             <h4>Size:</h4>
             <label>Width: <input type='text' value='50' id='width' size=1></label>
-            <label>Height: <input type='text' value='40' id='height' size=1></style></label>
+            <label>Height: <input type='text' value='40' id='height' size=1></label>
 
             <form style='max-width:200px'>
                 <h4>Slowness:</h4>
                 <input type='range' name='speed' id='speed-range' value='5' min='0.1' max='20' step='0.01' size='100px'>
             </form>
-
+<!-- 
             <form>
                 <h4>Mode:</h4>
                 <label><input type='radio' value='worm' name='mode'> Worm</label><br>
-                <label><input type='radio' value='dungeon' name='mode' checked> Dungeon</label><br>
+                <label><input type='radio' value='dungeon' name='mode' checked> Random walk</label><br>
+            </form> -->
+
+            <form id='config'>
+                <h4>Configuration:</h4>
+                <label>Base:        <input type='text' name='base' size=1></label><br>
+                <label>Friend bias: <input type='text' name='friendBias' size=1></label><br>
+                <label>Row spacing: <input type='text' name='vSpace' size=1></label>
+                <label>Row bias:    <input type='text' name='vBias' size=1></label><br>
+                <label>Col spacing: <input type='text' name='hSpace' size=1></label>
+                <label>Col bias:    <input type='text' name='hBias' size=1></label>
             </form>
 
-            <form id='dungeon-config'>
-                <h4>Dungeon configuration:</h4>
-                <label>Base: <input type='text' value='-0.3' id='base' size=1></label><br>
-                <label>Friend bias: <input type='text' value='0.3' id='friendBias' size=1></label><br>
-                <label>Row spacing: <input type='text' value='4' id='vSpace' size=1></label>
-                <label>Row bias: <input type='text' value='0.5' id='vBias' size=1></style></label><br>
-                <label>Col spacing: <input type='text' value='4' id='hSpace' size=1></label>
-                <label>Col bias: <input type='text' value='0.5' id='hBias' size=1></style></label>
-            </form>
+            <div id='presets'>
+                <h4>Presets:</h4>
+                <button class='btn btn-xs' name='worm'>Worm</button>
+                <button class='btn btn-xs' name='labyrinth'>Labyrinth</button>
+                <button class='btn btn-xs' name='dungeon'>Dungeon</button>
+                <button class='btn btn-xs' name='metroid'>Metroid</button>
+                <button class='btn btn-xs' name='classicvania'>Classicvania</button>
+                <button class='btn btn-xs' name='modernvania'>Modernvania</button>
+                <button class='btn btn-xs' name='usa'>USA</button>
+                <button class='btn btn-xs' name='mansion'>Mansion</button>
+            </div>
 
             <div style='margin-top:100px;width:200px;margin-left:auto;margin-right:auto;'>
                 <button id='reset-button' class='btn btn-primary'>Generate</button>

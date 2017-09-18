@@ -2,54 +2,95 @@
 //                 Ready                 //
 ///////////////////////////////////////////
 
-var wormFunc = _ => 'black';
-
-var dungeonConfig = {
-    base: -0.3,
-    friendBias: 0.3,
-    vSpace: 4, vBias: 0.5,
-    hSpace: 4, hBias: 0.5,
+var configs = {
+    worm: {
+        base: 0, friendBias: 0,
+        vSpace: 2, vBias: 0,
+        hSpace: 2, hBias: 0,
+    },
+    labyrinth: {
+        base: -0.1, friendBias: 0,
+        vSpace: 2, vBias: 0.6,
+        hSpace: 2, hBias: 0.6,
+    },
+    dungeon: {
+        base: -0.3, friendBias: 0.3,
+        vSpace: 4, vBias: 0.5,
+        hSpace: 4, hBias: 0.5,
+    },
+    metroid: {
+        base: -0.5, friendBias: 0.2,
+        vSpace: 2, vBias: 1,
+        hSpace: 5, hBias: 0.5,
+    },
+    classicvania: {
+        base: 0, friendBias: -0.2,
+        vSpace: 2, vBias: 0.3,
+        hSpace: 5, hBias: 1.2,
+    },
+    modernvania: {
+        base: -0.5, friendBias: 0.2,
+        vSpace: 2, vBias: 0.6,
+        hSpace: 4, hBias: 0.9,
+    },
+    usa: {
+        base: -0.2, friendBias: -0.2,
+        vSpace: 6, vBias: 1.4,
+        hSpace: 6, hBias: 1.4,
+    },
+    mansion: {
+        base: 0.6, friendBias: 0.5,
+        vSpace: 4, vBias: -1.2,
+        hSpace: 4, hBias: -1.2,
+    }
 }
 
+var selectedConfig;
+
 var dungeonFunc = function(tile, grid){
-    var cfg = dungeonConfig;
-    var whiteFriends = 0;
-    var grayFriends = 0;
-    var adjacent = grid.getAdjacent(tile);
-    adjacent.forEach(t=>t.state=='white'?whiteFriends++:t.state=='gray'?grayFriends++:0);
+    var cfg = selectedConfig;
     p = cfg.base;
-    p += (whiteFriends + grayFriends/3) * cfg.friendBias - (whiteFriends > 2 ? 10 : 0);
+    if(cfg.friendBias){
+        var whiteFriends = 0;
+        var grayFriends = 0;
+        var adjacent = grid.getAdjacent(tile);
+        adjacent.forEach(t=>t.state=='white'?whiteFriends++:t.state=='gray'?grayFriends++:0);
+        p += (whiteFriends + grayFriends/3) * cfg.friendBias - (whiteFriends > 2 ? 0 : 0);
+    }
     p += (tile.x % cfg.vSpace == 0) * cfg.vBias + (tile.y % cfg.hSpace==0) * cfg.hBias;
     return chance(p) ? 'white' : 'black';
-};
-
-var modeMap = {
-    worm: wormFunc,
-    dungeon: dungeonFunc
 };
 
 async function reset(){
     var $maze = await $('#maze-container');
     var xtiles = parseInt($('#width').val());
     var ytiles = parseInt($('#height').val());
-    var func = modeMap[$('input[name=mode]:checked').val()];
-    var $cfg = $('#dungeon-config');
-
-    dungeonConfig = {
-        base: parseFloat($cfg.find('#base').val()),
-        friendBias: parseFloat($cfg.find('#friendBias').val()),
-        vSpace: parseFloat($cfg.find('#vSpace').val()),
-        vBias: parseFloat($cfg.find('#vBias').val()),
-        hSpace: parseFloat($cfg.find('#hSpace').val()),
-        hBias: parseFloat($cfg.find('#hBias').val()),
-    }
-
+    var func = dungeonFunc;
     maze = new Maze($maze, xtiles, ytiles, func);
+}
+
+function readConfig(){
+    var $fields = $('#config input');
+    $fields.each((i,e)=>selectedConfig[$(e).attr('name')]=parseFloat($(e).val()));
+    console.log(selectConfig);
+}
+
+function writeConfig(){
+    var $fields = $('#config input');
+    $fields.each((i,e)=>$(e).val(selectedConfig[$(e).attr('name')]));
+}
+
+function selectConfig(cfg){
+    selectedConfig = cfg;
+    writeConfig();
 }
 
 async function ready(){
     $('button#validate-button').click(_=>maze.validateVisually());
     $('button#reset-button').click(reset);
+    $('#presets>button').each((i, e)=>$(e).click(_=>selectConfig(configs[$(e).attr('name')])));
+    $('#config input').on('input', readConfig);
+    selectConfig(configs.dungeon);
     await reset();
 }
 
@@ -197,24 +238,34 @@ Maze.prototype.generate = async function(){
         var tile = popRandom(this.queue);
         if(tile.state != 'gray') continue;
 
-        await tile.set('red')
+        await this.generateTile(tile);
 
-        var valid = await this.validate();
-        if (!valid)
-            await tile.set('white');
-        else
-            await tile.set(this.func(tile, this.grid));
-
-        if(tile.state=='white'){
-            this.explored.push(tile);
-            this.queue = this.queue.concat(this.grid.getAdjacent(tile).filter(t=>this.queue.indexOf(t)<0)).filter(t=>t.state=='gray');
-        }
         if(chance(speed/this.queue.length)){
             speed = Math.pow($('#speed-range').val(), 2);
             await sleep(speed/20); // sleep(0) ~=~ sleep(3) because javascript
         }
     }
     console.timeEnd('maze');
+}
+
+Maze.prototype.generateTile = async function(tile){
+    if(tile.state!='gray') return;
+    // Set the tile red to test if closing it off would make the maze unsolvable
+    await tile.set('red')
+
+    var valid = await this.validate();
+    if (!valid)
+        await tile.set('white');
+    else
+        // The maze would still be solvable even if the tile were black!
+        // Now we get to decide what the tile will be based on our whims.
+        await tile.set(this.func(tile, this.grid));
+
+    if(tile.state=='white'){
+        // Expand the queue and explored list
+        this.explored.push(tile);
+        this.queue = this.queue.concat(this.grid.getAdjacent(tile).filter(t=>this.queue.indexOf(t)<0)).filter(t=>t.state=='gray');
+    }
 }
 
 // Test whether or not a path exists from the start to the goal
