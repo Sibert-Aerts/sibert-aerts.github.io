@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <!-- JQuery -->
+    <script src='https://code.jquery.com/jquery-3.2.1.min.js' integrity='sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=' crossorigin='anonymous'></script>
+
+    <!-- Bootstrap Stylesheet and Script -->
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css' integrity='sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M' crossorigin='anonymous'>    
+    <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u' crossorigin='anonymous'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js' integrity='sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4' crossorigin='anonymous'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa' crossorigin='anonymous'></script>
+
+    <!-- My stuff -->
+    <script src='util.js'></script>
+    <script src='script.js'></script>
+    <link href='style.css' rel='stylesheet'>
+
+    <title>Cat generator</title>
+</head>
+
+<body>
+    <nav class='navbar navbar-dark bg-dark'>
+        <b class='navbar-brand'>Cat generator</b>
+    </nav>
+
+
+    <div class='container col-md-8'>
+        <canvas id='cat-container'></canvas>
+    </div>
+
+    <div class='container col-md-4'>
+        <div id='controls'>
+            <div style='margin-top:100px;width:200px;margin-left:auto;margin-right:auto;'>
+                <button id='reset-button' class='btn btn-primary'>Generate</button>
+                <button id='kill-button' class='btn btn-primary'>Kill</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
