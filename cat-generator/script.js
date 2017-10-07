@@ -416,6 +416,9 @@ Cat = function(grid){
     var frontThick = randInt(1, 6);
     this.backLeg  = new Leg(this.body.backLegJoint,  legLength, 2, backThick);
     this.frontLeg = new Leg(this.body.frontLegJoint, legLength, 1, frontThick, 4);
+    
+
+    this.yOffset = 80 - this.backLeg.foot.get(0).y - backThick/2 - 1;
 
     // Head
     this.head = new Head(randInt(6, 10));
@@ -492,10 +495,12 @@ Cat.prototype.animate = async function(){
     }
 
     await this.grid.reset();
+    this.grid.ctx.translate(0, this.yOffset);
     if(DEBUG_BACK)
         await this.grid.drawGrid(back);
     if(DEBUG_FRONT)
         await this.grid.drawGrid(front);
+    this.grid.ctx.resetTransform();
 
     this.frame++;
     if(this.alive)
