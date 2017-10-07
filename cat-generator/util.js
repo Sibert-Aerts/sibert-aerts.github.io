@@ -36,5 +36,10 @@ bounded = (x, xmin, xmax) => x >= xmin && x <= xmax
 // Interpolation between two arrays a and b of equal size.
 arrInterp = (a, b, p) => a.slice().map((e,i)=>e*p+b[i]*(1-p))
 
+// Interpolation between two arrays a and b of equal size.
+pointsInterp = (a, b, p) => a.slice().map((e,i)=>({x: e.x*p+b[i].x*(1-p), y: e.y*p+b[i].y*(1-p)}))
+
 // Rounds x to the nearest multiple of y
-roundNearest = (x, y) => Math.round(x/y)*y;
+roundNearest = (x, y) => Math.round(x/y)*y
+
+inheritsFrom = (child, parent) => child.prototype = Object.create(parent.prototype)
