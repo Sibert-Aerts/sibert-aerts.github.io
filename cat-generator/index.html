@@ -12,6 +12,8 @@
 
     <!-- My stuff -->
     <script src='util.js'></script>
+    <script src='pixelgrid.js'></script>
+    <script src='cat.js'></script>
     <script src='script.js'></script>
     <link href='style.css' rel='stylesheet'>
 
@@ -19,8 +21,17 @@
 </head>
 
 <body>
-    <nav class='navbar navbar-dark bg-dark'>
-        <b class='navbar-brand'>Cat generator</b>
+    <nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
+        <b class='navbar-brand'>Cat generator prototype</b>
+
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="https://twitter.com/rezuaq">Made by @Rezuaq</a>
+                </li>
+                <li class="nav-item">
+                    <a class='nav-link' href='https://github.com/Sibert-Aerts/javascrapt/tree/master/javascrapt/cat-generator'>Source code on github</a>
+                </li>
+            </ul>
     </nav>
 
 
@@ -30,19 +41,37 @@
 
     <div class='container col-md-4'>
         <div id='controls'>
-            <div style='margin-top:100px;width:200px;margin-left:auto;margin-right:auto;'>
+            <div style='margin-top:100px'>
                 <button id='reset-button' class='btn btn-primary'>Generate</button>
-                <button id='kill-button' class='btn btn-primary'>Kill</button>
+                <button id='prev-button' class='btn btn-primary'>Previous</button>
+                <button id='pause-button' class='btn btn-primary'><i class="glyphicon glyphicon-pause" aria-hidden="true"></i></button>
             </div>
             <div style='margin-top:100px'>
                 <h3>Debug controls</h3>
-                <button id='front-button' class='btn btn-sm'>Front layer</button>
-                <button id='back-button' class='btn btn-sm'>Back layer</button>
-                <button id='alias-button' class='btn btn-sm'>Aliasing</button>
-                <button id='outline-button' class='btn btn-sm'>Outline</button>
-                <button id='spline-button' class='btn btn-sm'>Spline bones</button>
-                <button id='spin-button' class='btn btn-sm'>Spin wildly</button>
+                <div class='btn-group-toggle' data-toggle='buttons'>
+                    <label class='btn btn-secondary btn-sm active' id='front-button'>
+                        <input type=checkbox> Front layer
+                    </label>
+                    <label class='btn btn-secondary btn-sm active' id='back-button'>
+                        <input type=checkbox> Back layer
+                    </label>
+                    <label class='btn btn-secondary btn-sm active' id='alias-button'>
+                        <input type=checkbox> Aliasing
+                    </label>
+                    <label class='btn btn-secondary btn-sm active' id='outline-button'>
+                        <input type=checkbox> Outline
+                    </label>
+                    <label class='btn btn-secondary btn-sm' id='spline-button'>
+                        <input type=checkbox> Spline bones
+                    </label>
+                </div>
             </div>
+            <!-- <div>
+                <h3>Animation controls</h3>
+                <button id='anim-default' class='btn btn-sm'>Default</button>
+                <button id='anim-spin' class='btn btn-sm'>Spin wildly</button>
+                <button id='anim-keke' class='btn btn-sm'>KékéFlipnote</button>
+            </div> -->
         </div>
     </div>
 </body>

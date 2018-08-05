@@ -1,6 +1,12 @@
 // Gets a random integer inclusively between the given two numbers, doesn't matter which is larger
 randInt = (a, b=0) => Math.floor(Math.random()*(Math.abs(a-b)+1)) + Math.min(a,b)
 
+// Returns 1 or -1
+randSign = () => randInt(1)*2-1
+
+// Gets a random float on [a, b[ where b > a
+randFloat = (a, b=0) => Math.random()*(Math.abs(a-b)) + Math.min(a,b)
+
 // Choose a random element
 choose = indexable => indexable[Math.floor(Math.random()*indexable.length)]
 

@@ -1,6 +1,5 @@
 #cat-container{
-    background-color: blue;
-    width: 100%;
+    background-color: rgb(255, 81, 97);
     height: 85vh;
     line-height: 0px;
     /* First one for FireFox, second one for Chrome */
@@ -9,10 +8,5 @@
 }
 
 label{
-    min-width: 180px;
-}
-
-label > input{
-    float: right;
-    margin-right: 20px;
+    min-width: 100px;
 }
