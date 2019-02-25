@@ -1,0 +1,228 @@
+<head>
+    <style>
+    body { background-color: #333; }
+
+    #table {
+        float: left;
+        background-color: #633;
+        border-radius: 20px;
+        margin: 30px 30px;
+        padding: 20px;
+        width: 1300px;
+        height: 800px;
+    }
+
+    #indicator {
+        float: left;
+        margin: 30px 30px;
+        background-color: #222;
+        width: 100px; height: 100px;
+        border-radius: 50px;
+    }
+    #indicator.good { background-color: #2f2; }
+    #indicator.bad  { background-color: #f22; }
+
+    #controller {
+        float: left;
+        margin: 30px 30px;
+        background-color: #833;
+        width: 250px; height: 200px;
+        padding: 20px;
+        border-radius: 20px;
+
+        line-height: 30px;
+        font-size: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card {
+        user-select: none;
+        vertical-align: top;
+        display: inline-block;
+        background-color: #eee;
+        border-radius: 15px;
+        width: 100px;
+        height: 140px;
+        padding: 10px;
+        margin: 10px;
+        line-height: 40px;
+    }
+    .card > div {
+        margin-top: 47px;
+        margin-left: 25px;
+        color: #444;
+        font-weight: bolder;
+        font-size: 80px;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+    .card.selected { margin-top: 20px; margin-bottom: 0px; background-color: #cbd }
+    .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #feb }
+
+
+    .card.red > div   { color: #a22; }
+    .card.green > div { color: #2a2; }
+    .card.blue > div  { color: #22a; }
+    
+    .card.line > div { -webkit-text-stroke: 2px #222; }
+    .card.shad > div { text-shadow: 5px 5px 0px #222; }
+    </style>
+</head>
+
+<body>
+
+    <div id=table width=600px height=400px></div>
+    <div id=indicator></div>
+    <div id=controller>
+        <button onclick=shuffleCards()> SHUFFLE </button> <br>
+            
+        <label><input type=checkbox onclick="HINTS^=true; clearHint(); hint()"> HINTS </label>
+
+    </div>
+
+</body>
+
+<script>
+
+    ///////////////////////////////////////////////////////// USEFUL SMOL FUNCTIONS
+    var byId = id => document.getElementById(id);
+    var makeElem = tag => document.createElement(tag);
+
+    /////////////////////////// GRACIOUSLY NABBED FROM STACKOVERFLOW
+    function shuffle(arr) {
+        let i = arr.length;
+        while (i) {
+            let j = Math.floor(Math.random() * i);
+            i--;
+            let t = arr[i];
+            arr[i] = arr[j];
+            arr[j] = t;
+        }
+        return arr;
+    }
+
+
+    class Card {
+        constructor(props){
+            this.props = props;
+            this.elem = undefined;
+        }
+
+        element() {
+            if (this.elem) return this.elem;
+            let props = this.props;
+
+            let card = this.elem = makeElem('div');
+            card.className = 'card';
+
+            let [n, c, e] = this.props;
+
+            let d = makeElem('div');
+            d.innerText = NUMBERS[n];
+            card.appendChild(d);
+
+            card.classList.add(COLOURS[c]);
+            card.classList.add(EFFECTS[e]);
+
+            this.elem.addEventListener('click', select.bind(this));
+
+            return this.elem;
+        }
+    }
+
+    let table = byId('table');
+    let indicator = byId('indicator');
+    let cards = [];
+    let selected = [];
+
+    function select() {
+        clearHint();
+
+        let i = selected.indexOf(this);
+        /// CARD IS ALREADY SELECTED: UNSELECT
+        if (i != -1) {
+            selected.splice(i, 1);
+            this.element().classList.remove('selected');
+            indicator.className = '';
+        
+        } else {
+            /// ALREADY THREE CARDS SELECTED: REMOVE THE OLDEST ONE
+            if (selected.length == 3) {
+                selected[0].element().classList.remove('selected');
+                selected = selected.slice(1);
+            }
+            this.element().classList.add('selected');
+            selected.push(this);
+        }
+
+        let l = selected.length;
+        if ( l == 2 )
+            hint();
+        else if ( l == 3 )
+            check();
+    }
+
+    function extrapolate(a, b){
+        if ( a == b ) return a;
+        let s = a+b;
+        return (s==1)? 2 : (s==2)? 1 : 0;
+    }
+
+    function _clearHint(){ this.element().classList.remove('hint'); }
+    var clearHint = () => null;
+    var HINTS = false;
+
+    function hint() {
+        if (!HINTS || selected.length < 2) return;
+        let [a, b] = selected;
+        let p = [];
+        for (let i = 0; i < 3; i++ ){
+            p.push( extrapolate(a.props[i], b.props[i]) );
+        }
+        let [i, j, k] = p;
+        let hintCard = CARDMATRIX[i][j][k];
+        hintCard.element().classList.add('hint');
+        clearHint = _clearHint.bind(hintCard);
+    }
+
+    function check() {
+        let [a, b, c] = selected;
+        
+        let set = true;
+        for (let i = 0; i < 3 && set; i++ ){
+            // All properties are identical
+            let subset = ( a.props[i] == b.props[i] && b.props[i] == c.props[i] );
+            // OR: All properties are different
+            subset = subset || ( a.props[i] != b.props[i] && b.props[i] != c.props[i] && a.props[i] != c.props[i] );
+
+            set = set &= subset;
+        }
+
+        if (set)
+            indicator.className = 'good';
+        else
+            indicator.className = 'bad';
+    }
+
+    NUMBERS = [1, 2, 3]
+    COLOURS = ['red', 'green', 'blue']
+    EFFECTS = [undefined, 'line', 'shad']
+
+    CARDMATRIX = [ [[],[],[]], [[],[],[]], [[],[],[]] ]
+
+    // This is what a Carthesian product looks like
+    for (let i of [0, 1, 2])
+        for (let j of [0, 1, 2])
+            for (let k of [0, 1, 2]) {
+                let card = new Card([i, j, k])
+                cards.push( card );
+                CARDMATRIX[i][j].push( card );
+            }
+
+    function shuffleCards() {
+        shuffle(cards);
+        for( let card of cards ) table.appendChild(card.element())
+    }
+
+    for( let card of cards ) table.appendChild(card.element())
+
+</script>
