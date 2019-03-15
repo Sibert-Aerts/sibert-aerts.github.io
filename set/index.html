@@ -1,7 +1,7 @@
 <head>
     <style>
     body { background-color: #333; }
-  
+
     #table {
         float: left;
         background-color: #633;
@@ -10,7 +10,7 @@
         padding: 10px;
         width: 70%;
     }
-  
+
     #indicator {
         float: left;
         margin: 1% 3%;
@@ -20,7 +20,7 @@
     }
     #indicator.good { background-color: #2f2; }
     #indicator.bad  { background-color: #f22; }
-  
+
     #controller {
         float: left;
         margin: 1% 2%;
@@ -28,12 +28,12 @@
         width: 15%; height: 15%;
         padding: 20px;
         border-radius: 20px;
-  
+
         line-height: 30px;
         font-size: 20px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-  
+
     .card {
         user-select: none;
         vertical-align: top;
@@ -47,9 +47,9 @@
         line-height: 40px;
     }
     .smol .card {
-      width: 50px; height: 50px;
-      padding: 5px; margin: 5px;
-      line-height: 20px;
+        width: 50px; height: 50px;
+        padding: 5px; margin: 5px;
+        line-height: 20px;
     }
     .card > div {
         margin-top: 47px;
@@ -60,291 +60,291 @@
         font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     }
     .smol .card > div {
-      margin-top: 12px; margin-left: 12px; font-size: 40px;
+        margin-top: 12px; margin-left: 12px; font-size: 40px;
     }
     .card.selected { margin-top: 20px; margin-bottom: 0px; background-color: #cbd }
     .smol .card.selected { margin-top: 10px }
     .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #feb }
     .smol .card.hint { margin-top: 2px; margin-bottom: 8px }
-  
+
     .card.red > div   { color: #a22; }
     .card.green > div { color: #2a2; }
     .card.blue > div  { color: #22a; }
     .card.yellow > div  { color: #ca6; }
-    
+
     .card.line > div { -webkit-text-stroke: 2px #222; }
     .card.shad > div { text-shadow: 5px 5px 0px #222; }
-    .smol .card.shad > div { text-shadow: 3px 3px 0px #222; }
-    .smol .card.blur > div { text-shadow: 0px 0px 10px #222; }
-    
+        .smol .card.shad > div { text-shadow: 3px 3px 0px #222; }
+    .card.blur > div { text-shadow: 0px 0px 15px #222; }
+
     .card.alpha > div { font-family: Georgia, 'Times New Roman', Times, serif }
     .card.beta > div  { font-family: 'Comic Sans MS' }
-    
+
     .card.square { border-radius: 0; }
     .card.round  { border-radius: 10000px; }
     </style>
-  
-    <title>Set 2</title>
-  </head>
-  
-  <body>
-  
-      <div id=table class=smol width=600px height=400px></div>
-  
-      <div id=indicator></div>
-  
-      <div id=controller>
-          #Cards = <span id=count></span>
-          <br>
-          <button onclick=game.shuffle()> SHUFFLE </button>
-          <br>
-          <label><input type=checkbox onclick="HINTS^=true; game.clearHint(); game.hint()"> HINTS </label>
-          <label><input type=checkbox checked onclick="byId('table').classList.toggle('smol');"> SMOL </label>
-          <br>
-  
-          <label>
-              # Dimensies:
-          <select id=selector>
-              <option value=1>1</option>
-              <option value=2>2</option>
-              <option value=3>3</option>
-              <option selected value=4>4</option>
-              <option value=5>5</option>
-          </select>
-          </label>
-      </div>
-  
-  </body>
-  
-  <script>
-  
-      ///////////////////////////////////////////////////////// USEFUL SMOL FUNCTIONS
-      var byId = id => document.getElementById(id);
-      var makeElem = tag => document.createElement(tag);
-      var removeChildren = x => { while (x.lastChild) x.removeChild(x.lastChild) };
-  
-      /////////////////////////// GRACIOUSLY NABBED FROM STACKOVERFLOW
-      function shuffle(a) {
-          let i = a.length;
-          while (i) {
-              let j = Math.floor(Math.random() * i);
-              i--;
-              let t = a[i];
-              a[i] = a[j];
-              a[j] = t;
-          }
-          return a;
-      }
-  
-      function makeTuples(dims, depth){
-          if (dims < 1 || depth < 1) throw 'ERROR: You idiot!!!!!';
-  
-          let tuples = [];
-          // The "First iteration" of the loop is different!!!!
-          for( let j = 0; j < depth; j++)
-              tuples.push([j]);
-  
-          for (let dim = 1; dim < dims; dim++){
-              let oldTuples = tuples;
-              tuples = [];
-              for( let i=0; i < oldTuples.length; i++ ){
-                  let oldTuple = oldTuples[i];
-                  for( let j=0; j < depth; j++ )
-                      tuples.push([...oldTuple, j]);
-              }
-          }
-          return tuples;
-      }
-  
-  
-      class Card {
-          constructor(props){
-              this.props = props;
-              this.elem = undefined;
-          }
-  
-          element(render, select) {
-              let elem = this.elem = makeElem('div');
-              elem.className = 'card';
-  
-              render(elem, this.props);
-  
-              elem.addEventListener( 'click', ()=>select(this) );
-  
-              return elem;
-          }
-      }
-  
-      class Game {
-          constructor(dims, depth, render){
-              // Constructs a game of Set with (dims) properties, each of which can be one of (depth) different values.
-              // This means there will be (depth)^(dims) different cards, and each set consists of (depth) cards.
-              if (dims < 1 || depth < 1) throw 'Error: you fucking idiot';
-              this.dims = dims;
-              this.depth = depth;
-              this.render_card = render || function(div, props){
-                  // default card rendering function
-                  let [a, b, c, d, e] = props;
-                  let text = makeElem('div');
-                  text.innerText = NUMBERS[a];
-                  div.appendChild(text);
-                  if (b != undefined) div.classList.add(COLOURS[b]);
-                  if (c != undefined) div.classList.add(EFFECTS[c]);
-                  if (d != undefined) div.classList.add(FONTS[d]);
-                  if (e != undefined) div.classList.add(CORNERS[e]);
-              };
-  
-              this.rendered = false;
-              this.selected = [];
-              this.clearHint = () => undefined;
-  
-              this.build();
-          }
-  
-          build(){
-              //// Construct the set of all possible tuples!
-              // i.e. tuples = F_depth ^ num
-              let tuples = makeTuples(this.dims, this.depth);
-              this.cards = tuples.map(t => new Card(t));
-          }
-  
-          getCard(props){
-              // Gets a card by its properties.
-              if (props.length != this.dims) throw 'Error: Insufficient number of properties';
-              // if props = [p0, p1, p2, ... pn]
-              // then index = d^n * p0 + d^n-1 * p1 + ... + pn
-              // this relies on the order in which the cards are generated
-              let index = props.reduce( (i, p) => p + this.depth * i);
-              return this.cards[index];
-          }
-          
-  
-          select(card) {
-              this.clearHint();
-  
-              let i = this.selected.indexOf(card);
-              /// CARD IS ALREADY SELECTED: UNSELECT
-              if (i != -1) {
-                  this.selected.splice(i, 1);
-                  card.elem.classList.remove('selected');
-                  indicator.className = '';
-  
-              } else {
-                  /// ALREADY THREE CARDS SELECTED: REMOVE THE OLDEST ONE
-                  if (this.selected.length == this.depth) {
-                      this.selected[0].elem.classList.remove('selected');
-                      this.selected = this.selected.slice(1);
-                  }
-                  card.elem.classList.add('selected');
-                  this.selected.push(card);
-              }
-  
-              let l = this.selected.length;
-              // ooh this one depends on how many points uniquely define a "line"
-              if ( l == this.depth - 1 )
-                  this.hint();
-              else if ( l == this.depth )
-                  this.check();
-          }
-  
-          check() {
-              // HARDCODED FOR DEPTH == 3
-              if (this.depth == 3){
 
-                let [a, b, c] = this.selected;
+    <title>Set 2</title>
+</head>
+
+<body>
+
+    <div id=table class=smol width=600px height=400px></div>
+
+    <div id=indicator></div>
+
+    <div id=controller>
+        #Cards = <span id=count></span>
+        <br>
+        <button onclick=game.shuffle()> SHUFFLE </button>
+        <br>
+        <label><input type=checkbox onclick="HINTS^=true; game.clearHint(); game.hint()"> HINTS </label>
+        <label><input type=checkbox checked onclick="byId('table').classList.toggle('smol');"> SMOL </label>
+        <br>
+
+        <label>
+            # Dimensies:
+        <select id=selector>
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option selected value=4>4</option>
+            <option value=5>5</option>
+        </select>
+        </label>
+    </div>
+
+</body>
+
+<script>
+
+    ///////////////////////////////////////////////////////// USEFUL SMOL FUNCTIONS
+    var byId = id => document.getElementById(id);
+    var makeElem = tag => document.createElement(tag);
+    var removeChildren = x => { while (x.lastChild) x.removeChild(x.lastChild) };
+
+    /////////////////////////// GRACIOUSLY NABBED FROM STACKOVERFLOW
+    function shuffle(a) {
+        let i = a.length;
+        while (i) {
+            let j = Math.floor(Math.random() * i);
+            i--;
+            let t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+        }
+        return a;
+    }
+
+    function makeTuples(dims, depth){
+        if (dims < 1 || depth < 1) throw 'ERROR: You idiot!!!!!';
+
+        let tuples = [];
+        // The "First iteration" of the loop is different!!!!
+        for( let j = 0; j < depth; j++)
+            tuples.push([j]);
+
+        for (let dim = 1; dim < dims; dim++){
+            let oldTuples = tuples;
+            tuples = [];
+            for( let i=0; i < oldTuples.length; i++ ){
+                let oldTuple = oldTuples[i];
+                for( let j=0; j < depth; j++ )
+                    tuples.push([...oldTuple, j]);
+            }
+        }
+        return tuples;
+    }
+
+
+    class Card {
+        constructor(props){
+            this.props = props;
+            this.elem = undefined;
+        }
+
+        element(render, select) {
+            let elem = this.elem = makeElem('div');
+            elem.className = 'card';
+
+            render(elem, this.props);
+
+            elem.addEventListener( 'click', ()=>select(this) );
+
+            return elem;
+        }
+    }
+
+    class Game {
+        constructor(dims, depth, render){
+            // Constructs a game of Set with (dims) properties, each of which can be one of (depth) different values.
+            // This means there will be (depth)^(dims) different cards, and each set consists of (depth) cards.
+            if (dims < 1 || depth < 1) throw 'Error: you fucking idiot';
+            this.dims = dims;
+            this.depth = depth;
+            this.render_card = render || function(div, props){
+                // default card rendering function
+                let [a, b, c, d, e] = props;
+                let text = makeElem('div');
+                text.innerText = NUMBERS[a];
+                div.appendChild(text);
+                if (b != undefined) div.classList.add(COLOURS[b]);
+                if (c != undefined) div.classList.add(EFFECTS[c]);
+                if (d != undefined) div.classList.add(FONTS[d]);
+                if (e != undefined) div.classList.add(CORNERS[e]);
+            };
+
+            this.rendered = false;
+            this.selected = [];
+            this.clearHint = () => undefined;
+
+            this.build();
+        }
+
+        build(){
+            //// Construct the set of all possible tuples!
+            // i.e. tuples = F_depth ^ num
+            let tuples = makeTuples(this.dims, this.depth);
+            this.cards = tuples.map(t => new Card(t));
+        }
+
+        getCard(props){
+            // Gets a card by its properties.
+            if (props.length != this.dims) throw 'Error: Insufficient number of properties';
+            // if props = [p0, p1, p2, ... pn]
+            // then index = d^n * p0 + d^n-1 * p1 + ... + pn
+            // this relies on the order in which the cards are generated
+            let index = props.reduce( (i, p) => p + this.depth * i);
+            return this.cards[index];
+        }
+        
+
+        select(card) {
+            this.clearHint();
+
+            let i = this.selected.indexOf(card);
+            /// CARD IS ALREADY SELECTED: UNSELECT
+            if (i != -1) {
+                this.selected.splice(i, 1);
+                card.elem.classList.remove('selected');
+                indicator.className = '';
+
+            } else {
+                /// ALREADY THREE CARDS SELECTED: REMOVE THE OLDEST ONE
+                if (this.selected.length == this.depth) {
+                    this.selected[0].elem.classList.remove('selected');
+                    this.selected = this.selected.slice(1);
+                }
+                card.elem.classList.add('selected');
+                this.selected.push(card);
+            }
+
+            let l = this.selected.length;
+            // ooh this one depends on how many points uniquely define a "line"
+            if ( l == this.depth - 1 )
+                this.hint();
+            else if ( l == this.depth )
+                this.check();
+        }
+
+        check() {
+            // HARDCODED FOR DEPTH == 3
+            if (this.depth == 3){
+
+            let [a, b, c] = this.selected;
+            var set = true;
+            for (let i = 0; i < this.dims && set; i++ ){
+                // All properties are identical
+                let subset = ( a.props[i] == b.props[i] && b.props[i] == c.props[i] );
+                // OR: All properties are different
+                subset = subset || ( a.props[i] != b.props[i] && b.props[i] != c.props[i] && a.props[i] != c.props[i] );
+                // Sione Janssen Whiteman
+                set = set &= subset;
+            }
+            } else if (this.depth == 4){
+                let [A, B, C, D] = this.selected;
                 var set = true;
-                for (let i = 0; i < this.dims && set; i++ ){
-                    // All properties are identical
-                    let subset = ( a.props[i] == b.props[i] && b.props[i] == c.props[i] );
-                    // OR: All properties are different
-                    subset = subset || ( a.props[i] != b.props[i] && b.props[i] != c.props[i] && a.props[i] != c.props[i] );
-                    // Sione Janssen Whiteman
-                    set = set &= subset;
-                }
-              } else if (this.depth == 4){
-                  let [A, B, C, D] = this.selected;
-                  var set = true;
-                for (let i = 0; i < this.dims && set; i++ ){
-                    let [a, b, c, d] = [A.props[i], B.props[i], C.props[i], D.props[i]];
-                    // All properties are identical
-                    let subset = a == b && b == c && c == d;
-                    // OR all properties different
-                    subset = subset || a != b && a != c & a != d && b != c && b != d && c != d;
-                    // OR two by two identical
-                    subset = subset || a == b && c == d  || a == c && b == d || a == d && b == c;
-                    set = set &= subset;
-                    if(!set) break;
-                }
-              }
-  
-              if (set)
-                  indicator.className = 'good';
-              else
-                  indicator.className = 'bad';
-          }
-          
-          extrapolate(a, b) {
-              /// EXTREMELY HARDCODED FOR DEPTH == 3!!!!!!!!!
-              if ( a == b ) return a;
-              let s = a+b;
-              return (s==1)? 2 : (s==2)? 1 : 0;
-          }
-          
-          hint() {
-              if (!HINTS || this.selected.length < this.depth-1) return;
-              // HARDCODED FOR DEPTH == 3
-              let [a, b] = this.selected;
-              let p = [];
-              for (let i = 0; i < this.dims; i++ )
-                  p.push( this.extrapolate(a.props[i], b.props[i]) );
-              let hintCard = this.getCard(p);
-              hintCard.elem.classList.add('hint');
-              this.clearHint = () => hintCard.elem.classList.remove('hint');
-          }
-  
-          render() {
-              for (let card of this.cards) {
-                  card.element(this.render_card, this.select.bind(this));
-              }
-          }
-  
-          activate() {
-              if(!this.rendered) this.render();
-  
-              // Clear the table
-              let table = byId('table');
-              removeChildren(table);
-              // Clear the indicator
-              indicator.className = '';
-  
-              // Put our cards on (all?)
-              for (let card of this.cards) table.appendChild(card.elem);
-  
-              byId('count').innerHTML = this.cards.length + ' = ' + this.depth + '<sup>' + this.dims + '</sup>';
-          }
-  
-          shuffle() {
-              let table = byId('table');
-              removeChildren(table);
-              for (let card of shuffle(this.cards.slice())) table.appendChild(card.elem);
-          }
-      }
-  
-      var indicator = byId('indicator');
-      var HINTS = false;
-  
-      var NUMBERS = [1, 2, 3, 4]
-      var COLOURS = ['red', 'green', 'blue', 'yellow']
-      var EFFECTS = [undefined, 'line', 'shad', 'blur']
-      var FONTS   = [undefined, 'alpha', 'beta']
-      var CORNERS = ['square', undefined, 'round'];
-  
-      let games = [new Game(1, 3), new Game(2, 3), new Game(3, 3), new Game(4, 3), new Game(5, 3)];
-      game = new Game(3, 4);
-      game.activate();
-  
-      let selector = byId('selector');
-      selector.addEventListener( 'change', () => { game = games[selector.value-1]; game.activate() } )
-  
-  </script>
-  
+            for (let i = 0; i < this.dims && set; i++ ){
+                let [a, b, c, d] = [A.props[i], B.props[i], C.props[i], D.props[i]];
+                // All properties are identical
+                let subset = a == b && b == c && c == d;
+                // OR all properties different
+                subset = subset || a != b && a != c & a != d && b != c && b != d && c != d;
+                // OR two by two identical
+                subset = subset || a == b && c == d  || a == c && b == d || a == d && b == c;
+                set = set &= subset;
+                if(!set) break;
+            }
+            }
+
+            if (set)
+                indicator.className = 'good';
+            else
+                indicator.className = 'bad';
+        }
+        
+        extrapolate(a, b) {
+            /// EXTREMELY HARDCODED FOR DEPTH == 3!!!!!!!!!
+            if ( a == b ) return a;
+            let s = a+b;
+            return (s==1)? 2 : (s==2)? 1 : 0;
+        }
+        
+        hint() {
+            if (!HINTS || this.selected.length < this.depth-1) return;
+            // HARDCODED FOR DEPTH == 3
+            let [a, b] = this.selected;
+            let p = [];
+            for (let i = 0; i < this.dims; i++ )
+                p.push( this.extrapolate(a.props[i], b.props[i]) );
+            let hintCard = this.getCard(p);
+            hintCard.elem.classList.add('hint');
+            this.clearHint = () => hintCard.elem.classList.remove('hint');
+        }
+
+        render() {
+            for (let card of this.cards) {
+                card.element(this.render_card, this.select.bind(this));
+            }
+        }
+
+        activate() {
+            if(!this.rendered) this.render();
+
+            // Clear the table
+            let table = byId('table');
+            removeChildren(table);
+            // Clear the indicator
+            indicator.className = '';
+
+            // Put our cards on (all?)
+            for (let card of this.cards) table.appendChild(card.elem);
+
+            byId('count').innerHTML = this.cards.length + ' = ' + this.depth + '<sup>' + this.dims + '</sup>';
+        }
+
+        shuffle() {
+            let table = byId('table');
+            removeChildren(table);
+            for (let card of shuffle(this.cards.slice())) table.appendChild(card.elem);
+        }
+    }
+
+    var indicator = byId('indicator');
+    var HINTS = false;
+
+    var NUMBERS = [1, 2, 3, 4]
+    var COLOURS = ['red', 'green', 'blue', 'yellow']
+    var EFFECTS = [undefined, 'line', 'shad', 'blur']
+    var FONTS   = [undefined, 'alpha', 'beta']
+    var CORNERS = ['square', undefined, 'round'];
+
+    let games = [new Game(1, 3), new Game(2, 3), new Game(3, 3), new Game(4, 3), new Game(5, 3)];
+    game = new Game(3, 4);
+    game.activate();
+
+    let selector = byId('selector');
+    selector.addEventListener( 'change', () => { game = games[selector.value-1]; game.activate() } )
+
+</script>
+
