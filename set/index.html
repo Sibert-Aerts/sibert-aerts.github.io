@@ -12,8 +12,8 @@
     }
 
     #indicator {
-        float: left;
-        margin: 1% 3%;
+        position: fixed;
+        top: 30px; right: 5%;
         background-color: #222;
         width: 100px; height: 100px;
         border-radius: 50px;
@@ -22,8 +22,8 @@
     #indicator.bad  { background-color: #f22; }
 
     #controller {
-        float: left;
-        margin: 1% 2%;
+        position: fixed;
+        top: 150px; right: 5%;
         background-color: #833;
         width: 15%;
         padding: 20px;
@@ -64,7 +64,7 @@
     }
     .card.selected { margin-top: 20px; margin-bottom: 0px; background-color: #cbd }
     .smol .card.selected { margin-top: 10px }
-    .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #feb }
+    .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #ffd880; border-color: red; }
     .smol .card.hint { margin-top: 2px; margin-bottom: 8px }
 
     /*********** COLOURS ***********/
@@ -94,8 +94,8 @@
     /*********** CORNERS ***********/
     .card.square { border-radius: 2px; }
     .card.round  { border-radius: 60px; border-bottom-right-radius: 5px; }
-    .card.dnuor  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 30px, #000 31px); border-radius: 15px; }
-    .smol .card.dnuor  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 15px, #000 16px); border-radius: 8px; }
+    .card.chipped  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 30px, #000 31px); border-radius: 15px; }
+    .smol .card.chipped  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 15px, #000 16px); border-radius: 8px; }
     </style>
 
     <title>Set 2</title>
@@ -136,6 +136,7 @@
     var byId = id => document.getElementById(id);
     var makeElem = tag => document.createElement(tag);
     var removeChildren = x => { while (x.lastChild) x.removeChild(x.lastChild) };
+    var addClass = (e, c) => { if (c!=undefined) e.classList.add(c); }
 
     /////////////////////////// GRACIOUSLY NABBED FROM STACKOVERFLOW
     function shuffle(a) {
@@ -202,16 +203,14 @@
                 let text = makeElem('div');
                 text.innerText = NUMBERS[a];
                 div.appendChild(text);
-                if (b != undefined) div.classList.add(COLOURS[b]);
-                if (c != undefined) div.classList.add(EFFECTS[c]);
-                if (d != undefined) div.classList.add(FONTS[d]);
-                if (e != undefined) div.classList.add(CORNERS[e]);
+                if (b != undefined) addClass(div, COLOURS[b]);
+                if (c != undefined) addClass(div, EFFECTS[c]);
+                if (d != undefined) addClass(div, FONTS[d]);
+                if (e != undefined) addClass(div, CORNERS[e]);
             };
 
             this.rendered = false;
             this.selected = [];
-            this.clearHint = () => undefined;
-
             this.build();
         }
 
@@ -223,7 +222,7 @@
         }
 
         getCard(props){
-            // Gets a card by its properties.
+            //// Gets a card by its properties.
             if (props.length != this.dims) throw 'Error: Insufficient number of properties';
             // if props = [p0, p1, p2, ... pn]
             // then index = d^n * p0 + d^n-1 * p1 + ... + pn
@@ -244,7 +243,7 @@
                 indicator.className = '';
 
             } else {
-                /// ALREADY THREE CARDS SELECTED: REMOVE THE OLDEST ONE
+                /// ALREADY (DEPTH) CARDS SELECTED: REMOVE THE OLDEST ONE FIRST
                 if (this.selected.length == this.depth) {
                     this.selected[0].elem.classList.remove('selected');
                     this.selected = this.selected.slice(1);
@@ -262,58 +261,71 @@
         }
 
         check() {
-            // HARDCODED FOR DEPTH == 3
             if (this.depth == 3){
+                let [A, B, C] = this.selected;
+                var set = true;
+                for (let i = 0; i < this.dims && set; i++ ){
+                    let [a, b, c] = [A.props[i], B.props[i], C.props[i]];
+                    // All properties are identical
+                    let subset = ( a == b && b == c );
+                    // OR: All properties are different
+                    subset = subset || ( a != b && b != c && a != c );
+                    // Sione Janssen Whiteman
+                    set &= subset;
+                }
 
-            let [a, b, c] = this.selected;
-            var set = true;
-            for (let i = 0; i < this.dims && set; i++ ){
-                // All properties are identical
-                let subset = ( a.props[i] == b.props[i] && b.props[i] == c.props[i] );
-                // OR: All properties are different
-                subset = subset || ( a.props[i] != b.props[i] && b.props[i] != c.props[i] && a.props[i] != c.props[i] );
-                // Sione Janssen Whiteman
-                set = set &= subset;
-            }
             } else if (this.depth == 4){
                 let [A, B, C, D] = this.selected;
                 var set = true;
-            for (let i = 0; i < this.dims && set; i++ ){
-                let [a, b, c, d] = [A.props[i], B.props[i], C.props[i], D.props[i]];
-                // All properties are identical
-                let subset = a == b && b == c && c == d;
-                // OR all properties different
-                subset = subset || a != b && a != c & a != d && b != c && b != d && c != d;
-                // OR two by two identical
-                subset = subset || a == b && c == d  || a == c && b == d || a == d && b == c;
-                set = set &= subset;
-                if(!set) break;
-            }
+                for (let i = 0; i < this.dims && set; i++){
+                    let [a, b, c, d] = [A.props[i], B.props[i], C.props[i], D.props[i]];
+                    // Properties are two pairs of identical values
+                    let subset = (a == b && c == d || a == c && b == d || a == d && b == c)
+                    // OR: all properties different
+                    subset = subset || a != b && a != c & a != d && b != c && b != d && c != d;
+                    set &= subset;
+                }
             }
 
-            if (set)
-                indicator.className = 'good';
-            else
-                indicator.className = 'bad';
+            indicator.className = set ? 'good' : 'bad';
         }
         
-        extrapolate(a, b) {
-            /// EXTREMELY HARDCODED FOR DEPTH == 3!!!!!!!!!
-            if ( a == b ) return a;
-            let s = a+b;
-            return (s==1)? 2 : (s==2)? 1 : 0;
+        extrapolate(values) {
+            // Uses (depth-1) values to extrapolate what the final value should be.
+            if (this.depth == 3) {
+                let [a, b] = values;
+                if (a == b) return a;
+                return 3 - (a + b);
+
+            } else if (this.depth == 4) {
+                let [a, b, c] = values;
+                if (a == b) return c;
+                if (a == c) return b;
+                if (b == c) return a;
+                // None of the previous conditions were met ⇒ {a, b, c} are all different values.
+                // Therefor the number (d) we're looking for is the missing fourth value, so that {a, b, c, d} = {0, 1, 2, 3}
+                // So: (a + b + c + d) = (0 + 1 + 2 + 3) = 6
+                // ⇒ 6 - (a + b + c) = d
+                return 6 - (a + b + c);
+            }
         }
-        
+
+        clearHint() {
+            //// Removes the "hint" effect from the hinted card.
+            if (this.hintCard) this.hintCard.elem.classList.remove('hint');
+        }
+
         hint() {
             if (!HINTS || this.selected.length < this.depth-1) return;
-            // HARDCODED FOR DEPTH == 3
-            let [a, b] = this.selected;
-            let p = [];
-            for (let i = 0; i < this.dims; i++ )
-                p.push( this.extrapolate(a.props[i], b.props[i]) );
-            let hintCard = this.getCard(p);
-            hintCard.elem.classList.add('hint');
-            this.clearHint = () => hintCard.elem.classList.remove('hint');
+
+            let props = [];
+            for (let i = 0; i < this.dims; i++){
+                let selectedProps = this.selected.map(A => A.props[i]);
+                props.push( this.extrapolate(selectedProps) );
+            }
+            this.hintCard = this.getCard(props);
+            this.hintCard.elem.classList.add('hint');
+            // set the callback to clear this hint
         }
 
         render() {
@@ -351,10 +363,10 @@
     var COLOURS = ['red', 'green', 'blue', 'yellow']
     var EFFECTS = [undefined, 'line', 'shad', 'blur']
     var FONTS   = [undefined, 'alpha', 'beta', 'gamma']
-    var CORNERS = ['square', undefined, 'round', 'dnuor'];
+    var CORNERS = ['square', undefined, 'round', 'chipped'];
 
     let games = [new Game(1, 3), new Game(2, 3), new Game(3, 3), new Game(4, 3), new Game(5, 3)];
-    game = new Game(3, 4);
+    game = new Game(5, 4);
     game.activate();
 
     let selector = byId('selector');
