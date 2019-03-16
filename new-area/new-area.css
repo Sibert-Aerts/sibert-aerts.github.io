@@ -61,7 +61,7 @@
         height: 80px;
     }
     .underline {
-        border-top: 4px solid white;
+        border-top: 3px solid white;
     }
     #generate-button {
         padding: 6px;
@@ -94,25 +94,23 @@ body {
     font-weight: 400;
     font-style: normal;
     color: white;
-    margin: 0;
 }
 
-.content {
+
+#main {
+    margin-bottom: 40px;
     margin-left: 5%;
     margin-top: 8%;
     width: 90%;
-    background-color: rgba(0, 8, 8, 0.7);
+}
+#main.transp { background-color: transparent }
+#main.chroma { background-color: #00f }
+
+.content {
+    background-color: rgba(0, 8, 8, 0.5);
     padding: 20px;
     border-radius: 8px;
 }
-
-    .content#main {
-        margin-bottom: 40px;
-    }
-
-    .content.chroma {
-        background-color: #00f;
-    }
 
     .content.lesser {
         margin-top: 20px;
@@ -146,18 +144,18 @@ body {
     width: 100%;
     float: left;
     text-align: center;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 .underline {
     float: left;
     position: relative;
-    top: -30px;
-    margin-left: 10%;
+    top: -29px;
+    margin-left: 15%;
     margin-top: 20px;
-    width: 80%;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
-    opacity: 0.75;
+    width: 70%;
+    border-bottom: 2px solid #0003;
+    opacity: 0.8;
     -webkit-mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
     mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
 }
@@ -201,7 +199,6 @@ body {
     padding: 3px;
     padding-left: 5px;
     padding-right: 5px;
-    
 }
 
 .option-button {
@@ -212,6 +209,7 @@ body {
     float: right;
     padding: 2px;
     display: table-cell;
+    margin-left: 8px;
 }
 
 label { font-weight: normal; font-size: 16px; }
@@ -221,7 +219,7 @@ label { font-weight: normal; font-size: 16px; }
     margin-right: 20px;
     cursor: pointer;
     font-size: 16px;
-    opacity: 0.9;
+    text-shadow: 0px 0px 1px #1118
 }
     label.special { color: #88BBDD; }
     label.custom  { color: #ffaaaa; }
@@ -272,9 +270,7 @@ textarea, input {
         text-decoration: underline;
         color: white;
     }
-        .credits > a:hover {
-            opacity: 1;
-        }
+        .credits > a:hover { color: orange }
     
     .credits > .dash {
         margin-left: 10px;
@@ -286,7 +282,7 @@ textarea, input {
     height: 80px;
     position: fixed;
     bottom: 0px;
-    
+
     background: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
     background: -o-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
     background: -moz-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));

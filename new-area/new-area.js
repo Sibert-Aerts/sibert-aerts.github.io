@@ -36,7 +36,7 @@ function playSound(a){
 function mute(){
     newAreaSound.pause();
     muted = !muted;
-    $("#muteButton").text(muted? "unmute" : "mute");
+    $("#muteButton").html(muted? "🔇&#xFE0F;" : "🔊&#xFE0F;");
 }
 
 
@@ -76,7 +76,7 @@ var setAreaName = (text) => { window.location.hash = text };
 function parseAnchor(){
     let split = document.URL.split('#');
     if (split.length == 1) return;
-    let anchor = split[split.length-1];
+    let anchor = split.slice(1).join('#');
     $("#name-underline-wrapper").removeClass("faded-out");
     $("#name").text(decodeURIComponent(anchor));
     smartFadeOut();
@@ -123,6 +123,15 @@ function chromaToggle(){
     else
         $("#main").removeClass("chroma");
     $("#chromaButton").text(chroma? "no chroma" : "chroma")
+}
+
+var transp = false;
+
+function transpToggle(){
+    transp ^= true;
+    if(transp) $('#main').addClass('transp')
+    else $("#main").removeClass('transp')
+    $("#transpButton").html(transp? '👁&#xFE0F;' : '👓&#xFE0F;');
 }
 
 /*      Utility functions     */
