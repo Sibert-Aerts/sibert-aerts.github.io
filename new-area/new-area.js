@@ -3,29 +3,26 @@
     Made by Sibert Aerts (Rezuaq), documented as well as I could.
     If you have any questions/remarks about what's going on in this script, feel free to ask.
 */
-
-
 /*      Sound Stuff     */
-
 // Make a new MultiAudio object, made to be able to play multiple instances
 // of the same Audio simultaneously (i.e. overlapping).
-var MultiAudio = function(audioUrl, maxSounds = 10){
-    this.soundArray = new Array(maxSounds);
-    for(var i = 0; i < maxSounds; i++)
-        this.soundArray[i] = new Audio(audioUrl);
-    this.index = 0;
-};
-
-// Play the next sound in line.
-MultiAudio.prototype.play = function(){
-    playSound(this.soundArray[this.index]);
-    this.index = (this.index+1)%this.soundArray.length;
-}
-
-// Pauses all sounds
-MultiAudio.prototype.pause = function(){
-    for(var i in this.soundArray)
-        this.soundArray[i].pause();
+class MultiAudio {
+    constructor(audioUrl, maxSounds = 10) {
+        this.soundArray = new Array(maxSounds);
+        for (let i = 0; i < maxSounds; i++)
+            this.soundArray[i] = new Audio(audioUrl);
+        this.index = 0;
+    }
+    // Play the next sound in line.
+    play() {
+        playSound(this.soundArray[this.index]);
+        this.index = (this.index + 1) % this.soundArray.length;
+    }
+    // Pauses all sounds
+    pause() {
+        for (let i in this.soundArray)
+            this.soundArray[i].pause();
+    }
 }
 
 // Reset and play the given sound unless muted.
@@ -37,14 +34,14 @@ function playSound(a){
 
 // Toggles whether sounds are allowed to play.
 function mute(){
-    newAreaSounds.pause();
+    newAreaSound.pause();
     muted = !muted;
     $("#muteButton").text(muted? "unmute" : "mute");
 }
 
 
 var muted = false;
-var newAreaSounds = new MultiAudio("https://puu.sh/k1OGY.mp3", 50);
+var newAreaSound = new MultiAudio("https://puu.sh/k1OGY.mp3", 50);
 var itemGetSound = new Audio("https://my.mixtape.moe/gmtxtg.mp3");
 
 // List of backgrounds that's cycled through randomly
@@ -72,6 +69,19 @@ async function randomBackground(fade=true) {
     $("body").css("background-image", `url(${choose(backgrounds)})`);
 }
 
+// Incredibly dumb: updating the area name actually just sets the anchor, this triggers window.onhashchange, calling parseAnchor
+// which then reads & decodes the anchor from the URI, and updates the webpage.
+var setAreaName = (text) => { window.location.hash = text };
+
+function parseAnchor(){
+    let split = document.URL.split('#');
+    if (split.length == 1) return;
+    let anchor = split[split.length-1];
+    $("#name-underline-wrapper").removeClass("faded-out");
+    $("#name").text(decodeURIComponent(anchor));
+    smartFadeOut();
+}
+
 // Called when the page is loaded.
 $(document).ready(function () {
     // Put up a random background
@@ -79,6 +89,10 @@ $(document).ready(function () {
 
     // Bind the enter-key event to the custom-text input field
     $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() });
+
+    // DO ANCHOR THINGS
+    window.onhashchange = parseAnchor
+    parseAnchor();
     
     // Bind the two checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) });
@@ -146,9 +160,9 @@ function arrayContains (a, obj) {
 /*      Pools and stuff     */
 
 function compileCustom(){
-    Custom.locations = $("#custom-places").val().split(";").slice(0,-1);
-    Custom.prefixes = $("#custom-prefixes").val().split(";").slice(0,-1);
-    Custom.suffixes = $("#custom-suffixes").val().split(";").slice(0,-1);
+    Custom.locations = $("#custom-places").val().split(";");
+    Custom.prefixes = $("#custom-prefixes").val().split(";");
+    Custom.suffixes = $("#custom-suffixes").val().split(";");
 }
 
 function selectPools(){
@@ -157,7 +171,7 @@ function selectPools(){
     compileCustom();
 
     // Add all pools whose box is checked to the list of selected pools
-    for( key in allPools )
+    for( let key in allPools )
         if( $(`input[target=${key}]`).prop("checked") )
             selected.push(allPools[key]);
 }
@@ -252,17 +266,15 @@ function generateName(){
     // Check for easter eggs.
     for(var egg in easterEggs){
         if( egg == name ){
-
-            // 50% chance to just generate a new name, since easter eggs are a bit too common otherwise
+            // 50% chance to actually just generate a new name, since easter eggs are a bit too common otherwise
             if(chance(0.5))
                 return generateName();
 
-            newAreaSounds.pause();
+            newAreaSound.pause();
             $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"));
             refreshTooltips();
             playSound(easterEggs[egg].audio);
-            if (easterEggs[egg].func)
-                easterEggs[egg].func();
+            if (easterEggs[egg].func) easterEggs[egg].func();
         }
     }
 
@@ -282,10 +294,9 @@ function smartFadeOut(){
     // Increment the ID to cancel out any previous fade-outs
     let thisId = ++fadeOutID;
     setTimeout(
-        function(){
-            if(thisId == fadeOutID && $("#fade-out-check").prop("checked"))
-                $("#name-underline-wrapper").addClass("faded-out"); 
-        }, fadeOutTime);
+        () => { if (thisId == fadeOutID && $("#fade-out-check").prop("checked"))
+            $("#name-underline-wrapper").addClass("faded-out") },
+        fadeOutTime);
 }
 
 var count = 0;
@@ -293,10 +304,9 @@ var bgCooldown = 0;
 
 // Called by the main "Travel somewhere else" button.
 function generate(){
-    newAreaSounds.play();
+    newAreaSound.play();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").text(generateName());
-    smartFadeOut();
+    setAreaName(generateName());
 
     count++;
     bgCooldown++;
@@ -312,8 +322,7 @@ function generate(){
 
 // Called by the manual override button.
 function customGenerate(){
-    newAreaSounds.play();
+    newAreaSound.play();
     $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").text($("#custom-text").val());
-    smartFadeOut();
+    setAreaName($("#custom-text").val());
 }

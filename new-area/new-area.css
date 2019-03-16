@@ -79,8 +79,6 @@
 
 /* ACTUAL STYLE */
 
-.hidden { display: none!important }
-
 .unselectable {
     cursor: default;
     -webkit-touch-callout: none;
@@ -138,15 +136,9 @@ body {
     letter-spacing: 10px;
     opacity: 0.9;
 }
-    #stars .area {
-        color: #FFFFFF;
-    }
-    #stars .easter-egg{
-        color: #AACCFF;
-    }
-    .chroma #stars{
-        visibility: hidden;
-    }
+    #stars .area { color: #FFFFFF }
+    #stars .easter-egg { color: #AACCFF }
+    .chroma #stars { visibility: hidden }
 
 #name {
     position: relative;
