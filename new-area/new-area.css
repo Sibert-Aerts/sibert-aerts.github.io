@@ -3,7 +3,7 @@
     src: url(OptimusPrinceps.ttf);
 }
 
-/* reactive stuff */
+/* REACTIVE SCREEN SIZE STUFF */
 @media screen and (max-width: 720px) {
     #name {
         font-size: 30px;
@@ -77,10 +77,9 @@
     }
 }
 
-body {
-    font-family: OptimusPrinceps, Minion Pro, Times New Roman, Arial;
-    color: white;
-}
+/* ACTUAL STYLE */
+
+.hidden { display: none!important }
 
 .unselectable {
     cursor: default;
@@ -90,6 +89,14 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+body {
+    font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+    font-weight: 400;
+    font-style: normal;
+    color: white;
+    margin: 0;
 }
 
 .content {
@@ -142,21 +149,25 @@ body {
     }
 
 #name {
+    position: relative;
+    z-index: 1;
     width: 100%;
     float: left;
     text-align: center;
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .underline {
     float: left;
     position: relative;
-    top: -31px;
+    top: -30px;
     margin-left: 10%;
     margin-top: 20px;
     width: 80%;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
-    opacity: 0.9;
+    opacity: 0.75;
+    -webkit-mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
+    mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
 }
 
 #name-underline-wrapper {
@@ -164,10 +175,7 @@ body {
     transition: opacity 2s ease;
     opacity: 1;
 }
-
-    #name-underline-wrapper.faded-out {
-        opacity: 0;
-    }
+    #name-underline-wrapper.faded-out { opacity: 0 }
 
 #checkboxes-wrapper{
     display: inline-block;
@@ -180,10 +188,18 @@ body {
 }
 
 #generate-button {
-    opacity: 0.9;
     float: right;
     font-family: Tahoma, Arial;
-    color: #DDEEEE;
+    color: #FFFFEE;
+    background-image: linear-gradient(to bottom, orange, orangered);
+    background-color: orangered;
+    border: none;
+    border-top: 1px solid rgb(255, 174, 0);
+    text-shadow: 0 -1px 0 rgb(211, 42, 0);
+}
+#generate-button:active {
+    background-image: linear-gradient(to bottom, orange, rgb(199, 40, 0));
+    background-color: rgb(199, 40, 0);
 }
 
 .btn {
@@ -206,22 +222,17 @@ body {
     display: table-cell;
 }
 
-label {
-    cursor: pointer;
-    font-weight: normal;
-    opacity: 0.9;
+label { font-weight: normal }
+#main label {
+    display: inline-block;
+    min-width: 120px;
     margin-right: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.9;
 }
-
-    label.special {
-        color: #88BBDD;
-    }
-    label.custom {
-        color: #ffaaaa;
-    }
-    #main label {
-        min-width: 110px;
-    }
+    label.special { color: #88BBDD; }
+    label.custom  { color: #ffaaaa; }
 
 .input-title{
     display: inline-block;
