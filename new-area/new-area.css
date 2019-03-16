@@ -107,7 +107,7 @@ body {
 #main.chroma { background-color: #00f }
 
 .content {
-    background-color: rgba(0, 8, 8, 0.5);
+    background-color: rgba(0, 8, 8, 0.7);
     padding: 20px;
     border-radius: 8px;
 }
@@ -144,7 +144,7 @@ body {
     width: 100%;
     float: left;
     text-align: center;
-    text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.6);
+    text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.7);
 }
 
 .underline {
@@ -154,7 +154,7 @@ body {
     margin-left: 15%;
     margin-top: 20px;
     width: 70%;
-    border-bottom: 2px solid #0003;
+    border-bottom: 2px solid #0004;
     opacity: 0.8;
     -webkit-mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
     mask-image: radial-gradient( ellipse 50% 20px at 50% 50%, #000 0, #000 80%, transparent 100%);
