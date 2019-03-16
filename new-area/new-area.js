@@ -147,22 +147,12 @@ function stringToProperCase(s) {
     return s.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
-// Returns true if the array contains an instance of obj.
-function arrayContains (a, obj) {
-    var i = a.length;
-    while (i--)
-        if (a[i] === obj)
-            return true;
-    return false;
-}
-
-
 /*      Pools and stuff     */
 
 function compileCustom(){
-    Custom.locations = $("#custom-places").val().split(";");
-    Custom.prefixes = $("#custom-prefixes").val().split(";");
-    Custom.suffixes = $("#custom-suffixes").val().split(";");
+    Custom.locations = $("#custom-places").val().split(";").filter(x => x != '');
+    Custom.prefixes = $("#custom-prefixes").val().split(";").filter(x => x != '');
+    Custom.suffixes = $("#custom-suffixes").val().split(";").filter(x => x != '');
 }
 
 function selectPools(){
@@ -226,8 +216,8 @@ function generateName(){
             name += randomPrefix();
     }
 
-    // if Dark Souls 2 is enabled, 1 in 40 chance of prepending "Shulva, "
-    if($("input[target=Dark2]").prop("checked") && chance (1, 30) && hasPrefix){ 
+    // if Dark Souls 2 is enabled, 1 in 30 chance of prepending "Shulva, "
+    if($("input[target=Dark2]").prop("checked") && chance (1, 30) && hasPrefix){
         name = choose(shulva) + name;
         allowThe = false;
     }
@@ -238,8 +228,8 @@ function generateName(){
     // Fix the case so "BlightTown" turns into "Blighttown"
     name = stringToProperCase(name);
 
-    // 1 in 15 chance to add an area suffix if the name is longer than 15 characters
-    // 1 in 5 chance to add an area suffix if the name is shorter than 15 characters
+    // 1 in 15 chance to add an area suffix if the name has a prefix
+    // 1 in 5 chance to add an area suffix if the name has no prefix
     if( chance( 1, 15 ) || (chance(4,15) && !hasPrefix) ){
         hasSuffix = true;
         name += randomSuffix();
@@ -253,7 +243,7 @@ function generateName(){
         name = "The " + name;
 
     // If it generated an existing name: reward the user with a star and a sound, at a slight delay
-    if( arrayContains(allAreas, name)){
+    if (allAreas.includes(name)) {
         let theName = name;
         setTimeout(
             function(){
