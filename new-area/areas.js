@@ -32,7 +32,7 @@ Dark1.prefixes = ["anor", "ash", "blight|", "crystal", "darkroot", "demon", "fir
     "northern", "undead", "oolacile", "painted", "quelaag's", "royal", "sanctuary", "sen's", "duke's", "great"];
 
 // Capitalization matters in suffixes
-Dark1.suffixes = ["ruins", "of the Abyss", "of the First Flame", "Dungeon", "of Ariamis", "of the Giants", "of Drakes"];
+Dark1.suffixes = ["Ruins", "of the Abyss", "of the First Flame", "Dungeon", "of Ariamis", "of the Giants", "of Drakes"];
 
 
 // Dark Souls 2
