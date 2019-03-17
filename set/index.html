@@ -11,9 +11,18 @@
         width: 70%;
     }
 
-    #indicator {
+    #sidebar {
         position: fixed;
-        top: 30px; right: 5%;
+        right: 3%;
+        top: 30px;
+        width: 20%;
+        height: 100%;
+        padding-left: 4%;
+        overflow-y: auto;
+    }
+
+    #indicator {
+        float: right;
         background-color: #222;
         width: 100px; height: 100px;
         border-radius: 50px;
@@ -21,18 +30,20 @@
     #indicator.good { background-color: #2f2; }
     #indicator.bad  { background-color: #f22; }
 
-    #controller {
-        position: fixed;
-        top: 150px; right: 5%;
+    .panel {
+        float: right;
         background-color: #833;
-        width: 15%;
+        width: 100%;
         padding: 20px;
         border-radius: 20px;
+        margin: 15px 0;
 
         line-height: 30px;
         font-size: 20px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+    .panel h2 { margin-top: 0px; margin-bottom: 10px; margin-left: 20px; color: #101 }
+    #guide-contents > span { display: block; width: 100%; margin-top: 4px; margin-bottom: 4px; border-top: 2px solid #511 }
 
     .card {
         user-select: none;
@@ -54,7 +65,7 @@
     .card > div {
         margin-top: 47px;
         margin-left: 25px;
-        color: #444;
+        color: #888;
         font-weight: bolder;
         font-size: 80px;
         font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -68,16 +79,18 @@
     .smol .card.hint { margin-top: 2px; margin-bottom: 8px }
 
     /*********** COLOURS ***********/
-    .card.red > div   { color: #a22; }
-    .card.green > div { color: #2a2; }
-    .card.blue > div  { color: #22a; }
-    .card.yellow > div  { color: #ca6; }
+    .card.red > div   { color: #a22 }
+    .card.green > div { color: #2a2 }
+    .card.blue > div  { color: #22a }
+    .card.yellow > div{ color: #ca6 }
 
     /*********** EFFECTS ***********/
-    .card.line > div { -webkit-text-stroke: 2px #222; }
-    .card.shad > div { text-shadow: 5px 5px 0px #222; }
-        .smol .card.shad > div { text-shadow: 3px 3px 0px #222; }
-    .card.blur > div { text-shadow: 0px 0px 15px #222, 0px 0px 5px #222; }
+    .card.line > div { -webkit-text-stroke: 3px #222 }
+        .smol .card.line > div { -webkit-text-stroke: 2px #222 }
+    .card.shad > div { text-shadow: 5px 5px 0px #222 }
+        .smol .card.shad > div { text-shadow: 3px 3px 0px #222 }
+    .card.blur > div { text-shadow: 0px 0px 15px #222, 0px 0px 5px #222 }
+        .smol .card.blur > div { text-shadow: 0px 0px 10px #222, 0px 0px 5px #222 }
 
 
     /************ FONTS ************/
@@ -88,14 +101,20 @@
         margin-top: 40px;
     }
         .smol .card.alpha > div { font-size: 50px; margin-top: 10px;}
-    .card.beta > div  { font-family: 'Impact'; transform: scale(1.2, 1); margin-left: 33%; }
-    .card.gamma > div { font-family: 'Comic Sans MS', 'TSCU_Comic' }
+    .card.beta > div  {
+        font-family: 'Impact';
+        transform: scale(1.2, 1);
+        margin-left: 33%;
+    }
+    .card.gamma > div {
+        font-family: 'Comic Sans MS', 'TSCU_Comic';
+    }
 
     /*********** CORNERS ***********/
-    .card.square { border-radius: 2px; }
-    .card.round  { border-radius: 60px; border-bottom-right-radius: 5px; }
-    .card.chipped  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 30px, #000 31px); border-radius: 15px; }
-    .smol .card.chipped  { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 15px, #000 16px); border-radius: 8px; }
+    .card.square { border-radius: 2px }
+    .card.round { border-radius: 60px; border-bottom-right-radius: 5px; }
+    .card.chipped { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 30px, #000 31px); border-radius: 15px; }
+    .smol .card.chipped { -webkit-mask-image: radial-gradient(circle at 0 0, transparent 0, transparent 15px, #000 16px); border-radius: 8px; }
     </style>
 
     <title>Set 2</title>
@@ -105,27 +124,44 @@
 
     <div id=table class=smol width=600px height=400px></div>
 
-    <div id=indicator></div>
+    <div id=sidebar>
+        <div id=indicator></div>
 
-    <div id=controller>
-        #Cards = <span id=count></span>
-        <br>
-        <button onclick=game.shuffle()> SHUFFLE </button>
-        <br>
-        <label><input type=checkbox onclick="HINTS^=true; game.clearHint(); game.hint()"> HINTS </label>
-        <label><input type=checkbox checked onclick="byId('table').classList.toggle('smol');"> SMOL </label>
-        <br>
+        <div id=controller class=panel>
+            <h2> SET 2™ </h2>
+            #Cards = <span id=count></span>
+            <br>
 
-        <label>
-            # Dimensies:
-        <select id=selector>
-            <option value=1>1</option>
-            <option value=2>2</option>
-            <option value=3>3</option>
-            <option selected value=4>4</option>
-            <option value=5>5</option>
-        </select>
-        </label>
+            <label style=margin-right:20px>
+                Depth:
+                <select id=depth>
+                    <option value=3 selected>3</option>
+                    <option value=4>4</option>
+                </select>
+            </label>
+
+            <label>
+                Dimensions:
+                <select id=dimensions>
+                    <option value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=3>3</option>
+                    <option value=4 selected>4</option>
+                    <option value=5>5</option>
+                </select>
+            </label>
+
+            <div style=margin-top:10px;>
+                <button onclick=game.shuffle()> SHUFFLE </button>
+                <label><input type=checkbox onclick="HINTS^=true; game.clearHint(); game.hint()"> HINTS </label>
+                <label><input type=checkbox checked onclick="byId('table').classList.toggle('smol');"> SMOL </label>
+            </div>
+        </div>
+
+        <div id=guide class='panel smol'>
+            <h2>Guide</h2>
+            <div id=guide-contents></div>
+        </div>
     </div>
 
 </body>
@@ -191,7 +227,7 @@
     }
 
     class Game {
-        constructor(dims, depth, render){
+        constructor(depth, dims, render){
             // Constructs a game of Set with (dims) properties, each of which can be one of (depth) different values.
             // This means there will be (depth)^(dims) different cards, and each set consists of (depth) cards.
             if (dims < 1 || depth < 1) throw 'Error: you fucking idiot';
@@ -201,7 +237,8 @@
                 // default card rendering function
                 let [a, b, c, d, e] = props;
                 let text = makeElem('div');
-                text.innerText = NUMBERS[a];
+                if (a != undefined) text.innerText = NUMBERS[a];
+                else text.innerText = '0';
                 div.appendChild(text);
                 if (b != undefined) addClass(div, COLOURS[b]);
                 if (c != undefined) addClass(div, EFFECTS[c]);
@@ -230,7 +267,6 @@
             let index = props.reduce( (i, p) => p + this.depth * i);
             return this.cards[index];
         }
-        
 
         select(card) {
             this.clearHint();
@@ -337,6 +373,7 @@
         activate() {
             if(!this.rendered) this.render();
 
+            this.selected = [];
             // Clear the table
             let table = byId('table');
             removeChildren(table);
@@ -347,6 +384,22 @@
             for (let card of this.cards) table.appendChild(card.elem);
 
             byId('count').innerHTML = this.cards.length + ' = ' + this.depth + '<sup>' + this.dims + '</sup>';
+
+            let guideBox = byId('guide-contents');
+            removeChildren(guideBox);
+            for (let i = 0; i < this.dims; i++){
+                for (let j = 0; j < this.depth; j++){
+                    let props = [];
+                    // Leaving the other elements undefined actually works nicely
+                    props[i] = j;
+                    let card = makeElem('div');
+                    card.className = 'card';
+                    this.render_card(card, props);
+                    guideBox.appendChild(card);
+                }
+                if (i < this.dims-1) guideBox.appendChild(makeElem('span'));
+            }
+
         }
 
         shuffle() {
@@ -365,12 +418,24 @@
     var FONTS   = [undefined, 'alpha', 'beta', 'gamma']
     var CORNERS = ['square', undefined, 'round', 'chipped'];
 
-    let games = [new Game(1, 3), new Game(2, 3), new Game(3, 3), new Game(4, 3), new Game(5, 3)];
-    game = new Game(5, 4);
-    game.activate();
+    let games = [];
+    var game = null;
+    
+    let depthSelect = byId('depth');
+    let dimSelect = byId('dimensions');
 
-    let selector = byId('selector');
-    selector.addEventListener( 'change', () => { game = games[selector.value-1]; game.activate() } )
+    function updateSelection(){
+        let depth = parseInt(depthSelect.value);
+        let dims = parseInt(dimSelect.value);
+        if (games[depth] == undefined) games[depth] = [];
+        if (games[depth][dims] == undefined) games[depth][dims] = new Game(depth, dims);
+        game = games[depth][dims];
+        game.activate();
+    }
+
+    depthSelect.addEventListener( 'change', updateSelection )
+    dimSelect.addEventListener( 'change', updateSelection )
+    updateSelection();
 
 </script>
 
