@@ -1,12 +1,12 @@
 <head>
     <style>
-    body { background-color: #333; }
+    body { background-color: #333 }
 
     #table {
         float: left;
         background-color: #633;
         border-radius: 20px;
-        margin: 1% 1%;
+        margin: 1%;
         padding: 10px;
         width: 70%;
     }
@@ -27,8 +27,8 @@
         width: 100px; height: 100px;
         border-radius: 50px;
     }
-    #indicator.good { background-color: #2f2; }
-    #indicator.bad  { background-color: #f22; }
+    #indicator.good { background-color: #2f2 }
+    #indicator.bad  { background-color: #f22 }
 
     .panel {
         float: right;
@@ -43,6 +43,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .panel h2 { margin-top: 0px; margin-bottom: 10px; margin-left: 20px; color: #101 }
+    .panel label { margin-right: 20px; display: inline-block; }
     #guide-contents > span { display: block; width: 100%; margin-top: 4px; margin-bottom: 4px; border-top: 2px solid #511 }
 
     .card {
@@ -73,16 +74,16 @@
     .smol .card > div {
         margin-top: 14px; margin-left: 12px; font-size: 40px;
     }
-    .card.selected { margin-top: 20px; margin-bottom: 0px; background-color: #cbd }
+    .card.selected { margin-top: 20px; margin-bottom: 0px; background-color: #cbd; }
     .smol .card.selected { margin-top: 10px }
-    .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #ffd880; border-color: red; }
+    .card.hint     { margin-top: 5px; margin-bottom: 15px; background-color: #ffd880; }
     .smol .card.hint { margin-top: 2px; margin-bottom: 8px }
 
     /*********** COLOURS ***********/
-    .card.red > div   { color: #a22 }
-    .card.green > div { color: #2a2 }
-    .card.blue > div  { color: #22a }
-    .card.yellow > div{ color: #ca6 }
+    .card.red    > div { color: #a22 }
+    .card.green  > div { color: #2a2 }
+    .card.blue   > div { color: #22a }
+    .card.yellow > div { color: #ca6 }
 
     /*********** EFFECTS ***********/
     .card.line > div { -webkit-text-stroke: 3px #222 }
@@ -101,7 +102,7 @@
         margin-top: 40px;
     }
         .smol .card.alpha > div { font-size: 50px; margin-top: 10px;}
-    .card.beta > div  {
+    .card.beta > div {
         font-family: 'Impact';
         transform: scale(1.2, 1);
         margin-left: 33%;
@@ -118,6 +119,7 @@
     </style>
 
     <title>Set 2</title>
+
 </head>
 
 <body>
@@ -132,7 +134,7 @@
             #Cards = <span id=count></span>
             <br>
 
-            <label style=margin-right:20px>
+            <label>
                 Depth:
                 <select id=depth>
                     <option value=3 selected>3</option>
@@ -151,8 +153,8 @@
                 </select>
             </label>
 
-            <div style=margin-top:10px;>
-                <button onclick=game.shuffle()> SHUFFLE </button>
+            <div style=margin-top:10px>
+                <button onclick=game.shuffle() style=margin-right:20px> SHUFFLE </button>
                 <label><input type=checkbox onclick="HINTS^=true; game.clearHint(); game.hint()"> HINTS </label>
                 <label><input type=checkbox checked onclick="byId('table').classList.toggle('smol');"> SMOL </label>
             </div>
