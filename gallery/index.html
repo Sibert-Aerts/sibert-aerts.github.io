@@ -1,0 +1,115 @@
+<head>
+    <meta charset="UTF-8">
+    <link rel=stylesheet type=text/css href=_html/style.css>
+    <title>Rezuaq's Image Gallery Demo</title>
+    <link rel=icon href=_html/favicon.ico>
+</head>
+
+<body>
+    <div id=spinner>
+        <div id=spindle>💀</div>
+    </div>
+
+    <div id=month class=box>
+        <span class='big butt' id=month-prev style=float:left>⬅</span>
+        <span id=month-name></span>
+        <span class='big butt' id=month-next style=float:right>➡</span>
+    </div>
+
+    <div id=picture-frame>
+        <img id=picture>
+    </div>
+
+    <div id=navigator class=box>
+        <div class=title>
+            <span id=nav-random class=butt>🔀&#xFE0E;</span> <span class=butt id=nav-prev>⬅</span>NAVIGATOR<span class=butt id=nav-next>➡</span> <div id=help>?</div>
+        </div>
+        <div id=nav-container></div>
+    </div>
+
+    <div id=commentary class=box>
+        <div class=title id=pic-name></div>
+        <div class=title style=font-size:18px>COMMENTARY</div>
+        <div class=body id=desc></div>
+    </div>
+
+
+    <div id=help-box hidden>
+        <h2 style=margin-left:2%;margin-bottom:0px>Info</h2>
+
+        <div>
+            <div style=width:30%;float:left;>
+                <h3 style=margin-left:5%>Thumbnails</h3>
+                <div class='nav'></div> <span class=nav-help>Regular scan</span> <br>
+                <div class='nav special'></div> <span class=nav-help>Edited scan or collage</span> <br>
+                <div class='nav digital'></div> <span class=nav-help>Digital drawing</span> <br>
+                <div class='nav spoiler'></div> <span class=nav-help>Spoilers!</span> <br>
+                <div class='nav has-desc' style=background-image:none;background-color:#fff2></div> <span class=nav-help>Has commentary</span> <br>
+            </div>
+
+            <div style=width:25%;float:left;>
+                <h3 style=margin-left:5%>Icons</h3>
+                <span class=emoji>🦑</span> Splatoon <br>
+                <span class=emoji>👧</span> Girls <br>
+                <span class=emoji>💬</span> Comic <br>
+                <span class=emoji>💉</span> Blood & Gore <br>
+            </div>
+
+            <div style=width:40%;float:left;>
+                <h3 style=margin-left:5%>Controls</h3>
+                <p><b>Left/right</b> on the <b>keyboard</b> for previous/next scan.</p>
+                <p><b>Up/down</b> on the <b>keyboard</b> for next/previous month.</p>
+                <p><b>Forward/backwards</b> in your <b>browser</b> to navigate forward/backwards through the scans you've visited.</p>
+                <p><b>Enter</b> on the <b>keyboard</b> to zoom in on the image.</p>
+                <p><b>Escape/Enter</b> on the <b>keyboard</b> to zoom back out.</p>
+
+                <h3 style=margin-left:5%;margin-top:30px>Contact</h3>
+                If anything is weird or broken or you just want to chat, you can contact me on Twitter&nbsp;(<a href=https://twitter.com/rezuaq target=_blank>@Rezuaq</a>)
+                or by e-mail&nbsp;(<a href=mailto:rezuaq@gmail.com target=_blank>rezuaq@gmail.com</a>) or on Discord&nbsp;(<b>Rezuaq#0736</b>).
+            </div>
+        </div>
+
+        <div style=opacity:.6;position:absolute;bottom:16px;left:5%>Click to close</div>
+    </div>
+
+    <div id=credit>
+        Made by Rezuaq 2019 <a href=https://twitter.com/rezuaq style=padding-left:10px>@Rezuaq</a>
+    </div>
+
+    <div id=zoom-view hidden>
+        <img id=zoom-picture></img>
+    </div>
+
+</body>
+
+<script src=_html/script.js></script>
+
+<script>
+
+    // IMAGE FLAGS
+    let SPOILER = true;
+    let DIGITAL = true;
+    let SPECIAL = true;
+    let COMIC = true;
+    let BLOOD = true;
+    let SQUID = true;
+    let GIRLS = true;
+
+    var jan = new Month('Month 1', '01');
+
+    jan.add('Untitled.png', `This is the first picture in the gallery!<br><br> Press right on your keyboard, or right arrow on the navigator to go to the next image!`, {DIGITAL, COMIC});
+    jan.add('Capture.PNG', `This is the second picture in the gallery!<br><br> click this link to go back to the first image: [01/Untitled]`, {DIGITAL, COMIC});
+
+    var feb = new Month('Month 2', '02');
+    feb.add('Untitled2.jpg', `This is the first picture of the second month!`, {DIGITAL, COMIC});
+    feb.add('Untitled3.png', `This picture is very large, click on it to see it at 100%!`, {DIGITAL, COMIC});
+    feb.add('Untitled4.jpg', `This picture uses <b>HTML</b> markup!<br><span class=bottom-text>bottom text</span>`, {DIGITAL, COMIC});
+
+
+    // THIS LINE IS VERY IMPORTANT!!!!!!!!!!!!!
+    months = [jan, feb];
+
+    // THIS ONE TOO!!!!!!!!!!!
+    start_gallery();
+
+</script>

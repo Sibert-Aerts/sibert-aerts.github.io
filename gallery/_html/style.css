@@ -1,0 +1,317 @@
+body {
+    background-color: rgb(151, 10, 60);
+    background-image: url('../EXTRA/background.jpg');
+    overflow-x: hidden;
+    margin: 0;
+}
+
+a{ color: #ff007f; }
+a:hover{ color: #0FF; }
+
+/***************************/
+/*         SPINNER         */
+/***************************/
+#spinner {
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+    position: absolute;
+    left: 25%;
+    top: 35%;
+    transition: all 0.2s ease-in-out;
+    opacity: 1;
+}
+#spinner.invisible { opacity: 0 }
+#spinner #spindle {
+    user-select: none;
+    opacity: 0.5;
+    font-size: 200px;
+    transform-origin: 65% 50%;
+    animation-name: spin;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/***************************/
+/*      PICTURE FRAME      */
+/***************************/
+#picture-frame {
+    float: left;
+    max-width: 60%;
+    max-height: 900px;
+    padding: 15px;
+}
+
+#picture{
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 100%;
+    max-height: inherit;
+    border: 8px solid #602;
+    border-radius: 8px;
+    background-color: #602;
+    box-shadow: 0px 8px 20px 0px #301 inset;
+
+    cursor: zoom-in;
+}
+
+/***************************/
+/*           BOX           */
+/***************************/
+.BOX {
+    float: right;
+    margin: 15px 10px 5px;
+    margin-right: 1%;
+    background-color: #602;
+    padding: 10px;
+    font-family: Tahoma;
+    border-radius: 8px;
+    border-bottom: 4px solid #301;
+}
+    .BOX .TITLE {
+        text-align: center;
+        font-weight: bold;
+        font-size: 22;
+        margin-bottom: 10px;
+    }    
+    /* SMOL MODE */
+    @media all and (max-width: 1450px) {
+        .BOX .TITLE { font-size: 18px; margin-bottom: 6px;}
+    }
+    .BOX .BODY {
+        font-size: 18;
+        padding: 8px;
+        padding-bottom: 16px;
+        background-color: #913;
+        border-radius: 6px;
+        border-top: 3px solid #480018;
+    }
+
+
+/***************************/
+/*        MONTH BOX        */
+/***************************/
+#month {
+    width: 400px;
+    text-align: center;
+    font-size: 40px;
+    font-family: Georgia;
+    font-weight: bold;
+}
+/* SMOL MODE */
+@media all and (max-width: 1450px) {
+    #month { font-size: 30px; }
+}
+
+
+/***************************/
+/*      NAVIGATOR BOX      */
+/***************************/
+#navigator {
+    width: 500px;
+    max-width: 30%;
+    clear: right;
+    position: relative;
+}
+
+.nav{
+    position: relative;
+    width: 45; height: 45;
+    vertical-align:top;
+    user-select: none;
+    background-color: rgb(155, 91, 105);
+    background-image: linear-gradient(rgb(255, 177, 184), rgb(236, 98, 98));
+    display: inline-block;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.nav.special{
+    background-image: linear-gradient(rgb(177, 178, 255), rgb(213, 98, 236));
+}
+.nav.spoiler{
+    background-image: linear-gradient(rgb(27, 27, 59), rgb(68, 25, 105));
+}
+.nav.digital{
+    background-image: linear-gradient(rgb(255, 170, 58), rgb(255, 95, 95), rgb(255, 0, 94) );
+}
+.nav.has-desc{ height: 42px; border-bottom: 3px solid #0fa }
+
+.nav:hover{ border: 1px solid white; margin: 4px }
+    .nav.has-desc:hover{ border-bottom: 4px solid #0fa }
+.nav.selected{ border: 2px solid white; margin: 3px }
+    .nav.has-desc.selected{ border-bottom: 5px solid #0fa }
+
+/* SMOL MODE */
+@media all and (max-width: 1450px) {
+    .nav { width: 30px; height: 30px; font-size: 10px;}
+    .nav.has-desc { height: 27px; }
+}
+
+.tooltip {
+    position: absolute;
+    top: -30px;
+    left: -47px;
+    margin: 0;
+    min-width: 120px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    background-color: #101E;
+    visibility: hidden;
+    pointer-events: none;
+}
+div:hover > .tooltip{ visibility: visible; }
+
+#nav-random {
+    position: absolute;
+    left: 10px;
+    font-size: 16px;
+    top: 13px;
+}
+#nav-random:active { top: 15px; }
+
+#help {
+    float: right;
+    display: block;
+    margin-right: 10px;
+    margin-top: 3px;
+    margin-left: -80px;
+    color: #300;
+    background-color: #702;
+    padding: 0 7px;
+    border-radius: 6px;
+    user-select: none;
+    cursor: pointer;
+}
+#help:hover { background-color: #903; }
+
+/****************************/
+/*      COMMENTARY BOX      */
+/****************************/
+#commentary {
+    clear: right;
+    max-width: 33%;
+    width: 600px;
+    margin-bottom: 40px;
+}
+    #commentary .empty {
+        text-align: center;
+        color: #501;
+    }
+
+.butt {
+    background-color: #913;
+    padding: 2px 8px 4px 8px;
+    margin: 0 10px;
+    border-radius: 6px;
+    border-bottom: 3px solid #400;
+    cursor: pointer;
+    user-select: none;
+}
+.big.butt {
+    padding-top: 3px;
+    border-bottom: 4px solid #400;
+    height: 38px;
+    line-height: 40px;
+}
+/* SMOL MODE */
+@media all and (max-width: 1450px) {
+    .big.butt { line-height: 30px; height: 28px;}
+}
+.butt:hover{ background-color: #a24; }
+.butt:active{ border-bottom: none; padding-top: 0px; padding-bottom: 6px }
+.big.butt:active{ margin-top: 3px; padding-bottom: 7px; }
+
+
+/****************************/
+/*         HELP BOX         */
+/****************************/
+#help-box {
+    position: absolute;
+    z-index: 2;
+    width: 70%;
+    left: 10%;
+    top: 5%;
+    padding: 10px 40px 60px 40px;
+    border-radius: 15px;
+    background-color: rgba(8, 0, 1, 0.99);
+    transition: background-color 0.1s;
+    box-shadow: #000 0px 5px 20px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
+}
+#help-box:hover { background-color: #080001f5; }
+#help-box .nav-help {
+    display: inline-block;
+    margin-top: 15px;
+    margin-left: 10px;
+    height: 40px;
+}
+#help-box .emoji {
+    display: inline-block;
+    font-size: 40px;
+    margin-right: 10px;
+    animation-name: spin;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-play-state: paused;
+}
+#help-box .emoji:hover { animation-play-state: running; }
+
+
+#credit {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    padding: 10px 20px 10px 20px;
+    border-top-left-radius: 20px;
+    font-size: 18px;
+    background-color: #c12155;
+    border-left: 4px solid #E46;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+#credit a { color: #ff66c8 }
+#credit a:hover { color: #0FF }
+
+/****************************/
+/*         ZOOM VIEW        */
+/****************************/
+#zoom-view {
+    margin: 0;
+    position: absolute;
+    width: calc(100% - 250px);
+    height: calc(100% - 250px);
+    background-color: #1016;
+    padding: 50px 200px 200px 50px;
+    overflow: auto;
+    cursor: zoom-out;
+}
+#zoom-picture {
+    -webkit-box-shadow: 0px 0px 80px 20px #000;
+    -moz-box-shadow: 0px 0px 80px 20px #000;
+    box-shadow: 0px 0px 80px 20px #000;
+}
+
+
+/* CUSTOM STYLES FOR USE IN COMMENTARY TEXT GOES HERE HAHA */
+
+.BOTTOM-TEXT {
+    font-size: 30;
+    font-family: impact;
+    color: white;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+}
+.small {
+  font-variant: small-caps;
+}
