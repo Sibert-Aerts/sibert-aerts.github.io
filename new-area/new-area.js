@@ -42,7 +42,7 @@ function mute(){
 
 var muted = false;
 var newAreaSound = new MultiAudio("https://puu.sh/k1OGY.mp3", 50);
-var itemGetSound = new Audio("https://my.mixtape.moe/gmtxtg.mp3");
+var itemGetSound = new Audio("ITEMGET.mp3");
 
 // List of backgrounds that's cycled through randomly
 var backgrounds = [
@@ -107,7 +107,7 @@ Custom.suffixes = [];
 Custom.prefixes = [];
 
 // All the pools together
-var allPools = {Dark1: Dark1, Dark2: Dark2, Dark3: Dark3, Demons: Demons, Blood: Blood, Custom: Custom};
+var allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Custom};
 var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas), []);
 
 // Selected pools
@@ -164,6 +164,10 @@ function compileCustom(){
     Custom.suffixes = $("#custom-suffixes").val().split(";").filter(x => x != '');
 }
 
+function isChecked(key){
+    return $(`input[target=${key}]`).prop("checked")
+}
+
 function selectPools(){
     // clear selected
     selected = [];
@@ -171,13 +175,13 @@ function selectPools(){
 
     // Add all pools whose box is checked to the list of selected pools
     for( let key in allPools )
-        if( $(`input[target=${key}]`).prop("checked") )
+        if( isChecked(key) )
             selected.push(allPools[key]);
 }
 
 // Get a random prefix from the list of selected pools
 function randomPrefix(){
-    var prefix = choose(choose(selected).prefixes);
+    let prefix = choose(choose(selected).prefixes);
     // Add a space if the prefix doesn't end with the special | character
     if (prefix[prefix.length-1] == '|')
         return prefix.slice(0, prefix.length-1);
@@ -185,7 +189,12 @@ function randomPrefix(){
 }
 
 var randomLocation = () => choose(choose(selected).locations);
-var randomSuffix = () => ' ' + choose(choose(selected).suffixes);
+
+function randomSuffix(){
+    let suf = choose(choose(selected).suffixes)
+    if (suf[0] == ',') return suf;
+    return ' ' + suf;
+}
 
 /*      Easter eggs     */
 
@@ -197,22 +206,22 @@ function worldFunc(){
 
 // List of easter egg words, the audio they should play, and optionally the function they should call.
 var easterEggs = {
-    "The Wall"  : {audio: new Audio("https://my.mixtape.moe/alfgxc.mp3")},
-    "The World" : {audio: new Audio("https://my.mixtape.moe/lgvonw.mp3"), func: worldFunc},
-    "The Doors" : {audio: new Audio("https://my.mixtape.moe/kvpycq.mp3")},
+    "The Wall"  : {audio: new Audio("the_wall.mp3")},
+    "The World" : {audio: new Audio("the_world.mp3"), func: worldFunc},
+    "The Doors" : {audio: new Audio("the_doors.mp3")},
 };
 
 // Generate a random area name, and perform any easter eggs if needed.
 function generateName(){
-    name = "";
-    allowThe = true;
-    var hasPrefix = false;
-    var hasSuffix = false;
+    let name = "";
+    let allowThe = true;
+    let hasPrefix = false;
+    let hasSuffix = false;
     
     selectPools();
     
     // if no checkboxes are checked, tell the user to do so
-    if( !Object.keys(allPools).reduce((total, key) => total || $(`input[target=${key}]`).prop("checked"), false) )
+    if( !Object.keys(allPools).reduce((total, key) => total || isChecked(key), false) )
         return "Tick one of the Checkboxes";
     
     // double choose because the parts are hidden in lists within lists
@@ -226,7 +235,7 @@ function generateName(){
     }
 
     // if Dark Souls 2 is enabled, 1 in 30 chance of prepending "Shulva, "
-    if($("input[target=Dark2]").prop("checked") && chance (1, 30) && hasPrefix){
+    if( isChecked('Dark2') && chance (1, 30) && hasPrefix ){
         name = choose(shulva) + name;
         allowThe = false;
     }
@@ -243,6 +252,9 @@ function generateName(){
         hasSuffix = true;
         name += randomSuffix();
     }
+
+    // Sekiro has no "The" before any area name, so if it's checked... half the chance of "The" being prepended
+    allowThe &= isChecked('Sekiro') || chance(0.5);
 
     // 0% chance to prefix "The" if "Shulva, " is present
     // 1/6 chance if the name is longer than 10 characters

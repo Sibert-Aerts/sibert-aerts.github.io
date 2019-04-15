@@ -112,3 +112,15 @@ Blood.prefixes = ["Hunter's", "Central", "Iosefka's", "Old", "Healing Church", "
     "Abandoned", "Yahar'gul,", "Forsaken", "Cainhurst", "Lecture", "Nightmare", "Fishing"];
 
 Blood.suffixes = ["Ward", "of Despair", "of Mensis"];
+
+// Sekiro: Shadows Die Twice
+var Sekiro = {};
+
+Sekiro.areas = ["Ashina Reservoir", "Dilapidated Temple", "Ashina Outskirts", "Hirata Estate", "Ashina Castle", "Abandoned Dungeon",
+    "Senpou Temple, Mt. Kongo", "Sunken Valley", "Sunken Valley Passage", "Ashina Depths", "Mibu Village", "Fountainhead Palace"];
+
+Sekiro.locations = ["Ashina", "Reservoir", "Temple", "Outskirts", "Estate", "Castle", "Dungeon", "Temple", "Valley", "Passage", "Depths", "Village", "Palace"];
+
+Sekiro.prefixes = ["Ashina", "Dilapidated", "Hirata", "Abandoned", "Senpou", "Sunken", "Mibu", "Fountainhead"];
+
+Sekiro.suffixes = [", Mt. Kongo", "Passage", "Depths", "Outskirts"];
