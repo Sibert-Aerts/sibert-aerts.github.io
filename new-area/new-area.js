@@ -254,13 +254,13 @@ function generateName(){
     }
 
     // Sekiro has no "The" before any area name, so if it's checked... half the chance of "The" being prepended
-    allowThe &= isChecked('Sekiro') || chance(0.5);
+    let sekiroThe = isChecked('Sekiro') || chance(0.5);
 
     // 0% chance to prefix "The" if "Shulva, " is present
     // 1/6 chance if the name is longer than 10 characters
     // 5/6 chance if the name is shorter than 10 characters
     // 100% chance if no prefix or suffix is present yet.
-    if( allowThe && (chance(1, 6) || (chance(4, 5) && name.length < 10) || (!hasPrefix && !hasSuffix)))
+    if( allowThe && (chance(1, 6) && sekiroThe || (chance(4, 5) && name.length < 10) || (!hasPrefix && !hasSuffix)))
         name = "The " + name;
 
     // If it generated an existing name: reward the user with a star and a sound, at a slight delay
