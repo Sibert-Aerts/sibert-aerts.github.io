@@ -253,8 +253,8 @@ function generateName(){
         name += randomSuffix();
     }
 
-    // Sekiro has no "The" before any area name, so if it's checked... half the chance of "The" being prepended
-    let sekiroThe = isChecked('Sekiro') || chance(0.5);
+    // Sekiro has no "The" before any area name, so if it's checked... decrease the chance of "The" being prepended
+    let sekiroThe = !isChecked('Sekiro') || chance(0.5);
 
     // 0% chance to prefix "The" if "Shulva, " is present
     // 1/6 chance if the name is longer than 10 characters
