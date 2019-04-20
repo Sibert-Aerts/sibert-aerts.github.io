@@ -23,7 +23,7 @@ Dark1.areas = ["The Abyss", "Anor Londo", "Ash Lake", "Battle of Stoicism", "Und
 // pieces, minced from the above list by hand
 
 // Capitalization doesn't matter in locations
-Dark1.locations = ["abyss", "londo", "lake", "town", "chasm", "cave", "basin", "garden", "ruins", "depths", "altar", "shrine", "kiln", "ruins",
+Dark1.locations = ["abyss", "londo", "lake", "town", "chasm", "cave", "basin", "garden", "ruins", "depths", "altar", "shrine", "kiln", "ruins", "hollow", "izalith"
     "asylum", "sanctuary", "township", "dungeon", "world", "domain", "wood", "fortress", "catacombs", "archives", "tomb", "burg", "valley", "parish"];
 
 // Capitalization doesn't matter in prefixes
