@@ -21,6 +21,10 @@
         overflow-y: auto;
     }
 
+    select {
+        font-size: 18px;
+    }
+
     #indicator {
         float: right;
         background-color: #222;
@@ -83,7 +87,10 @@
     .card.red    > div { color: #a22 }
     .card.green  > div { color: #2a2 }
     .card.blue   > div { color: #22a }
-    .card.yellow > div { color: #ca6 }
+    .card.yellow > div { color: #ca4 }
+    .card.cyan   > div { color: #4bb }
+    .card.magenta> div { color: #b4b }
+    .card.black  > div { color: #888 }
 
     /*********** EFFECTS ***********/
     .card.line > div { -webkit-text-stroke: 3px #222 }
@@ -139,6 +146,7 @@
                 <select id=depth>
                     <option value=3 selected>3</option>
                     <option value=4>4</option>
+                    <option value=7>7?</option>
                 </select>
             </label>
 
@@ -189,12 +197,12 @@
         return a;
     }
 
-    function makeTuples(dims, depth){
-        if (dims < 1 || depth < 1) throw 'ERROR: You idiot!!!!!';
+    function makeTuples(dims, depths){
+        if (dims < 1 || depths.length == 0) throw 'ERROR: You idiot!!!!!';
 
         let tuples = [];
         // The "First iteration" of the loop is different!!!!
-        for( let j = 0; j < depth; j++)
+        for( let j = 0; j < depths[0]; j++)
             tuples.push([j]);
 
         for (let dim = 1; dim < dims; dim++){
@@ -202,13 +210,21 @@
             tuples = [];
             for( let i=0; i < oldTuples.length; i++ ){
                 let oldTuple = oldTuples[i];
-                for( let j=0; j < depth; j++ )
+                for( let j=0; j < depths[dim]; j++ )
                     tuples.push([...oldTuple, j]);
             }
         }
         return tuples;
     }
 
+    //
+    //        1
+    //       / \
+    //      3 - 4
+    //     / \6/ \
+    //    0 - 5 - 2
+    //
+    FanoLines = ['013', '025', '046', '124', '156', '236', '345'];
 
     class Card {
         constructor(props){
@@ -229,12 +245,18 @@
     }
 
     class Game {
-        constructor(depth, dims, render){
+        constructor(depths, render) {
             // Constructs a game of Set with (dims) properties, each of which can be one of (depth) different values.
             // This means there will be (depth)^(dims) different cards, and each set consists of (depth) cards.
-            if (dims < 1 || depth < 1) throw 'Error: you fucking idiot';
-            this.dims = dims;
-            this.depth = depth;
+            if (depths.length < 1) throw 'Error: you fucking idiot';
+            this.dims = depths.length;
+
+            if ( typeof(depths) == 'number' ) depths = new Array(dims).fill(depths);
+            else if ( depths.length != this.dims ) throw 'Error: mismatched dims/depths';
+            this.depths = depths;
+
+            this.set_size = this.depths[0]; // dumb lol but always gonna be the case probavbly :)
+
             this.render_card = render || function(div, props){
                 // default card rendering function
                 let [a, b, c, d, e] = props;
@@ -253,20 +275,23 @@
             this.build();
         }
 
-        build(){
+        build() {
             //// Construct the set of all possible tuples!
             // i.e. tuples = F_depth ^ num
-            let tuples = makeTuples(this.dims, this.depth);
+            let tuples = makeTuples(this.dims, this.depths);
             this.cards = tuples.map(t => new Card(t));
         }
 
-        getCard(props){
+        getCard(props) {
             //// Gets a card by its properties.
             if (props.length != this.dims) throw 'Error: Insufficient number of properties';
             // if props = [p0, p1, p2, ... pn]
             // then index = d^n * p0 + d^n-1 * p1 + ... + pn
-            // this relies on the order in which the cards are generated
-            let index = props.reduce( (i, p) => p + this.depth * i);
+            // that is... if depth d is constant for each dimension
+            // otherwise you get a more complex formula that's basically expressed recursively by the .reduce statement down there :)
+            // (for this math to work, it relies on the cards to be generated in the right order too)
+            let j = 0;
+            let index = props.reduce( (i, p) => p + this.depths[++j] * i);
             return this.cards[index];
         }
 
@@ -281,8 +306,8 @@
                 indicator.className = '';
 
             } else {
-                /// ALREADY (DEPTH) CARDS SELECTED: REMOVE THE OLDEST ONE FIRST
-                if (this.selected.length == this.depth) {
+                /// ALREADY (SET_SIZE) CARDS SELECTED: REMOVE THE OLDEST ONE FIRST
+                if (this.selected.length == this.set_size) {
                     this.selected[0].elem.classList.remove('selected');
                     this.selected = this.selected.slice(1);
                 }
@@ -292,30 +317,41 @@
 
             let l = this.selected.length;
             // ooh this one depends on how many points uniquely define a "line"
-            if ( l == this.depth - 1 )
+            if ( l == this.set_size - 1 )
                 this.hint();
-            else if ( l == this.depth )
+            else if ( l == this.set_size )
                 this.check();
         }
 
         check() {
-            if (this.depth == 3){
+            if (this.set_size == 3){
                 let [A, B, C] = this.selected;
                 var set = true;
                 for (let i = 0; i < this.dims && set; i++ ){
                     let [a, b, c] = [A.props[i], B.props[i], C.props[i]];
-                    // All properties are identical
-                    let subset = ( a == b && b == c );
-                    // OR: All properties are different
-                    subset = subset || ( a != b && b != c && a != c );
-                    // Sione Janssen Whiteman
-                    set &= subset;
+
+                    //// NORMAL SET RULE
+                    if (this.depths[i] == 3) {
+                        // All properties are identical
+                        let subset = ( a == b && b == c );
+                        // OR: All properties are different
+                        subset = subset || ( a != b && b != c && a != c );
+                        set &= subset;
+                    
+                    //// FANO SET RULE
+                    } else if (this.depths[i] == 7) {
+                        // Reduce our set of indices to the form "abc" (e.g. "012") to check if it's a line because javascript loves strings more than anything
+                        let abc = [a, b, c].sort().join('');
+                        set &= (a == b && b == c ) || FanoLines.includes(abc);
+
+                    } else { throw 'You can\'t do that dumbass' }
                 }
 
-            } else if (this.depth == 4){
+            //// GENERALIZED SET RULE FOR DEPTH = 4
+            } else if (this.set_size == 4){
                 let [A, B, C, D] = this.selected;
                 var set = true;
-                for (let i = 0; i < this.dims && set; i++){
+                for (let i = 0; i < this.dims && set; i++) {
                     let [a, b, c, d] = [A.props[i], B.props[i], C.props[i], D.props[i]];
                     // Properties are two pairs of identical values
                     let subset = (a == b && c == d || a == c && b == d || a == d && b == c)
@@ -328,14 +364,14 @@
             indicator.className = set ? 'good' : 'bad';
         }
         
-        extrapolate(values) {
-            // Uses (depth-1) values to extrapolate what the final value should be.
-            if (this.depth == 3) {
+        extrapolate(values, depth) {
+            // Uses some number of values to extrapolate what the final value should be.
+            if (depth == 3) {
                 let [a, b] = values;
                 if (a == b) return a;
                 return 3 - (a + b);
 
-            } else if (this.depth == 4) {
+            } else if (depth == 4) {
                 let [a, b, c] = values;
                 if (a == b) return c;
                 if (a == c) return b;
@@ -345,6 +381,15 @@
                 // So: (a + b + c + d) = (0 + 1 + 2 + 3) = 6
                 // ⇒ 6 - (a + b + c) = d
                 return 6 - (a + b + c);
+            
+            } else if (depth == 7) {
+                let [a, b] = values;
+                if (a == b) return a;
+                // The line we want is the single line which includes both a and b
+                let line = FanoLines.filter(l => l.includes(a) && l.includes(b))[0];
+                // Find the index of whichever value is neither a or b.
+                let i = 3 - (line.indexOf(a) + line.indexOf(b));
+                return parseInt(line[i]);
             }
         }
 
@@ -354,12 +399,13 @@
         }
 
         hint() {
-            if (!HINTS || this.selected.length < this.depth-1) return;
+            if (!HINTS || this.selected.length < this.set_size-1) return;
 
             let props = [];
             for (let i = 0; i < this.dims; i++){
+                // Project each selected card to just its i'th index value to make a set of properties
                 let selectedProps = this.selected.map(A => A.props[i]);
-                props.push( this.extrapolate(selectedProps) );
+                props.push( this.extrapolate(selectedProps, this.depths[i]) );
             }
             this.hintCard = this.getCard(props);
             this.hintCard.elem.classList.add('hint');
@@ -385,12 +431,12 @@
             // Put our cards on (all?)
             for (let card of this.cards) table.appendChild(card.elem);
 
-            byId('count').innerHTML = this.cards.length + ' = ' + this.depth + '<sup>' + this.dims + '</sup>';
+            byId('count').innerHTML = this.cards.length + ' = ' + this.depths.join('×');
 
             let guideBox = byId('guide-contents');
             removeChildren(guideBox);
             for (let i = 0; i < this.dims; i++){
-                for (let j = 0; j < this.depth; j++){
+                for (let j = 0; j < this.depths[i]; j++){
                     let props = [];
                     // Leaving the other elements undefined actually works nicely
                     props[i] = j;
@@ -414,10 +460,10 @@
     var indicator = byId('indicator');
     var HINTS = false;
 
-    var NUMBERS = [1, 2, 3, 4]
-    var COLOURS = ['red', 'green', 'blue', 'yellow']
-    var EFFECTS = [undefined, 'line', 'shad', 'blur']
-    var FONTS   = [undefined, 'alpha', 'beta', 'gamma']
+    var NUMBERS = [1, 2, 3, 4];
+    var COLOURS = ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta', 'black'];
+    var EFFECTS = [undefined, 'line', 'shad', 'blur'];
+    var FONTS   = [undefined, 'alpha', 'beta', 'gamma'];
     var CORNERS = ['square', undefined, 'round', 'chipped'];
 
     let games = [];
@@ -429,8 +475,18 @@
     function updateSelection(){
         let depth = parseInt(depthSelect.value);
         let dims = parseInt(dimSelect.value);
+    
+        let depths;
+        if (depth == 7) {
+            depths = new Array(dims).fill(3);
+            depths[1] = 7;
+        } else {
+            depths = new Array(dims).fill(depth);
+        }
+
         if (games[depth] == undefined) games[depth] = [];
-        if (games[depth][dims] == undefined) games[depth][dims] = new Game(depth, dims);
+        if (games[depth][dims] == undefined) games[depth][dims] = new Game(depths);
+
         game = games[depth][dims];
         game.activate();
     }
