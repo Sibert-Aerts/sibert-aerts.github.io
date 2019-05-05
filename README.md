@@ -6,3 +6,4 @@ my webzone
 * [Lazy Maze generator](/lazy-maze)
 * [Evangelion title card generator](/evangelion)
 * [Cat generator (less than finished)](/cat-generator)
+* [Art gallery demo](/gallery)
