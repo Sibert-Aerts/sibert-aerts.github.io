@@ -1,0 +1,169 @@
+<head>
+    <style>
+    body { background-color: #333 }
+
+    #table {
+        float: left;
+        background-color: #633;
+        border-radius: 20px;
+        margin: 1%;
+        padding: 10px;
+        width: 80%;
+    }
+
+    .card {
+        user-select: none;
+        vertical-align: top;
+        display: inline-block;
+        background-color: #eee;
+        border-radius: 18px;
+        width: 100px;
+        height: 140px;
+        padding: 10px;
+        margin: 10px;
+        font-size: 30px;
+        line-height: 40px;
+    }
+
+    #sidebar {
+        position: fixed;
+        right: 3%;
+        top: 30px;
+        width: 10%;
+        height: 100%;
+        padding-left: 4%;
+        overflow-y: auto;
+    }
+    .panel {
+        float: right;
+        background-color: #833;
+        width: 100%;
+        padding: 20px;
+        border-radius: 20px;
+        margin: 15px 0;
+
+        line-height: 30px;
+        font-size: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .panel label { display: inline-block; }
+    </style>
+</head>
+
+<body>
+    <div id=table></div>
+    <div id=sidebar>
+        <div class=panel>
+            <label><input name=h type=radio onClick="render=emojiRender; rerender()" checked> EMOJI </label>
+            <label><input name=h type=radio onClick="render=hexRender; rerender()"> HEX </label>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    ///////////////////////////////////////////////////////// USEFUL SMOL FUNCTIONS
+    var byId = id => document.getElementById(id);
+    var makeElem = tag => document.createElement(tag);
+    var removeChildren = x => { while (x.lastChild) x.removeChild(x.lastChild) };
+    var addClass = (e, c) => { if (c!=undefined) e.classList.add(c); }
+    ///////////////////////////////////////////////////////////////////////////////
+    
+    let squares = [
+        { inf: 0,
+          sq: [[6, 7, 8 ],
+               [4, 9, 10],
+               [3, 5, 11]]
+        },
+        { inf: 1,
+          sq: [[6, 7, 8 ],
+               [9, 10, 4],
+               [11, 3, 5]]
+        },
+        { inf: 2,
+          sq: [[4, 5, 8 ],
+               [3, 7, 10],
+               [6, 9, 11]]
+        }
+    ]
+
+    EMOJIS = ['🤫','😈','💀','✨','😴','👏','🔊','🐱','⭐','🎂','👓','⚓']
+
+    let blocks = [];
+    let addBlock = (...args) => blocks.push(args);
+    let mod3 = a => ((a%3)+3)%3;
+
+
+    let sq0 = (x, y) => squares[0].sq[mod3(x)][mod3(y)];
+
+    // Each line + all infinities:
+    for ( let [dx, dy] of [ [0,1], [1,0], [1,1], [1,-1] ] ) {
+        for (let i=0; i<3; i++){
+            let x = dy*i;
+            let y = -dx*i;
+            addBlock( 0, 1, 2, sq0(x, y), sq0(x+dx, y+dy), sq0(x+2*dx, y+2*dy) );
+        }
+    }
+
+    let lines1 = [...blocks];
+
+    // Each pair of parallel lines
+    for ( let [dx, dy] of [ [0,1], [1,0], [1,1], [1,-1] ] ) {
+        for (let i=0; i<3; i++){
+            let x = dy*i;
+            let y = -dx*i;
+            addBlock( sq0(x, y), sq0(x+dx, y+dy), sq0(x+2*dx, y+2*dy), sq0(x+dy, y-dx), sq0(x+dx+dy, y+dy-dx), sq0(x+2*dx+dy, y+2*dy-dx) );
+        }
+    }
+
+    let lines2 = blocks.slice(12);
+
+    // Each square: each cross + its infinity
+    for ( let square of squares ){
+        let inf = square.inf;
+        let sq = (x, y) => square.sq[mod3(x)][mod3(y)];
+
+        for (let x=0; x<3; x++){
+            for (let y=0; y<3; y++){
+                addBlock( inf, sq(x, y), sq(x+1, y), sq(x, y+1), sq(x-1, y), sq(x, y-1) );         // Plus shaped cross
+                addBlock( inf, sq(x, y), sq(x+1, y+1), sq(x+1, y-1), sq(x-1, y+1), sq(x-1, y-1) ); // X shaped cross
+            }
+        }
+    }
+
+    let crosses = blocks.slice(24);
+
+    // Each square: each box + the other two infinities
+    for ( let square of squares ){
+        let [inf1, inf2] = [0, 1, 2].filter(i => i != square.inf);
+        let sq = (x, y) => square.sq[mod3(x)][mod3(y)];
+
+        for (let x=0; x<3; x++){
+            for (let y=0; y<3; y++){
+                addBlock( inf1, inf2, sq(x, y), sq(x+1, y), sq(x, y+1), sq(x+1, y+1) ); // square shaped box
+                addBlock( inf1, inf2, sq(x+1, y), sq(x, y+1), sq(x-1, y), sq(x, y-1) ); // empty plus shaped box
+            }
+        }
+    }
+
+    let boxes = blocks.slice(78);
+
+
+    var emojiRender = i => EMOJIS[i];
+    var hexRender = i => i.toString(16).toUpperCase();
+    var render = emojiRender;
+
+    function rerender() {
+        let table = byId('table');
+        removeChildren(table);
+        for (let block of blocks){
+            let card = makeElem('div');
+            addClass(card, 'card');
+            card.innerText = block.map(render).join(' ');
+            table.appendChild(card);
+        }
+    }
+
+    rerender();
+
+</script>
