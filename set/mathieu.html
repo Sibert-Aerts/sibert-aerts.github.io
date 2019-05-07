@@ -21,8 +21,9 @@
         height: 140px;
         padding: 10px;
         margin: 10px;
-        font-size: 30px;
+        font-size: 34px;
         line-height: 40px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     #sidebar {
@@ -54,8 +55,12 @@
     <div id=table></div>
     <div id=sidebar>
         <div class=panel>
-            <label><input name=h type=radio onClick="render=emojiRender; rerender()" checked> EMOJI </label>
-            <label><input name=h type=radio onClick="render=hexRender; rerender()"> HEX </label>
+            <label><input name=h type=radio onClick="rerender(emojiRender)" checked> EMOJI </label>
+            <label><input name=h type=radio onClick="rerender(hexRender)"> HEX </label>
+            <label><input name=h type=radio onClick="rerender(mathRender)"> MATH </label>
+        </div>
+
+        <div class=panel id=symbols>
         </div>
     </div>
 
@@ -67,6 +72,7 @@
     var makeElem = tag => document.createElement(tag);
     var removeChildren = x => { while (x.lastChild) x.removeChild(x.lastChild) };
     var addClass = (e, c) => { if (c!=undefined) e.classList.add(c); }
+    var range = n => [...Array(n).keys()];
     ///////////////////////////////////////////////////////////////////////////////
     
     let squares = [
@@ -86,8 +92,6 @@
                [6, 9, 11]]
         }
     ]
-
-    EMOJIS = ['🤫','😈','💀','✨','😴','👏','🔊','🐱','⭐','🎂','👓','⚓']
 
     let blocks = [];
     let addBlock = (...args) => blocks.push(args);
@@ -149,11 +153,14 @@
     let boxes = blocks.slice(78);
 
 
+    let EMOJIS = ['🤫','😈','💀','✨','😴','👏','🔊','🐱','⭐','🎂','👓','⚓'];
+    let MATHS = ['∫','√','ℯ','∞','×','÷','π','𝑖','=','-','+','1'];
+
     var emojiRender = i => EMOJIS[i];
     var hexRender = i => i.toString(16).toUpperCase();
-    var render = emojiRender;
+    var mathRender = i => MATHS[i];
 
-    function rerender() {
+    function rerender(render) {
         let table = byId('table');
         removeChildren(table);
         for (let block of blocks){
@@ -162,8 +169,10 @@
             card.innerText = block.map(render).join(' ');
             table.appendChild(card);
         }
+        let symbols = byId('symbols');
+        symbols.innerText = range(12).map(render).join(' ');
     }
 
-    rerender();
+    rerender(emojiRender);
 
 </script>
