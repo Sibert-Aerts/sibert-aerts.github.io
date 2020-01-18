@@ -1,0 +1,44 @@
+
+<style>
+    #text {
+        overflow-wrap: break-word;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        transition: all 0.2s ease-out;
+    }
+    body { background-color: #F8F8F8 }
+</style>
+
+<body>
+    <span id=text style=line-height:100%>Type something.</span>
+    <input id=input type=text style=opacity:0>
+</body>
+
+<script>
+    let byId = i => document.getElementById(i);
+    let clamp = (x, low, up) => Math.min(up, Math.max(low, x));
+
+    let text = byId('text');
+    let input = byId('input');
+    let body = document.body;
+
+    input.focus();
+    document.addEventListener('mouseup', _=>input.focus());
+
+    input.addEventListener('input', func);
+
+    function func(){
+        let val = input.value;
+        let length = val.length;
+        text.innerText = val;
+        text.style.fontSize = length*0.5 + 1 + 'px';
+        let lh = 60 + 6000 / (length + 80);
+        text.style.lineHeight = lh + '%';
+        if (length > 80) {
+            let ls = Math.pow(Math.max(length-80, 0), 0.3) -1;
+            ls = (Math.pow(length, .75) - 28)/12;
+            text.style.letterSpacing = '-' + ls + 'px';
+        } else
+            text.style.letterSpacing = '0px';
+        body.scrollTop = body.scrollHeight;
+    }
+</script>
