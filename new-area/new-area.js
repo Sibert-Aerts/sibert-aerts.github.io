@@ -46,27 +46,33 @@ var itemGetSound = new Audio("ITEMGET.mp3");
 
 // List of backgrounds that's cycled through randomly
 var backgrounds = [
-    "https://i.imgur.com/cURcsam.jpg",
-    "https://i.imgur.com/uNuqPte.jpg",
-    "https://i.imgur.com/d8thQaE.jpg",
-    "https://i.imgur.com/ic9I2Uu.jpg",
-    "https://i.imgur.com/hjPuO8N.jpg",
-    "https://i.imgur.com/9gX5pBB.jpg",
-    "https://i.imgur.com/qEk3cZa.jpg",
-    "https://i.imgur.com/7qzGveQ.jpg",
-    "https://i.imgur.com/ej8kxIW.jpg",
-    "https://i.imgur.com/baIPonl.jpg",
-    "https://i.imgur.com/kfTzoWv.jpg",
+    {url: "https://i.imgur.com/uNuqPte.jpg", name: 'Great Bridge from Above'},
+    {url: "https://i.imgur.com/ic9I2Uu.jpg", name: 'Two Bridges of Lothric'},
+    {url: "https://i.imgur.com/d8thQaE.jpg", name: 'Anor Londo in the Fog'},
+    {url: "https://i.imgur.com/qEk3cZa.jpg", name: 'Undead Settlement Hidden Bonfire'},
+    {url: "https://i.imgur.com/9gX5pBB.jpg", name: 'Undead Settlement Bridge'},
+    {url: "https://i.imgur.com/hjPuO8N.jpg", name: 'Pondering Cathedral Goul'},
+    {url: "https://i.imgur.com/cURcsam.jpg", name: 'Giant at Sundown'},
+    {url: "https://i.imgur.com/baIPonl.jpg", name: 'Blue Skies of Archdragon Peak'},
+    {url: "https://i.imgur.com/7qzGveQ.jpg", name: 'Grand Archives Steps'},
+    {url: "https://i.imgur.com/ej8kxIW.jpg", name: 'Ruins of Lothric Beyond Time'},
+    {url: "https://i.imgur.com/kfTzoWv.jpg", name: 'Darkeater\'s Abode'},
 ];
 
 async function randomBackground(fade=true) {
+    await setBackground(choose(backgrounds), fade);
+}
+
+async function setBackground(bg, fade=true) {
+    $('.background-item').removeClass('selected');
+    bg.elem.classList.add('selected');
     if(fade){
         $("#background-layer").css("background-image", $("body").css("background-image"));
         $("#background-layer").removeClass("faded");
         await sleep(100);
         $("#background-layer").addClass("faded");
     }
-    $("body").css("background-image", `url(${choose(backgrounds)})`);
+    $("body").css("background-image", `url(${bg.url})`);
 }
 
 // Incredibly dumb: updating the area name actually just sets the anchor, this triggers window.onhashchange, calling parseAnchor
@@ -84,8 +90,6 @@ function parseAnchor(){
 
 // Called when the page is loaded.
 $(document).ready(function () {
-    // Put up a random background
-    randomBackground(false);
 
     // Bind the enter-key event to the custom-text input field
     $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() });
@@ -97,7 +101,20 @@ $(document).ready(function () {
     // Bind the two checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) });
     $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) });
+    $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) });
 
+    // Fill up the 'background selection' element:
+    let bgList = $('#background-list');
+    for( let bg of backgrounds ){
+        let e = bg.elem = document.createElement('div');
+        e.classList.add('background-item');
+        e.innerText = bg.name;
+        e.onclick = () => setBackground(bg);
+        bgList.append(e);
+    }
+    
+    // Put up a random background without fade-in
+    randomBackground(false);
 });
 
 // Custom pool
@@ -325,7 +342,8 @@ function generate(){
     // Never swap bg within 10 clicks of last swap
     // Always swap bg after 30 clicks
     // 4% chance per click of swapping bg between 10 and 30 clicks
-    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04))){
+    // Don't swap if manual selection is enabled
+    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && !$("input[target=background-select]").prop('checked') ){
         bgCooldown = 0;
         randomBackground();
     }

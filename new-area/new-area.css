@@ -89,6 +89,7 @@ body {
     font-weight: 400;
     font-style: normal;
     color: white;
+    margin-bottom: 40px;
 }
 
 
@@ -277,11 +278,22 @@ textarea, input {
     height: 80px;
     position: fixed;
     bottom: 0px;
+    pointer-events: none;
 
-    background: -webkit-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
-    background: -o-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
-    background: -moz-linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
-    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6));
+    background: -webkit-linear-gradient(#0000, rgba(0,0,0,0.8));
+    background: -o-linear-gradient(#0000, rgba(0,0,0,0.8));
+    background: -moz-linear-gradient(#0000, rgba(0,0,0,0.8));
+    background: linear-gradient(#0000, rgba(0,0,0,0.8));
+}
+
+.background-item {
+    cursor: pointer;
+}
+.background-item.selected {
+    color: #88BBDD;
+}
+.background-item:hover {
+    text-decoration: underline;
 }
 
 .background-layer {
