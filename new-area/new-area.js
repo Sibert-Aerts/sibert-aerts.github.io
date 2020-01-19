@@ -46,13 +46,13 @@ var itemGetSound = new Audio("ITEMGET.mp3");
 
 // List of backgrounds that's cycled through randomly
 var backgrounds = [
-    {url: "https://i.imgur.com/uNuqPte.jpg", name: 'Great Bridge from Above'},
     {url: "https://i.imgur.com/ic9I2Uu.jpg", name: 'Two Bridges of Lothric'},
+    {url: "https://i.imgur.com/uNuqPte.jpg", name: 'Great Bridge from Above'},
     {url: "https://i.imgur.com/d8thQaE.jpg", name: 'Anor Londo in the Fog'},
     {url: "https://i.imgur.com/qEk3cZa.jpg", name: 'Undead Settlement Hidden Bonfire'},
     {url: "https://i.imgur.com/9gX5pBB.jpg", name: 'Undead Settlement Bridge'},
-    {url: "https://i.imgur.com/hjPuO8N.jpg", name: 'Pondering Cathedral Goul'},
-    {url: "https://i.imgur.com/cURcsam.jpg", name: 'Giant at Sundown'},
+    {url: "https://i.imgur.com/hjPuO8N.jpg", name: 'Sundowning Cathedral Ghoul'},
+    {url: "https://i.imgur.com/cURcsam.jpg", name: 'Giant at Time\'s End'},
     {url: "https://i.imgur.com/baIPonl.jpg", name: 'Blue Skies of Archdragon Peak'},
     {url: "https://i.imgur.com/7qzGveQ.jpg", name: 'Grand Archives Steps'},
     {url: "https://i.imgur.com/ej8kxIW.jpg", name: 'Ruins of Lothric Beyond Time'},
@@ -88,6 +88,14 @@ function parseAnchor(){
     smartFadeOut();
 }
 
+function addBackgroundItem(bg){   
+    let e = bg.elem = document.createElement('div');
+    e.classList.add('background-item');
+    e.innerText = bg.name;
+    e.onclick = () => setBackground(bg);
+    $('#background-list').append(e);
+}
+
 // Called when the page is loaded.
 $(document).ready(function () {
 
@@ -104,14 +112,12 @@ $(document).ready(function () {
     $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) });
 
     // Fill up the 'background selection' element:
-    let bgList = $('#background-list');
     for( let bg of backgrounds ){
-        let e = bg.elem = document.createElement('div');
-        e.classList.add('background-item');
-        e.innerText = bg.name;
-        e.onclick = () => setBackground(bg);
-        bgList.append(e);
+        addBackgroundItem(bg);
     }
+
+    // Not in the random bg circulation
+    addBackgroundItem({url: 'https://i.imgur.com/qabmNjV.png', name: 'The Abyss'});
     
     // Put up a random background without fade-in
     randomBackground(false);
@@ -343,7 +349,7 @@ function generate(){
     // Always swap bg after 30 clicks
     // 4% chance per click of swapping bg between 10 and 30 clicks
     // Don't swap if manual selection is enabled
-    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && !$("input[target=background-select]").prop('checked') ){
+    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
         bgCooldown = 0;
         randomBackground();
     }

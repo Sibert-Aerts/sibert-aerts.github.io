@@ -288,6 +288,7 @@ textarea, input {
 
 .background-item {
     cursor: pointer;
+    margin-left: 8px;
 }
 .background-item.selected {
     color: #88BBDD;
