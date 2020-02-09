@@ -16,6 +16,7 @@
     #checkboxes-wrapper {
         width: 65%;
     }
+    #streamer-switch, .streamer-feature { display: none }
 }
 
 @media screen and (min-width: 720px) {
@@ -86,12 +87,12 @@
 
 body {
     font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+    background-attachment: fixed;
     font-weight: 400;
     font-style: normal;
     color: white;
     margin-bottom: 40px;
 }
-
 
 #main {
     margin-bottom: 40px;
@@ -141,6 +142,12 @@ body {
     float: left;
     text-align: center;
     text-shadow: 2px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+#lesser-content-wrapper {
+    overflow: hidden;
+    margin-left: 5%;
+    margin-bottom: 200px;
 }
 
 .underline {
@@ -245,30 +252,36 @@ textarea, input {
     color: black;
 }
 
-.credits {
+#credits {
     position: fixed;
-    bottom: 20px;
+    bottom: 0px;
+    width: 100vw;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.credit {
+    display: inline-block;
+    margin: 0px 30px 20px;
     opacity: 0.9;
     font-family: Tahoma, Arial;
     font-size: 16px;
     text-shadow: 1px 1px 1px black, 0px 0px 20px #111, 0px 0px 20px #111;
 }
-    .credits.left {
-        left: 30px;
+    .credit.left {
         font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
         font-size: 18px;
     }
-    .credits.right {
-        right: 30px;
-    }
 
-    .credits > a {
+    .credit > a {
         text-decoration: underline;
         color: white;
     }
-        .credits > a:hover { color: orange }
+        .credit > a:hover { color: orange }
     
-    .credits > .dash {
+    .credit > .dash {
         margin-left: 10px;
         margin-right: 10px;
     }
@@ -299,7 +312,7 @@ textarea, input {
 
 .background-layer {
     z-index: -1;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     width: 100%;

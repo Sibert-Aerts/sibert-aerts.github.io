@@ -2,6 +2,8 @@
 <html>
 <head>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 
     <!-- Latest compiled and minified CSS -->
@@ -60,7 +62,7 @@
     </div>
 
 
-    <div id="lesser-content-wrapper" style="margin-left:5%;">
+    <div id=lesser-content-wrapper>
 
         <div id="custom-input" class="lesser content hidden">
             <h4>Custom input:</h4> <span class="help">Use semicolons to separate individual bits</span>
@@ -121,20 +123,22 @@
 
     <div class="bottom-fade"></div>
 
-    <div class="credits left">
-        Sekiro: Shadows Die Twice Edition™<br>
-        <label>Enable Streamer Features: <input type=checkbox target="streamer-features"></label><br>
-        <label>Show Background Selector: <input type=checkbox target="background-select"></label>
-    </div>
+    <div id=credits> 
+        <div class="credit left">
+            Sekiro: Shadows Die Twice Edition™<br>
+            <label id=streamer-switch>Enable Streamer Features: <input type=checkbox target="streamer-features"><br></label>
+            <label>Show Background Selector: <input type=checkbox target="background-select"></label>
+        </div>
 
-    <div class="credits right">
-        <a href="http://twitter.com/rezuaq">Made by Rezuaq</a>
-        <span class=dash>-</span>
-        <a href="https://rezuaq.tumblr.com/post/175718225293/enhanced-area-name-generator">On Tumblr</a>
-        <span class=dash>-</span>
-        <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area">On Github</a>
-        <span class=dash>-</span>
-        <a href="http://imgur.com/a/xrxes">Background images</a>
+        <div class="credit right">
+            <a href="http://twitter.com/rezuaq">Made by Rezuaq</a>
+            <span class=dash>-</span>
+            <a href="https://rezuaq.tumblr.com/post/175718225293/enhanced-area-name-generator">On Tumblr</a>
+            <span class=dash>-</span>
+            <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area">On Github</a>
+            <span class=dash>-</span>
+            <a href="http://imgur.com/a/xrxes">Background images</a>
+        </div>
     </div>
 
 </body>
