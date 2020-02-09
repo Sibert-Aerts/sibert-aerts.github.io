@@ -16,7 +16,7 @@
     #checkboxes-wrapper {
         width: 65%;
     }
-    #streamer-switch, .streamer-feature { display: none }
+    .streamer-hide, .streamer-feature { display: none }
 }
 
 @media screen and (min-width: 720px) {
