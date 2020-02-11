@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* STYLE */
+    body {
+        background-color: white;
+        color: black;
+    }
+
+    body.dark {
+        background-color: black;
+        color: white;
+    }
+
+    #container {
+        position: absolute;
+        width: 240px;
+        height: 90%;
+        left: 40%;
+        top: 5%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #container > div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #container > div > span {
+        flex: 0 1;
+        text-align: center;
+        line-height: 30px;
+    }
+
+    @keyframes flicker{
+        0% {opacity: 1} 50% {opacity: 0}
+    }
+    .caret {
+        transform: scaleX(0.6) scaleY(1.2);
+        animation-name: flicker;
+        animation-duration: 1s;
+        animation-iteration-count: infinite;
+        animation-timing-function: steps(1);
+    }
+
+
+</style>
+</head>
+<body class=dark>
+<!-- HTML -->
+
+    <textarea style=opacity:0;pointer-events:none; id=input rows=30 cols=60>it is with a heavy heart that i must announce that the celebs are at it again </textarea>
+
+    <div id=container></div>  
+
+    <input id=check type=checkbox checked style=position:absolute;top:30px;left:30px>
+
+
+</body>
+<script>
+// SCRIPT
+let byId = i => document.getElementById(i)
+let makeElem = n => document.createElement(n)
+
+let cont = byId('container')
+let input = byId('input')
+
+input.oninput = function(){
+    let text = input.value;
+    cont.innerHTML = '';
+    for( let word of text.split(/(\n| +)/) ){
+        row = makeElem('div');
+        row.style.fontSize = 40 - 1.2* word.length + 'px';
+        cont.appendChild(row);
+        for( let letter of word ){
+            let l = makeElem('span');
+            l.innerText = letter.toUpperCase();
+            row.appendChild(l);
+        }
+    }
+    let l = makeElem('span');
+    l.innerText = 'I'; l.className = 'caret';
+    row.appendChild(l);    
+}
+
+function focus(){
+    input.focus();
+    let val = input.value;
+    input.value = '';
+    input.value = val;
+}
+focus();
+input.oninput();
+document.addEventListener('mouseup', focus);
+document.addEventListener('keyup', focus);
+
+byId('check').onchange= function(){ document.body.classList[this.checked? 'add' : 'remove']('dark') }
+
+</script>
+</html>

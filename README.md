@@ -7,3 +7,4 @@ my webzone
 * [Evangelion title card generator](/evangelion)
 * [Cat generator (less than finished)](/cat-generator)
 * [Art gallery demo](/gallery)
+* [Small html toys](/toys)
