@@ -17,7 +17,7 @@ const ctx = canvas.getContext('2d');
 
 function newGrid(){
     let grid = new Array(width);
-    for( let i=0; i<width; i++ ) grid[i] = new Array(height).fill(false);
+    for( let i=0; i<width; i++ ) grid[i] = new Int8Array(height);
     return grid;
 }
 
@@ -170,17 +170,17 @@ for( let t in transforms )
 fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
 $('input[value=sierpinski_triangle]').click();
 
-$('button[target=clear]').onclick = ()=>{ grid = newGrid(); renderGrid(grid) };
-$('button[target=dot]').onclick = ()=>{ grid = newGrid(); grid[int(width/2)][int(height/2)] = true; renderGrid(grid) };
-$('button[target=square]').onclick = ()=>{ grid = getSquare(); renderGrid(grid) };
-$('button[target=esquare]').onclick = ()=>{ grid = getEmptySquare(); renderGrid(grid) };
-$('button[target=circle]').onclick = ()=>{ grid = getCircle(); renderGrid(grid) };
-$('button[target=path]').onclick = ()=>{ grid = getPath(); renderGrid(grid) };
+$('button[target=clear]').onclick = ()=>{ GRID = newGrid(); renderGrid(GRID) };
+$('button[target=dot]').onclick = ()=>{ GRID = newGrid(); GRID[int(width/2)][int(height/2)] = true; renderGrid(GRID) };
+$('button[target=square]').onclick = ()=>{ GRID = getSquare(); renderGrid(GRID) };
+$('button[target=esquare]').onclick = ()=>{ GRID = getEmptySquare(); renderGrid(GRID) };
+$('button[target=circle]').onclick = ()=>{ GRID = getCircle(); renderGrid(GRID) };
+$('button[target=path]').onclick = ()=>{ GRID = getPath(); renderGrid(GRID) };
 
 function step( grid ){
     let nuGrid = newGrid();
-    for(let x=0; x<width; x++)
-        for(let y=0; y<height; y++)
+    for( let x=0; x<width; x++)
+        for( let y=0; y<height; y++)
             if( grid[x][y] )
                 for( let [px, py] of TRANSFORM(x, y) )
                     if( 0 <= px && px < width && 0 <= py && py < height )
@@ -189,8 +189,8 @@ function step( grid ){
 }
 
 function step_and_render(){
-    grid = step(grid);
-    renderGrid(grid);
+    GRID = step(GRID);
+    renderGrid(GRID);
 }
 
 const random_sierpinski =  [
@@ -200,14 +200,14 @@ const random_sierpinski =  [
 ]
 
 function random_render(){
-    grid = newGrid();
+    GRID = newGrid();
     let nsteps = parseInt(byId('rand-steps').value);
     let [x, y] = [randInt(width), randInt(height)];
     for( let i=0; i<nsteps; i++ ){
         [x, y] = random_sierpinski[randInt(3)](x, y);
-        grid[x][y] = true;
+        GRID[x][y] = 1;
     }
-    renderGrid(grid);
+    renderGrid(GRID);
 }
 
 document.onkeypress = e => {
@@ -215,6 +215,14 @@ document.onkeypress = e => {
         step_and_render();
 }
 
-let grid = getSquare();
-renderGrid(grid);
+let GRID = getSquare();
+renderGrid(GRID);
         
+function time(){
+    console.time('TIMER');
+    GRID = getSquare();
+    for( let i=0; i<10; i++ )
+        GRID = step(GRID);
+    renderGrid(GRID);    
+    console.timeEnd('TIMER');
+}
