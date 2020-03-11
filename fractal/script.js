@@ -95,7 +95,7 @@ const transforms = {
         [ int(x/2), int(y/2 + height/2) ] 
     ],
 
-    square: (x, y) => [
+    square_2x2: (x, y) => [
         [ int(x/2), int(y/2) ],
         [ int(x/2 + width/2), int(y/2) ],
         [ int(x/2), int(y/2 + height/2) ],
@@ -141,6 +141,26 @@ const transforms = {
         [ int(x/2) + width/2, int(y/2 + height/2) ],
         [ int(x/2 + width/4), int((height - y)/2 + height/2) ]
     ],
+
+    X: (x, y) => {
+        let x0 = int(x/3), x1 = int(x/3 + width/3), x2 = int(x/3 + 2*width/3);
+        let y0 = int(y/3), y1 = int(y/3 + height/3), y2 = int(y/3 + 2*height/3);
+        return [
+            [ x0, y0 ],            [ x2, y0 ],
+                        [ x1, y1 ],
+            [ x0, y2 ],            [ x2, y2 ],
+        ]
+    },
+
+    film: (x, y) => {
+        let x0 = int(x/3), x1 = int(x/3 + width/3), x2 = int(x/3 + 2*width/3);
+        let y0 = int(y/3), y1 = int(y/3 + height/3), y2 = int(y/3 + 2*height/3);
+        return [
+            [ x0, y0 ], [ x1, y0 ], [ x2, y0 ],
+                        [ x1, y1 ],
+            [ x0, y2 ], [ x1, y2 ], [ x2, y2 ],
+        ]
+    },
 
     flower: (x, y) => {
         let x0 = int(x/3), x1 = int(x/3 + width/3), x2 = int(x/3 + 2*width/3);
@@ -211,7 +231,7 @@ function random_render(){
 }
 
 document.onkeypress = e => {
-    if( e.key == 'Enter' )
+    if( e.key == 'Enter' && document.activeElement === document.body )
         step_and_render();
 }
 
