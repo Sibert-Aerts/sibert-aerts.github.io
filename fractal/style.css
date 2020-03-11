@@ -6,13 +6,17 @@ body {
     color: #ccc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
 }
 #screen {
+    width: 900px;
+    height: 900px;
     margin: 10px;
-    background-color: #666;
+    background-color: #999;
     box-shadow: 0px 10px 25px #000a;
+    image-rendering: pixelated;
 }
 #controls {
     min-width: 16%;
@@ -22,9 +26,13 @@ body {
 form {
     border-radius: 10px;
     margin: 20px 10%;
-    padding: 30px;
+    padding: 20px 30px;
     background-color: #333;
     box-shadow: 0px 10px 15px #0004, 0px -10px 10px #8881;
+}
+form > h4 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
 }
 #frac-select > label {
     display: block;

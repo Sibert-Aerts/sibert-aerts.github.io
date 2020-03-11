@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <link rel=stylesheet type=text/css href=style.css>
-    <title>Rezuaq's Image Gallery Demo</title>
-    <link rel=icon href=html/favicon.ico>
+    <title>Fractal Generator</title>
+    <link rel=icon href=favicon.ico>
 </head>
 
 <body>
 	<canvas id=screen width=900 height=900></canvas>
 
     <div id=controls>
-        <form id=frac-select></form>
+        <form id=frac-select>
+            <h4>Transformation</h4>
+            <!-- added by script -->
+        </form>
         <form id=clear-select>
             <button type=button target=clear>clear</button>
             <button type=button target=dot>pixel</button>
             <button type=button target=square>square</button>
             <button type=button target=esquare>empty square</button>
             <button type=button target=circle>circle</button>
+            <button type=button target=path>path</button>
         </form>
         <button onclick=step_and_render() style=font-size:24px>step</button>
         <button onclick=random_render() style=font-size:24px>random</button>
-        <label>#random steps <input id=rand-steps type=text value=10000 size=6></label>
+        <label>#random steps <input id=rand-steps type=text value=100000 size=6></label>
     </div>
 
 </body>
 
 <script type=text/javascript src=script.js></script>
+
 </html>

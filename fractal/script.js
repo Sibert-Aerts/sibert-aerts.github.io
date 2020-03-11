@@ -1,37 +1,42 @@
-
+// Useful aliases
 const int = Math.floor;
-const chance = (x, y=1) => Math.random() * y < x;
-const randInt = a => int( Math.random()*a );
 const byId = i => document.getElementById(i);
 const $ = s => document.querySelector(s);
 
-const canvas = document.querySelector('#screen');
-const width  = +canvas.width;
-const height = +canvas.height;
+// Useful functions
+const chance = (x, y=1) => Math.random()*y < x;
+const randInt = a => int( Math.random()*a );
+
+// Useful globals
+const canvas = byId('screen');
+const canvasWidth = +canvas.width;
+const canvasHeight = +canvas.height;
+const width = canvasWidth * 2;
+const height = canvasHeight * 2;
 const ctx = canvas.getContext('2d');
 
 function newGrid(){
     let grid = new Array(width);
-    for(i=0;i<width;i++) grid[i] = new Array(height).fill(false);
+    for( let i=0; i<width; i++ ) grid[i] = new Array(height).fill(false);
     return grid;
 }
-            
+
 function clear(){
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 }
-        
+
 function renderGrid( grid ){
     clear();
-    let id = ctx.getImageData(0, 0, width, height);
+    let id = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
     let pixels = id.data;
-    let i = 0; // i = (y*height + x)*4
-    for(let y=0; y<width; y++){
-        for(let x=0; x<height; x++){
-            if( grid[x][y] ) pixels[i+3]=255;
-            i += 4;
+    let i = 0; // i = (cy*canvasHeight + cx)*4
+    let x, y;  // gx = 2*cx, gy = 2*cy
+    for( y=0; y<width; y+=2 ){
+        for( x=0, gx=0 ; x<height; x+=2, i+=4 ){            
+            pixels[i+3] = 64 * (grid[x][y] + grid[x+1][y] + grid[x][y+1] + grid[x+1][y+1]) - 1;
         }
     }
-    ctx.putImageData(id, 0, 0)
+    ctx.putImageData(id, 0, 0);
 }
 
 var getterCache = []; var cacheIndex = 0;
@@ -63,7 +68,7 @@ const getEmptySquare = makeGetter(function(){
 // Draw a circle
 const getCircle = makeGetter(function(){
     let circle = newGrid();
-    let rsq = Math.pow((height/4), 2);
+    const rsq = Math.pow((height/4), 2);
     for( let y=0; y<height; y++ ){
         let D = rsq - Math.pow(y-height/2, 2);
         if( D < 0 ) continue;
@@ -73,6 +78,15 @@ const getCircle = makeGetter(function(){
     }
     return circle;
 });
+// Draw a path
+const getPath = function(){
+    let path = newGrid();
+    const dxdy = width/height/2;
+    for( let y=0; y<height; y++ ){
+        path[int(y*dxdy)][height-1-y] = path[int(width-1-y*dxdy)][height-1-y] = true;
+    }
+    return path;
+};
 
 const transforms = {
     sierpinski_square: (x, y) => [
@@ -97,6 +111,13 @@ const transforms = {
             [ x0, y2 ], [ x1, y2 ], [ x2, y2 ],
         ]
     },
+
+    make_path_fill_space: (x, y) => [
+        [ int(x/2), int(y/2) ],
+        [ int(x/2 + width/2), int(y/2) ],
+        [ int((width-1)/2 - y/2), int(x/2 + height/2) ],
+        [ int(y/2 + width/2), int(x/2 + height/2) ]
+    ],
 
     sponge: (x, y) => {
         let x0 = int(x/3), x1 = int(x/3 + width/3), x2 = int(x/3 + 2*width/3);
@@ -145,7 +166,7 @@ const transforms = {
 var fracSelect = byId('frac-select');
 var TRANSFORM;
 for( let t in transforms )
-    fracSelect.innerHTML += `<label><input type="radio" name="frac" value="${t}"> ${t.replace('_', ' ')}</label>`
+    fracSelect.innerHTML += `<label><input type="radio" name="frac" value="${t}"> ${t.replace(/_/g, ' ')}</label>`
 fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
 $('input[value=sierpinski_triangle]').click();
 
@@ -154,6 +175,7 @@ $('button[target=dot]').onclick = ()=>{ grid = newGrid(); grid[int(width/2)][int
 $('button[target=square]').onclick = ()=>{ grid = getSquare(); renderGrid(grid) };
 $('button[target=esquare]').onclick = ()=>{ grid = getEmptySquare(); renderGrid(grid) };
 $('button[target=circle]').onclick = ()=>{ grid = getCircle(); renderGrid(grid) };
+$('button[target=path]').onclick = ()=>{ grid = getPath(); renderGrid(grid) };
 
 function step( grid ){
     let nuGrid = newGrid();
