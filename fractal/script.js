@@ -11,13 +11,14 @@ const randInt = a => int( Math.random()*a );
 const canvas = byId('screen');
 const canvasWidth = +canvas.width;
 const canvasHeight = +canvas.height;
-const width = canvasWidth * 2;
-const height = canvasHeight * 2;
+const PIXELFACTOR = 1;
+const width = canvasWidth * PIXELFACTOR;
+const height = canvasHeight * PIXELFACTOR;
 const ctx = canvas.getContext('2d');
 
 function newGrid(){
     let grid = new Array(width);
-    for( let i=0; i<width; i++ ) grid[i] = new Int8Array(height);
+    for( let i=0; i<width; i++ ) grid[i] = new Uint8Array(height);
     return grid;
 }
 
@@ -29,13 +30,20 @@ function renderGrid( grid ){
     clear();
     let id = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
     let pixels = id.data;
-    let i = 0; // i = (cy*canvasHeight + cx)*4
-    let x, y;  // gx = 2*cx, gy = 2*cy
-    for( y=0; y<width; y+=2 ){
-        for( x=0, gx=0 ; x<height; x+=2, i+=4 ){            
-            pixels[i+3] = 64 * (grid[x][y] + grid[x+1][y] + grid[x][y+1] + grid[x+1][y+1]) - 1;
-        }
+    let i = 0;
+    let x, y;
+
+    if( PIXELFACTOR == 1 ){
+        for( y=0; y<width; y++ )
+            for( x=0, gx=0 ; x<height; x++, i+=4 )
+                if( grid[x][y] ) pixels[i+3] = 255;
     }
+    else if( PIXELFACTOR == 2 ){
+        for( y=0; y<width; y+=2 )
+            for( x=0, gx=0 ; x<height; x+=2, i+=4 )
+                pixels[i+3] = 64 * (grid[x][y] + grid[x+1][y] + grid[x][y+1] + grid[x+1][y+1]) - 1;
+    }
+
     ctx.putImageData(id, 0, 0);
 }
 
@@ -52,17 +60,16 @@ function makeGetter(func){
 const getSquare = makeGetter(function(){
     let square = newGrid();
     for(let i=int(width/4); i<int(3*width/4); i++)
-        for(let j=int(height/4); j<int(3*height/4); j++)
-            square[i][j] = true;
+        square[i].fill( 1, int(height/4), int(3*height/4) );
     return square;
 });
 // Draw an empty square
 const getEmptySquare = makeGetter(function(){
     let empty = newGrid();
     for(let x=0; x<width; x++)
-        empty[x][0] = empty[x][height-1] = true;
-    for(let y=0; y<height; y++)
-        empty[0][y] = empty[width-1][y] = true;
+        empty[x][0] = empty[x][height-1] = 1;
+    empty[0].fill(1)
+    empty[width-1].fill(1);
     return empty;
 });
 // Draw a circle
@@ -73,8 +80,7 @@ const getCircle = makeGetter(function(){
         let D = rsq - Math.pow(y-height/2, 2);
         if( D < 0 ) continue;
         let sqD = Math.sqrt( D );
-        for( let x=int(width/2-sqD); x<=int(width/2+sqD); x++ )
-            circle[x][y] = true;
+        circle[x].fill(1, int(width/2-sqD), int(width/2+sqD))
     }
     return circle;
 });

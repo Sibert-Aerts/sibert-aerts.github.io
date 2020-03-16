@@ -1,36 +1,33 @@
 
 body {
     margin: 0;
+    width: 100vw;
     min-height: 80vh;
     background-color: #333;
     color: #ccc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
 }
 #screen {
+    float: left;
     width: 900px;
     height: 900px;
-    margin: 10px;
+    margin: 10px 50px;
     background-color: #999;
     box-shadow: 0px 10px 25px #000a;
     image-rendering: pixelated;
 }
 #controls {
-    min-width: 16%;
-    display: flex;
-    flex-direction: column;
+    min-width: 30%;
 }
-form {
+.box {
+    float: left;
     border-radius: 10px;
-    margin: 20px 10%;
+    margin: 20px;
     padding: 20px 30px;
     background-color: #333;
     box-shadow: 0px 10px 15px #0004, 0px -10px 10px #8881;
 }
-form > h4 {
+.box > h4 {
     margin-top: 0;
     margin-bottom: 0.5em;
 }
@@ -69,7 +66,7 @@ button:focus {
 }
 
 input[type=radio] { position: relative; top: 3px; }
-input[type=radio]::before { 
+input[type=radio]:before { 
     content: '';
     pointer-events: none;
     position: absolute;
@@ -79,9 +76,9 @@ input[type=radio]::before {
     background-color: #333;
     box-shadow: 0px 8px 10px #0004, 0px -8px 8px #8881;
 }
-input[type=radio]:active::before {
+input[type=radio]:active:before {
     box-shadow: 0px -3px 4px #00000046, 0px 3px 4px #88888813, inset 0px 6px 7px #0004;;
 }
-input[type=radio]:checked::before {
+input[type=radio]:checked:before {
     box-shadow: 0px -3px 4px #0004, 0px 3px 4px #8881, inset 0px 4px 5px #0004;
 }

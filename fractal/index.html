@@ -12,21 +12,24 @@
 	<canvas id=screen width=900 height=900></canvas>
 
     <div id=controls>
-        <form id=frac-select>
-            <h4>Transformation</h4>
-            <!-- added by script -->
-        </form>
-        <form id=clear-select>
+        <div id=clear-select class=box>
+            <h4>Draw</h4>
             <button type=button target=clear>clear</button>
             <button type=button target=dot>pixel</button>
             <button type=button target=square>square</button>
             <button type=button target=esquare>empty square</button>
             <button type=button target=circle>circle</button>
             <button type=button target=path>path</button>
+        </div>
+        <form id=frac-select class=box>
+            <h4>Transformations</h4>
+            <!-- added by script -->
         </form>
-        <button onclick=step_and_render() style=font-size:24px>step</button>
-        <button onclick=random_render() style=font-size:24px>random</button>
-        <label>#random steps <input id=rand-steps type=text value=100000 size=6></label>
+        <div class=box>
+            <button onclick=step_and_render() style=font-size:24px>step</button>
+            <button onclick=random_render() style=font-size:24px>random</button>
+            <label>#random steps <input id=rand-steps type=text value=100000 size=6></label>
+        </div>
     </div>
 
 </body>
