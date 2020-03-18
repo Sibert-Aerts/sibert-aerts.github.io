@@ -30,7 +30,7 @@ body {
     margin-top: 0;
     margin-bottom: 0.5em;
 }
-#frac-select > label {
+#frac-select > label, #trans-select > label {
     display: block;
     line-height: 2em;
 }
