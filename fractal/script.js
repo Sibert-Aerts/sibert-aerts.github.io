@@ -138,13 +138,14 @@ class FunctionTransform extends Transform {
 
 class TransformGroup extends Transform {
     // Class representing several Transforms applied alongside each other
-    // e.g. TransformGroup(T1, T2).apply_to_point(x, y) == [...T1.apply(x, y), ...T2.apply(x, y)]
+    // e.g. TransformGroup(T1, T2).apply_to_point(x, y) == [...T1.apply_to_point(x, y), ...T2.apply_to_point(x, y)]
     constructor( ...transforms ){
         super();
         this.transforms = transforms;
         // multiplicity will be (undefined) unless every transform has a known multiplicity
         this.multiplicity = transforms.reduce( (s, t) => s + t.multiplicity, 0 )
     }
+
     apply_to_point(x, y){
         if( this.multiplicity ){
             // If everyone knows their multiplicity everyone should be returning Uint16Arrays
@@ -155,12 +156,62 @@ class TransformGroup extends Transform {
                 offset += t.multiplicity*2;
             }
             return out;
+        } else {
+            // Multiplicity unknown: Just spread it, whatever
+            return this.transforms.reduce( (i, t) => [...i, ...t.apply_to_point(x, y)], [] );
         }
-        return this.transforms.reduce( (i, t) => [...i, ...t.apply_to_point(x, y)], [] );
     }
+
     apply_to_grid(grid, newGrid){
         // I don't understand why but this is somehow the most efficient way to implement this
         for( let t of this.transforms ) t.apply_to_grid(grid, newGrid);
+    }
+}
+
+class TransformChain extends Transform {
+    // Class representing several Transforms applied one after the other (i.e. a composition of Transforms)
+    constructor( ...transforms ){
+        super();
+        this.transforms = transforms;
+        // multiplicity will be (undefined) unless every transform has a known multiplicity
+        this.multiplicity = transforms.reduce( (s, t) => s * t.multiplicity, 1 )
+    }
+
+    apply_to_point(x, y){
+        if( this.multiplicity ){
+            // Known multiplicity: Make an array and carefully use it to repeatedly map our coordinates
+            const out = new Uint16Array(this.multiplicity * 2)
+            out[0] = x;
+            out[1] = y;
+            let size = 2;
+            for( const t of this.transforms ){
+                const m = t.multiplicity;
+                for( let i=0; i<size; i+= 2 )
+                    out.set( t.apply_to_point(out[i], out[i+1]), m*i )
+                size *= t.multiplicity;
+            }
+            return out;
+
+        } else {
+            // Don't know multiplicity: Just use arrays whatever
+            let out = [x, y];
+            for( const t of this.transforms ){
+                let image = [];
+                for( let i=0; i<size; i+= 2 )
+                    image = image.concat( t.apply_to_point(out[i], out[i+1]) )
+                out = image;
+            }
+            return out;
+        }
+    }    
+
+    apply_to_grid(grid, newGrid){
+        for( let t of this.transforms.slice(0, -1) ){
+            let imageGrid = new Grid();
+            t.apply_to_grid(grid, imageGrid);
+            grid = imageGrid;
+        }
+        this.transforms[this.transforms.length-1].apply_to_grid(grid, newGrid);
     }
 }
 
@@ -240,7 +291,6 @@ class ScaleAndRotateTransform extends MatrixTransform {
         this.r = r;
     }
 }
-
 
 const transforms2 = {
     sierpinski_triangle: new MatrixTransform(0.5, 0, 0, 0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
