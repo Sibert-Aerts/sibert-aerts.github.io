@@ -14,13 +14,13 @@ const mod = (x, m) => ((x%m)+m%m);
 CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT) }
 
 // Useful globals
-const canvas = byId('screen');
-const CANVASWIDTH = +canvas.width;
-const CANVASHEIGHT = +canvas.height;
-const PIXELFACTOR = 2;
+const CANVAS = byId('screen');
+const CANVASWIDTH = +CANVAS.width;
+const CANVASHEIGHT = +CANVAS.height;
+const PIXELFACTOR = 1;
 const WIDTH = CANVASWIDTH * PIXELFACTOR;
 const HEIGHT = CANVASHEIGHT * PIXELFACTOR;
-const CTX = canvas.getContext('2d');
+const CTX = CANVAS.getContext('2d');
 
 /****************************************************************************************/
 /*                                       NEW CODE                                       */
@@ -48,7 +48,7 @@ class Grid {
         return this._count = count;
     }
 
-    draw(ctx=CTX) {
+    render(ctx=CTX) {
         ctx.clear();
         let id = ctx.getImageData(0, 0, CANVASWIDTH, CANVASHEIGHT);
         let h = this.height;
@@ -89,12 +89,23 @@ class Grid {
         return newGrid;
     }
 
-    step(transform){       
+    step(transform){
         const newGrid = new Grid();
         transform.apply_to_grid(this, newGrid);
         return newGrid;
     }
+
+    drawRectangle(x0, y0, width, height){
+        // x0, y0, width and height all given as values on [0, 1[
+        x0 = int(x0 * this.width);
+        y0 = int(y0* this.height);
+        width = Math.min(this.width, int(width*this.width) + x0 );
+        height = Math.min(this.height, int(height*this.height) + y0 );
+        for( let x=x0; x<width; x++ )
+            this.grid[x].fill(1, y0, height)
+    }
 }
+
 
 class Transform {
     // Abstract Class representing a transformation on a Grid
@@ -303,6 +314,38 @@ const transforms2 = {
         new ScaleAndRotateTransform(0.5, 0.5,  90, [+0.25, -0.25]),
         new ScaleAndRotateTransform(0.5, 0.5, -90, [-0.25, -0.25])
     ),
+    fern: new TransformGroup(
+        new ScaleAndRotateTransform(0.01, 0.5,   0, [0,     -0.25]),
+        new ScaleAndRotateTransform(0.8, 0.8, -10, [0,    0.1 ]),
+        new ScaleAndRotateTransform(0.4, 0.4, -35, [0.15,    -0.2 ]),
+        new ScaleAndRotateTransform(-0.5, 0.5, -45, [-0.18, -0.2])
+    ),
+    shrub: new TransformGroup(
+        new ScaleAndRotateTransform( 0.8, 0.8,  5, [0, 0.1] ),
+        new ScaleAndRotateTransform( 0.4, 0.4, 30, [-0.25, -0.2] ),
+        new ScaleAndRotateTransform( 0.4, 0.4, -30, [0.25, -0.18] ),
+        new ScaleAndRotateTransform( 0.25, 0.25, 10, [0, -0.35] ),
+    ),
+    spiral: new TransformGroup(
+        new ScaleAndRotateTransform( 0.96, 0.96, 10, [0, 0] ),
+        new ScaleAndRotateTransform( 0.15, 0.15, 160, [-0.4, 0] )
+    ),
+    dragon: new ScaleAndRotateTransform(0.69, 0.69, 45, [0.1, -0.2, -0.1, +0.2] ),
+    pointy: new TransformGroup(
+        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
+        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2]),
+        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2])
+    ),
+    pointier: new TransformGroup(
+        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
+        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0]),
+        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0])
+    ),
+    pointiest: new TransformGroup(
+        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
+        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2]),
+        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2])
+    ),
 }
 
 var TRANSFORM2;
@@ -334,8 +377,7 @@ function makeGetter(func){
 // Draw a square
 const getSquare = makeGetter(function(){
     let square = new Grid();
-    for(let i=int(WIDTH/4); i<int(3*WIDTH/4); i++)
-        square.grid[i].fill( 1, int(HEIGHT/4), int(3*HEIGHT/4) );
+    square.drawRectangle(1/4, 1/4, 1/2, 1/2)
     return square;
 });
 // Draw an empty square
@@ -367,6 +409,21 @@ const getPath = function(){
         path.grid[int(y*dxdy)][y] = path.grid[int(WIDTH-1-y*dxdy)][y] = true;
     return path;
 };
+// Draw an R, a letter without any symmetries
+const getR = makeGetter(function(){
+    let R = new Grid();
+    let r = '#******#'
+          + '# #**# #'
+          + '# #**. #'
+          + '#......#'
+    let i = 0;
+    for(let y=0; y<4; y++)
+        for(let x=0; x<8; x++, i++)
+            if(r[i]==='#') R.drawRectangle(x/8, 3/4-y/4, 1/8+0.001, 1/4+0.001)
+            else if( r[i]==='*') R.drawRectangle(x/8, 7/8-y/4, 1/8+0.001, 1/8+0.001)
+            else if( r[i]==='.') R.drawRectangle(x/8, 3/4-y/4, 1/8+0.001, 1/8+0.001)
+    return R;
+});
 
 const transforms = {
     sierpinski_square: (x, y) => [
@@ -470,25 +527,26 @@ for( let t in transforms )
 fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
 $('input[value=sierpinski_triangle][name=frac]').click();
 
-$('button[target=clear]').onclick = ()=>{ GRID = new Grid(); GRID.draw() };
-$('button[target=dot]').onclick = ()=>{ GRID = new Grid(); GRID.grid[int(WIDTH/2)][int(HEIGHT/2)] = true; GRID.draw() };
-$('button[target=square]').onclick = ()=>{ GRID = getSquare(); GRID.draw() };
-$('button[target=esquare]').onclick = ()=>{ GRID = getEmptySquare(); GRID.draw() };
-$('button[target=circle]').onclick = ()=>{ GRID = getCircle(); GRID.draw() };
-$('button[target=path]').onclick = ()=>{ GRID = getPath(); GRID.draw() };
+$('button[target=clear]').onclick = ()=>{ GRID = new Grid(); GRID.render() };
+$('button[target=dot]').onclick = ()=>{ GRID = new Grid(); GRID.grid[int(WIDTH/2)][int(HEIGHT/2)] = true; GRID.render() };
+$('button[target=square]').onclick = ()=>{ GRID = getSquare(); GRID.render() };
+$('button[target=esquare]').onclick = ()=>{ GRID = getEmptySquare(); GRID.render() };
+$('button[target=circle]').onclick = ()=>{ GRID = getCircle(); GRID.render() };
+$('button[target=path]').onclick = ()=>{ GRID = getPath(); GRID.render() };
+$('button[target=R]').onclick = ()=>{ GRID = getR(); GRID.render() };
 
 
 function step_and_render(){
     console.time('OLDSTEP');
     GRID = GRID.oldStep(TRANSFORM)
-    GRID.draw();
+    GRID.render();
     console.timeEnd('OLDSTEP');
 }
 
 function step_and_render2(){
     console.time('STEP');
     GRID = GRID.step(TRANSFORM2);
-    GRID.draw();
+    GRID.render();
     console.timeEnd('STEP');
 }
 
@@ -507,22 +565,22 @@ function random_render(){
         [x, y] = random_sierpinski[randInt(3)](x, y);
         GRID.grid[x][y] = 1;
     }
-    GRID.draw();
+    GRID.render();
 }
 
 document.onkeypress = e => {
     if( e.key == 'Enter' && document.activeElement === document.body )
-        step_and_render();
+        step_and_render2();
 }
 
 let GRID = getSquare();
-GRID.draw();
+GRID.render();
         
 function time(){
     console.time('TIMER');
     GRID = getSquare();
     for( let i=0; i<10; i++ )
         GRID = GRID.step();
-    GRID.draw();    
+    GRID.render();    
     console.timeEnd('TIMER');
 }
