@@ -9,6 +9,7 @@ const $ = s => document.querySelector(s);
 const chance = (x, y=1) => Math.random()*y < x;
 const randInt = a => int( Math.random()*a );
 const mod = (x, m) => ((x%m)+m%m);
+const {max, min, sin, cos, tan, cot, atan2, sqrt } = Math;
 
 // Useful methods
 CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT) }
@@ -95,14 +96,97 @@ class Grid {
         return newGrid;
     }
 
-    drawRectangle(x0, y0, width, height){
+    gridCoords(x, y){
+        // maps [0, 1[² to [0, width[ × [0, height[
+        return [int(x*this.width), int(y*this.height)]
+    }
+
+    gridRadius(r){
+        return min(r*this.width, r*this.height)
+    }
+
+    drawRectangle(x0, y0, width, height, color=1){
         // x0, y0, width and height all given as values on [0, 1[
-        x0 = int(x0 * this.width);
-        y0 = int(y0* this.height);
-        width = Math.min(this.width, int(width*this.width) + x0 );
-        height = Math.min(this.height, int(height*this.height) + y0 );
+        [x0, y0] = this.gridCoords(x0, y0);
+        width = min(this.width, int(width*this.width) + x0 );
+        height = min(this.height, int(height*this.height) + y0 );
         for( let x=x0; x<width; x++ )
-            this.grid[x].fill(1, y0, height)
+            this.grid[x].fill(color, y0, height)
+    }
+
+    drawCircle(cx, cy, r, color=1){
+        // cx, cy and r all given as values in [0, 1[
+        // with r being relative to whichever is shortest, width or height
+        [cx, cy] = this.gridCoords(cx, cy);
+        r = this.gridRadius(r);
+        const rsq = r*r;
+        const x0 = max(0, int(cx-r));
+        const x1 = min(this.width, int(cx+r)+1);
+        for( let x=x0; x<x1; x++ ){
+            const D = rsq - (x-cx)*(x-cx);
+            if( D < 0 ) continue;
+            const sqD = sqrt( D );
+            this.grid[x].fill(color, max(0, int(cy-sqD)), int(cy+sqD))
+        }
+    }
+
+    drawStroke(Ax, Ay, Bx, By, w, color=1){
+        w = this.gridRadius(w)/2;
+        [Ax, Ay] = this.gridCoords(Ax, Ay);
+        [Bx, By] = this.gridCoords(Bx, By);
+        if ( Ax === Bx && Ay === By ) return;
+        // Swap A and B so Ax <= Bx
+        if (Ax > Bx) [Ax, Ay, Bx, By] = [Bx, By, Ax, Ay];
+
+        const theta = atan2(By-Ay, Bx-Ax);
+        const tanth = (By-Ay)/(Bx-Ax);
+        const tanphi = (Bx-Ax)/(By-Ay);
+
+        try{
+        if( Ay === By ){ // Horizontal line
+            const Aly = int(Ay + w);
+            const Ary = max(0, int(Ay - w));
+            for(let x=max(0, Ax); x<=min(this.width-1, Bx); x++)
+                this.grid[x].fill(color, Ary, Aly);
+        }
+        else if( Ax === Bx ){ // Vertical line
+            if (Ay > By) [Ay, By] = [By, Ay];
+            const Alx = max(0, int(Ax - w));
+            const Arx = min(this.width-1, int(Ax + w));
+            for(let x=Alx; x<=Arx; x++)
+                this.grid[x].fill(color, Ay, By);
+        }
+        else if( Ay < By ){ // Line bottom left to top right
+            const Alx = max(0, int(Ax - w*sin(theta)));
+            const Arx = max(0, int(Ax + w*sin(theta)));
+            const Brx = min(this.width-1, int(Bx + w*sin(theta)));
+            const Aly = Ay + w*cos(theta);
+            const Ary = Ay - w*cos(theta);
+            for( let x=Alx; x<=Brx; x++ ){
+                const y0 = int(max( Ay - (x-Ax)*tanphi, Ary + (x-Arx)*tanth ));
+                const yf = int(min( By - (x-Bx)*tanphi, Aly + (x-Alx)*tanth ));
+                if (yf > 0) this.grid[x].fill(color, y0, yf);
+            }
+        }
+        else if ( By < Ay ){ // Line top left to bottom right
+            const Alx = max(0, int(Ax - w*sin(theta)));
+            const Arx = max(0, int(Ax + w*sin(theta)));
+            const Blx = min(this.width-1, int(Bx - w*sin(theta)));
+            const Aly = Ay + w*cos(theta);
+            const Ary = Ay - w*cos(theta);
+            for( let x=Arx; x<=Blx; x++ ){
+                const y0 = int(max( By - (x-Bx)*tanphi, Ary + (x-Arx)*tanth ));
+                const yf = int(min( Ay - (x-Ax)*tanphi, Aly + (x-Alx)*tanth ));
+                if (yf > 0) this.grid[x].fill(color, y0, yf);
+            }
+        }
+        }catch(e){console.error(e); console.error(Ax, Ay, Bx, By)}
+    }
+
+    drawRoundedStroke(Ax, Ay, Bx, By, w, color=1){
+        this.drawCircle(Ax, Ay, w/2, color);
+        this.drawCircle(Bx, By, w/2, color);
+        this.drawStroke(Ax, Ay, Bx, By, w, color);
     }
 }
 
@@ -348,6 +432,7 @@ const transforms2 = {
     ),
 }
 
+// Transform selection
 var TRANSFORM2;
 function fill_transformation_selector(){
     var fracSelect = byId('trans-select');
@@ -360,47 +445,64 @@ function fill_transformation_selector(){
 fill_transformation_selector();
 $('input[value=sierpinski_triangle][name=trans]').click();
 
+
+// Drawing onto the grid
+var DRAWSTATE = {
+    drawing: false,
+    size: 0.05,
+    color: 1,
+    x: 0, y: 0
+}
+byId('brushmode').onchange = e => DRAWSTATE.color = +e.target.value;
+byId('brushsize').onchange = e => DRAWSTATE.size = e.target.value/1000;
+
+CANVAS.onmousedown = function(e){
+    if( e.button !== 0 ) return;
+    DRAWSTATE.drawing = true;
+    const x = e.offsetX, y = e.offsetY;
+    const w = this.offsetWidth, h = this.offsetHeight;
+    DRAWSTATE.x = x; DRAWSTATE.y = y;
+    GRID.drawCircle(x/w, 1-y/h, DRAWSTATE.size, DRAWSTATE.color);
+    GRID.render()
+}
+CANVAS.onmousemove = function(e){
+    if( e.button !== 0 || !DRAWSTATE.drawing ) return;
+    const x = e.offsetX, y = e.offsetY;
+    const w = this.offsetWidth, h = this.offsetHeight;
+    const dx = x - DRAWSTATE.x, dy = y - DRAWSTATE.y;
+    DRAWSTATE.x = x; DRAWSTATE.y = y;
+    if( sqrt(dx*dx+dy*dy) > GRID.gridRadius(DRAWSTATE.size)/4 )
+        GRID.drawStroke((x-dx)/w, 1-(y-dy)/h, x/w, 1-y/h, DRAWSTATE.size*2, DRAWSTATE.color);
+    GRID.drawCircle(x/w, 1-y/h, DRAWSTATE.size, DRAWSTATE.color);
+    GRID.render()
+}
+document.addEventListener('mouseup', e => DRAWSTATE.drawing = false)
+
 /****************************************************************************************/
 /*                                       OLD CODE                                       */
 /****************************************************************************************/
 
-
-var getterCache = []; var cacheIndex = 0;
-function makeGetter(func){
-    let i = cacheIndex++;
-    return function(){
-        if( !getterCache[i] ) getterCache[i] = func();
-        return getterCache[i];
-    }
-}
-
 // Draw a square
-const getSquare = makeGetter(function(){
+const getSquare = function(){
     let square = new Grid();
     square.drawRectangle(1/4, 1/4, 1/2, 1/2)
     return square;
-});
+}
 // Draw an empty square
-const getEmptySquare = makeGetter(function(){
+const getEmptySquare = function(){
     let empty = new Grid();
     for(let x=0; x<WIDTH; x++)
         empty.grid[x][0] = empty.grid[x][HEIGHT-1] = 1;
     empty.grid[0].fill(1)
     empty.grid[WIDTH-1].fill(1);
     return empty;
-});
+}
 // Draw a circle
-const getCircle = makeGetter(function(){
+const getCircle = function(){
     let circle = new Grid();
-    const rsq = Math.pow((WIDTH/4), 2);
-    for( let x=0; x<WIDTH; x++ ){
-        let D = rsq - Math.pow(x-WIDTH/2, 2);
-        if( D < 0 ) continue;
-        let sqD = Math.sqrt( D );
-        circle.grid[x].fill(1, int(HEIGHT/2-sqD), int(HEIGHT/2+sqD))
-    }
+    circle.drawCircle(0.5, 0.5, 0.25)
     return circle;
-});
+}
 // Draw a path
 const getPath = function(){
     let path = new Grid();
@@ -410,7 +512,7 @@ const getPath = function(){
     return path;
 };
 // Draw an R, a letter without any symmetries
-const getR = makeGetter(function(){
+const getR_ = function(){
     let R = new Grid();
     let r = '#******#'
           + '# #**# #'
@@ -423,7 +525,24 @@ const getR = makeGetter(function(){
             else if( r[i]==='*') R.drawRectangle(x/8, 7/8-y/4, 1/8+0.001, 1/8+0.001)
             else if( r[i]==='.') R.drawRectangle(x/8, 3/4-y/4, 1/8+0.001, 1/8+0.001)
     return R;
-});
+}
+// Draw an R, a letter without any symmetries
+const getR = function(){
+    let R = new Grid();
+    const w = 0.005;
+    R.drawStroke(0, 0, 1, 0, w*2);
+    R.drawStroke(1, 0, 1, 1, w*2);
+    R.drawStroke(1, 1, 0, 1, w*2);
+    R.drawStroke(0, 1, 0, 0, w*2);
+    R.drawRoundedStroke(0.21, 0.14, 0.21, 0.79, w); // spine
+    R.drawRoundedStroke(0.21, 0.79, 0.52, 0.79, w); // -
+    R.drawRoundedStroke(0.52, 0.79, 0.73, 0.68, w); //  \
+    R.drawRoundedStroke(0.73, 0.68, 0.73, 0.52, w); //   |
+    R.drawRoundedStroke(0.73, 0.52, 0.52, 0.43, w); //  /
+    R.drawRoundedStroke(0.52, 0.43, 0.21, 0.43, w); // -
+    R.drawRoundedStroke(0.52, 0.43, 0.71, 0.14, w); //  \
+    return R;
+}
 
 const transforms = {
     sierpinski_square: (x, y) => [
@@ -573,7 +692,7 @@ document.onkeypress = e => {
         step_and_render2();
 }
 
-let GRID = getSquare();
+let GRID = new Grid();
 GRID.render();
         
 function time(){

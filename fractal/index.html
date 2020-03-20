@@ -13,14 +13,20 @@
 
     <div id=controls>
         <div id=clear-select class=box>
-            <h4>Draw</h4>
+            <h4>Drawing</h4>
             <button type=button target=clear>clear</button>
-            <button type=button target=dot>pixel</button>
+            <button type=button target=dot>center pixel</button>
             <button type=button target=square>square</button>
             <button type=button target=esquare>box outline</button>
             <button type=button target=circle>circle</button>
             <button type=button target=path>path</button>
             <button type=button target=R>🅁</button>
+            <form id=brushmode>
+                <label><input type=radio name=brushmode value=1 checked> Draw</label>
+                <label><input type=radio name=brushmode value=0> Erase</label>
+            </form>
+            <div style=text-align:center;margin-top:8px;>Brush size:</div>
+            <input id=brushsize type=range min=1 max=100>
         </div>
         <form id=frac-select class=box>
             <h4>Transformations (old)</h4>
