@@ -14,9 +14,11 @@ body {
     background-color: #ccc;
     box-shadow: 0px 10px 25px #000a;
     image-rendering: pixelated;
+    cursor: pointer;
 }
 #controls {
-    min-width: 30%;
+    float: left;
+    width: calc( 100% - 1000px );
 }
 .box {
     float: left;
@@ -34,10 +36,17 @@ body {
     display: block;
     line-height: 2em;
 }
-#clear-select > button {
+#drawing button {
     display: block;
     width: 80%;
     margin: 10px 10%;
+}
+#drawing button.clear {
+    background-image: linear-gradient(#313638, #303538);
+    color: #aab;
+}
+#drawing button.clear:focus {
+    background-image: linear-gradient(rgb(61, 65, 55), #3c3d3a);
 }
 
 button {
@@ -55,13 +64,13 @@ button {
 button:hover {
     box-shadow: 0px 6px 8px #0004, 0px -6px 6px #8881;
 }
+button:focus {
+    background-image: linear-gradient(#3b3b39, #373735);
+}
 button:active {
     color: #bbb;
     background-image: none;
     box-shadow: 0px 2px 2px #0004, 0px -2px 2px #8881;
-}
-button:focus {
-    background-image: linear-gradient(#333336, #353537);
 }
 
 input[type=radio] { position: relative; top: 3px; }

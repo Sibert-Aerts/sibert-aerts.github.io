@@ -12,15 +12,11 @@
 	<canvas id=screen width=900 height=900></canvas>
 
     <div id=controls>
-        <div id=clear-select class=box>
+        <div id=drawing class=box>
             <h4>Drawing</h4>
-            <button type=button target=clear>clear</button>
-            <button type=button target=dot>center pixel</button>
-            <button type=button target=square>square</button>
-            <button type=button target=esquare>box outline</button>
-            <button type=button target=circle>circle</button>
-            <button type=button target=path>path</button>
-            <button type=button target=R>🅁</button>
+            <div id=drawing-buttons>
+                <!-- added by script -->
+            </div>
             <form id=brushmode>
                 <label><input type=radio name=brushmode value=1 checked> Draw</label>
                 <label><input type=radio name=brushmode value=0> Erase</label>
@@ -28,19 +24,23 @@
             <div style=text-align:center;margin-top:8px;>Brush size:</div>
             <input id=brushsize type=range min=1 max=100>
         </div>
-        <form id=frac-select class=box>
-            <h4>Transformations (old)</h4>
-            <!-- added by script -->
-        </form>
         <form id=trans-select class=box>
-            <h4>Transformations 2</h4>
+            <h4>Transformations</h4>
             <!-- added by script -->
         </form>
         <div class=box>
             <button onclick=step_and_render() style=font-size:24px>step</button>
-            <button onclick=step_and_render2() style=font-size:24px>step2</button>
             <button onclick=random_render() style=font-size:24px>random</button>
             <label>#random steps <input id=rand-steps type=text value=100000 size=6></label>
+        </div>
+        <div class=box>
+            <h4>How to use</h4>
+            <ul>
+                <li>Use the buttons or click on the canvas to draw something to transform</li>
+                <li>Select a transformation you want to apply</li>
+                <li>Click 'step' or press Enter to apply the selected transformation</li>
+                <li>Click 'random' to apply the "random walk" algorithm the defined number of times for the selected transformation</li>
+            </ul>
         </div>
     </div>
 

@@ -4,12 +4,20 @@
 const int = Math.floor;
 const byId = i => document.getElementById(i);
 const $ = s => document.querySelector(s);
+const makeElem = (x, c, t) => { let e = document.createElement(x); if(c) e.className = c; if(t) e.textContent = t; return e };
 
 // Useful functions
 const chance = (x, y=1) => Math.random()*y < x;
 const randInt = a => int( Math.random()*a );
 const mod = (x, m) => ((x%m)+m%m);
-const {max, min, sin, cos, tan, cot, atan2, sqrt } = Math;
+const {abs, max, min, sin, cos, tan, cot, atan2, sqrt } = Math;
+function choose_weighted( items ){
+    const sum = items.reduce( (s, i)=>s+i.weight, 0);
+    let pick = Math.random()*sum;
+    for(let i=0; i<items.length; i++)
+        if( pick < items[i].weight ) return items[i]
+        else pick -= items[i].weight;
+}
 
 // Useful methods
 CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT) }
@@ -24,7 +32,7 @@ const HEIGHT = CANVASHEIGHT * PIXELFACTOR;
 const CTX = CANVAS.getContext('2d');
 
 /****************************************************************************************/
-/*                                       NEW CODE                                       */
+/*                                         GRID                                         */
 /****************************************************************************************/
 
 class Grid {
@@ -157,25 +165,25 @@ class Grid {
                 this.grid[x].fill(color, Ay, By);
         }
         else if( Ay < By ){ // Line bottom left to top right
-            const Alx = max(0, int(Ax - w*sin(theta)));
-            const Arx = max(0, int(Ax + w*sin(theta)));
+            const Alx = int(Ax - w*sin(theta));
+            const Arx = int(Ax + w*sin(theta));
             const Brx = min(this.width-1, int(Bx + w*sin(theta)));
             const Aly = Ay + w*cos(theta);
             const Ary = Ay - w*cos(theta);
-            for( let x=Alx; x<=Brx; x++ ){
-                const y0 = int(max( Ay - (x-Ax)*tanphi, Ary + (x-Arx)*tanth ));
+            for( let x=max(0, Alx); x<=Brx; x++ ){
+                const y0 = int(max( Ay - (x-Ax)*tanphi, Ary + (x-Arx)*tanth, 0 ));
                 const yf = int(min( By - (x-Bx)*tanphi, Aly + (x-Alx)*tanth ));
                 if (yf > 0) this.grid[x].fill(color, y0, yf);
             }
         }
         else if ( By < Ay ){ // Line top left to bottom right
-            const Alx = max(0, int(Ax - w*sin(theta)));
-            const Arx = max(0, int(Ax + w*sin(theta)));
+            const Alx = int(Ax - w*sin(theta));
+            const Arx = int(Ax + w*sin(theta));
             const Blx = min(this.width-1, int(Bx - w*sin(theta)));
             const Aly = Ay + w*cos(theta);
             const Ary = Ay - w*cos(theta);
-            for( let x=Arx; x<=Blx; x++ ){
-                const y0 = int(max( By - (x-Bx)*tanphi, Ary + (x-Arx)*tanth ));
+            for( let x=max(0, Arx); x<=Blx; x++ ){
+                const y0 = int(max( By - (x-Bx)*tanphi, Ary + (x-Arx)*tanth, 0 ));
                 const yf = int(min( Ay - (x-Ax)*tanphi, Aly + (x-Alx)*tanth ));
                 if (yf > 0) this.grid[x].fill(color, y0, yf);
             }
@@ -191,12 +199,30 @@ class Grid {
 }
 
 
+/****************************************************************************************/
+/*                                      TRANSFORM                                       */
+/****************************************************************************************/
+
 class Transform {
     // Abstract Class representing a transformation on a Grid
+
+    // multiplicity is the number of points a single point maps to
+    multiplicity = 1;
+    // weight is the surface area of the image of the unit square [0, 1]²
+    weight = 1;
 
     apply_to_point(x, y){
         // Map the dot (x, y) into a list of dots represented as [x1, y1, x2, y2, ...] coordinates
         return [x, y];
+    }
+
+    apply_random(x, y){
+        // Map the dot (x, y) to a single, random [xi, yi] pair from apply_to_point
+        // This default implementation calls apply_to_point (likely calculating [xi, yi]'s that we will throw away)
+        // and chooses a pair uniformly (only correct if the different composite images have the same surface transforming properties)
+        const image = this.apply_to_point(x, y);
+        const i = randInt(image.length/2)*2;
+        return [image[i], image[i+1]];
     }
 
     apply_to_grid(grid, newGrid){
@@ -237,8 +263,10 @@ class TransformGroup extends Transform {
     constructor( ...transforms ){
         super();
         this.transforms = transforms;
-        // multiplicity will be (undefined) unless every transform has a known multiplicity
+        // multiplicity is sum of multiplicities
         this.multiplicity = transforms.reduce( (s, t) => s + t.multiplicity, 0 )
+        // weight is sum of weights
+        this.weight = transforms.reduce( (s, t) => s + t.weight, 0 )
     }
 
     apply_to_point(x, y){
@@ -257,6 +285,11 @@ class TransformGroup extends Transform {
         }
     }
 
+    apply_random(x, y){
+        const t = choose_weighted(this.transforms);
+        return t.apply_random(x, y);
+    }
+
     apply_to_grid(grid, newGrid){
         // I don't understand why but this is somehow the most efficient way to implement this
         for( let t of this.transforms ) t.apply_to_grid(grid, newGrid);
@@ -268,8 +301,10 @@ class TransformChain extends Transform {
     constructor( ...transforms ){
         super();
         this.transforms = transforms;
-        // multiplicity will be (undefined) unless every transform has a known multiplicity
+        // multiplicity is product of multiplicities
         this.multiplicity = transforms.reduce( (s, t) => s * t.multiplicity, 1 )
+        // weight is product of weights 
+        this.weight = transforms.reduce( (s, t) => s * t.weight, 1 )
     }
 
     apply_to_point(x, y){
@@ -324,6 +359,10 @@ class MatrixTransform extends Transform {
         this.m = [a, b, c, d];
         this.dxy = dxy;
         this.multiplicity = dxy.length/2;
+        // Weight = abs(determinant)
+        this.weight = abs(a * d - b * c) * this.multiplicity;
+        // Matrices with negligible determinant still have a nonzero image due to pixels
+        this.weight = max(1/1000, this.weight);
     }
 
     apply_to_point(x, y){
@@ -334,10 +373,16 @@ class MatrixTransform extends Transform {
         const ny = c*x + d*y;
         const dxy = this.dxy;
         for( let i=0; i<dxy.length; i+=2 ){
-            out[o++] = int( nx + dxy[i] );
-            out[o++] = int( ny + dxy[i+1] );
+            out[o++] = nx + dxy[i];
+            out[o++] = ny + dxy[i+1];
         }
         return out;
+    }
+
+    apply_random(x, y){
+        const [a, b, c, d] = this.m;
+        const i = randInt(this.multiplicity)*2;
+        return [ int(a*x + b*y + this.dxy[i]), int(c*x + d*y + this.dxy[i+1]) ];
     }
 
     apply_to_grid(grid, newGrid){
@@ -387,7 +432,12 @@ class ScaleAndRotateTransform extends MatrixTransform {
     }
 }
 
-const transforms2 = {
+
+/****************************************************************************************/
+/*                                    PUT IT TO WORK                                    */
+/****************************************************************************************/
+
+const transforms = {
     sierpinski_triangle: new MatrixTransform(0.5, 0, 0, 0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
     menger_sponge: new MatrixTransform(1/3, 0, 0, 1/3, 
         [0, 0,   1/3, 0,   2/3, 0,
@@ -432,21 +482,60 @@ const transforms2 = {
     ),
 }
 
-// Transform selection
-var TRANSFORM2;
+// Transform selector
+var TRANSFORM;
 function fill_transformation_selector(){
     var fracSelect = byId('trans-select');
     let html = [];
-    for( let t in transforms2 )
+    for( let t in transforms )
         html.push( `<label><input type=radio name=trans value="${t}"> ${t.replace(/_/g, ' ')}</label>` )
     fracSelect.innerHTML += html.join('');
-    fracSelect.onchange = e => TRANSFORM2 = transforms2[e.target.value] 
+    fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
 }
 fill_transformation_selector();
 $('input[value=sierpinski_triangle][name=trans]').click();
 
 
-// Drawing onto the grid
+// Drawing buttons
+const drawing_buttons = {
+    square: g => g.drawRectangle(1/4, 1/4, 1/2, 1/2),
+    circle: g => g.drawCircle(0.5, 0.5, 0.25),
+    speck: g => g.drawCircle(0.5, 0.5, 0.001),
+    box_outline: g => {
+        g.drawStroke(0, 0, 1, 0, 0.01);
+        g.drawStroke(1, 0, 1, 1, 0.01);
+        g.drawStroke(1, 1, 0, 1, 0.01);
+        g.drawStroke(0, 1, 0, 0, 0.01);
+    },
+    path: g => {
+        g.drawStroke(0, 0, 0.5, 1, 0.01);
+        g.drawStroke(1, 0, 0.5, 1, 0.01);
+    },
+    R: g => {
+        const w = 0.005;
+        g.drawRoundedStroke(0.21, 0.14, 0.21, 0.79, w); // spine
+        g.drawRoundedStroke(0.21, 0.79, 0.52, 0.79, w); // -
+        g.drawRoundedStroke(0.52, 0.79, 0.73, 0.68, w); //  \
+        g.drawRoundedStroke(0.73, 0.68, 0.73, 0.52, w); //   |
+        g.drawRoundedStroke(0.73, 0.52, 0.52, 0.43, w); //  /
+        g.drawRoundedStroke(0.52, 0.43, 0.21, 0.43, w); // -
+        g.drawRoundedStroke(0.52, 0.43, 0.71, 0.14, w); //  \
+    }
+}
+
+const buttonHolder = byId('drawing-buttons');
+let clear = makeElem('button', 'clear', 'clear');
+clear.onclick = () => { GRID = new Grid(); GRID.render() }
+buttonHolder.appendChild(clear);
+for( let t in drawing_buttons ){
+    let butt = makeElem('button', '', t.replace('_', ' '));
+    butt.onclick = () => { drawing_buttons[t](GRID); GRID.render() }
+    buttonHolder.appendChild(butt);
+}
+
+
+
+// Drawing onto the grid directly
 var DRAWSTATE = {
     drawing: false,
     size: 0.05,
@@ -478,228 +567,39 @@ CANVAS.onmousemove = function(e){
 }
 document.addEventListener('mouseup', e => DRAWSTATE.drawing = false)
 
-/****************************************************************************************/
-/*                                       OLD CODE                                       */
-/****************************************************************************************/
 
-// Draw a square
-const getSquare = function(){
-    let square = new Grid();
-    square.drawRectangle(1/4, 1/4, 1/2, 1/2)
-    return square;
-}
-// Draw an empty square
-const getEmptySquare = function(){
-    let empty = new Grid();
-    for(let x=0; x<WIDTH; x++)
-        empty.grid[x][0] = empty.grid[x][HEIGHT-1] = 1;
-    empty.grid[0].fill(1)
-    empty.grid[WIDTH-1].fill(1);
-    return empty;
-}
-// Draw a circle
-const getCircle = function(){
-    let circle = new Grid();
-    circle.drawCircle(0.5, 0.5, 0.25)
-    return circle;
-}
-// Draw a path
-const getPath = function(){
-    let path = new Grid();
-    const dxdy = WIDTH/HEIGHT/2;
-    for( let y=0; y<HEIGHT; y++ )
-        path.grid[int(y*dxdy)][y] = path.grid[int(WIDTH-1-y*dxdy)][y] = true;
-    return path;
-};
-// Draw an R, a letter without any symmetries
-const getR_ = function(){
-    let R = new Grid();
-    let r = '#******#'
-          + '# #**# #'
-          + '# #**. #'
-          + '#......#'
-    let i = 0;
-    for(let y=0; y<4; y++)
-        for(let x=0; x<8; x++, i++)
-            if(r[i]==='#') R.drawRectangle(x/8, 3/4-y/4, 1/8+0.001, 1/4+0.001)
-            else if( r[i]==='*') R.drawRectangle(x/8, 7/8-y/4, 1/8+0.001, 1/8+0.001)
-            else if( r[i]==='.') R.drawRectangle(x/8, 3/4-y/4, 1/8+0.001, 1/8+0.001)
-    return R;
-}
-// Draw an R, a letter without any symmetries
-const getR = function(){
-    let R = new Grid();
-    const w = 0.005;
-    R.drawStroke(0, 0, 1, 0, w*2);
-    R.drawStroke(1, 0, 1, 1, w*2);
-    R.drawStroke(1, 1, 0, 1, w*2);
-    R.drawStroke(0, 1, 0, 0, w*2);
-    R.drawRoundedStroke(0.21, 0.14, 0.21, 0.79, w); // spine
-    R.drawRoundedStroke(0.21, 0.79, 0.52, 0.79, w); // -
-    R.drawRoundedStroke(0.52, 0.79, 0.73, 0.68, w); //  \
-    R.drawRoundedStroke(0.73, 0.68, 0.73, 0.52, w); //   |
-    R.drawRoundedStroke(0.73, 0.52, 0.52, 0.43, w); //  /
-    R.drawRoundedStroke(0.52, 0.43, 0.21, 0.43, w); // -
-    R.drawRoundedStroke(0.52, 0.43, 0.71, 0.14, w); //  \
-    return R;
-}
-
-const transforms = {
-    sierpinski_square: (x, y) => [
-        int(x/2), int(y/2),
-        int(x/2 + WIDTH/2), int(y/2),
-        int(x/2), int(y/2 + HEIGHT/2) 
-    ],
-
-    square_2x2: (x, y) => [
-        int(x/2), int(y/2),
-        int(x/2 + WIDTH/2), int(y/2),
-        int(x/2), int(y/2 + HEIGHT/2),
-        int(x/2 + WIDTH/2), int(y/2 + HEIGHT/2)
-    ],
-
-    square_3x3: (x, y) => {
-        let x0 = int(x/3), x1 = int(x/3 + WIDTH/3), x2 = int(x/3 + 2*WIDTH/3);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-            x0, y0, x1, y0, x2, y0,
-            x0, y1,	x1, y1, x2, y1,
-            x0, y2, x1, y2, x2, y2,
-        ]
-    },
-
-    make_path_fill_space: (x, y) => [
-        int(x/2), int(y/2),
-        int(x/2 + WIDTH/2), int(y/2),
-        int((WIDTH-1)/2 - y/2), int(x/2 + HEIGHT/2),
-        int(y/2 + WIDTH/2), int(x/2 + HEIGHT/2)
-    ],
-
-    sponge: (x, y) => {
-        let x0 = int(x/3), x1 = int(x/3 + WIDTH/3), x2 = int(x/3 + 2*WIDTH/3);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-            x0, y0, x1, y0, x2, y0,
-            x0, y1,         x2, y1,
-            x0, y2, x1, y2, x2, y2,
-        ]
-    },
-
-    sierpinski_triangle: (x, y) => [
-        int(x/2 + WIDTH/4), int(y/2),
-        int(x/2), int(y/2 + HEIGHT/2),
-        int(x/2 + WIDTH/2), int(y/2 + HEIGHT/2 )
-    ],
-
-    triangle: (x, y) => [
-        int(x/2 + WIDTH/4), int(y/2),
-        int(x/2), int(y/2 + HEIGHT/2),
-        int(x/2) + WIDTH/2, int(y/2 + HEIGHT/2),
-        int(x/2 + WIDTH/4), int((HEIGHT - y)/2 + HEIGHT/2)
-    ],
-
-    X: (x, y) => {
-        let x0 = int(x/3), x1 = int(x/3 + WIDTH/3), x2 = int(x/3 + 2*WIDTH/3);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-            x0, y0,         x2, y0,
-                    x1, y1,
-            x0, y2,         x2, y2,
-        ]
-    },
-
-    film: (x, y) => {
-        let x0 = int(x/3), x1 = int(x/3 + WIDTH/3), x2 = int(x/3 + 2*WIDTH/3);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-            x0, y0, x1, y0, x2, y0,
-                    x1, y1,
-            x0, y2, x1, y2, x2, y2,
-        ]
-    },
-
-    flower: (x, y) => {
-        let x0 = int(x/3), x1 = int(x/3 + WIDTH/3), x2 = int(x/3 + 2*WIDTH/3);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-                    x1, y0,
-            x0, y1,         x2, y1,
-                    x1, y2,
-        ]
-    },
-
-    hexagon_flower: (x, y) => {
-        let x0 = int(x/3 + WIDTH/6), x1 = int(x/3 + WIDTH/2);
-        let y0 = int(y/3), y1 = int(y/3 + HEIGHT/3), y2 = int(y/3 + 2*HEIGHT/3);
-        return [
-                    x0, y0, x1, y0,
-            int(x/3), y1,	    int(x/3+2*WIDTH/3), y1,
-                    x0, y2, x1, y2,
-        ]
-    },
-}
-
-var fracSelect = byId('frac-select');
-var TRANSFORM;
-for( let t in transforms )
-    fracSelect.innerHTML += `<label><input type="radio" name="frac" value="${t}"> ${t.replace(/_/g, ' ')}</label>`
-fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
-$('input[value=sierpinski_triangle][name=frac]').click();
-
-$('button[target=clear]').onclick = ()=>{ GRID = new Grid(); GRID.render() };
-$('button[target=dot]').onclick = ()=>{ GRID = new Grid(); GRID.grid[int(WIDTH/2)][int(HEIGHT/2)] = true; GRID.render() };
-$('button[target=square]').onclick = ()=>{ GRID = getSquare(); GRID.render() };
-$('button[target=esquare]').onclick = ()=>{ GRID = getEmptySquare(); GRID.render() };
-$('button[target=circle]').onclick = ()=>{ GRID = getCircle(); GRID.render() };
-$('button[target=path]').onclick = ()=>{ GRID = getPath(); GRID.render() };
-$('button[target=R]').onclick = ()=>{ GRID = getR(); GRID.render() };
-
-
+// Bind the main buttons to work
 function step_and_render(){
-    console.time('OLDSTEP');
-    GRID = GRID.oldStep(TRANSFORM)
-    GRID.render();
-    console.timeEnd('OLDSTEP');
-}
-
-function step_and_render2(){
     console.time('STEP');
-    GRID = GRID.step(TRANSFORM2);
+
+    GRID = GRID.step(TRANSFORM);
     GRID.render();
+
     console.timeEnd('STEP');
 }
 
-
-const random_sierpinski =  [
-    (x, y) => [ int(x/2 + WIDTH/4), int(y/2) ],
-    (x, y) => [ int(x/2), int(y/2 + HEIGHT/2) ],
-    (x, y) => [ int(x/2 + WIDTH/2), int(y/2 + HEIGHT/2) ]
-]
-
 function random_render(){
+    console.time('RANDOM');
+
     GRID = new Grid();
     let nsteps = parseInt(byId('rand-steps').value);
     let [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
     for( let i=0; i<nsteps; i++ ){
-        [x, y] = random_sierpinski[randInt(3)](x, y);
+        [x, y] = TRANSFORM.apply_random(x, y);
+        if( x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT )
+            [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
         GRID.grid[x][y] = 1;
     }
     GRID.render();
+
+    console.timeEnd('RANDOM');
 }
 
 document.onkeypress = e => {
     if( e.key == 'Enter' && document.activeElement === document.body )
-        step_and_render2();
+        step_and_render();
 }
 
-let GRID = new Grid();
+var GRID = new Grid();
+drawing_buttons.circle(GRID);
 GRID.render();
-        
-function time(){
-    console.time('TIMER');
-    GRID = getSquare();
-    for( let i=0; i<10; i++ )
-        GRID = GRID.step();
-    GRID.render();    
-    console.timeEnd('TIMER');
-}
