@@ -6,6 +6,7 @@ body {
     color: #ccc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
 #screen {
     float: left;
     width: 900px;
@@ -20,19 +21,21 @@ body {
     float: left;
     width: calc( 100% - 1000px );
 }
+
 .box {
     float: left;
-    border-radius: 10px;
-    margin: 20px;
+    border-radius: 8px;
+    margin: 10px;
     padding: 20px 30px;
-    background-color: #333;
-    box-shadow: 0px 10px 15px #0004, 0px -10px 10px #8881;
+    background-color: #404040;
+    box-shadow: 0px 4px 6px #0004;
 }
 .box > h4 {
     margin-top: 0;
     margin-bottom: 0.5em;
 }
-#frac-select > label, #trans-select > label {
+
+#trans-select > label {
     display: block;
     line-height: 2em;
 }
@@ -41,52 +44,42 @@ body {
     width: 80%;
     margin: 10px 10%;
 }
-#drawing button.clear {
-    background-image: linear-gradient(#313638, #303538);
-    color: #aab;
-}
-#drawing button.clear:focus {
-    background-image: linear-gradient(rgb(61, 65, 55), #3c3d3a);
-}
 
 button {
     color: #aaa;
     margin: 10px;
     padding: 4px 10px;
-    background-color: #333;
-    background-image: linear-gradient(#313131, #333);
-    box-shadow: 0px 8px 10px #0004, 0px -8px 8px #8881;
+    background-color: #444;
+    box-shadow: 0px 4px 4px #0004;
     font-size: 18px;
     border: none;
     outline: none;
     border-radius: 10px;
 }
 button:hover {
-    box-shadow: 0px 6px 8px #0004, 0px -6px 6px #8881;
-}
-button:focus {
-    background-image: linear-gradient(#3b3b39, #373735);
+    background-color: #464646;
+    box-shadow: 0px 2px 2px #0004;
 }
 button:active {
     color: #bbb;
-    background-image: none;
-    box-shadow: 0px 2px 2px #0004, 0px -2px 2px #8881;
+    background-color: #3c3c3c;
+    box-shadow: inset 0px 2px 4px #0004;
 }
 
-input[type=radio] { position: relative; top: 3px; }
+input[type=radio] { position: relative; top: 3px; margin-right: 4px }
 input[type=radio]:before { 
     content: '';
     pointer-events: none;
     position: absolute;
-    left: -1px; top: -1px;
-    width: 15px; height: 15px;
+    left: -4px; top: -4px;
+    width: 10px; height: 10px;
     border-radius: 10px;
-    background-color: #333;
-    box-shadow: 0px 8px 10px #0004, 0px -8px 8px #8881;
+    background-color: #444;
+    border: solid #333 5px;
 }
 input[type=radio]:active:before {
-    box-shadow: 0px -3px 4px #00000046, 0px 3px 4px #88888813, inset 0px 6px 7px #0004;;
+    background-color: #333;
 }
 input[type=radio]:checked:before {
-    box-shadow: 0px -3px 4px #0004, 0px 3px 4px #8881, inset 0px 4px 5px #0004;
+    background-color: #222;
 }
