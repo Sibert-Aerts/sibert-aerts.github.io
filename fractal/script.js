@@ -10,7 +10,7 @@ const makeElem = (x, c, t) => { let e = document.createElement(x); if(c) e.class
 const chance = (x, y=1) => Math.random()*y < x;
 const randInt = a => int( Math.random()*a );
 const mod = (x, m) => ((x%m)+m%m);
-const {abs, max, min, sin, cos, tan, cot, atan2, sqrt } = Math;
+const { abs, max, min, sin, cos, tan, cot, atan2, sqrt, log } = Math;
 function choose_weighted( items ){
     const sum = items.reduce( (s, i)=>s+i.weight, 0);
     let pick = Math.random()*sum;
@@ -276,6 +276,8 @@ class TransformGroup extends Transform {
         this.multiplicity = transforms.reduce( (s, t) => s + t.multiplicity, 0 )
         // weight is sum of weights
         this.weight = transforms.reduce( (s, t) => s + t.weight, 0 )
+        // convergence_ratio is the max of convergence_ratios
+        this.convergence_ratio = max(...transforms.map( t => t.convergence_ratio ))
     }
 
     apply_to_point(x, y){
@@ -317,7 +319,9 @@ class TransformChain extends Transform {
         // multiplicity is product of multiplicities
         this.multiplicity = transforms.reduce( (s, t) => s * t.multiplicity, 1 )
         // weight is product of weights 
-        this.weight = transforms.reduce( (s, t) => s * t.weight, 1 )
+        this.weight = transforms.reduce( (p, t) => p * t.weight, 1 )
+        // convergence ratio is product of convergence ratios
+        this.convergence_ratio = transforms.reduce( (p, t) => p * t.convergence_ratio, 1 )
     }
 
     apply_to_point(x, y){
@@ -376,6 +380,13 @@ class MatrixTransform extends Transform {
         this.weight = abs(a * d - b * c) * this.multiplicity;
         // Matrices with negligible determinant still have a nonzero image due to pixels
         this.weight = max(1/1000, this.weight);
+        // Convergence ratio is the 2-norm, AKA largest norm of the square of an eigenvalue of AᵀA
+        const apd = a*a + b*b + c*c + d*d;
+        const D = apd*apd - 4*(a*d-b*c)*(a*d-b*c);
+        if( D >= 0 )
+            this.convergence_ratio = sqrt( max( abs(-apd + sqrt(D))/2, abs(-apd - sqrt(D))/2 ) );
+        else
+            this.convergence_ratio = sqrt(abs(sqrt(apd*apd-D)/2));
     }
 
     apply_to_point(x, y){
@@ -499,6 +510,8 @@ const TRANSFORMS = {
     ),
     HEXAGON: SEPARATOR,
     hollow_snowflake: new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
+    hollow_snowflake: new ScalarTransform( 1/3, 
+        [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
     snowflake: new TransformGroup(
         new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
         new ScaleThenRotateTransform( 2/3*0.866, 2/3*0.866, 30, [0, 0])
@@ -551,9 +564,16 @@ var TRANSFORM;
         else
             html.push( `<option value="${t}"> ${t.replace(/_/g, ' ')}</option>` )
     transSelect.innerHTML = html.join('');
+
     transSelect.onchange = function(e){
         TRANSFORM = TRANSFORMS[this.value];
-        transInfo.innerHTML = TRANSFORM.get_formula();
+        let html = TRANSFORM.get_formula() + '<br>';
+        html += `<br><b>Point factor:</b> 1 point maps to ${TRANSFORM.multiplicity}`;
+        html += `<br><b>Surface factor:</b> 1 to ${floatFormat(TRANSFORM.weight, 3)} <span style=opacity:0.5>(assuming no overlap)</span>`;
+        let con = TRANSFORM.convergence_ratio ;
+        html += `<br><b>Convergence factor:</b> ${floatFormat(con, 3)}`;
+        html += `<br><b>Approx. # of steps to converge:</b> ${Math.ceil(-log(WIDTH)/log(con))}`;
+        transInfo.innerHTML = html;        
     }
     transSelect.onchange()
 }
@@ -645,7 +665,6 @@ function step_and_render(){
 function random_render(){
     console.time('RANDOM');
 
-    GRID = new Grid();
     let nsteps = parseInt(byId('rand-steps').value);
     let [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
     for( let i=0; i<nsteps; i++ ){

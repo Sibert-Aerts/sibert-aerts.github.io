@@ -17,14 +17,12 @@
             <div id=drawing-buttons>
                 <!-- added by script -->
             </div>
-            <div>
-                <form id=brushmode>
-                    <label><input type=radio name=brushmode value=1 checked> Draw</label>
-                    <label><input type=radio name=brushmode value=0> Erase</label>
-                </form>
-                <div style=text-align:center;margin-top:8px;>Brush size:</div>
-                <input id=brushsize type=range min=1 max=100>
-            </div>
+            <form id=brushmode style=margin-top:8px>
+                <label><input type=radio name=brushmode value=1 checked> Draw</label>
+                <label><input type=radio name=brushmode value=0> Erase</label>
+            </form>
+            <div style=text-align:center;margin-top:8px;>Brush size:</div>
+            <input id=brushsize type=range min=1 max=100>
         </div>
 
         <div class=box style=max-width:65%>
@@ -40,7 +38,7 @@
         
         <div class=box>
             <button class=important onclick=random_render()>random</button>
-            <label>#random steps <input id=rand-steps type=text value=100000 size=6></label>
+            <label>walk length: <input id=rand-steps type=text value=100000 size=6></label>
         </div>
         
         <div class=box>
@@ -49,7 +47,7 @@
                 <li>Use the buttons or click on the canvas to draw something to transform</li>
                 <li>Select a transformation you want to apply</li>
                 <li>Click 'step' or press Enter to apply the selected transformation</li>
-                <li>Click 'random' to apply the "random walk" algorithm the defined number of times for the selected transformation</li>
+                <li>Click 'random' to apply the "random walk" algorithm for the selected transformation</li>
             </ul>
         </div>
     </div>

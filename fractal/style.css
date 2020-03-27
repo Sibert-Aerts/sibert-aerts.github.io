@@ -84,7 +84,7 @@ option[disabled]{
     }
 
 #drawing {
-    max-width: 15%;
+    max-width: 16%;
 }
 #drawing-buttons {
     display: flex;
@@ -97,7 +97,7 @@ option[disabled]{
 }
 
 button {
-    color: #aaa;
+    color: #ccc;
     margin: 10px;
     padding: 4px 10px;
     background-color: #444;
@@ -112,13 +112,13 @@ button:hover {
     box-shadow: 0px 2px 2px #0004;
 }
 button:active {
-    color: #bbb;
+    color: #aaa;
     background-color: #3c3c3c;
     box-shadow: inset 0px 2px 4px #0004;
 }
 
 button.important {
-    color: #a6b4b4;
+    color: #bbcaca;
     font-size: 1.2em;
     background-color: #3c4747;
 }
@@ -126,7 +126,7 @@ button.important:hover {
     background-color: #3e5050;
 }
 button.important:active {
-    color: #b9cccc;
+    color: #a3bbbb;
     background-color: #303a3a;
 }
 
