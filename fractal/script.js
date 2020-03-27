@@ -18,6 +18,7 @@ function choose_weighted( items ){
         if( pick < items[i].weight ) return items[i]
         else pick -= items[i].weight;
 }
+const floatFormat = (x, n) => x.toFixed(n).replace(/\.?0+$/, '' )
 
 // Useful methods
 CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT) }
@@ -206,10 +207,13 @@ class Grid {
 class Transform {
     // Abstract Class representing a transformation on a Grid
 
-    // multiplicity is the number of points a single point maps to
+    // multiplicity is the number of points a single point maps to, i.e. number of sub-transforms
     multiplicity = 1;
-    // weight is the surface area of the image of the unit square [0, 1]²
+    // weight is the surface area of the image of the unit square [0, 1]² (not accounting for overlap)
     weight = 1;
+    // convergence ratio is L ∈ ℝ so that for each sub-transform T: ∀p, q ∈ [0, 1]²: d(p, q) ≤ L  d(T(p), T(q))
+    // This needs to be < 1 else the fractal will not converge
+    convergence_ratio = 1;
 
     apply_to_point(x, y){
         // Map the dot (x, y) into a list of dots represented as [x1, y1, x2, y2, ...] coordinates
@@ -246,6 +250,11 @@ class Transform {
                 }
             }
         }
+    }
+
+    get_formula(){
+        // Get a formulaic representation of the transform as HTML
+        return '';
     }
 }
 
@@ -293,6 +302,10 @@ class TransformGroup extends Transform {
     apply_to_grid(grid, newGrid){
         // I don't understand why but this is somehow the most efficient way to implement this
         for( let t of this.transforms ) t.apply_to_grid(grid, newGrid);
+    }
+
+    get_formula(){
+        return this.transforms.map( x => x.get_formula() ).join('<div class=big>AND</div>')
     }
 }
 
@@ -402,11 +415,40 @@ class MatrixTransform extends Transform {
                     }
                 }
     }
+
+    get_formula(){
+        const [a, b, c, d] = this.m.map( x => floatFormat(x, 3) );
+        const matrix = `<table class=matrix><tr><td>${a}</td><td>${b}</td></tr><tr><td>${c}</td><td>${d}</td></tr></table>`;
+        const xy = `<table class=matrix><tr><td class=x-var>x</td></tr><tr><td class=y-var>y</td></tr></table>`;
+        let dxy = [];
+        for( let i=0; i<this.dxy.length; i+= 2){
+            const [dx, dy] = this.dxy.slice(i, i+2);
+            dxy.push( `<table class=matrix><tr><td>${floatFormat(dx/WIDTH, 2)}</td></tr><tr><td>${floatFormat(dy/HEIGHT, 2)}</td></tr></table>` )
+        }
+        return matrix + ' × ' + xy + ' + ' + dxy.join(' and ');
+    }
 }
 
-class ScaleAndRotateTransform extends MatrixTransform {
-    // Class representing the transformation that first independently scales x and y,
-    // followed by a rotation r (in degrees) around the point (0.5, 0.5)
+class ScalarTransform extends MatrixTransform {
+    constructor(s, dxy){
+        super(s, 0, 0, s, dxy);
+        this.s = s;
+    }
+    get_formula(){
+        const matrix = floatFormat(this.s, 3);
+        const xy = `<table class=matrix><tr><td class=x-var>x</td></tr><tr><td class=y-var>y</td></tr></table>`;
+        let dxy = [];
+        for( let i=0; i<this.dxy.length; i+= 2){
+            const [dx, dy] = this.dxy.slice(i, i+2);
+            dxy.push( `<table class=matrix><tr><td>${floatFormat(dx/WIDTH, 2)}</td></tr><tr><td>${floatFormat(dy/HEIGHT, 2)}</td></tr></table>` )
+        }
+        return matrix + ' × ' + xy + ' + ' + dxy.join(' and ');
+    }
+}
+
+class ScaleThenRotateTransform extends MatrixTransform {
+    // Class representing the transformation that first rotates r degrees around (0.5, 0.5)
+    // followed by scaling the x and y coordinates
     constructor(fx, fy, r, dxy){
         r = mod(r, 360);
         let c, s;
@@ -417,15 +459,15 @@ class ScaleAndRotateTransform extends MatrixTransform {
         else if( r === 270 ) [c, s] = [ 0,-1]
         else [c, s] = [Math.cos(r*Math.PI/180), Math.sin(r*Math.PI/180)]
         // Correct for the center of scaling AND rotation being (0.5, 0.5) instead of (0, 0)
-        let dx = (1 - fx * c + fx * s) * 0.5;
-        let dy = (1 - fy * s - fy * c) * 0.5;
+        let dx = (1 - fx * c + fy * s) * 0.5;
+        let dy = (1 - fx * s - fy * c) * 0.5;
         for( let i=0; i<dxy.length; i+=2 ){
             dxy[i] += dx; dxy[i+1] += dy;
         }
         // Matrix:
         //  ( fx*c  -fx*s )
         //  ( fy*s   fy*c )
-        super( fx*c, -fx*s, fy*s, fy*c, dxy );
+        super( fx*c, -fy*s, fx*s, fy*c, dxy );
         this.fx = fx;
         this.fy = fy;
         this.r = r;
@@ -436,68 +478,90 @@ class ScaleAndRotateTransform extends MatrixTransform {
 /****************************************************************************************/
 /*                                    PUT IT TO WORK                                    */
 /****************************************************************************************/
-
-const transforms = {
-    sierpinski_triangle: new MatrixTransform(0.5, 0, 0, 0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
-    menger_sponge: new MatrixTransform(1/3, 0, 0, 1/3, 
+const SEPARATOR = new Object();
+const TRANSFORMS = {
+    TRIANGULAR: SEPARATOR,
+    sierpinski_triangle: new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
+    'sierpinski_triangle?': new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5, 1/4, 1/6]),
+    triangle: new TransformGroup(
+        new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
+        new ScaleThenRotateTransform(0.5, -0.5, 0, [0, -0.25] )
+    ),
+    SQUARE: SEPARATOR,
+    menger_sponge: new ScalarTransform(1/3,
         [0, 0,   1/3, 0,   2/3, 0,
          0, 1/3,           2/3, 1/3,
          0, 2/3, 1/3, 2/3, 2/3, 2/3]),
     space_filling_curve: new TransformGroup(
-        new ScaleAndRotateTransform(0.5, 0.5,   0, [-0.25, +0.25,  +0.25, +0.25]),
-        new ScaleAndRotateTransform(0.5, 0.5,  90, [+0.25, -0.25]),
-        new ScaleAndRotateTransform(0.5, 0.5, -90, [-0.25, -0.25])
+        new ScaleThenRotateTransform(0.5, 0.5,   0, [-0.25, +0.25,  +0.25, +0.25]),
+        new ScaleThenRotateTransform(0.5, 0.5,  90, [+0.25, -0.25]),
+        new ScaleThenRotateTransform(0.5, 0.5, -90, [-0.25, -0.25])
     ),
+    HEXAGON: SEPARATOR,
+    hollow_snowflake: new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
+    snowflake: new TransformGroup(
+        new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
+        new ScaleThenRotateTransform( 2/3*0.866, 2/3*0.866, 30, [0, 0])
+    ),
+    OTHER: SEPARATOR,
     fern: new TransformGroup(
-        new ScaleAndRotateTransform(0.01, 0.5,   0, [0,     -0.25]),
-        new ScaleAndRotateTransform(0.8, 0.8, -10, [0,    0.1 ]),
-        new ScaleAndRotateTransform(0.4, 0.4, -35, [0.15,    -0.2 ]),
-        new ScaleAndRotateTransform(-0.5, 0.5, -45, [-0.18, -0.2])
+        new ScaleThenRotateTransform(0.01, 0.5,  0, [0,    -0.25]),
+        new ScaleThenRotateTransform(0.8, 0.8, -10, [0,      0.1]),
+        new ScaleThenRotateTransform(0.4, 0.4, -35, [0.15,  -0.2]),
+        new ScaleThenRotateTransform(-0.5, 0.5, 45, [-0.18, -0.2])
     ),
     shrub: new TransformGroup(
-        new ScaleAndRotateTransform( 0.8, 0.8,  5, [0, 0.1] ),
-        new ScaleAndRotateTransform( 0.4, 0.4, 30, [-0.25, -0.2] ),
-        new ScaleAndRotateTransform( 0.4, 0.4, -30, [0.25, -0.18] ),
-        new ScaleAndRotateTransform( 0.25, 0.25, 10, [0, -0.35] ),
+        new ScaleThenRotateTransform( 0.8, 0.8,  5, [0, 0.1] ),
+        new ScaleThenRotateTransform( 0.4, 0.4, 30, [-0.25, -0.2] ),
+        new ScaleThenRotateTransform( 0.4, 0.4, -30, [0.25, -0.18] ),
+        new ScaleThenRotateTransform( 0.25, 0.25, 10, [0, -0.35] ),
     ),
     spiral: new TransformGroup(
-        new ScaleAndRotateTransform( 0.96, 0.96, 10, [0, 0] ),
-        new ScaleAndRotateTransform( 0.15, 0.15, 160, [-0.4, 0] )
+        new ScaleThenRotateTransform( 0.96, 0.96, 10, [0, 0] ),
+        new ScaleThenRotateTransform( 0.15, 0.15, 160, [-0.4, 0] )
     ),
-    dragon: new ScaleAndRotateTransform(0.69, 0.69, 45, [0.1, -0.2, -0.1, +0.2] ),
+    dragon: new ScaleThenRotateTransform(0.69, 0.69, 45, [0.1, -0.2, -0.1, +0.2] ),
+    POINTIES: SEPARATOR,
     pointy: new TransformGroup(
-        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
-        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2]),
-        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2])
+        new ScalarTransform(0.5, [0.25, 0, 0.25, 0.5]),
+        new ScaleThenRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2]),
+        new ScaleThenRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0.2*Math.SQRT1_2])
     ),
     pointier: new TransformGroup(
-        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
-        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0]),
-        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0])
+        new ScalarTransform(0.5, [0.25, 0, 0.25, 0.5]),
+        new ScaleThenRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, 0]),
+        new ScaleThenRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, 0])
     ),
     pointiest: new TransformGroup(
-        new ScaleAndRotateTransform(0.5, 0.5, 0, [0, -0.25, 0, +0.25]),
-        new ScaleAndRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2]),
-        new ScaleAndRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2])
+        new ScalarTransform(0.5, [0.25, 0, 0.25, 0.5]),
+        new ScaleThenRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2]),
+        new ScaleThenRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2])
     ),
 }
 
 // Transform selector
 var TRANSFORM;
-function fill_transformation_selector(){
-    var fracSelect = byId('trans-select');
+{
+    let transSelect = byId('transform-select');
+    let transInfo = byId('transform-info');
     let html = [];
-    for( let t in transforms )
-        html.push( `<label><input type=radio name=trans value="${t}"> ${t.replace(/_/g, ' ')}</label>` )
-    fracSelect.innerHTML += html.join('');
-    fracSelect.onchange = e => TRANSFORM = transforms[e.target.value] 
+    for( let t in TRANSFORMS )
+        if( TRANSFORMS[t] === SEPARATOR )
+            html.push( `<option disabled> ${t.replace(/_/g, ' ')}</option>` )
+        else
+            html.push( `<option value="${t}"> ${t.replace(/_/g, ' ')}</option>` )
+    transSelect.innerHTML = html.join('');
+    transSelect.onchange = function(e){
+        TRANSFORM = TRANSFORMS[this.value];
+        transInfo.innerHTML = TRANSFORM.get_formula();
+    }
+    transSelect.onchange()
 }
-fill_transformation_selector();
-$('input[value=sierpinski_triangle][name=trans]').click();
 
 
 // Drawing buttons
 const drawing_buttons = {
+    fill: g => g.drawRectangle(0, 0, 1, 1),
     square: g => g.drawRectangle(1/4, 1/4, 1/2, 1/2),
     circle: g => g.drawCircle(0.5, 0.5, 0.25),
     speck: g => g.drawCircle(0.5, 0.5, 0.001),
@@ -599,6 +663,8 @@ document.onkeypress = e => {
     if( e.key == 'Enter' && document.activeElement === document.body )
         step_and_render();
 }
+
+// Start the basic grid.
 
 var GRID = new Grid();
 drawing_buttons.circle(GRID);
