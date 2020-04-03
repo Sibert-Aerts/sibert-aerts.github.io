@@ -288,6 +288,11 @@ class Transform {
         // Get a formulaic representation of the transform as HTML
         return '';
     }
+
+    add_boxes(rectangles){
+        // Add one or more shapes visualising the transform's effect on the unit square
+        return;
+    }
 }
 
 class FunctionTransform extends Transform {
@@ -340,6 +345,11 @@ class TransformGroup extends Transform {
 
     get_formula(){
         return this.transforms.map( x => x.get_formula() ).join('<div class=big>AND</div>')
+    }
+
+    add_boxes(rectangles){
+        for(let t of this.transforms)
+            t.add_boxes(rectangles)
     }
 }
 
@@ -401,6 +411,7 @@ class MatrixTransform extends Transform {
     constructor(a, b, c, d, dxy){
         super();
         if( dxy.length % 2 ) throw Error('dxy must contain an even number of items');
+        this.odxy = dxy.slice();
         for( let i=0; i<dxy.length; i+=2 ){
             dxy[i] *= WIDTH;
             dxy[i+1] *= HEIGHT;
@@ -470,6 +481,19 @@ class MatrixTransform extends Transform {
         }
         return matrix + ' × ' + xy + ' + ' + dxy.join(' and ');
     }
+
+    add_boxes(rectangles){
+        let [a, b, c, d] = this.m;
+        // I DONT UNDERSTAND WHAT IS WRONG WITH CSS MATRIX TRANSFORMS (OUR Y IS NEGATIVE OF THEIRS? IDK) BUT THIS IS REQUIRED
+        if( c*b > 0 ) { b *= -1; c *= -1 }
+        for( let i=0; i<this.multiplicity; i++ ){
+            const box = makeElem('div', 'rectangle', 'R');
+            const tx = this.odxy[2*i] * rectangles.offsetWidth;
+            const ty = (-this.odxy[2*i+1])* rectangles.offsetHeight;
+            box.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${tx}, ${ty})`;
+            rectangles.appendChild(box);
+        }
+    }
 }
 
 class ScalarTransform extends MatrixTransform {
@@ -480,7 +504,7 @@ class ScalarTransform extends MatrixTransform {
     get_formula(){
         const matrix = floatFormat(this.s, 3);
         const xy = `<table class=matrix><tr><td class=x-var>x</td></tr><tr><td class=y-var>y</td></tr></table>`;
-        let dxy = [];
+        const dxy = [];
         for( let i=0; i<this.dxy.length; i+= 2){
             const [dx, dy] = this.dxy.slice(i, i+2);
             dxy.push( `<table class=matrix><tr><td>${floatFormat(dx/WIDTH, 2)}</td></tr><tr><td>${floatFormat(dy/HEIGHT, 2)}</td></tr></table>` )
@@ -502,8 +526,9 @@ class ScaleThenRotateTransform extends MatrixTransform {
         else if( r === 270 ) [c, s] = [ 0,-1]
         else [c, s] = [Math.cos(r*PI/180), Math.sin(r*PI/180)]
         // Correct for the center of scaling AND rotation being (0.5, 0.5) instead of (0, 0)
-        let dx = (1 - fx * c + fy * s) * 0.5;
-        let dy = (1 - fx * s - fy * c) * 0.5;
+        const uncorrected_dxy = dxy.slice();
+        const dx = (1 - fx * c + fy * s) * 0.5;
+        const dy = (1 - fx * s - fy * c) * 0.5;
         for( let i=0; i<dxy.length; i+=2 ){
             dxy[i] += dx; dxy[i+1] += dy;
         }
@@ -514,6 +539,18 @@ class ScaleThenRotateTransform extends MatrixTransform {
         this.fx = fx;
         this.fy = fy;
         this.r = r;
+        this.uncorrected_dxy = uncorrected_dxy;
+    }
+    
+    add_boxes(rectangles){
+        for( let i=0; i<this.multiplicity; i++ ){
+            const box = makeElem('div', 'rectangle STR', 'R');
+            const tx = this.uncorrected_dxy[2*i] * rectangles.offsetWidth;
+            const ty = -this.uncorrected_dxy[2*i+1]* rectangles.offsetHeight;
+            box.style.transformOrigin = 'center';
+            box.style.transform = `translate(${tx}px, ${ty}px) rotate(${-this.r}deg) scale(${this.fx}, ${this.fy})`;
+            rectangles.appendChild(box);
+        }
     }
 }
 
@@ -541,7 +578,7 @@ const TRANSFORMS = {
         new ScaleThenRotateTransform(-0.5, 0.5,  90, [+0.25, -0.25]),
         new ScaleThenRotateTransform(-0.5, 0.5, -90, [-0.25, -0.25])
     ),
-    space_filling_curve2: new TransformGroup(
+    symmetric_space_filling_curve: new TransformGroup(
         new MatrixTransform(-0.5, 0, 0, 0.5, [0.5, 0.5]),
         new MatrixTransform( 0.5, 0, 0, 0.5, [0.5, 0.5]),
         new ScaleThenRotateTransform(-0.5, 0.5,  90, [+0.25, -0.25]),
@@ -611,19 +648,24 @@ var TRANSFORM;
 
     transSelect.onchange = function(e){
         TRANSFORM = TRANSFORMS[this.value];
+        // TRANSFORM INFO BOX
         let html = TRANSFORM.get_formula() + '<br>';
         html += `<br><b>Point factor:</b> 1 point maps to ${TRANSFORM.multiplicity}`;
         html += `<br><b>Surface factor:</b> 1 to ${floatFormat(TRANSFORM.weight, 3)} <span style=opacity:0.5>(assuming no overlap)</span>`;
         let con = TRANSFORM.convergence_ratio ;
         html += `<br><b>Convergence factor:</b> ${floatFormat(con, 3)}`;
         html += `<br><b>Approx. # of steps to converge:</b> ${Math.ceil(-log(WIDTH)/log(con))}`;
-        transInfo.innerHTML = html;        
+        transInfo.innerHTML = html;
+        // TRANSFORM VISUALISATION BOXES
+        byId('rectangles').innerHTML = '';
+        TRANSFORM.add_boxes(byId('rectangles'));
     }
     transSelect.onchange()
 }
 
 
 // Drawing buttons
+
 const drawing_buttons = {
     fill: g => g.drawRectangle(0, 0, 1, 1),
     square: g => g.drawRectangle(1/4, 1/4, 1/2, 1/2),
@@ -640,7 +682,7 @@ const drawing_buttons = {
         g.drawStroke(1, 0, 0.5, 1, 0.01);
     },
     R: g => {
-        const w = 0.005;
+        const w = 0.01;
         g.drawRoundedStroke(0.21, 0.14, 0.21, 0.79, w); // spine
         g.drawRoundedStroke(0.21, 0.79, 0.52, 0.79, w); // -
         g.drawRoundedStroke(0.52, 0.79, 0.73, 0.68, w); //  \
@@ -650,32 +692,36 @@ const drawing_buttons = {
         g.drawRoundedStroke(0.52, 0.43, 0.71, 0.14, w); //  \
     },
     '😉': g => {
-        g.drawArc(0.5, 0.5, 0.4, 0.02, 0, PI*2);
-        g.drawArc(0.5, 0.5, 0.3, 0.02, PI, PI);
-        g.drawArc(0.65, 0.6, 0.1, 0.02, 0, PI);
-        g.drawCircle(0.35, 0.62, 0.05);
+        g.drawArc(0.5, 0.5, 0.4, 0.02, 0, PI*2); // head
+        g.drawArc(0.5, 0.5, 0.3, 0.02, PI, PI);  // smile
+        g.drawArc(0.65, 0.6, 0.1, 0.02, 0, PI);  // wink
+        g.drawCircle(0.35, 0.64, 0.06); // left eye
+        g.drawCircle(0.2, 0.5, 0.025); // left cheek
+        g.drawCircle(0.8, 0.5, 0.025); // right cheek
     }
 }
 
-const buttonHolder = byId('drawing-buttons');
-// Clear button
-let clear = makeElem('button', 'important', 'clear');
-clear.onclick = () => { GRID = new Grid(); GRID.render() }
-buttonHolder.appendChild(clear);
-// Drawing buttons
-for( let t in drawing_buttons ){
-    let butt = makeElem('button', '', t.replace('_', ' '));
-    butt.onclick = () => { drawing_buttons[t](GRID); GRID.render() }
-    buttonHolder.appendChild(butt);
+{
+    const buttonHolder = byId('drawing-buttons');
+    // Clear button
+    let clear = makeElem('button', 'important', 'clear');
+    clear.onclick = () => { GRID = new Grid(); GRID.render() }
+    buttonHolder.appendChild(clear);
+    // Drawing buttons
+    for( let t in drawing_buttons ){
+        let butt = makeElem('button', '', t.replace('_', ' '));
+        butt.onclick = () => { drawing_buttons[t](GRID); GRID.render() }
+        buttonHolder.appendChild(butt);
+    }
+    // SAVE/LOAD drawing buttons
+    let save = makeElem('button', 'important', 'save');
+    let load = makeElem('button', 'important', 'load');
+    let SAVEDGRID;
+    save.onclick = () => SAVEDGRID = GRID.copy();
+    load.onclick = () => { if( SAVEDGRID ) { GRID.overlay(SAVEDGRID); GRID.render(); } }
+    buttonHolder.appendChild(save);
+    buttonHolder.appendChild(load);
 }
-// SAVE/LOAD drawing buttons
-let save = makeElem('button', 'important', 'save');
-let load = makeElem('button', 'important', 'load');
-let SAVEDGRID;
-save.onclick = () => SAVEDGRID = GRID.copy();
-load.onclick = () => { if( SAVEDGRID ) { GRID.overlay(SAVEDGRID); GRID.render(); } }
-buttonHolder.appendChild(save);
-buttonHolder.appendChild(load);
 
 
 
@@ -692,13 +738,14 @@ byId('brushmode').onchange = e => DRAWSTATE.color = +e.target.value;
 byId('brushsize').onchange = e => {
     DRAWSTATE.size = byId('brushsize').value/1000;
     DRAWSTATE.pixelSize = GRID.gridRadius(DRAWSTATE.size);
-    brushCircle.style.width = brushCircle.style.height = DRAWSTATE.pixelSize-3 + 'px';
+    brushCircle.style.width = brushCircle.style.height = DRAWSTATE.pixelSize+1 + 'px';
 }
 byId('brushsize').onchange();
 
 CANVAS.onmousedown = function(e){
     if( e.button !== 0 ) return;
-    DRAWSTATE.drawing = brushCircle.hidden = true;
+    DRAWSTATE.drawing = true;
+    brushCircle.classList.add('drawing');
     const x = e.offsetX, y = e.offsetY;
     const w = this.offsetWidth, h = this.offsetHeight;
     DRAWSTATE.x = x; DRAWSTATE.y = y;
@@ -721,7 +768,7 @@ CANVAS.onmousemove = function(e){
     GRID.drawCircle(x/w, 1-y/h, DRAWSTATE.size, DRAWSTATE.color);
     GRID.render()
 }
-document.addEventListener('mouseup', e => { DRAWSTATE.drawing = false; brushCircle.hidden = false; })
+document.addEventListener('mouseup', e => { DRAWSTATE.drawing = false; brushCircle.classList.remove('drawing'); })
 
 
 // Bind the main buttons to work

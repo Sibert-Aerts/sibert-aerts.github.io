@@ -11,6 +11,9 @@
 <body>
     <div id=canvas-wrap>
         <div id=editor-overlay>
+            <div id=rectangles style=opacity:0>
+                <!-- added by script -->
+            </div>
             <div id=brush-circle></div>
         </div>
         <canvas id=screen width=900 height=900></canvas>
@@ -36,9 +39,12 @@
                 <!-- added by script -->
             </select>
             <button class='important bigger' onclick=step_and_render()>apply</button>
+            
             <div id=transform-info>
                 <!-- added by script -->
             </div>
+            <br>
+            <label><input type=checkbox onchange="byId('rectangles').style.opacity ^= true"></input>Show transform boxes</label>
         </div>
         
         <div class=box>
