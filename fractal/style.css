@@ -7,20 +7,44 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-#screen {
+#canvas-wrap{
+    position: relative;
     float: left;
     width: 900px;
     height: 900px;
     margin: 10px 20px 10px 40px;
+}
+
+#screen {
+    position: absolute;
+    left: 0; top: 0;
     background-color: #ccc;
     box-shadow: 0px 10px 25px #000a;
     image-rendering: pixelated;
-    cursor: pointer;
+    cursor: none;
 }
 #controls {
     float: left;
     width: calc( 100% - 980px );
 }
+
+#editor-overlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+#brush-circle {
+    position: absolute;
+    border-radius: 100000px;
+    border: 2px solid #fffB;
+    width: 50px;
+    height: 50px;
+    z-index: 2;
+    visibility: hidden;
+}
+    #canvas-wrap:hover #brush-circle { visibility: visible }
 
 .box {
     float: left;
@@ -64,7 +88,7 @@ option[disabled]{
         display: inline-block;
         vertical-align: middle;
         padding: 2px 4px 3px;
-        border-radius: 10px;
+        border-radius: 12px;
         border-left: 2px #aaa solid;
         border-right: 2px #aaa solid;
         border-top: 1px #3b3b3b solid;
@@ -119,8 +143,10 @@ button:active {
 
 button.important {
     color: #bbcaca;
-    font-size: 1.2em;
     background-color: #3c4747;
+}
+button.bigger {
+    font-size: 1.2em;
 }
 button.important:hover {
     background-color: #3e5050;

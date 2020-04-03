@@ -2,15 +2,19 @@
 
 // Useful aliases
 const int = Math.floor;
-const byId = i => document.getElementById(i);
-const $ = s => document.querySelector(s);
+const byId = document.getElementById.bind(document);
+const $ = document.querySelector.bind(document);
 const makeElem = (x, c, t) => { let e = document.createElement(x); if(c) e.className = c; if(t) e.textContent = t; return e };
+const sessionGet = window.sessionStorage.getItem.bind(window.sessionStorage);
+const sessionSet = window.sessionStorage.setItem.bind(window.sessionStorage);
+const localGet = window.localStorage.getItem.bind(window.localStorage);
+const localSet = window.localStorage.setItem.bind(window.localStorage);
 
 // Useful functions
 const chance = (x, y=1) => Math.random()*y < x;
 const randInt = a => int( Math.random()*a );
 const mod = (x, m) => ((x%m)+m%m);
-const { abs, max, min, sin, cos, tan, cot, atan2, sqrt, log } = Math;
+const { abs, max, min, sin, cos, tan, cot, atan2, sqrt, log, PI } = Math;
 function choose_weighted( items ){
     const sum = items.reduce( (s, i)=>s+i.weight, 0);
     let pick = Math.random()*sum;
@@ -27,7 +31,7 @@ CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANV
 const CANVAS = byId('screen');
 const CANVASWIDTH = +CANVAS.width;
 const CANVASHEIGHT = +CANVAS.height;
-const PIXELFACTOR = 1;
+const PIXELFACTOR = 2;
 const WIDTH = CANVASWIDTH * PIXELFACTOR;
 const HEIGHT = CANVASHEIGHT * PIXELFACTOR;
 const CTX = CANVAS.getContext('2d');
@@ -45,6 +49,22 @@ class Grid {
         // We use Uint8Array, but we only really put 0's or 1's in there for now.
         this.grid = new Array(width);
         for( let x=0; x<width; x++ ) this.grid[x] = new Uint8Array(height);
+    }
+
+    copy() {
+        let copy = new Grid(this.width, this.height, this.pixelFactor);
+        for( let x=0; x<this.width; x++ )
+            copy.grid[x].set(this.grid[x]);
+        return copy;
+    }
+
+    overlay(other) {
+        if( this.width !== other.width || this.height !== other.height || this.pixelFactor !== other.pixelFactor )
+            throw 'Overlaying non-matching grids!'
+        const tg = this.grid, og = other.grid;
+        for( let x=0; x<this.width; x++ )
+            for( let y=0; y<this.height; y++ )
+                tg[x][y] += og[x][y]
     }
 
     count() {
@@ -196,6 +216,18 @@ class Grid {
         this.drawCircle(Ax, Ay, w/2, color);
         this.drawCircle(Bx, By, w/2, color);
         this.drawStroke(Ax, Ay, Bx, By, w, color);
+    }
+
+    drawArc(cx, cy, r, w, start=0, angle=PI*2, color=1){
+        angle = min(angle, PI*2);
+        const iter = int(72 * angle/PI*2);
+        const dphi = angle/iter;
+        let prevx = cos(start-dphi)*r+cx, prevy = sin(start-dphi)*r+cy;
+        for( let i=0; i<iter; i++ ){
+            let x = cos(start+i*dphi)*r+cx, y = sin(start+i*dphi)*r+cy;
+            this.drawRoundedStroke(prevx, prevy, x, y, w, color);
+            prevx = x; prevy = y;
+        }
     }
 }
 
@@ -468,7 +500,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
         else if( r === 90  ) [c, s] = [ 0, 1]
         else if( r === 180 ) [c, s] = [-1, 0]
         else if( r === 270 ) [c, s] = [ 0,-1]
-        else [c, s] = [Math.cos(r*Math.PI/180), Math.sin(r*Math.PI/180)]
+        else [c, s] = [Math.cos(r*PI/180), Math.sin(r*PI/180)]
         // Correct for the center of scaling AND rotation being (0.5, 0.5) instead of (0, 0)
         let dx = (1 - fx * c + fy * s) * 0.5;
         let dy = (1 - fx * s - fy * c) * 0.5;
@@ -489,6 +521,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
 /****************************************************************************************/
 /*                                    PUT IT TO WORK                                    */
 /****************************************************************************************/
+var GRID = new Grid();
 const SEPARATOR = new Object();
 const TRANSFORMS = {
     TRIANGULAR: SEPARATOR,
@@ -505,11 +538,22 @@ const TRANSFORMS = {
          0, 2/3, 1/3, 2/3, 2/3, 2/3]),
     space_filling_curve: new TransformGroup(
         new ScaleThenRotateTransform(0.5, 0.5,   0, [-0.25, +0.25,  +0.25, +0.25]),
-        new ScaleThenRotateTransform(0.5, 0.5,  90, [+0.25, -0.25]),
+        new ScaleThenRotateTransform(-0.5, 0.5,  90, [+0.25, -0.25]),
+        new ScaleThenRotateTransform(-0.5, 0.5, -90, [-0.25, -0.25])
+    ),
+    space_filling_curve2: new TransformGroup(
+        new MatrixTransform(-0.5, 0, 0, 0.5, [0.5, 0.5]),
+        new MatrixTransform( 0.5, 0, 0, 0.5, [0.5, 0.5]),
+        new ScaleThenRotateTransform(-0.5, 0.5,  90, [+0.25, -0.25]),
         new ScaleThenRotateTransform(0.5, 0.5, -90, [-0.25, -0.25])
     ),
+    space_filling_diagonal: new TransformGroup(
+        new ScalarTransform(1/3, [0, 0, 0, 2/3, 2/3, 0, 2/3, 2/3]),
+        new ScaleThenRotateTransform(1/3, 1/3,  90, [-1/3, 0, 1/3, 0]),
+        new ScaleThenRotateTransform(1/3, 1/3,  -90, [0, 1/3, 0, -1/3]),
+        new ScaleThenRotateTransform(1/3, 1/3,  180, [0, 0])
+    ),
     HEXAGON: SEPARATOR,
-    hollow_snowflake: new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
     hollow_snowflake: new ScalarTransform( 1/3, 
         [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
     snowflake: new TransformGroup(
@@ -604,18 +648,34 @@ const drawing_buttons = {
         g.drawRoundedStroke(0.73, 0.52, 0.52, 0.43, w); //  /
         g.drawRoundedStroke(0.52, 0.43, 0.21, 0.43, w); // -
         g.drawRoundedStroke(0.52, 0.43, 0.71, 0.14, w); //  \
+    },
+    '😉': g => {
+        g.drawArc(0.5, 0.5, 0.4, 0.02, 0, PI*2);
+        g.drawArc(0.5, 0.5, 0.3, 0.02, PI, PI);
+        g.drawArc(0.65, 0.6, 0.1, 0.02, 0, PI);
+        g.drawCircle(0.35, 0.62, 0.05);
     }
 }
 
 const buttonHolder = byId('drawing-buttons');
-let clear = makeElem('button', 'clear', 'clear');
+// Clear button
+let clear = makeElem('button', 'important', 'clear');
 clear.onclick = () => { GRID = new Grid(); GRID.render() }
 buttonHolder.appendChild(clear);
+// Drawing buttons
 for( let t in drawing_buttons ){
     let butt = makeElem('button', '', t.replace('_', ' '));
     butt.onclick = () => { drawing_buttons[t](GRID); GRID.render() }
     buttonHolder.appendChild(butt);
 }
+// SAVE/LOAD drawing buttons
+let save = makeElem('button', 'important', 'save');
+let load = makeElem('button', 'important', 'load');
+let SAVEDGRID;
+save.onclick = () => SAVEDGRID = GRID.copy();
+load.onclick = () => { if( SAVEDGRID ) { GRID.overlay(SAVEDGRID); GRID.render(); } }
+buttonHolder.appendChild(save);
+buttonHolder.appendChild(load);
 
 
 
@@ -623,15 +683,22 @@ for( let t in drawing_buttons ){
 var DRAWSTATE = {
     drawing: false,
     size: 0.05,
+    pixelSize: 90,
     color: 1,
     x: 0, y: 0
 }
+const brushCircle = byId('brush-circle');
 byId('brushmode').onchange = e => DRAWSTATE.color = +e.target.value;
-byId('brushsize').onchange = e => DRAWSTATE.size = e.target.value/1000;
+byId('brushsize').onchange = e => {
+    DRAWSTATE.size = byId('brushsize').value/1000;
+    DRAWSTATE.pixelSize = GRID.gridRadius(DRAWSTATE.size);
+    brushCircle.style.width = brushCircle.style.height = DRAWSTATE.pixelSize-3 + 'px';
+}
+byId('brushsize').onchange();
 
 CANVAS.onmousedown = function(e){
     if( e.button !== 0 ) return;
-    DRAWSTATE.drawing = true;
+    DRAWSTATE.drawing = brushCircle.hidden = true;
     const x = e.offsetX, y = e.offsetY;
     const w = this.offsetWidth, h = this.offsetHeight;
     DRAWSTATE.x = x; DRAWSTATE.y = y;
@@ -639,8 +706,13 @@ CANVAS.onmousedown = function(e){
     GRID.render()
 }
 CANVAS.onmousemove = function(e){
-    if( e.button !== 0 || !DRAWSTATE.drawing ) return;
     const x = e.offsetX, y = e.offsetY;
+    // Move the cursor
+    brushCircle.style.left = int(x - DRAWSTATE.pixelSize/2) + 'px';
+    brushCircle.style.top = int(y - DRAWSTATE.pixelSize/2) + 'px';
+    if( e.button !== 0 || !DRAWSTATE.drawing ) return;
+
+    // Draw the line connecting this spot to the previous spot if needed
     const w = this.offsetWidth, h = this.offsetHeight;
     const dx = x - DRAWSTATE.x, dy = y - DRAWSTATE.y;
     DRAWSTATE.x = x; DRAWSTATE.y = y;
@@ -649,7 +721,7 @@ CANVAS.onmousemove = function(e){
     GRID.drawCircle(x/w, 1-y/h, DRAWSTATE.size, DRAWSTATE.color);
     GRID.render()
 }
-document.addEventListener('mouseup', e => DRAWSTATE.drawing = false)
+document.addEventListener('mouseup', e => { DRAWSTATE.drawing = false; brushCircle.hidden = false; })
 
 
 // Bind the main buttons to work
@@ -662,10 +734,13 @@ function step_and_render(){
     console.timeEnd('STEP');
 }
 
+byId('rand-steps').value = sessionGet('randSteps') || 100000;
+
 function random_render(){
     console.time('RANDOM');
 
     let nsteps = parseInt(byId('rand-steps').value);
+    sessionSet('randSteps', nsteps);
     let [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
     for( let i=0; i<nsteps; i++ ){
         [x, y] = TRANSFORM.apply_random(x, y);
@@ -685,6 +760,5 @@ document.onkeypress = e => {
 
 // Start the basic grid.
 
-var GRID = new Grid();
 drawing_buttons.circle(GRID);
 GRID.render();

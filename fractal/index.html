@@ -9,7 +9,12 @@
 </head>
 
 <body>
-	<canvas id=screen width=900 height=900></canvas>
+    <div id=canvas-wrap>
+        <div id=editor-overlay>
+            <div id=brush-circle></div>
+        </div>
+        <canvas id=screen width=900 height=900></canvas>
+    </div>
 
     <div id=controls>
         <div id=drawing class=box>
@@ -26,28 +31,28 @@
         </div>
 
         <div class=box style=max-width:65%>
-            <h4>Transformation:</h4>
+            <h4>Transformation</h4>
             <select id=transform-select>
                 <!-- added by script -->
             </select>
-            <button class=important onclick=step_and_render()>apply</button>
+            <button class='important bigger' onclick=step_and_render()>apply</button>
             <div id=transform-info>
                 <!-- added by script -->
             </div>
         </div>
         
         <div class=box>
-            <button class=important onclick=random_render()>random</button>
+            <button class='important bigger' onclick=random_render()>random</button>
             <label>walk length: <input id=rand-steps type=text value=100000 size=6></label>
         </div>
         
         <div class=box>
             <h4>How to use</h4>
             <ul>
-                <li>Use the buttons or click on the canvas to draw something to transform</li>
-                <li>Select a transformation you want to apply</li>
-                <li>Click 'step' or press Enter to apply the selected transformation</li>
-                <li>Click 'random' to apply the "random walk" algorithm for the selected transformation</li>
+                <li>Use the buttons or click on the canvas to draw something</li>
+                <li>Select a transformation</li>
+                <li>Click 'apply' to apply the selected transformation to the current drawing</li>
+                <li>Click 'random' to draw the results of a "random walk" for the selected transformation</li>
             </ul>
         </div>
     </div>
