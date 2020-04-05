@@ -33,7 +33,7 @@
             <input id=brushsize type=range min=1 max=100>
         </div>
 
-        <div class=box style=max-width:65%>
+        <div id=transformation class=box style=max-width:65%>
             <h4>Transformation</h4>
             <select id=transform-select>
                 <!-- added by script -->
@@ -41,16 +41,19 @@
             <button class='important bigger' onclick=step_and_render()>apply</button>
             <button class='bigger yellow' onclick=edit()>edit</button>
 
-            <div id=custom-transform-box>
+            <div id=custom-transform-box hidden>
                 <div id=custom-transforms>
                     <!-- added by script -->
                 </div>
-
 
                 <div style=width:100%;text-align:center>
                     <button onclick='add_custom_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]))' class='important' >+ scale and rotate</button>
                     <button onclick='add_custom_form(new MatrixTransform(1, 0, 0, 1, [0, 0]))' class='important' >+ matrix</button>
                 </div>
+            </div>
+
+            <div id=transform-formula>
+                <!-- added by script -->
             </div>
             
             <div id=transform-info>

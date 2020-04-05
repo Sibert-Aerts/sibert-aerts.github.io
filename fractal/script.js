@@ -485,33 +485,32 @@ class MatrixTransform extends Transform {
         const matrix = `<table class=matrix><tr><td>${a}</td><td>${b}</td></tr><tr><td>${c}</td><td>${d}</td></tr></table>`;
         const xy = `<table class=matrix><tr><td class=x-var>x</td></tr><tr><td class=y-var>y</td></tr></table>`;
         let dxy = [];
-        for( let i=0; i<this.dxy.length; i+= 2){
-            const [dx, dy] = this.dxy.slice(i, i+2);
-            dxy.push( `<table class=matrix><tr><td>${floatFormat(dx/WIDTH, 2)}</td></tr><tr><td>${floatFormat(dy/HEIGHT, 2)}</td></tr></table>` )
-        }
+        for( let i=0; i<this.dxy.length; i+= 2)
+            dxy.push( `<table class=matrix><tr><td>${floatFormat(this.odxy[i], 3)}</td></tr><tr><td>${floatFormat(this.odxy[i+1], 3)}</td></tr></table>` )
         return matrix + ' × ' + xy + ' + ' + dxy.join(' and ');
     }
 
     add_boxes(rectangles){
         let [a, b, c, d] = this.m;
-        // I DONT UNDERSTAND WHAT IS WRONG WITH CSS MATRIX TRANSFORMS (OUR Y IS NEGATIVE OF THEIRS? IDK) BUT THIS IS REQUIRED
-        if( c*b > 0 ) { b *= -1; c *= -1 }
         for( let i=0; i<this.multiplicity; i++ ){
             const box = makeElem('div', 'rectangle', 'R');
             const tx = this.odxy[2*i] * rectangles.offsetWidth;
-            const ty = (-this.odxy[2*i+1])* rectangles.offsetHeight;
-            box.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${tx}, ${ty})`;
+            // ty negative because Y points down in CSS
+            const ty = -this.odxy[2*i+1] * rectangles.offsetHeight;
+            // No that is not a typo, CSS expects the matrix indices in a different order than we have them
+            // additionally, b and c are negative due to the inverted Y axis in CSS
+            box.style.transform = `matrix(${a}, ${-c}, ${-b}, ${d}, ${tx}, ${ty})`;
             rectangles.appendChild(box);
         }
     }
 
-    make_form(){        
+    make_form(){
         const form = makeElem('form', 'custom-matrix');
         const [a, b, c, d] = this.m;
         form.innerHTML = `
             <table class=matrix>
-                <tr><td><input type=text size=1 target=a value=${a}></td><td><input type=text size=1 target=b value=${b}></td></tr>
-                <tr><td><input type=text size=1 target=c value=${c}></td><td><input type=text size=1 target=d value=${d}></td></tr>
+                <tr><td><input type=text size=1 target=a value=${floatFormat(a, 4)}></td><td><input type=text size=1 target=b value=${floatFormat(b, 4)}></td></tr>
+                <tr><td><input type=text size=1 target=c value=${floatFormat(c, 4)}></td><td><input type=text size=1 target=d value=${floatFormat(d, 4)}></td></tr>
             </table>
             ×
             <table class=matrix>
@@ -525,8 +524,8 @@ class MatrixTransform extends Transform {
             const wrap = makeElem('div', 'txy');
             const dxy = makeElem('table', 'matrix');
             dxy.innerHTML = `
-                <tr></td><td><input type=text size=1 value=${tx}></td></tr>
-                <tr></td><td><input type=text size=1 value=${ty}></td></tr>
+                <tr></td><td><input type=text size=1 value=${floatFormat(tx, 4)}></td></tr>
+                <tr></td><td><input type=text size=1 value=${floatFormat(ty, 4)}></td></tr>
             `;
             wrap.append(dxy);
 
@@ -571,10 +570,8 @@ class ScalarTransform extends MatrixTransform {
         const matrix = floatFormat(this.s, 3);
         const xy = `<table class=matrix><tr><td class=x-var>x</td></tr><tr><td class=y-var>y</td></tr></table>`;
         const dxy = [];
-        for( let i=0; i<this.dxy.length; i+= 2){
-            const [dx, dy] = this.dxy.slice(i, i+2);
-            dxy.push( `<table class=matrix><tr><td>${floatFormat(dx/WIDTH, 2)}</td></tr><tr><td>${floatFormat(dy/HEIGHT, 2)}</td></tr></table>` )
-        }
+        for( let i=0; i<this.dxy.length; i+= 2)
+            dxy.push( `<table class=matrix><tr><td>${floatFormat(this.odxy[i], 3)}</td></tr><tr><td>${floatFormat(this.odxy[i+1], 3)}</td></tr></table>` )
         return matrix + ' × ' + xy + ' + ' + dxy.join(' and ');
     }
 }
@@ -608,12 +605,33 @@ class ScaleThenRotateTransform extends MatrixTransform {
         this.txy = txy;
     }
     
+    get_formula(){
+        let matrix = `
+            <table class=matrix>
+                <tr><td>${floatFormat(this.fx, 3)} × <span class=x-var>x</span></td></tr>
+                <tr><td>${floatFormat(this.fy, 3)} × <span class=y-var>y</span></td></tr>
+            </table>
+        `;
+
+        if( this.r !== 0 )
+            matrix += ` × rotate ${floatFormat(this.r, 3)}° `
+
+        let txy = [];
+        
+        for( let i=0; i<this.txy.length; i+= 2)
+            txy.push( `<table class=matrix><tr><td>${floatFormat(this.txy[i], 3)}</td></tr><tr><td>${floatFormat(this.txy[i+1], 3)}</td></tr></table>` )
+
+        return matrix + ' + ' + txy.join(' and ');
+    }
+
     add_boxes(rectangles){
         for( let i=0; i<this.multiplicity; i++ ){
             const box = makeElem('div', 'rectangle STR', 'R');
             const tx = this.txy[2*i] * rectangles.offsetWidth;
-            const ty = -this.txy[2*i+1]* rectangles.offsetHeight;
+            // ty negative because Y points down in CSS
+            const ty = -this.txy[2*i+1] * rectangles.offsetHeight;
             box.style.transformOrigin = 'center';
+            // r is negative because CSS turns clockwise like an idiot
             box.style.transform = `translate(${tx}px, ${ty}px) rotate(${-this.r}deg) scale(${this.fx}, ${this.fy})`;
             rectangles.appendChild(box);
         }
@@ -623,11 +641,11 @@ class ScaleThenRotateTransform extends MatrixTransform {
         const form = makeElem('form', 'custom-STR');
         form.innerHTML = `
             <table class=matrix>
-                <tr><td><input type=text size=1 value=${this.fx}> × <span class=x-var>x</span></td></tr>
-                <tr><td><input type=text size=1 value=${this.fy}> × <span class=y-var>y</span></td></tr>
+                <tr><td><input type=text size=1 value=${floatFormat(this.fx, 4)}> × <span class=x-var>x</span></td></tr>
+                <tr><td><input type=text size=1 value=${floatFormat(this.fy, 4)}> × <span class=y-var>y</span></td></tr>
             </table>
             ×
-            rotate <input type=text size=1 value=${this.r}> ° 
+            rotate <input type=text size=1 value=${floatFormat(this.r, 4)}> ° 
             +
         `;
     
@@ -635,8 +653,8 @@ class ScaleThenRotateTransform extends MatrixTransform {
             const wrap = makeElem('div', 'txy');
             const txy = makeElem('table', 'matrix');
             txy.innerHTML = `
-                <tr></td><td><input type=text size=1 value=${tx}></td></tr>
-                <tr></td><td><input type=text size=1 value=${ty}></td></tr>
+                <tr></td><td><input type=text size=1 value=${floatFormat(tx, 4)}></td></tr>
+                <tr></td><td><input type=text size=1 value=${floatFormat(ty, 4)}></td></tr>
             `;
             wrap.append(txy);
 
@@ -681,7 +699,6 @@ var GRID = new Grid();
 const SEPARATOR = new Object();
 const CUSTOM = new Object();
 const TRANSFORMS = {
-    CUSTOM: CUSTOM,
     TRIANGULAR: SEPARATOR,
     sierpinski_triangle: new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
     'sierpinski_triangle?': new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5, 1/4, 1/6]),
@@ -695,7 +712,7 @@ const TRANSFORMS = {
          0, 1/3,           2/3, 1/3,
          0, 2/3, 1/3, 2/3, 2/3, 2/3]),
     squares_within_squares: new TransformGroup(
-        new ScalarTransform(1/3, [1/3, 0, 0, 1/3, 1/3, 2/3, 2/3, 1/3]),
+        new ScalarTransform(1/3, [0, 0, 2/3, 0, 0, 2/3, 2/3, 2/3]),
         new ScaleThenRotateTransform(Math.SQRT1_2, Math.SQRT1_2, 45, [0, 0])
     ),
     space_filling_curve: new TransformGroup(
@@ -756,12 +773,16 @@ const TRANSFORMS = {
         new ScaleThenRotateTransform(0.4, 0.4, 45, [-0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2]),
         new ScaleThenRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2])
     ),
+    CUSTOM: SEPARATOR,
+    CUSTOM1: CUSTOM,
 }
 
 //// Transform selector
 var TRANSFORM;
-const customTransforms = byId('custom-transforms');
 const transSelect = byId('transform-select');
+const customTransforms = byId('custom-transforms');
+const customTransformBox = byId('custom-transform-box');
+const transFormula = byId('transform-formula');
 const transInfo = byId('transform-info');
 const rectangles = byId('rectangles');
 {
@@ -774,18 +795,25 @@ const rectangles = byId('rectangles');
 
     // Hook up transform selection
     transSelect.onchange = function(){
-        if( this.value === 'CUSTOM' ){
-            byId('custom-transform-box').hidden = false;
+        sessionSet('selectedTransform', this.value);
+
+        if( TRANSFORMS[this.value] === CUSTOM ){
+            customTransformBox.hidden = false;
+            transFormula.hidden = true;
             update_custom_transform();
             return;
-        }   
-        byId('custom-transform-box').hidden = true;
+        }
+        customTransformBox.hidden = true;
+        transFormula.hidden = false;
         TRANSFORM = TRANSFORMS[this.value];
         // SHOW INFORMATIONS
-        transInfo.innerHTML = TRANSFORM.get_formula() + '<br><br>' + TRANSFORM.get_stats();
+        transFormula.innerHTML = TRANSFORM.get_formula();
+        transInfo.innerHTML = TRANSFORM.get_stats();
         rectangles.innerHTML = '';
         TRANSFORM.add_boxes(rectangles);
     }
+
+    transSelect.value = sessionGet('selectedTransform') || 'sierpinski_triangle';
     transSelect.onchange()
 }
 
@@ -806,7 +834,7 @@ function edit(){
     else
         add_custom_form(TRANSFORM);
         
-    transSelect.value = 'CUSTOM';
+    transSelect.value = 'CUSTOM1';
     transSelect.onchange();
 }
 
@@ -830,8 +858,6 @@ function add_custom_form(transform){
     customTransforms.appendChild(wrap);
     update_custom_transform();
 }
-
-add_custom_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]));
 
 
 

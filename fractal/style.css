@@ -40,10 +40,6 @@ body {
     cursor: none;
 }
 
-#controls {
-    float: left;
-    width: calc( 100% - 980px );
-}
 
 #editor-overlay {
     position: relative;
@@ -55,45 +51,76 @@ body {
     -moz-user-select: none;
     -webkit-user-select: none;
 }
+    #brush-circle {
+        box-sizing: border-box;
+        position: absolute;
+        border-radius: 100000px;
+        border: 2px solid #fffB;
+        z-index: 2;
+        visibility: hidden;
+    }
+        #brush-circle.drawing { border: 1px solid #fffc }
+        #canvas-wrap:hover #brush-circle { visibility: visible }
 
-#brush-circle {
-    box-sizing: border-box;
-    position: absolute;
-    border-radius: 100000px;
-    border: 2px solid #fffB;
-    z-index: 2;
-    visibility: hidden;
+    #rectangles {
+        position: relative;
+        width: 100%; height: 100%;
+        z-index: 2;
+    }
+    #rectangles > .rectangle {
+        position: absolute;
+        box-sizing: border-box;
+        transform-origin: bottom left;
+        width: 100%;
+        height: 100%;
+        border: 2px solid black;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 880px;
+        text-align: center;
+        line-height: 950px;
 }
-    #brush-circle.drawing { border: 1px solid #fffc }
-    #canvas-wrap:hover #brush-circle { visibility: visible }
+#rectangles > .rectangle:nth-child(9n+1) { background-color: #f001; border-color: #8008; color: #8004; }
+#rectangles > .rectangle:nth-child(9n+2) { background-color: #0f01; border-color: #0808; color: #0804; }
+#rectangles > .rectangle:nth-child(9n+3) { background-color: #00f1; border-color: #0088; color: #0084; }
+#rectangles > .rectangle:nth-child(9n+4) { background-color: #aa01; border-color: #6608; color: #6604; }
+#rectangles > .rectangle:nth-child(9n+5) { background-color: #a0a1; border-color: #6068; color: #6064; }
+#rectangles > .rectangle:nth-child(9n+6) { background-color: #0aa1; border-color: #0668; color: #0664; }
+#rectangles > .rectangle:nth-child(9n+7) { background-color: rgba(170, 91, 0, 0.067); border-color: rgba(102, 66, 0, 0.533); color: rgba(102, 66, 0, 0.267); }
+#rectangles > .rectangle:nth-child(9n+8) { background-color: rgba(170, 0, 85, 0.067); border-color: rgba(102, 0, 59, 0.533); color: rgba(102, 0, 63, 0.267); }
+#rectangles > .rectangle:nth-child(9n+9) { background-color: rgba(0, 170, 77, 0.067); border-color: rgba(0, 102, 51, 0.533); color: rgba(0, 102, 71, 0.267); }
 
-#rectangles {
-    position: relative;
-    width: 100%; height: 100%;
-    z-index: 2;
-}
-#rectangles > .rectangle {
-    position: absolute;
-    box-sizing: border-box;
-    transform-origin: bottom left;
-    width: 100%;
-    height: 100%;
-    border: 2px solid black;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 880px;
-    text-align: center;
-    line-height: 950px;
-}
-#rectangles > .rectangle:nth-child(1), #rectangles > .rectangle:nth-child(7)  { background-color: #f001; border-color: #800; color: #8006; }
-#rectangles > .rectangle:nth-child(2), #rectangles > .rectangle:nth-child(8)  { background-color: #0f01; border-color: #080; color: #0806; }
-#rectangles > .rectangle:nth-child(3), #rectangles > .rectangle:nth-child(9)  { background-color: #00f1; border-color: #008; color: #0086; }
-#rectangles > .rectangle:nth-child(4), #rectangles > .rectangle:nth-child(10) { background-color: #aa01; border-color: #660; color: #6606; }
-#rectangles > .rectangle:nth-child(5), #rectangles > .rectangle:nth-child(11) { background-color: #a0a1; border-color: #606; color: #6066; }
-#rectangles > .rectangle:nth-child(6), #rectangles > .rectangle:nth-child(12) { background-color: #0aa1; border-color: #066; color: #0666; }
 #rectangles > .rectangle.STR { border-style: dashed }
 
 
-#transform-info, #custom-transform-box {
+#controls {
+    float: left;
+    width: calc( 100% - 960px );
+    min-height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+#drawing {
+    max-width: 140px;
+}
+    #drawing-buttons {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    #drawing button {
+        margin: 4px 2px;
+        flex-grow: 1;
+    }
+
+#transformation {
+    flex-shrink: 1;
+    flex-grow: 1;
+}
+
+#transform-info, #transform-formula, #custom-transform-box {
     margin-top: 10px;
     padding: 8px;
     border-radius: 8px;
@@ -113,7 +140,7 @@ body {
     table.matrix td{
         text-align: center
     }
-    #transform-info .big{
+    #transform-formula .big{
         display: block;
         margin: 10px 0;
         width: 100%;
@@ -123,18 +150,6 @@ body {
         color: #99f
     }
 
-#drawing {
-    max-width: 16%;
-}
-#drawing-buttons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-    #drawing button {
-        margin: 4px 2px;
-        flex-grow: 1;
-    }
 
 /**********************************\
           TRANSFORM EDITING
@@ -143,6 +158,20 @@ body {
 form.custom-STR, form.custom-matrix {
     display: inline;
 }
+
+#custom-transforms > div {
+    display: block;
+    position: relative;
+}
+    #custom-transforms > div:not(:first-child){
+        margin-top: 1.8em;
+    }
+    #custom-transforms > div:not(:first-child):before{
+        content: 'AND';
+        position: absolute;
+        top: -1.6em;
+        left: 48%;
+    }
 
 .add-txy {
     position: relative;
@@ -154,7 +183,6 @@ form.custom-STR, form.custom-matrix {
     display: inline-block;
     position: relative;
     padding-right: 16px;
-    text-indent: 0;
 }
     .txy:not(:first-child){
         padding-left: 10px;
@@ -188,6 +216,9 @@ button {
     outline: none;
     border-radius: 10px;
 }
+    button:focus {
+        background-color: #4a4d58;
+    }
     button:hover {
         background-color: #505050;
         box-shadow: 0px 2px 2px #0004;
@@ -203,16 +234,19 @@ button {
     button.tiny  { padding: 0px 4px; border-radius: 4px; margin: 2px }
 
     button.important { color: #c2d8d8; background-color: #3c4747 }
+        button.important:focus { background-color: rgb(61, 86, 100) }
         button.important:hover { background-color: #3a5f5d }
         button.important:active { color: #a3bbbb; background-color: #263a3a }
 
     button.red { color: #ccbbbb; background-color: #663a3a }
+        button.red:focus { background-color: #994a65 }
         button.red:hover { background-color: #a14545 }
         button.red:active { color: #c8a3a3; background-color: #582828 }
 
-    button.yellow { color: #ccbbbb; background-color: #79663e }
+    button.yellow { color: #dddcca; background-color: #79663e }
+        button.yellow:focus { background-color: #8f6945 }
         button.yellow:hover { background-color: #a08f45 }
-        button.yellow:active { color: #c8a3a3; background-color: #5a5120 }
+        button.yellow:active { color: #dbc8ab; background-color: #5a5120 }
 
 
 select {
@@ -268,7 +302,7 @@ input[type=checkbox]:before {
 
 input[type=text]{
     border-radius: 4px;
-    padding: 3px 4px;
+    padding: 3px 2px 3px 4px;
     background-color: #ddd;
     border: none;
 }
