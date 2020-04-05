@@ -39,10 +39,24 @@
                 <!-- added by script -->
             </select>
             <button class='important bigger' onclick=step_and_render()>apply</button>
+            <button class='bigger yellow' onclick=edit()>edit</button>
+
+            <div id=custom-transform-box>
+                <div id=custom-transforms>
+                    <!-- added by script -->
+                </div>
+
+
+                <div style=width:100%;text-align:center>
+                    <button onclick='add_custom_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]))' class='important' >+ scale and rotate</button>
+                    <button onclick='add_custom_form(new MatrixTransform(1, 0, 0, 1, [0, 0]))' class='important' >+ matrix</button>
+                </div>
+            </div>
             
             <div id=transform-info>
                 <!-- added by script -->
             </div>
+
             <br>
             <label><input type=checkbox onchange="byId('rectangles').style.opacity ^= true"></input>Show transform boxes</label>
         </div>

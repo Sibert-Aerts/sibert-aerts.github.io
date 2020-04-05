@@ -4,7 +4,7 @@
 const int = Math.floor;
 const byId = document.getElementById.bind(document);
 const $ = document.querySelector.bind(document);
-const makeElem = (x, c, t) => { let e = document.createElement(x); if(c) e.className = c; if(t) e.textContent = t; return e };
+const makeElem = (name, className, text) => { let e = document.createElement(name); if(className) e.className = className; if(text) e.textContent = text; return e };
 const sessionGet = window.sessionStorage.getItem.bind(window.sessionStorage);
 const sessionSet = window.sessionStorage.setItem.bind(window.sessionStorage);
 const localGet = window.localStorage.getItem.bind(window.localStorage);
@@ -22,7 +22,7 @@ function choose_weighted( items ){
         if( pick < items[i].weight ) return items[i]
         else pick -= items[i].weight;
 }
-const floatFormat = (x, n) => x.toFixed(n).replace(/\.?0+$/, '' )
+const floatFormat = (x, n) => x.toFixed(n).replace(/\.?0+$/, '' ).replace(/^-0$/, '0')
 
 // Useful methods
 CanvasRenderingContext2D.prototype.clear = function(){ this.clearRect(0, 0, CANVASWIDTH, CANVASHEIGHT) }
@@ -285,8 +285,18 @@ class Transform {
     }
 
     get_formula(){
-        // Get a formulaic representation of the transform as HTML
+        // Get a formulaic representation of the transform as an HTML string
         return '';
+    }
+
+    get_stats(){
+        // Get some interesting information about the transform as an HTML string
+        const con = this.convergence_ratio;
+        const steps = Math.ceil(-log(WIDTH)/log(con));
+        return `<b>Point factor:</b> 1 point maps to ${this.multiplicity}` + 
+        `<br><b>Surface factor:</b> 1 to ${floatFormat(this.weight, 3)} <span style=opacity:0.5>(assuming no overlap)</span>` +
+        `<br><b>Convergence factor:</b> ${floatFormat(con, 3)}` + 
+        `<br><b>Approx. # of steps to converge:</b> ${( steps >= 0 && steps < 1e10 ) ? steps : 'Never'}`
     }
 
     add_boxes(rectangles){
@@ -494,6 +504,62 @@ class MatrixTransform extends Transform {
             rectangles.appendChild(box);
         }
     }
+
+    make_form(){        
+        const form = makeElem('form', 'custom-matrix');
+        const [a, b, c, d] = this.m;
+        form.innerHTML = `
+            <table class=matrix>
+                <tr><td><input type=text size=1 target=a value=${a}></td><td><input type=text size=1 target=b value=${b}></td></tr>
+                <tr><td><input type=text size=1 target=c value=${c}></td><td><input type=text size=1 target=d value=${d}></td></tr>
+            </table>
+            ×
+            <table class=matrix>
+                <tr></td><td class=x-var>x</td></tr>
+                <tr></td><td class=y-var>y</td></tr>
+            </table>
+            +
+        `;
+
+        function append_dxy(tx, ty){
+            const wrap = makeElem('div', 'txy');
+            const dxy = makeElem('table', 'matrix');
+            dxy.innerHTML = `
+                <tr></td><td><input type=text size=1 value=${tx}></td></tr>
+                <tr></td><td><input type=text size=1 value=${ty}></td></tr>
+            `;
+            wrap.append(dxy);
+
+            const del_dxy = makeElem('button', 'del-txy tiny red', '×');
+            del_dxy.setAttribute('type', 'button');
+            del_dxy.onclick = () => {
+                if( dxysWrapper.children.length > 1 )
+                dxysWrapper.removeChild(wrap); 
+                update_custom_transform() 
+            }
+            wrap.appendChild(del_dxy);
+
+            dxysWrapper.append(wrap);
+            return dxy;
+        }
+
+        const dxysWrapper = makeElem('span', 'txywrapper');
+        for( let i=0; i<this.dxy.length; i+=2 )
+            append_dxy(this.odxy[i], this.odxy[i+1]);
+        form.appendChild(dxysWrapper);
+
+        const add_dxy = makeElem('button', 'add-txy tiny important', '+');
+        add_dxy.setAttribute('type', 'button');
+        add_dxy.onclick = () => { append_dxy(0, 0); update_custom_transform() }
+        form.appendChild(add_dxy);
+
+
+        form.parse_transform = function(){
+            const [a, b, c, d, ...dxy] = [...this.elements].filter(e => e.nodeName === 'INPUT').map(e => parseFloat(e.value));
+            return new MatrixTransform(a, b, c, d, dxy);
+        }
+        return form;
+    }
 }
 
 class ScalarTransform extends MatrixTransform {
@@ -516,7 +582,7 @@ class ScalarTransform extends MatrixTransform {
 class ScaleThenRotateTransform extends MatrixTransform {
     // Class representing the transformation that first rotates r degrees around (0.5, 0.5)
     // followed by scaling the x and y coordinates
-    constructor(fx, fy, r, dxy){
+    constructor(fx, fy, r, txy){
         r = mod(r, 360);
         let c, s;
         // Handle the right angles as special cases because even tiny rounding errors are extremely visible there
@@ -526,7 +592,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
         else if( r === 270 ) [c, s] = [ 0,-1]
         else [c, s] = [Math.cos(r*PI/180), Math.sin(r*PI/180)]
         // Correct for the center of scaling AND rotation being (0.5, 0.5) instead of (0, 0)
-        const uncorrected_dxy = dxy.slice();
+        const dxy = txy.slice();
         const dx = (1 - fx * c + fy * s) * 0.5;
         const dy = (1 - fx * s - fy * c) * 0.5;
         for( let i=0; i<dxy.length; i+=2 ){
@@ -539,18 +605,69 @@ class ScaleThenRotateTransform extends MatrixTransform {
         this.fx = fx;
         this.fy = fy;
         this.r = r;
-        this.uncorrected_dxy = uncorrected_dxy;
+        this.txy = txy;
     }
     
     add_boxes(rectangles){
         for( let i=0; i<this.multiplicity; i++ ){
             const box = makeElem('div', 'rectangle STR', 'R');
-            const tx = this.uncorrected_dxy[2*i] * rectangles.offsetWidth;
-            const ty = -this.uncorrected_dxy[2*i+1]* rectangles.offsetHeight;
+            const tx = this.txy[2*i] * rectangles.offsetWidth;
+            const ty = -this.txy[2*i+1]* rectangles.offsetHeight;
             box.style.transformOrigin = 'center';
             box.style.transform = `translate(${tx}px, ${ty}px) rotate(${-this.r}deg) scale(${this.fx}, ${this.fy})`;
             rectangles.appendChild(box);
         }
+    }
+
+    make_form(){
+        const form = makeElem('form', 'custom-STR');
+        form.innerHTML = `
+            <table class=matrix>
+                <tr><td><input type=text size=1 value=${this.fx}> × <span class=x-var>x</span></td></tr>
+                <tr><td><input type=text size=1 value=${this.fy}> × <span class=y-var>y</span></td></tr>
+            </table>
+            ×
+            rotate <input type=text size=1 value=${this.r}> ° 
+            +
+        `;
+    
+        function append_txy(tx, ty){
+            const wrap = makeElem('div', 'txy');
+            const txy = makeElem('table', 'matrix');
+            txy.innerHTML = `
+                <tr></td><td><input type=text size=1 value=${tx}></td></tr>
+                <tr></td><td><input type=text size=1 value=${ty}></td></tr>
+            `;
+            wrap.append(txy);
+
+            const del_txy = makeElem('button', 'del-txy tiny red', '×');
+            del_txy.setAttribute('type', 'button');
+            del_txy.onclick = () => {
+                if( txysWrapper.children.length > 1 )
+                txysWrapper.removeChild(wrap); 
+                update_custom_transform() 
+            }
+            wrap.appendChild(del_txy);
+
+            txysWrapper.append(wrap);
+            return txy;
+        }
+
+        const txysWrapper = makeElem('span', 'txywrapper');
+        for( let i=0; i<this.txy.length; i+=2 )
+            append_txy(this.txy[i], this.txy[i+1]);
+        form.appendChild(txysWrapper);
+
+        const add_txy = makeElem('button', 'tiny important add-txy', '+');
+        add_txy.setAttribute('type', 'button');
+        add_txy.onclick = () => { append_txy(0, 0); update_custom_transform() }
+        form.appendChild(add_txy);
+        
+        form.parse_transform = function(){
+            const [fx, fy, r, ...dxy] = [...this.elements].filter(e => e.nodeName === 'INPUT').map(e => parseFloat(e.value));
+            return new ScaleThenRotateTransform(fx, fy, r, dxy);
+        }
+        return form;
     }
 }
 
@@ -558,9 +675,13 @@ class ScaleThenRotateTransform extends MatrixTransform {
 /****************************************************************************************/
 /*                                    PUT IT TO WORK                                    */
 /****************************************************************************************/
+
 var GRID = new Grid();
+
 const SEPARATOR = new Object();
+const CUSTOM = new Object();
 const TRANSFORMS = {
+    CUSTOM: CUSTOM,
     TRIANGULAR: SEPARATOR,
     sierpinski_triangle: new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5]),
     'sierpinski_triangle?': new ScalarTransform(0.5, [0, 0,  0.5, 0,  1/4, 0.5, 1/4, 1/6]),
@@ -573,6 +694,10 @@ const TRANSFORMS = {
         [0, 0,   1/3, 0,   2/3, 0,
          0, 1/3,           2/3, 1/3,
          0, 2/3, 1/3, 2/3, 2/3, 2/3]),
+    squares_within_squares: new TransformGroup(
+        new ScalarTransform(1/3, [1/3, 0, 0, 1/3, 1/3, 2/3, 2/3, 1/3]),
+        new ScaleThenRotateTransform(Math.SQRT1_2, Math.SQRT1_2, 45, [0, 0])
+    ),
     space_filling_curve: new TransformGroup(
         new ScaleThenRotateTransform(0.5, 0.5,   0, [-0.25, +0.25,  +0.25, +0.25]),
         new ScaleThenRotateTransform(-0.5, 0.5,  90, [+0.25, -0.25]),
@@ -614,7 +739,7 @@ const TRANSFORMS = {
         new ScaleThenRotateTransform( 0.96, 0.96, 10, [0, 0] ),
         new ScaleThenRotateTransform( 0.15, 0.15, 160, [-0.4, 0] )
     ),
-    dragon: new ScaleThenRotateTransform(0.69, 0.69, 45, [0.1, -0.2, -0.1, +0.2] ),
+    dragon: new MatrixTransform(0.5, -0.5, 0.5, 0.5, [0.3, 0, 0.7, 0] ),
     POINTIES: SEPARATOR,
     pointy: new TransformGroup(
         new ScalarTransform(0.5, [0.25, 0, 0.25, 0.5]),
@@ -633,38 +758,84 @@ const TRANSFORMS = {
     ),
 }
 
-// Transform selector
+//// Transform selector
 var TRANSFORM;
+const customTransforms = byId('custom-transforms');
+const transSelect = byId('transform-select');
+const transInfo = byId('transform-info');
+const rectangles = byId('rectangles');
 {
-    let transSelect = byId('transform-select');
-    let transInfo = byId('transform-info');
+    // Add selection items
     let html = [];
     for( let t in TRANSFORMS )
-        if( TRANSFORMS[t] === SEPARATOR )
-            html.push( `<option disabled> ${t.replace(/_/g, ' ')}</option>` )
-        else
-            html.push( `<option value="${t}"> ${t.replace(/_/g, ' ')}</option>` )
+        if( TRANSFORMS[t] === SEPARATOR ) html.push( `<option disabled> ${t.replace(/_/g, ' ')}</option>` )
+        else html.push( `<option value="${t}"> ${t.replace(/_/g, ' ')}</option>` )
     transSelect.innerHTML = html.join('');
 
-    transSelect.onchange = function(e){
+    // Hook up transform selection
+    transSelect.onchange = function(){
+        if( this.value === 'CUSTOM' ){
+            byId('custom-transform-box').hidden = false;
+            update_custom_transform();
+            return;
+        }   
+        byId('custom-transform-box').hidden = true;
         TRANSFORM = TRANSFORMS[this.value];
-        // TRANSFORM INFO BOX
-        let html = TRANSFORM.get_formula() + '<br>';
-        html += `<br><b>Point factor:</b> 1 point maps to ${TRANSFORM.multiplicity}`;
-        html += `<br><b>Surface factor:</b> 1 to ${floatFormat(TRANSFORM.weight, 3)} <span style=opacity:0.5>(assuming no overlap)</span>`;
-        let con = TRANSFORM.convergence_ratio ;
-        html += `<br><b>Convergence factor:</b> ${floatFormat(con, 3)}`;
-        html += `<br><b>Approx. # of steps to converge:</b> ${Math.ceil(-log(WIDTH)/log(con))}`;
-        transInfo.innerHTML = html;
-        // TRANSFORM VISUALISATION BOXES
-        byId('rectangles').innerHTML = '';
-        TRANSFORM.add_boxes(byId('rectangles'));
+        // SHOW INFORMATIONS
+        transInfo.innerHTML = TRANSFORM.get_formula() + '<br><br>' + TRANSFORM.get_stats();
+        rectangles.innerHTML = '';
+        TRANSFORM.add_boxes(rectangles);
     }
     transSelect.onchange()
 }
 
+function update_custom_transform(){
+    const transforms = [...customTransforms.children].map( m => m.children[0].parse_transform() );
+    TRANSFORM = new TransformGroup(...transforms);
+    transInfo.innerHTML = TRANSFORM.get_stats();
+    rectangles.innerHTML = '';
+    TRANSFORM.add_boxes(rectangles);
+}
 
-// Drawing buttons
+function edit(){
+    customTransforms.innerHTML = '';
+
+    if( TRANSFORM instanceof TransformGroup )
+        for( let t of TRANSFORM.transforms )
+            add_custom_form(t);
+    else
+        add_custom_form(TRANSFORM);
+        
+    transSelect.value = 'CUSTOM';
+    transSelect.onchange();
+}
+
+function add_custom_form(transform){
+    const wrap = makeElem('div');
+    const form = transform.make_form();
+    wrap.appendChild(form);
+    form.onchange = update_custom_transform;
+
+    const duplicate = makeElem('button', 'small yellow', '↷');
+    duplicate.type = 'button';
+    duplicate.style.marginLeft = '10px';
+    duplicate.onclick = () => add_custom_form( form.parse_transform() );
+    wrap.appendChild(duplicate);
+
+    const remove = makeElem('button', 'small red', '×');
+    remove.type = 'button';
+    remove.onclick = () => { customTransforms.removeChild(wrap); update_custom_transform() }
+    wrap.appendChild(remove);
+
+    customTransforms.appendChild(wrap);
+    update_custom_transform();
+}
+
+add_custom_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]));
+
+
+
+//// Drawing buttons
 
 const drawing_buttons = {
     fill: g => g.drawRectangle(0, 0, 1, 1),

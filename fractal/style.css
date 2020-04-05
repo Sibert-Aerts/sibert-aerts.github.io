@@ -1,10 +1,27 @@
 
+/**********************************\
+             PAGE LAYOUT
+\**********************************/
+
 body {
     margin: 0;
     min-height: 80vh;
     background-color: #333;
     color: #ccc;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.box {
+    float: left;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 20px 30px;
+    background-color: #404040;
+    box-shadow: 0px 4px 6px #0004;
+}
+.box > h4 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
 }
 
 #canvas-wrap{
@@ -14,7 +31,6 @@ body {
     height: 900px;
     margin: 10px 20px 10px 40px;
 }
-
 #screen {
     position: absolute;
     left: 0; top: 0;
@@ -23,6 +39,7 @@ body {
     image-rendering: pixelated;
     cursor: none;
 }
+
 #controls {
     float: left;
     width: calc( 100% - 980px );
@@ -38,6 +55,7 @@ body {
     -moz-user-select: none;
     -webkit-user-select: none;
 }
+
 #brush-circle {
     box-sizing: border-box;
     position: absolute;
@@ -48,6 +66,7 @@ body {
 }
     #brush-circle.drawing { border: 1px solid #fffc }
     #canvas-wrap:hover #brush-circle { visibility: visible }
+
 #rectangles {
     position: relative;
     width: 100%; height: 100%;
@@ -71,42 +90,10 @@ body {
 #rectangles > .rectangle:nth-child(4), #rectangles > .rectangle:nth-child(10) { background-color: #aa01; border-color: #660; color: #6606; }
 #rectangles > .rectangle:nth-child(5), #rectangles > .rectangle:nth-child(11) { background-color: #a0a1; border-color: #606; color: #6066; }
 #rectangles > .rectangle:nth-child(6), #rectangles > .rectangle:nth-child(12) { background-color: #0aa1; border-color: #066; color: #0666; }
-#rectangles > .rectangle.STR {
-    border-style: dashed
-}
+#rectangles > .rectangle.STR { border-style: dashed }
 
-.box {
-    float: left;
-    border-radius: 8px;
-    margin: 10px;
-    padding: 20px 30px;
-    background-color: #404040;
-    box-shadow: 0px 4px 6px #0004;
-}
-.box > h4 {
-    margin-top: 0;
-    margin-bottom: 0.5em;
-}
 
-select {
-    padding: 3px;
-    border-radius: 4px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #ddd;
-    background-color: #444;
-}
-option {
-    color: #ddd;
-    background-color: #444;
-}
-option[disabled]{
-    font-weight: bold;
-    font-variant: small-caps;
-    color: #bbb;
-    background-color: #333;
-}
-
-#transform-info {
+#transform-info, #custom-transform-box {
     margin-top: 10px;
     padding: 8px;
     border-radius: 8px;
@@ -132,7 +119,7 @@ option[disabled]{
         width: 100%;
         text-align: center;
     }
-    #transform-info .x-var, #transform-info .y-var{
+    .x-var, .y-var{
         color: #99f
     }
 
@@ -144,10 +131,51 @@ option[disabled]{
     flex-direction: row;
     flex-wrap: wrap;
 }
-#drawing button {
-    margin: 4px 2px;
-    flex-grow: 1;
+    #drawing button {
+        margin: 4px 2px;
+        flex-grow: 1;
+    }
+
+/**********************************\
+          TRANSFORM EDITING
+\**********************************/
+
+form.custom-STR, form.custom-matrix {
+    display: inline;
 }
+
+.add-txy {
+    position: relative;
+    margin-left: -10px !important;
+    z-index: 10;
+}
+
+.txy {
+    display: inline-block;
+    position: relative;
+    padding-right: 16px;
+    text-indent: 0;
+}
+    .txy:not(:first-child){
+        padding-left: 10px;
+        margin-left: 10px;
+    }
+    .txy:not(:first-child):before{
+        content: 'and';
+        position: absolute;
+        top: 30%;
+        left: -22px;
+    }
+    .txy > .del-txy {
+        visibility: hidden;
+        position: absolute;
+        top: -4px;
+    }
+    .txy:hover > .del-txy { visibility: visible }
+
+/**********************************\
+        INTERACTIVE ELEMENTS
+\**********************************/
 
 button {
     color: #ccc;
@@ -160,63 +188,88 @@ button {
     outline: none;
     border-radius: 10px;
 }
-button:hover {
-    background-color: #464646;
-    box-shadow: 0px 2px 2px #0004;
-}
-button:active {
-    color: #aaa;
-    background-color: #3c3c3c;
-    box-shadow: inset 0px 2px 4px #0004;
-}
+    button:hover {
+        background-color: #505050;
+        box-shadow: 0px 2px 2px #0004;
+    }
+    button:active {
+        color: #aaa;
+        background-color: #3c3c3c;
+        box-shadow: inset 0px 2px 4px #0004;
+    }
 
-button.important {
-    color: #bbcaca;
-    background-color: #3c4747;
+    button.bigger { font-size: 1.2em }
+    button.small { padding: 2px 6px; border-radius: 6px; margin: 3px }
+    button.tiny  { padding: 0px 4px; border-radius: 4px; margin: 2px }
+
+    button.important { color: #c2d8d8; background-color: #3c4747 }
+        button.important:hover { background-color: #3a5f5d }
+        button.important:active { color: #a3bbbb; background-color: #263a3a }
+
+    button.red { color: #ccbbbb; background-color: #663a3a }
+        button.red:hover { background-color: #a14545 }
+        button.red:active { color: #c8a3a3; background-color: #582828 }
+
+    button.yellow { color: #ccbbbb; background-color: #79663e }
+        button.yellow:hover { background-color: #a08f45 }
+        button.yellow:active { color: #c8a3a3; background-color: #5a5120 }
+
+
+select {
+    padding: 3px;
+    border-radius: 4px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ddd;
+    background-color: #444;
 }
-button.bigger {
-    font-size: 1.2em;
-}
-button.important:hover {
-    background-color: #3e5050;
-}
-button.important:active {
-    color: #a3bbbb;
-    background-color: #303a3a;
-}
+    option {
+        color: #ddd;
+        background-color: #444;
+    }
+    option[disabled]{
+        font-weight: bold;
+        font-variant: small-caps;
+        color: #bbb;
+        background-color: #333;
+    }
+
 
 input[type=radio] { position: relative; top: 2px; margin-right: 4px }
 input[type=radio]:before { 
     content: '';
-    pointer-events: none;
     position: absolute;
+    box-sizing: border-box;
     left: -4px; top: -4px;
-    width: 10px; height: 10px;
+    width: 20px; height: 20px;
     border-radius: 10px;
     background-color: #444;
     border: solid #333 5px;
+    pointer-events: none;
 }
-input[type=radio]:active:before {
-    background-color: #333;
-}
-input[type=radio]:checked:before {
-    background-color: #222;
-}
+    input[type=radio]:hover:before { background-color: #555 }
+    input[type=radio]:checked:before { background-color: #222 }
+    input[type=radio]:active:before { background-color: #333 }
 
 input[type=checkbox] { position: relative; top: 2px; margin-right: 10px }
 input[type=checkbox]:before { 
     content: '';
-    pointer-events: none;
     position: absolute;
+    box-sizing: border-box;
     left: -4px; top: -4px;
-    width: 10px; height: 10px;
+    width: 20px; height: 20px;
     border-radius: 2px;
     background-color: #444;
     border: solid #333 5px;
+    pointer-events: none;
 }
-input[type=checkbox]:checked:before {
-    background-color: #222;
+    input[type=checkbox]:hover:before { background-color: #555 }
+    input[type=checkbox]:checked:before { background-color: #222 }
+    input[type=checkbox]:active:before { background-color: #333 }
+
+input[type=text]{
+    border-radius: 4px;
+    padding: 3px 4px;
+    background-color: #ddd;
+    border: none;
 }
-input[type=checkbox]:active:before {
-    background-color: #333;
-}
+    input[type=text]:hover{ background-color: #eee }
