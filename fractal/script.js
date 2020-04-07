@@ -967,9 +967,11 @@ const rectangles = byId('rectangles');
     CustomTransform.load_all();
     // Activate the transform that was active the previous session
     // (i.e. keep the same transform active even when refreshing the page)
-    let selected = sessionGet('selectedTransform') || 'sierpinski_triangle';
+    let selected = sessionGet('selectedTransform');
     if( CUSTOM_SESSION_NAME_MAP.has(selected) )
         selected = CUSTOM_SESSION_NAME_MAP.get(selected);
+    else if ( !TRANSFORMS.hasOwnProperty(selected) )
+        selected = 'sierpinski_triangle';
     transSelect.value = selected;
     transSelect.onchange()
 }
