@@ -11,6 +11,9 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+a { color: #add }
+a:hover { color: #ff8 }
+
 .box {
     float: left;
     border-radius: 8px;
@@ -19,18 +22,37 @@ body {
     background-color: #404040;
     box-shadow: 0px 4px 6px #0004;
 }
-.box > h4 {
-    margin-top: 0;
-    margin-bottom: 0.5em;
+    .box > h4 {
+        margin-top: 0;
+        margin-bottom: 0.5em;
+    }
+
+.tooltip {
+    position: absolute;
+    top: -30px;
+    left: -80px;
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    z-index: 1;
+    font-size: 15px;
+    white-space: nowrap;
+    text-align: center;
+    color: white;
+    background-color: #222f;
+    visibility: hidden;
+    pointer-events: none;
 }
+    :hover > .tooltip { visibility: visible }
 
 #canvas-wrap{
     position: relative;
     float: left;
     width: 900px;
     height: 900px;
-    margin: 10px 20px 10px 40px;
+    margin: 10px 20px 35px 40px;
 }
+
 #screen {
     position: absolute;
     left: 0; top: 0;
@@ -98,9 +120,6 @@ body {
     padding: 4px 12px 30px 30px;
     left: -16px; bottom: -22px;
 }
-
-a { color: #add }
-a:hover { color: #ff8 }
 
 #controls {
     position: fixed;
@@ -197,33 +216,33 @@ form.custom-STR, form.custom-matrix {
     }
 
 
-.txy {
+.dxy {
     display: inline-block;
     position: relative;
     padding-right: 26px;
 }
-    .txy:not(:first-child){
+    .dxy:not(:first-child){
         padding-left: 20px;
         margin-left: 10px;
     }
-    .txy:not(:last-child){
+    .dxy:not(:last-child){
         margin-right: -20px;
     }
-    .txy:not(:first-child):before{
+    .dxy:not(:first-child):before{
         content: 'and';
         position: absolute;
         top: 30%;
         left: -12px;
         pointer-events: none;
     }
-    .txy > .del-txy {
+    .dxy > .del-dxy {
         visibility: hidden;
         position: absolute;
         top: -4px;
     }
-    .txy:hover:not(:only-child) > .del-txy { visibility: visible }
+    .dxy:hover:not(:only-child) > .del-dxy { visibility: visible }
     
-.add-txy {
+.add-dxy {
     position: relative;
     margin-left: -20px !important;
     z-index: 10;
@@ -234,6 +253,7 @@ form.custom-STR, form.custom-matrix {
 \**********************************/
 
 button {
+    position: relative;
     color: #ccc;
     margin: 8px 4px;
     padding: 4px 10px;
@@ -291,6 +311,9 @@ select {
     }
     option.custom {
         color: rgb(132, 223, 208);
+    }
+    option.new-custom {
+        color: rgb(132, 179, 223);
     }
     option[disabled]{
         font-weight: bold;
