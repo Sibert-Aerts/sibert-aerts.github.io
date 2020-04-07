@@ -1116,17 +1116,40 @@ byId('rand-steps').value = sessionGet('randSteps') || 100000;
 function random_render(){
     console.time('RANDOM');
 
-    let nsteps = parseInt(byId('rand-steps').value);
-    sessionSet('randSteps', nsteps);
-    let [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
-    for( let i=0; i<nsteps; i++ ){
-        [x, y] = TRANSFORM.apply_random(x, y);
-        if( x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT )
-            [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
-        GRID.grid[x][y] = 1;
-    }
-    GRID.render();
+    let steps = parseInt(byId('rand-steps').value);
+    sessionSet('randSteps', steps);
+    const grid = GRID.grid;
 
+    while( steps ) {        
+        let [x, y] = [randInt(WIDTH), randInt(HEIGHT)];
+        
+        if( !byId('draw-uncertain').checked ){
+            // Before drawing anything, try to reach the attractor first by reducing the possible error to less than one dot.
+            const con = TRANSFORM.convergence_ratio;
+            const uncertainSteps = Math.ceil(-log(WIDTH)/log(con));
+            if( uncertainSteps < 1 || uncertainSteps >= steps ){
+                console.log('No certain steps.'); break;
+            }
+
+            for( let i=0; i<min(steps, uncertainSteps); i++ )
+                [x, y] = TRANSFORM.apply_random(x, y);
+
+            steps -= uncertainSteps;
+        }
+
+        for( let i=0; i<steps; i++ ){
+            [x, y] = TRANSFORM.apply_random(x, y);
+            if( x < 0 || x >= WIDTH || y < 0 || y >= HEIGHT ){
+                // If we accidentally leave the unit square, start over again (but subtract the steps we already did...)
+                steps -= i; continue;
+            }
+            grid[x][y] = 1;
+        }
+
+        break;
+    }
+
+    GRID.render();
     console.timeEnd('RANDOM');
 }
 

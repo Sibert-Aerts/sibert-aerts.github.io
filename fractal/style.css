@@ -278,6 +278,7 @@ button {
 
 
 select {
+    margin: 4px 8px;
     padding: 3px;
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -315,7 +316,7 @@ input[type=radio]:before {
     input[type=radio]:checked:before { background-color: #222 }
     input[type=radio]:active:before { background-color: #333 }
 
-input[type=checkbox] { position: relative; top: 2px; margin-right: 10px }
+input[type=checkbox] { position: relative; top: 2px; margin: 6px 10px 6px 3px }
 input[type=checkbox]:before { 
     content: '';
     position: absolute;

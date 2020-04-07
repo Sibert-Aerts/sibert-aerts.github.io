@@ -70,8 +70,11 @@
         </div>
         
         <div id=random-controls class=box>
-            <button class='important bigger' onclick=random_render()>random</button><br>
-            <label>walk length: <input id=rand-steps type=text value=100000 size=6></label>
+            <div style=text-align:center>
+                <button class='important bigger' onclick=random_render()>random</button>
+            </div>
+            <label>Walk length: <input id=rand-steps type=text value=100000 size=6></label><br>
+            <label><input id=draw-uncertain type=checkbox></input>Draw unconverged steps</label>
         </div>
         
         <div class=box id=how-to>
