@@ -20,7 +20,7 @@
     </div>
 
     <div id=controls>
-        <div id=drawing class=box>
+        <div id=drawing-controls class=box>
             <h4>Drawing</h4>
             <div id=drawing-buttons>
                 <!-- added by script -->
@@ -33,26 +33,31 @@
             <input id=brushsize type=range min=1 max=100>
         </div>
 
-        <div id=transformation class=box style=max-width:65%>
+        <div id=transformation-controls class=box style=max-width:65%>
             <h4>Transformation</h4>
+            <button class='important bigger' onclick=step_and_render()>apply</button>
             <select id=transform-select>
                 <!-- added by script -->
             </select>
-            <button class='important bigger' onclick=step_and_render()>apply</button>
-            <button class='bigger yellow' onclick=edit()>edit</button>
+            <button class='yellow' onclick=edit_current()><span for=native>edit</span><span for=custom>copy</span></button>
+            <button class='red' for=custom onclick=delete_current()>delete</button>
 
-            <div id=custom-transform-box hidden>
+            <div for=custom>
+                <label>Name: <input id=custom-name type=text></label>
+            </div>
+
+            <div id=custom-transform-box for=custom>
                 <div id=custom-transforms>
                     <!-- added by script -->
                 </div>
 
                 <div style=width:100%;text-align:center>
-                    <button onclick='add_custom_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]))' class='important' >+ scale and rotate</button>
-                    <button onclick='add_custom_form(new MatrixTransform(1, 0, 0, 1, [0, 0]))' class='important' >+ matrix</button>
+                    <button onclick=add_custom_STR() class='important' >+ scale and rotate</button>
+                    <button onclick=add_custom_matrix() class='important' >+ matrix</button>
                 </div>
             </div>
 
-            <div id=transform-formula>
+            <div id=transform-formula for=native>
                 <!-- added by script -->
             </div>
             
@@ -64,20 +69,25 @@
             <label><input type=checkbox onchange="byId('rectangles').style.opacity ^= true"></input>Show transform boxes</label>
         </div>
         
-        <div class=box>
-            <button class='important bigger' onclick=random_render()>random</button>
+        <div id=random-controls class=box>
+            <button class='important bigger' onclick=random_render()>random</button><br>
             <label>walk length: <input id=rand-steps type=text value=100000 size=6></label>
         </div>
         
-        <div class=box>
+        <div class=box id=how-to>
             <h4>How to use</h4>
             <ul>
                 <li>Use the buttons or click on the canvas to draw something</li>
-                <li>Select a transformation</li>
-                <li>Click 'apply' to apply the selected transformation to the current drawing</li>
-                <li>Click 'random' to draw the results of a "random walk" for the selected transformation</li>
+                <li>Click <b>apply</b> to apply the selected transformation to the current drawing</li>
+                <li>Click <b>random</b> to show the results of a "random walk" for the selected transformation</li>
+                <li>Click <b>edit</b> to create an editable copy of the selected transformation</li>
+                <li>Click <b>copy</b> to create an copy of the selected transformation</li>
             </ul>
         </div>
+    </div>
+
+    <div id=credit class=box>
+        © 2020 Sibert Aerts / <a target=_blank href=https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/fractal>view on github</a>
     </div>
 
 </body>

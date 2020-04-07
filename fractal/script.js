@@ -3,7 +3,7 @@
 // Useful aliases
 const int = Math.floor;
 const byId = document.getElementById.bind(document);
-const $ = document.querySelector.bind(document);
+const $ = document.querySelectorAll.bind(document);
 const makeElem = (name, className, text) => { let e = document.createElement(name); if(className) e.className = className; if(text) e.textContent = text; return e };
 const sessionGet = window.sessionStorage.getItem.bind(window.sessionStorage);
 const sessionSet = window.sessionStorage.setItem.bind(window.sessionStorage);
@@ -361,10 +361,15 @@ class TransformGroup extends Transform {
         for(let t of this.transforms)
             t.add_boxes(rectangles)
     }
+
+    serialize(){
+        return {type: 'group', transforms: this.transforms.map(t => t.serialize())};
+    }
 }
 
 class TransformChain extends Transform {
     // Class representing several Transforms applied one after the other (i.e. a composition of Transforms)
+    // WARNING: Unfinished and unused
     constructor( ...transforms ){
         super();
         this.transforms = transforms;
@@ -504,7 +509,7 @@ class MatrixTransform extends Transform {
         }
     }
 
-    make_form(){
+    make_form( customTransform ){
         const form = makeElem('form', 'custom-matrix');
         const [a, b, c, d] = this.m;
         form.innerHTML = `
@@ -534,7 +539,7 @@ class MatrixTransform extends Transform {
             del_dxy.onclick = () => {
                 if( dxysWrapper.children.length > 1 )
                 dxysWrapper.removeChild(wrap); 
-                update_custom_transform() 
+                customTransform.update() 
             }
             wrap.appendChild(del_dxy);
 
@@ -549,7 +554,7 @@ class MatrixTransform extends Transform {
 
         const add_dxy = makeElem('button', 'add-txy tiny important', '+');
         add_dxy.setAttribute('type', 'button');
-        add_dxy.onclick = () => { append_dxy(0, 0); update_custom_transform() }
+        add_dxy.onclick = () => { append_dxy(0, 0); customTransform.update() }
         form.appendChild(add_dxy);
 
 
@@ -558,6 +563,11 @@ class MatrixTransform extends Transform {
             return new MatrixTransform(a, b, c, d, dxy);
         }
         return form;
+    }
+
+    serialize(){
+        const [a, b, c, d] = this.m;
+        return {type: 'matrix', a, b, c, d, dxy: this.odxy};
     }
 }
 
@@ -637,7 +647,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
         }
     }
 
-    make_form(){
+    make_form(customTransform){
         const form = makeElem('form', 'custom-STR');
         form.innerHTML = `
             <table class=matrix>
@@ -663,7 +673,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
             del_txy.onclick = () => {
                 if( txysWrapper.children.length > 1 )
                 txysWrapper.removeChild(wrap); 
-                update_custom_transform() 
+                customTransform.update() 
             }
             wrap.appendChild(del_txy);
 
@@ -678,7 +688,7 @@ class ScaleThenRotateTransform extends MatrixTransform {
 
         const add_txy = makeElem('button', 'tiny important add-txy', '+');
         add_txy.setAttribute('type', 'button');
-        add_txy.onclick = () => { append_txy(0, 0); update_custom_transform() }
+        add_txy.onclick = () => { append_txy(0, 0); customTransform.update() }
         form.appendChild(add_txy);
         
         form.parse_transform = function(){
@@ -687,8 +697,140 @@ class ScaleThenRotateTransform extends MatrixTransform {
         }
         return form;
     }
+
+    serialize(){
+        return {type: 'STR', fx: this.fx, fy: this.fy, r: this.r, txy: this.txy};
+    }
 }
 
+
+// META CLASS FOR MANAGING CUSTOM TRANSFORM LOADING AND SAVING ETC.
+
+const CUSTOMTRANSFORMS = new Map();
+var ACTIVECUSTOMTRANSFORM;
+var CUSTOM_ID = 0;
+var CUSTOM_SESSION_NAME_MAP = new Map();
+const update_custom_transforms = function(){
+    localSet('customTransforms', JSON.stringify(Array.from(CUSTOMTRANSFORMS.keys())));
+    localSet('customId', CUSTOM_ID);
+}
+
+class CustomTransform {
+
+    constructor(name, transform, id){
+        // Creates a new CustomTransform and registers it in the global dictionary
+        this.name = name;
+        this.id = (CUSTOM_ID++).toString();
+        this.identifier = 'CUSTOM_TRANSFORM_' + this.id;
+        this.transform = transform;
+        
+        // Register as custom transform
+        CUSTOMTRANSFORMS.set(this.id, this);
+        update_custom_transforms();
+
+        // Add to transform dropdown menu
+        this.option = makeElem('option', 'custom', name);
+        this.option.value = this.identifier;
+        transSelect.appendChild(this.option);
+    }
+
+    set_name(name){
+        this.name = name;
+        this.option.innerText = name;
+        this.save();
+    }
+
+    delete(){
+        // Remove this transform completely
+        CUSTOMTRANSFORMS.delete(this.id);
+        update_custom_transforms();
+        this.option.previousSibling.selected = true;
+        transSelect.removeChild(this.option);
+        transSelect.onchange();
+    }
+    
+    static load_all(){
+        // Load all CustomTransforms from local storage and store them in the customTransforms object.
+        const ids = JSON.parse( localGet('customTransforms') ) || [];
+        for( let id of ids ){
+            try {
+                const obj = JSON.parse(localGet('CUSTOM_TRANSFORM_' + id));
+                let custom = new CustomTransform(obj.name, CustomTransform.deserialize(obj.transform));
+                CUSTOM_SESSION_NAME_MAP.set('CUSTOM_TRANSFORM_' + id, custom.identifier);
+            } catch(e) {
+                console.warn(`ERROR trying to parse ${id}`)
+                throw e;
+            }
+        }
+    }
+
+    activate(){
+        $('[for=native]').forEach(e => e.hidden = true);
+        $('[for=custom]').forEach(e => e.hidden = false);
+        byId('custom-name').value = this.name;
+        customForms.innerHTML = '';
+
+        if( this.transform instanceof TransformGroup )
+            for( let t of this.transform.transforms )
+                this.add_form(t);
+        else
+            this.add_form(this.transform);
+
+        ACTIVECUSTOMTRANSFORM = this;
+        this.update();
+    }
+
+    add_form(transform){
+        const wrap = makeElem('div');
+        const form = transform.make_form(this);
+        wrap.appendChild(form);
+        form.onchange = this.update.bind(this);
+    
+        const duplicate = makeElem('button', 'small yellow', '↷');
+        duplicate.type = 'button';
+        duplicate.style.marginLeft = '10px'; duplicate.style.lineHeight = '1.1em';
+        duplicate.onclick = () => this.add_form( form.parse_transform() );
+        wrap.appendChild(duplicate);
+    
+        const remove = makeElem('button', 'small red', '×');
+        remove.type = 'button';
+        remove.onclick = () => { customForms.removeChild(wrap); this.update.bind(this)() }
+        wrap.appendChild(remove);
+    
+        customForms.appendChild(wrap);
+        this.update();
+    }
+
+    save(){
+        localSet(this.identifier, JSON.stringify( {name: this.name, transform: TRANSFORM.serialize()} ) )
+    }
+
+    update(){
+        //// Called whenever this CustomTransform is selected and the form is edited in some way.
+
+        // Read the HTML forms to reconstruct the entire Transform object.
+        const transforms = [...customForms.children].map( m => m.children[0].parse_transform() );
+        TRANSFORM = new TransformGroup(...transforms);
+        // Update the informations
+        transInfo.innerHTML = TRANSFORM.get_stats();
+        rectangles.innerHTML = '';
+        TRANSFORM.add_boxes(rectangles);
+
+        // Save it to local storage
+        this.save();
+    }
+
+    static deserialize(obj){
+        if( obj.type === 'group' )
+            return new TransformGroup( ...obj.transforms.map( t => CustomTransform.deserialize(t) ) );
+        if( obj.type === 'matrix' )
+            return new MatrixTransform( obj.a, obj.b, obj.c, obj.d, obj.dxy )
+        if( obj.type === 'STR' )
+            return new ScaleThenRotateTransform( obj.fx, obj.fy, obj.r, obj.txy )
+        throw `ERROR: INVALID TRANSFORM TYPE "${obj.type}"!`;
+    }
+    
+}
 
 /****************************************************************************************/
 /*                                    PUT IT TO WORK                                    */
@@ -732,11 +874,16 @@ const TRANSFORMS = {
         new ScaleThenRotateTransform(1/3, 1/3,  -90, [0, 1/3, 0, -1/3]),
         new ScaleThenRotateTransform(1/3, 1/3,  180, [0, 0])
     ),
-    HEXAGON: SEPARATOR,
+    HEXAGONAL: SEPARATOR,
     hollow_snowflake: new ScalarTransform( 1/3, 
-        [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
+        [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]
+    ),
     snowflake: new TransformGroup(
         new ScalarTransform( 1/3, [1/6, 0.0455, 1/2, 0.0455, 1/6, 0.866*2/3+0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455, 2/3, 0.866*1/3+0.0455]),
+        new ScaleThenRotateTransform( 2/3*0.866, 2/3*0.866, 30, [0, 0])
+    ),
+    spiral_triangle: new TransformGroup(
+        new ScalarTransform( 1/3, [1/2, 0.0455, 1/2, 0.866*2/3+0.0455, 0, 0.866*1/3+0.0455]),
         new ScaleThenRotateTransform( 2/3*0.866, 2/3*0.866, 30, [0, 0])
     ),
     OTHER: SEPARATOR,
@@ -774,13 +921,12 @@ const TRANSFORMS = {
         new ScaleThenRotateTransform(0.4, 0.4, -45, [0.2*Math.SQRT1_2, -0.2*Math.SQRT1_2])
     ),
     CUSTOM: SEPARATOR,
-    CUSTOM1: CUSTOM,
 }
 
 //// Transform selector
 var TRANSFORM;
 const transSelect = byId('transform-select');
-const customTransforms = byId('custom-transforms');
+const customForms = byId('custom-transforms');
 const customTransformBox = byId('custom-transform-box');
 const transFormula = byId('transform-formula');
 const transInfo = byId('transform-info');
@@ -789,22 +935,22 @@ const rectangles = byId('rectangles');
     // Add selection items
     let html = [];
     for( let t in TRANSFORMS )
-        if( TRANSFORMS[t] === SEPARATOR ) html.push( `<option disabled> ${t.replace(/_/g, ' ')}</option>` )
-        else html.push( `<option value="${t}"> ${t.replace(/_/g, ' ')}</option>` )
+        if( TRANSFORMS[t] === SEPARATOR ) html.push( `<option disabled>${t.replace(/_/g, ' ')}</option>` )
+        else html.push( `<option value="${t}">${t.replace(/_/g, ' ')}</option>` )
     transSelect.innerHTML = html.join('');
 
     // Hook up transform selection
     transSelect.onchange = function(){
         sessionSet('selectedTransform', this.value);
 
-        if( TRANSFORMS[this.value] === CUSTOM ){
-            customTransformBox.hidden = false;
-            transFormula.hidden = true;
-            update_custom_transform();
+        if( this.value.startsWith('CUSTOM_TRANSFORM_') ){
+            CUSTOMTRANSFORMS.get( this.value.slice(17) ).activate();
             return;
         }
-        customTransformBox.hidden = true;
-        transFormula.hidden = false;
+        // Activate the native (non-custom) transform
+        $('[for=native]').forEach(e => e.hidden = false);
+        $('[for=custom]').forEach(e => e.hidden = true);
+        ACTIVECUSTOMTRANSFORM = null;        
         TRANSFORM = TRANSFORMS[this.value];
         // SHOW INFORMATIONS
         transFormula.innerHTML = TRANSFORM.get_formula();
@@ -813,52 +959,39 @@ const rectangles = byId('rectangles');
         TRANSFORM.add_boxes(rectangles);
     }
 
-    transSelect.value = sessionGet('selectedTransform') || 'sierpinski_triangle';
+    byId('custom-name').onchange = function(){
+        ACTIVECUSTOMTRANSFORM.set_name(this.value);
+    }
+    
+    // Deserialize stored custom transforms
+    CustomTransform.load_all();
+    // Activate the transform that was active the previous session
+    // (i.e. keep the same transform active even when refreshing the page)
+    let selected = sessionGet('selectedTransform') || 'sierpinski_triangle';
+    if( CUSTOM_SESSION_NAME_MAP.has(selected) )
+        selected = CUSTOM_SESSION_NAME_MAP.get(selected);
+    transSelect.value = selected;
     transSelect.onchange()
 }
 
-function update_custom_transform(){
-    const transforms = [...customTransforms.children].map( m => m.children[0].parse_transform() );
-    TRANSFORM = new TransformGroup(...transforms);
-    transInfo.innerHTML = TRANSFORM.get_stats();
-    rectangles.innerHTML = '';
-    TRANSFORM.add_boxes(rectangles);
+function edit_current(){
+    const name = transSelect.options[transSelect.selectedIndex].innerText + ' EDIT';
+    const edit = new CustomTransform(name, TRANSFORM);
+    transSelect.value = edit.identifier;
+    transSelect.onchange()
 }
 
-function edit(){
-    customTransforms.innerHTML = '';
-
-    if( TRANSFORM instanceof TransformGroup )
-        for( let t of TRANSFORM.transforms )
-            add_custom_form(t);
-    else
-        add_custom_form(TRANSFORM);
-        
-    transSelect.value = 'CUSTOM1';
-    transSelect.onchange();
+function delete_current(){
+    ACTIVECUSTOMTRANSFORM.delete();
 }
 
-function add_custom_form(transform){
-    const wrap = makeElem('div');
-    const form = transform.make_form();
-    wrap.appendChild(form);
-    form.onchange = update_custom_transform;
-
-    const duplicate = makeElem('button', 'small yellow', '↷');
-    duplicate.type = 'button';
-    duplicate.style.marginLeft = '10px';
-    duplicate.onclick = () => add_custom_form( form.parse_transform() );
-    wrap.appendChild(duplicate);
-
-    const remove = makeElem('button', 'small red', '×');
-    remove.type = 'button';
-    remove.onclick = () => { customTransforms.removeChild(wrap); update_custom_transform() }
-    wrap.appendChild(remove);
-
-    customTransforms.appendChild(wrap);
-    update_custom_transform();
+function add_custom_STR(){
+    ACTIVECUSTOMTRANSFORM.add_form(new ScaleThenRotateTransform(1, 1, 0, [0, 0]));
 }
 
+function add_custom_matrix(){
+    ACTIVECUSTOMTRANSFORM.add_form(new MatrixTransform(1, 0, 0, 1, [0, 0]));
+}
 
 
 //// Drawing buttons

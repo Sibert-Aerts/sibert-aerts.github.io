@@ -92,17 +92,31 @@ body {
 #rectangles > .rectangle.STR { border-style: dashed }
 
 
+#credit {
+    position: fixed;
+    margin: 0;
+    padding: 4px 12px 30px 30px;
+    left: -16px; bottom: -22px;
+}
+
+a { color: #add }
+a:hover { color: #ff8 }
+
 #controls {
-    float: left;
+    position: fixed;
+    top: 0; right: 0;
     width: calc( 100% - 960px );
-    min-height: 100%;
+    box-sizing: border-box;
+    height: 100vh;
+    padding-bottom: 50px;
+    overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
     align-content: flex-start;
 }
 
-#drawing {
+#drawing-controls {
     max-width: 140px;
 }
     #drawing-buttons {
@@ -110,12 +124,16 @@ body {
         flex-direction: row;
         flex-wrap: wrap;
     }
-    #drawing button {
+    #drawing-buttons > button {
         margin: 4px 2px;
         flex-grow: 1;
     }
 
-#transformation {
+#random-controls {
+}
+
+#transformation-controls {
+    flex-basis: 50%;
     flex-shrink: 1;
     flex-grow: 1;
 }
@@ -155,6 +173,11 @@ body {
           TRANSFORM EDITING
 \**********************************/
 
+#custom-name {
+    width: 300px;
+    max-width: 80%;
+}
+
 form.custom-STR, form.custom-matrix {
     display: inline;
 }
@@ -173,33 +196,38 @@ form.custom-STR, form.custom-matrix {
         left: 48%;
     }
 
-.add-txy {
-    position: relative;
-    margin-left: -10px !important;
-    z-index: 10;
-}
 
 .txy {
     display: inline-block;
     position: relative;
-    padding-right: 16px;
+    padding-right: 26px;
 }
     .txy:not(:first-child){
-        padding-left: 10px;
+        padding-left: 20px;
         margin-left: 10px;
+    }
+    .txy:not(:last-child){
+        margin-right: -20px;
     }
     .txy:not(:first-child):before{
         content: 'and';
         position: absolute;
         top: 30%;
-        left: -22px;
+        left: -12px;
+        pointer-events: none;
     }
     .txy > .del-txy {
         visibility: hidden;
         position: absolute;
         top: -4px;
     }
-    .txy:hover > .del-txy { visibility: visible }
+    .txy:hover:not(:only-child) > .del-txy { visibility: visible }
+    
+.add-txy {
+    position: relative;
+    margin-left: -20px !important;
+    z-index: 10;
+}
 
 /**********************************\
         INTERACTIVE ELEMENTS
@@ -207,7 +235,7 @@ form.custom-STR, form.custom-matrix {
 
 button {
     color: #ccc;
-    margin: 10px;
+    margin: 8px 4px;
     padding: 4px 10px;
     background-color: #444;
     box-shadow: 0px 4px 4px #0004;
@@ -233,7 +261,7 @@ button {
     button.small { padding: 2px 6px; border-radius: 6px; margin: 3px }
     button.tiny  { padding: 0px 4px; border-radius: 4px; margin: 2px }
 
-    button.important { color: #c2d8d8; background-color: #3c4747 }
+    button.important { color: #c2d8d8; background-color: #3c5252 }
         button.important:focus { background-color: rgb(61, 86, 100) }
         button.important:hover { background-color: #3a5f5d }
         button.important:active { color: #a3bbbb; background-color: #263a3a }
@@ -259,6 +287,9 @@ select {
     option {
         color: #ddd;
         background-color: #444;
+    }
+    option.custom {
+        color: rgb(132, 223, 208);
     }
     option[disabled]{
         font-weight: bold;
