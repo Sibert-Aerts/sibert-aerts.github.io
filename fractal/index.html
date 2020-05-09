@@ -42,8 +42,8 @@
             <button class='yellow' for=native onclick=edit_current()>edit</button>
             <button class='yellow' for=custom onclick=edit_current()>copy</button>
             <button class='yellow' for=custom onclick=textify_current()>code</button>
-            <button class='important' for=textify onclick=untextify_current()>save</button>
-            <button for=textify onclick=textify_cancel()>cancel</button>
+            <button class='important' for=textify onclick=untextify_current() hidden>save</button>
+            <button for=textify onclick=textify_cancel() hidden>cancel</button>
             <button class='red' for=custom onclick=delete_current()>delete</button>
 
             <div for=custom>
@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <textarea id=textify-target for=textify rows=20 cols=80></textarea>
+            <textarea id=textify-target for=textify rows=20 cols=80 hidden></textarea>
 
             <div id=transform-formula for=native>
                 <!-- added by script -->
