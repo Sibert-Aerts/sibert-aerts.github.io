@@ -39,7 +39,11 @@
             <select id=transform-select>
                 <!-- added by script -->
             </select>
-            <button class='yellow' onclick=edit_current()><span for=native>edit</span><span for=custom>copy</span></button>
+            <button class='yellow' for=native onclick=edit_current()>edit</button>
+            <button class='yellow' for=custom onclick=edit_current()>copy</button>
+            <button class='yellow' for=custom onclick=textify_current()>code</button>
+            <button class='important' for=textify onclick=untextify_current()>save</button>
+            <button for=textify onclick=textify_cancel()>cancel</button>
             <button class='red' for=custom onclick=delete_current()>delete</button>
 
             <div for=custom>
@@ -56,6 +60,8 @@
                     <button onclick=add_custom_matrix() class='important' >+ matrix</button>
                 </div>
             </div>
+
+            <textarea id=textify-target for=textify rows=20 cols=80></textarea>
 
             <div id=transform-formula for=native>
                 <!-- added by script -->

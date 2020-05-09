@@ -244,7 +244,7 @@ class Transform {
     multiplicity = 1;
     // weight is the surface area of the image of the unit square [0, 1]² (not accounting for overlap)
     weight = 1;
-    // convergence ratio is L ∈ ℝ so that for each sub-transform T: ∀p, q ∈ [0, 1]²: d(p, q) ≤ L  d(T(p), T(q))
+    // convergence ratio is L ∈ ℝ so that for each sub-transform T: ∀p, q ∈ [0, 1]²: d(T(p), T(q)) ≤ L  d(p, q)
     // This needs to be < 1 else the fractal will not converge
     convergence_ratio = 1;
 
@@ -307,7 +307,7 @@ class Transform {
 }
 
 class FunctionTransform extends Transform {
-    // Wraps a function (x, y) => [x1, y1, ...] into a transform
+    // Wraps a function (x, y) => [x1, y1, ...] into a transform (unused)
     constructor( func ){
         super();
         this.apply_to_point = func;
@@ -370,7 +370,7 @@ class TransformGroup extends Transform {
 
 class TransformChain extends Transform {
     // Class representing several Transforms applied one after the other (i.e. a composition of Transforms)
-    // WARNING: Unfinished and unused
+    // WARNING: Untested and unused
     constructor( ...transforms ){
         super();
         this.transforms = transforms;
@@ -567,6 +567,7 @@ class MatrixTransform extends Transform {
 }
 
 class ScalarTransform extends MatrixTransform {
+    // Special case matrix transform
     constructor(s, dxy){
         super(s, 0, 0, s, dxy);
         this.s = s;
@@ -582,8 +583,8 @@ class ScalarTransform extends MatrixTransform {
 }
 
 class ScaleThenRotateTransform extends MatrixTransform {
-    // Class representing the transformation that first rotates r degrees around (0.5, 0.5)
-    // followed by scaling the x and y coordinates
+    // Class representing the transformation of scaling the x and y coordinates by individual factors,
+    // then rotating `r` degrees counter-clockwise, all assuming (0.5, 0.5) as the center of transformation.
     constructor(fx, fy, r, txy){
         r = mod(r, 360);
         let c, s;
@@ -767,6 +768,7 @@ class CustomTransform {
         // Called when the CustomTransform is selected from the dropdown menu.
 
         $('[for=native]').forEach(e => e.hidden = true);
+        $('[for=textify]').forEach(e => e.hidden = true);
         $('[for=custom]').forEach(e => e.hidden = false);
         byId('custom-name').value = this.name;
         customForms.innerHTML = '';
@@ -958,6 +960,7 @@ const rectangles = byId('rectangles');
         
         // Activate the native (non-custom) transform
         $('[for=native]').forEach(e => e.hidden = false);
+        $('[for=textify]').forEach(e => e.hidden = true);
         $('[for=custom]').forEach(e => e.hidden = true);
         CUSTOMTRANSFORMS.active = null;        
         TRANSFORM = TRANSFORMS[this.value];
@@ -990,6 +993,26 @@ function edit_current(){
     const edit = new CustomTransform(name, TRANSFORM);
     transSelect.value = edit.identifier;
     transSelect.onchange()
+}
+
+const textify_target = byId('textify-target');
+function textify_current(){
+    $('[for=native]').forEach(e => e.hidden = true);
+    $('[for=textify]').forEach(e => e.hidden = false);
+    $('[for=custom]').forEach(e => e.hidden = true);
+    textify_target.value = JSON.stringify({name: CUSTOMTRANSFORMS.active.name, transform: TRANSFORM.serialize()});
+}
+function untextify_current(){
+    let obj = JSON.parse(textify_target.value);
+    let ct = CUSTOMTRANSFORMS.active;
+    ct.set_name(obj.name);
+    ct.transform = CustomTransform.deserialize(obj.transform);
+    ct.save();
+    ct.activate();
+}
+function textify_cancel(){
+    $('[for=textify]').forEach(e => e.hidden = true);
+    $('[for=custom]').forEach(e => e.hidden = false);
 }
 
 function delete_current(){

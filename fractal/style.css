@@ -11,6 +11,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 a { color: #add }
 a:hover { color: #ff8 }
 
@@ -129,6 +133,8 @@ a:hover { color: #ff8 }
     height: 100vh;
     padding-bottom: 50px;
     overflow-y: auto;
+    overflow-x: hidden;
+
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -362,3 +368,8 @@ input[type=text]{
     border: none;
 }
     input[type=text]:hover{ background-color: #eee }
+
+
+#textify-target{
+    display: block;
+}
