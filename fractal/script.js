@@ -618,9 +618,8 @@ class ScaleThenRotateTransform extends MatrixTransform {
                 <tr><td>${floatFormat(this.fy, 3)} × <span class=y-var>y</span></td></tr>
             </table>
         `;
-
-        if( this.r !== 0 )
-            matrix += ` × rotate ${floatFormat(this.r, 3)}° `
+        
+        matrix += ` × rotate ${floatFormat(this.r, 3)}° `
 
         let txy = [];
         
@@ -1160,8 +1159,8 @@ function random_render(){
         if( !byId('draw-uncertain').checked ){
             // Before drawing anything, try to reach the attractor first by reducing the possible error to less than one dot.
             const con = TRANSFORM.convergence_ratio;
-            const uncertainSteps = Math.ceil(-log(WIDTH)/log(con));
-            if( uncertainSteps < 1 || uncertainSteps >= steps ){
+            const uncertainSteps = Math.ceil((log(Math.SQRT2)-log(WIDTH))/log(con));
+            if( uncertainSteps < 0 || uncertainSteps >= steps ){
                 console.log('No certain steps.'); break;
             }
 
