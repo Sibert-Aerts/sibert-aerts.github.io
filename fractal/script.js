@@ -1150,6 +1150,7 @@ function random_render(){
     console.time('RANDOM');
 
     let steps = parseInt(byId('rand-steps').value);
+    if( Number.isNaN(steps) || steps < 1 ) throw 'ERROR: Please specify a valid number of steps.'
     sessionSet('randSteps', steps);
     const grid = GRID.grid;
 
