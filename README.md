@@ -8,3 +8,4 @@ my webzone
 * [Cat generator (less than finished)](/cat-generator)
 * [Art gallery demo](/gallery)
 * [Small html toys](/toys)
+* [Affine fractal generator](/fractal)
