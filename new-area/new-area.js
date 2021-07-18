@@ -1,8 +1,8 @@
 /*
     Script for the Dark Souls New Area Generator (https://sibert-aerts.github.io/new-area/)
     Made by Sibert Aerts (Rezuaq), documented as well as I could.
-    If you have any questions/remarks about what's going on in this script, feel free to ask.
 */
+
 /*      Sound Stuff     */
 // Make a new MultiAudio object, made to be able to play multiple instances
 // of the same Audio simultaneously (i.e. overlapping).
@@ -41,7 +41,7 @@ function mute(){
 
 
 var muted = false;
-var newAreaSound = new MultiAudio("https://puu.sh/k1OGY.mp3", 50);
+var newAreaSound = new MultiAudio("area-transition.mp3", 50);
 var itemGetSound = new Audio("ITEMGET.mp3");
 
 // List of backgrounds that's cycled through randomly
@@ -59,7 +59,7 @@ var backgrounds = [
     {url: "https://i.imgur.com/kfTzoWv.jpg", name: 'Darkeater\'s Abode'},
 ];
 
-async function randomBackground(fade=true) {
+async function putRandomBackground(fade=true) {
     await setBackground(choose(backgrounds), fade);
 }
 
@@ -100,7 +100,14 @@ function addBackgroundItem(bg){
 $(document).ready(function () {
 
     // Bind the enter-key event to the custom-text input field
-    $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() });
+    $("#custom-text").keyup(e => { if (e.keyCode == 13) customGenerate() })
+
+    // Load the user's saved Custom area parts
+    try {
+        loadCustom()
+    } catch (e) {
+        console.warn('Failed to load saved custom data:', e)
+    }
 
     // DO ANCHOR THINGS
     window.onhashchange = parseAnchor
@@ -120,7 +127,7 @@ $(document).ready(function () {
     addBackgroundItem({url: 'https://i.imgur.com/qabmNjV.png', name: 'The Abyss'});
     
     // Put up a random background without fade-in
-    randomBackground(false);
+    putRandomBackground(false);
 });
 
 // Custom pool
@@ -129,7 +136,7 @@ Custom.locations = [];
 Custom.suffixes = [];
 Custom.prefixes = [];
 
-// All the pools together
+// All the pools together (from areas.js)
 var allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Custom};
 var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas), []);
 
@@ -165,6 +172,22 @@ var chance = (p, outof=1) => Math.random() * outof <= p;
 // Get a random element from the given list.
 var choose = list => list[Math.floor(Math.random() * list.length)];
 
+weightedIndex = function(weights) {
+    let x = Math.random() * weights.reduce((s, w) => s+w)
+    let i = 0
+    for(; x > weights[i]; i++)
+        x-= weights[i]
+    return i
+}
+
+weightedChoice = function(arr) {
+    let x = Math.random() * arr.reduce((s, [_, w]) => s+w, 0)
+    let i=0
+    for(; x > arr[i][1]; i++ )
+        x-= arr[i][1]
+    return arr[i][0]
+}
+
 // Refresh bootstrap tooltips.
 var refreshTooltips = () => $('[data-toggle="tooltip"]').tooltip();
 
@@ -181,10 +204,20 @@ function stringToProperCase(s) {
 
 /*      Pools and stuff     */
 
-function compileCustom(){
-    Custom.locations = $("#custom-places").val().split(";").filter(x => x != '');
-    Custom.prefixes = $("#custom-prefixes").val().split(";").filter(x => x != '');
-    Custom.suffixes = $("#custom-suffixes").val().split(";").filter(x => x != '');
+
+function compileCustom(){    
+    for( let prop of AREA_PROPS)
+        Custom[prop] = document.getElementsByName(prop)[0].value.split(';').filter(x => x)
+}
+
+function saveCustom() {
+    for( let prop of AREA_PROPS)
+        window.localStorage.setItem(prop, document.getElementsByName(prop)[0].value)
+}
+
+function loadCustom() {
+    for( let prop of AREA_PROPS)
+        document.getElementsByName(prop)[0].value = window.localStorage.getItem(prop)
 }
 
 function isChecked(key){
@@ -193,31 +226,19 @@ function isChecked(key){
 
 function selectPools(){
     // clear selected
-    selected = [];
-    compileCustom();
+    selected = []
+
+    if( isChecked('Custom') )
+        compileCustom()
 
     // Add all pools whose box is checked to the list of selected pools
     for( let key in allPools )
         if( isChecked(key) )
-            selected.push(allPools[key]);
+            selected.push(allPools[key])
+
+    return selected;
 }
 
-// Get a random prefix from the list of selected pools
-function randomPrefix(){
-    let prefix = choose(choose(selected).prefixes);
-    // Add a space if the prefix doesn't end with the special | character
-    if (prefix[prefix.length-1] == '|')
-        return prefix.slice(0, prefix.length-1);
-    return prefix + ' ';
-}
-
-var randomLocation = () => choose(choose(selected).locations);
-
-function randomSuffix(){
-    let suf = choose(choose(selected).suffixes)
-    if (suf[0] == ',') return suf;
-    return ' ' + suf;
-}
 
 /*      Easter eggs     */
 
@@ -232,87 +253,185 @@ var easterEggs = {
     "The Wall"  : {audio: new Audio("the_wall.mp3")},
     "The World" : {audio: new Audio("the_world.mp3"), func: worldFunc},
     "The Doors" : {audio: new Audio("the_doors.mp3")},
-};
+}
 
-// Generate a random area name, and perform any easter eggs if needed.
-function generateName(){
-    let name = "";
-    let allowThe = true;
-    let hasPrefix = false;
-    let hasSuffix = false;
+/** 
+ * The main function that motivates it all.  
+ *  Generates a name (returned as a string), and performs easter-egg side effects based on the name it generates.
+ * */
+function generateName() {
+    let pools = selectPools()
+    if( !pools.length ) return "Tick one of the Checkboxes"
+
+    // Add some generic bits too
+    pools.push(Generic)
+
+    let pool = {}
+    // unify pools
+    for( let prop of AREA_PROPS)
+        pool[prop] = pools.reduce( (x, p) => x.concat(p[prop]), [])
     
-    selectPools();
+
+    // little methods
+
+    const leftPossessive = () => {
+        if( !pool.possessives.length ) return choose(pool.properNames) + "'s "
+        else if( !pool.properNames.length ) return choose(pool.possessives) + " "
+        else return chance(1/2)? choose(pool.properNames) + "'s ": choose(pool.possessives) + " "
+    }    
+
+    const appendix = () =>
+        (!pool.appendices.length)? 'of ' + choose(pool.properNames):
+        chance(5, 6)? choose(pool.appendices): 'of ' + choose(pool.properNames)
+
     
-    // if no checkboxes are checked, tell the user to do so
-    if( !Object.keys(allPools).reduce((total, key) => total || isChecked(key), false) )
-        return "Tick one of the Checkboxes";
-    
-    // double choose because the parts are hidden in lists within lists
-    
-    // 3 in 4 chance of adding an area prefix, 1 in 4 chance of adding an additional prefix
-    if( chance(3,4) ){
-        hasPrefix = true;
-        name += randomPrefix();
-        if(name[name.length-1] == ' ' && chance(1,4))
-            name += randomPrefix();
+    // Generation state
+    let name
+
+    if( chance(4/5) ) {
+        //// 80% chance for a "generic"-type area name
+
+        let firstType = weightedIndex([
+            70, // blank
+            pool.positionals.length? 4: 0, // a positional qualifier (if possible) 
+            (pool.possessives.length+pool.properNames.length) ? 20: 0,  // a possessive (if possible)
+            (pool.positionals.length*(pool.possessives.length+pool.properNames.length))? 1: 0 // both (if possible)
+        ])
+        let first
+        if (firstType === 0)
+            first = ''
+        else if (firstType === 1)
+            first = choose(pool.positionals) + ' '
+        else if (firstType === 2)
+            first = leftPossessive()
+        else if (firstType === 3)
+            first = choose(pool.positionals) + ' ' + leftPossessive()
+
+
+        let secondType = weightedIndex([
+            50, // blank
+            50, // adjective
+            pool.prefixes.length? 1: 0,  // prefix (if possible)
+            pool.prefixes.length? .5: 0, // adjective and prefix (if possible)
+        ])
+        let second
+        if (secondType === 0)
+            second = ''
+        else if (secondType === 1)
+            second = choose(pool.adjectives) + ' '
+        else if (secondType === 2)
+            second = choose(pool.prefixes)
+        else if (secondType === 3)
+        second = choose(pool.adjectives) + ' ' + choose(pool.prefixes)
+        
+
+        let thirdType = weightedIndex([
+            80, // blank
+            14, // an appendix
+            5,  // a location specifier
+            1,  // both
+        ])
+        let third
+        if (thirdType === 0)
+            third = ''
+        else if (thirdType === 1)
+            third = ' ' + appendix()
+        else if (thirdType === 2)
+            third = ' ' + choose(pool.secondaryLocations)
+        else if (thirdType === 3)
+            third = ' ' + choose(pool.secondaryLocations) + ' ' + appendix()
+
+        let main = choose(pool.primaryLocations)
+        if( secondType > 1 ) main = main.toLowerCase()
+
+        name = first + second + main + third
+
+        sum = firstType + secondType + thirdType
+
+        the = chance(1/2) && (sum < 2)
+        if( isChecked('Sekiro') ) the &&= chance(0.5)
+        if( sum === 0 ) the = true
+        if( name.startsWith('The') ) the = false
+
+        if( the ) name = "The " + name
+
+
+
+    } else if ( chance(18/20) ) {
+        //// 18% chance of getting a Proper Location-type area name
+        
+        let format = weightedIndex([
+            10, // "Location"
+            35, // "<adj> Location"
+            35, // "Location <subPlace>"
+            10, // "Location <subPlace> <subPlace>"
+            10, // "<adj> Location <subPlace>"
+        ])
+
+        const location = choose(pool.properLocations)
+        if( format === 0 )
+            name = location
+        else if (format === 1)
+            name = choose(chance(4, 5)? pool.adjectives: pool.positionals) + ' ' + location
+        else if (format === 2)
+            name = location + ' ' + choose(pool.secondaryLocations)
+        else if (format === 3)
+            name = location + ' ' + choose(pool.secondaryLocations) + ' ' + choose(pool.secondaryLocations)
+        else if (format === 4)
+            name = choose(chance(4, 5)? pool.adjectives: pool.positionals) + ' ' + location + ' ' + choose(pool.secondaryLocations)
+
+    } else {
+        //// 2% chance of a formal Proper Location-type name
+
+        // Construct a qualified place description
+        let format = weightedIndex([
+            30,                             // "adj place"
+            pool.appendices.length? 30: 0,  // "place appendix"
+            pool.appendices.length? 20: 0,  // "adj place appendix"
+        ])
+
+        let place = choose(pool.primaryLocations)
+        if( format === 0 )
+            place = choose(pool.adjectives) + ' ' + place
+        else if( format === 1 )
+            place = place + ' ' + choose(pool.appendices)
+        else if( format === 2 )
+            place = choose(pool.adjectives) + ' ' + place + ' ' + choose(pool.appendices)
+
+        const location = choose(pool.properLocations)
+        if( chance(1/3) )
+            name = location + ', ' + place
+        else if ( chance(1/2) )
+            name = place + ', ' + location
+        else
+            name = place + ' ' + location
+
     }
 
-    // if Dark Souls 2 is enabled, 1 in 30 chance of prepending "Shulva, "
-    if( isChecked('Dark2') && chance (1, 30) && hasPrefix ){
-        name = choose(shulva) + name;
-        allowThe = false;
-    }
-
-    // 100% chance of adding a main "location" piece
-    name += randomLocation();
-
-    // Fix the case so "BlightTown" turns into "Blighttown"
-    name = stringToProperCase(name);
-
-    // 1 in 15 chance to add an area suffix if the name has a prefix
-    // 1 in 5 chance to add an area suffix if the name has no prefix
-    if( chance( 1, 15 ) || (chance(4,15) && !hasPrefix) ){
-        hasSuffix = true;
-        name += randomSuffix();
-    }
-
-    // Sekiro has no "The" before any area name, so if it's checked... decrease the chance of "The" being prepended
-    let sekiroThe = !isChecked('Sekiro') || chance(0.5);
-
-    // 0% chance to prefix "The" if "Shulva, " is present
-    // 1/6 chance if the name is longer than 10 characters
-    // 5/6 chance if the name is shorter than 10 characters
-    // 100% chance if no prefix or suffix is present yet.
-    if( allowThe && (chance(1, 6) && sekiroThe || (chance(4, 5) && name.length < 10) || (!hasPrefix && !hasSuffix)))
-        name = "The " + name;
-
-    // If it generated an existing name: reward the user with a star and a sound, at a slight delay
+    // If it generated an existing name: reward the user with a star and a sound (at a slight delay)
     if (allAreas.includes(name)) {
-        let theName = name;
         setTimeout(
             function(){
-                $("#stars").prepend( $("<span>", {class: "area", "data-toggle": "tooltip", title: theName}).text("★"));
-                refreshTooltips();
-                playSound(itemGetSound);
-            }, 800);
+                $("#stars").prepend( $("<span>", {class: "area", "data-toggle": "tooltip", title: name}).text("★"))
+                refreshTooltips()
+                playSound(itemGetSound)
+        }, 800)
     }
 
-    // Check for easter eggs.
-    for(var egg in easterEggs){
-        if( egg == name ){
-            // 50% chance to actually just generate a new name, since easter eggs are a bit too common otherwise
-            if(chance(0.5))
-                return generateName();
+    // Easter eggs as a result of generating specific names...
+    if( name in easterEggs ) {
+        // 50% chance of just generating a new name instead, since otherwise Easter Eggs happen too frequently
+        if( count < 30 || chance(1/2) ) return generateName()
 
-            newAreaSound.pause();
-            $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"));
-            refreshTooltips();
-            playSound(easterEggs[egg].audio);
-            if (easterEggs[egg].func) easterEggs[egg].func();
-        }
+        newAreaSound.pause()
+        $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"))
+        refreshTooltips()
+        playSound(easterEggs[name].audio)
+        if (easterEggs[name].func)
+            easterEggs[name].func()
     }
 
-    return name;
+    return name
 }
 
 var fadeOutID = 0;
@@ -333,31 +452,31 @@ function smartFadeOut(){
         fadeOutTime);
 }
 
-var count = 0;
-var bgCooldown = 0;
+var count = 0
+var bgCooldown = 0
 
 // Called by the main "Travel somewhere else" button.
 function generate(){
-    newAreaSound.play();
-    $("#name-underline-wrapper").removeClass("faded-out");
-    setAreaName(generateName());
+    newAreaSound.play()
+    $("#name-underline-wrapper").removeClass("faded-out")
+    setAreaName(generateName())
 
-    count++;
-    bgCooldown++;
+    count++
+    bgCooldown++
 
     // Never swap bg within 10 clicks of last swap
     // Always swap bg after 30 clicks
     // 4% chance per click of swapping bg between 10 and 30 clicks
     // Don't swap if manual selection is enabled
     if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
-        bgCooldown = 0;
-        randomBackground();
+        bgCooldown = 0
+        putRandomBackground()
     }
 }
 
 // Called by the manual override button.
 function customGenerate(){
-    newAreaSound.play();
-    $("#name-underline-wrapper").removeClass("faded-out");
-    setAreaName($("#custom-text").val());
+    newAreaSound.play()
+    $("#name-underline-wrapper").removeClass("faded-out")
+    setAreaName($("#custom-text").val())
 }

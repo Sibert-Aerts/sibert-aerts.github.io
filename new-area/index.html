@@ -65,20 +65,43 @@
     <div id=lesser-content-wrapper>
 
         <div id="custom-input" class="lesser content hidden">
-            <h4>Custom input:</h4> <span class="help">Use semicolons to separate individual bits</span>
-            <br>
-            <div class="help">(Doesn't save on refresh, so you'll want to keep these in a text file somewhere)</div>
+            <h4>Custom area parts:</h4> <button class=btn-success style=float:right onclick=saveCustom()>Save</button>
             <br>
 
-            <span class="input-title">Prefixes:</span> <span class="example">e.g. "Painted;Heide's;Blight|;High"</span> <span class="help">No trailing or leading spaces, but add a | (bar) if you want to concatenate!</span><br>
-            <textarea id="custom-prefixes" cols="90" rows="2"></textarea><br><br>
+            <div class=help style=width:700px;max-width:80vw>
+                Use semicolons to separate pieces. Don't leave spaces before/after semicolons. Trailing semicolon optional.
+                Capitalisation matters. Does not auto-save.
+            </div><br>
 
-            <span class="input-title">Places:</span> <span class="example">e.g. "World;Tower;Wall"</span> <span class="help">No trailing or leading spaces!</span><br>
-            <textarea id="custom-places" cols="90" rows="2"></textarea><br><br>
+            <span class=input-title>Proper Locations:</span> <span class=example>e.g. "Anor Londo;Majula;Lothric"</span> <br>
+            <textarea name=properLocations cols=90 rows=1></textarea><br>
 
-            <span class="input-title">Suffixes:</span> <span class="example">e.g. "of Ariamis;of Flame;of Lothric"</span> <span class="help">No trailing or leading spaces!</span><br>
-            <textarea id="custom-suffixes" cols="90" rows="2"></textarea>
+            <span class=input-title>Places:</span> <span class=example>e.g. "World;Chasm;Forest"</span> <br>
+            <textarea name=primaryLocations cols=90 rows=2></textarea><br>
+            <span class=input-title>Sub-places:</span> <span class=example>e.g. "Chasm;Forest;Road"</span> <br>
+            <div class=help style=width:700px;max-width:90vw>
+                This should contain all the same parts as the previous box, except for the few ones that don't work for describing a sub-area of a larger area.<br>
+                e.g. "Lothric Town" works, so "Town" fits in here, "Lothric World" does not, so "World" is excluded.
+            </div>
+            <textarea name=secondaryLocations cols=90 rows=2></textarea><br><br>
+            
+            <span class=input-title>Personal names:</span> <span class=example>e.g. "Quelaag;Aldia;Ariandel"</span> <br>
+            <textarea name=properNames cols=90 rows=1></textarea><br><br>
+            
+            <span class=input-title>Possessives:</span> <span class=example>e.g. "No-Man's;Duke's;The King's"</span> <br>
+            <textarea name=possessives cols=90 rows=1></textarea><br>
+            <span class=input-title>Prefixes:</span> <span class=example>e.g. "Blight;Byrgen"</span> <span class=help>(These are glued directly onto a place name e.g. Blightcity)</span> <br>
+            <textarea name=prefixes cols=90 rows=1></textarea><br>
+            <span class=input-title>Positional descriptors:</span> <span class=example>e.g. "Northern;Upper;Inner"</span> <br>
+            <textarea name=positionals cols=90 rows=1></textarea><br>
+            <span class=input-title>Adjectives:</span> <span class=example>e.g. "New;Great;Frozen"</span> <span class=help>(Don't include anything from the previous three boxes.)</span> <br> 
+            <textarea name=adjectives cols=90 rows=2></textarea><br><br>
+            
+            <span class=input-title>Appendices:</span> <span class=example>e.g. "of the Giants;Betwixt;of Flame"</span> <br>
+            <textarea name=appendices cols=90 rows=2></textarea>
         </div>
+
+
 
         <div class="lesser content streamer-feature hidden">
             <h4>Custom text:</h4> <span class="help">Prints whatever text you put in.</span>
@@ -113,7 +136,7 @@
         <div id=background-select class="lesser content hidden">
             <h4>Background select</h4>
             <div id=background-list>
-                <!-- script puts stuff here -->
+                <!-- script fills this up -->
             </div>
             <br>
             <label><input type=checkbox target=shuffle-bg checked> Shuffle background while traveling</label>
@@ -125,15 +148,13 @@
 
     <div id=credits> 
         <div class="credit left">
-            Sekiro: Shadows Die Twice Edition™<br>
+            Latest inclusion: Demon's Souls (2020)<br>
             <label class=streamer-hide>Enable Streamer Features: <input type=checkbox target="streamer-features"></label> <br class=streamer-hide>
             <label>Show Background Selector: <input type=checkbox target="background-select"></label>
         </div>
 
         <div class="credit right">
-            <a href="http://twitter.com/rezuaq">Made by Rezuaq</a>
-            <span class=dash>-</span>
-            <a href="https://rezuaq.tumblr.com/post/175718225293/enhanced-area-name-generator">On Tumblr</a>
+            <a href="http://twitter.com/rezuaq">Created by Rezuaq</a>
             <span class=dash>-</span>
             <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area">On Github</a>
             <span class=dash>-</span>

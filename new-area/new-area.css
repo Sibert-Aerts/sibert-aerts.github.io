@@ -96,9 +96,9 @@ body {
 
 #main {
     margin-bottom: 40px;
-    margin-left: 5%;
-    margin-top: 8%;
-    width: 90%;
+    margin-left: 5vw;
+    margin-top: 15vh;
+    width: 90vw;
 }
 #main.transp { background-color: transparent }
 #main.chroma { background-color: #00f }
@@ -145,7 +145,7 @@ body {
 }
 
 #lesser-content-wrapper {
-    overflow: hidden;
+    overflow-y: hidden;
     margin-left: 5%;
     margin-bottom: 200px;
 }
@@ -227,6 +227,7 @@ body {
     label.custom  { color: #ffaaaa; }
 
 .input-title{
+    font-size: 16px;
     display: inline-block;
     min-width: 60px;
 }
@@ -242,12 +243,12 @@ body {
 
 .help {
     font-family: Arial;
-    font-size: 11px;
+    font-size: 13px;
     opacity: 0.6;
 }
 
 textarea, input {
-    background-color: #ddeeff;
+    background-color: #d3cdb5;
     font-family: Dejavu Sans Mono, Courier New;
     color: black;
 }
