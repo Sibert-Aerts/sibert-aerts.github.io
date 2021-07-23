@@ -350,7 +350,7 @@ function generateName() {
 
         the = chance(1/2) && (sum < 2)
         if( isChecked('Sekiro') ) the &&= chance(0.5)
-        if( sum === 0 ) the = true
+        if( sum === 0 && chance(9/10) ) the = true
         if( name.startsWith('The') ) the = false
 
         if( the ) name = "The " + name

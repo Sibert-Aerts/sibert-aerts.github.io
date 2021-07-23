@@ -11,7 +11,7 @@ var Dark1 = {}
 
 // I'm not sure how I originally got these
 Dark1.areas = ["The Abyss", "Anor Londo", "Ash Lake", "Battle of Stoicism", "Undead Parish", "Blighttown", "Chasm of the Abyss",
-    "Crystal Cave", "Darkroot Basin", "Darkroot Garden", "Demon Ruins", "The Depths", "Firelink Altar", "Firelink Shrine",
+    "Crystal Cave", "Darkroot Basin", "Darkroot Garden", "Demon Ruins", "Depths", "Firelink Altar", "Firelink Shrine",
     "Kiln of the First Flame", "Lost Izalith", "New Londo Ruins", "Northern Undead Asylum", "Oolacile Sanctuary", "Undead Burg",
     "Oolacile Township", "Oolacile Township Dungeon", "Painted World of Ariamis", "Quelaag's Domain", "Royal Wood",
     "Sanctuary Garden", "Sen's Fortress", "The Catacombs", "The Duke's Archives", "The Great Hollow", "Tomb of the Giants", "Valley of Drakes"]
