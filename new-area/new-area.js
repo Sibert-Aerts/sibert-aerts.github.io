@@ -112,7 +112,7 @@ $(document).ready(function () {
     window.onhashchange = parseAnchor
     parseAnchor()
     
-    // Bind the two checkboxes to hide/unhide parts of the page when clicked.
+    // Bind the checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
     $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) })
     $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) })
@@ -417,12 +417,14 @@ function generateName() {
         // 50% chance of just generating a new name instead, since otherwise Easter Eggs happen too frequently
         if( count < 30 || chance(1/2) ) return generateName()
 
-        newAreaSound.pause()
         $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"))
         refreshTooltips()
-        playSound(easterEggs[name].audio)
-        if (easterEggs[name].func)
-            easterEggs[name].func()
+        
+        if( !isChecked('disable-anims')) {
+            newAreaSound.pause()
+            playSound(easterEggs[name].audio)
+            if (easterEggs[name].func) easterEggs[name].func()
+        }
     }
 
     return name
@@ -458,11 +460,12 @@ function generate() {
     count++
     bgCooldown++
 
+    // Don't swap bg if disable-anims is on
     // Never swap bg within 10 clicks of last swap
     // Always swap bg after 30 clicks
     // 4% chance per click of swapping bg between 10 and 30 clicks
     // Don't swap if manual selection is enabled
-    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
+    if( !isChecked('disable-anims') && bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
         bgCooldown = 0
         randomiseBackground()
     }

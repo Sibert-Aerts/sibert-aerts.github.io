@@ -246,6 +246,7 @@ body {
     font-weight: normal;
     text-shadow: 0px 0px 4px #111f, 0px 0px 1px #111f;
 }
+    #main label > input { margin-right: 2px }
     label.special { color: #88BBDD; }
     label.custom  { color: #ffaaaa; }
 
