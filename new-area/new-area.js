@@ -3,36 +3,36 @@
     Made by Sibert Aerts (Rezuaq), originally made ca. 2016, updated sporadically since then.
 */
 
-/*      Sound Stuff     */
-// Make a new MultiAudio object, made to be able to play multiple instances
-// of the same Audio simultaneously (i.e. overlapping).
+/** 
+ * Class for handling multiple copies of an Audio object so you can get the effect of overlapping sounds.
+*/
 class MultiAudio {
-    constructor(audioUrl, maxSounds = 10) {
-        this.soundArray = new Array(maxSounds);
-        for (let i = 0; i < maxSounds; i++)
-            this.soundArray[i] = new Audio(audioUrl);
-        this.index = 0;
+    constructor(audioUrl, maxSounds=10) {
+        this.soundArray = new Array(maxSounds)
+        for (let i=0; i<maxSounds; i++)
+            this.soundArray[i] = new Audio(audioUrl)
+        this.index = 0
     }
-    // Play the next sound in line.
+    /** Play the next sound in line. */
     play() {
         playSound(this.soundArray[this.index]);
         this.index = (this.index + 1) % this.soundArray.length;
     }
-    // Pauses all sounds
+    /** Pauses all sounds */
     pause() {
         for (let i in this.soundArray)
-            this.soundArray[i].pause();
+            this.soundArray[i].pause()
     }
 }
 
-// Reset and play the given sound unless muted.
-function playSound(a){
-    if(muted) return;
-    a.currentTime = 0;
-    a.play();
+/** Reset and play the given sound unless muted. */
+function playSound(a) {
+    if(muted) return
+    a.currentTime = 0
+    a.play()
 }
 
-// Toggles whether sounds are allowed to play.
+/** Toggles whether sounds are allowed to play, actively mutes any newAreaSounds. */
 function toggleMute(){
     newAreaSound.pause();
     muted = !muted;
@@ -40,9 +40,9 @@ function toggleMute(){
 }
 
 
-var muted = false;
-var newAreaSound = new MultiAudio("area-transition.mp3", 50);
-var itemGetSound = new Audio("ITEMGET.mp3");
+var muted = false
+var newAreaSound = new MultiAudio("sound/area-transition.mp3", 50)
+var itemGetSound = new Audio("sound/ITEMGET.mp3")
 
 // List of backgrounds that's cycled through randomly
 var backgrounds = [
@@ -57,43 +57,42 @@ var backgrounds = [
     {url: "https://i.imgur.com/7qzGveQ.jpg", name: 'Grand Archives Steps'},
     {url: "https://i.imgur.com/ej8kxIW.jpg", name: 'Ruins of Lothric Beyond Time'},
     {url: "https://i.imgur.com/kfTzoWv.jpg", name: 'Darkeater\'s Abode'},
-];
+]
 
-async function putRandomBackground(fade=true) {
-    await setBackground(choose(backgrounds), fade);
+/** Changes the background to the given background object's image, optionally fading. */
+async function setBackground(bg, fade=true) {
+    $('.background-item').removeClass('selected')
+    bg.elem.classList.add('selected')
+    if(fade) {
+        $("#background-layer").css("background-image", $("body").css("background-image"))
+        $("#background-layer").removeClass("faded")
+        await sleep(100)
+        $("#background-layer").addClass("faded")
+    }
+    $("body").css("background-image", `url(${bg.url})`)
 }
 
-async function setBackground(bg, fade=true) {
-    $('.background-item').removeClass('selected');
-    bg.elem.classList.add('selected');
-    if(fade){
-        $("#background-layer").css("background-image", $("body").css("background-image"));
-        $("#background-layer").removeClass("faded");
-        await sleep(100);
-        $("#background-layer").addClass("faded");
-    }
-    $("body").css("background-image", `url(${bg.url})`);
+async function randomiseBackground(fade=true) {
+    await setBackground(choose(backgrounds), fade)
 }
 
 // Incredibly dumb: updating the area name actually just sets the anchor, this triggers window.onhashchange, calling parseAnchor
 // which then reads & decodes the anchor from the URI, and updates the webpage.
-var setAreaName = (text) => { window.location.hash = text };
+var setAreaName = (text) => { location.hash = text };
 
-function parseAnchor(){
-    let split = document.URL.split('#');
-    if (split.length == 1) return;
-    let anchor = split.slice(1).join('#');
-    $("#name-underline-wrapper").removeClass("faded-out");
-    $("#name").text(decodeURIComponent(anchor));
-    smartFadeOut();
+function parseAnchor() {
+    if( !location.hash ) return
+    $("#name-underline-wrapper").removeClass("faded-out")
+    $("#name").text(decodeURIComponent(location.hash.slice(1)))
+    smartFadeOut()
 }
 
-function addBackgroundItem(bg){   
-    let e = bg.elem = document.createElement('div');
-    e.classList.add('background-item');
-    e.innerText = bg.name;
-    e.onclick = () => setBackground(bg);
-    $('#background-list').append(e);
+function addBackgroundItem(bg){
+    const e = bg.elem = document.createElement('div')
+    e.classList.add('background-item')
+    e.innerText = bg.name
+    e.onclick = () => setBackground(bg)
+    $('#background-list').append(e)
 }
 
 // Called when the page is loaded.
@@ -111,57 +110,41 @@ $(document).ready(function () {
 
     // DO ANCHOR THINGS
     window.onhashchange = parseAnchor
-    parseAnchor();
+    parseAnchor()
     
     // Bind the two checkboxes to hide/unhide parts of the page when clicked.
-    $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) });
-    $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) });
-    $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) });
+    $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
+    $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) })
+    $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) })
 
     // Fill up the 'background selection' element:
     for( let bg of backgrounds ){
-        addBackgroundItem(bg);
+        addBackgroundItem(bg)
     }
 
     // Not in the random bg circulation
-    addBackgroundItem({url: 'https://i.imgur.com/qabmNjV.png', name: 'The Abyss'});
+    addBackgroundItem({url: 'https://i.imgur.com/qabmNjV.png', name: 'The Abyss'})
     
     // Put up a random background without fade-in
-    putRandomBackground(false);
-});
+    randomiseBackground(false)
+})
 
-// Custom pool
-var Custom = {};
-Custom.locations = [];
-Custom.suffixes = [];
-Custom.prefixes = [];
-
-// All the pools together (from areas.js)
-var allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Custom};
-var allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas), []);
-
-// Selected pools
-var selected = [];
-
-// chroma key background flag
-var chroma = false;
-
+// Chroma key background button
+var chroma = false
 function toggleChroma(){
-    chroma = !chroma;
-    if(chroma)
-        $("#main").addClass("chroma");
-    else
-        $("#main").removeClass("chroma");
+    chroma ^= true
+    if(chroma) $("#main").addClass("chroma")
+    else $("#main").removeClass("chroma")
     $("#chromaButton").text(chroma? "no chroma" : "chroma")
 }
 
-var transp = false;
-
+// Shaded background button
+var shaded = false
 function toggleShade(){
-    transp ^= true;
-    if(transp) $('#main').addClass('transp')
+    shaded ^= true;
+    if(shaded) $('#main').addClass('transp')
     else $("#main").removeClass('transp')
-    $("#transpButton").html(transp? '👓&#xFE0F;' : '🕶️&#xFE0F;');
+    $("#transpButton").html(shaded? '👓&#xFE0F;' : '🕶️&#xFE0F;')
 }
 
 /*      Utility functions     */
@@ -204,24 +187,33 @@ function stringToProperCase(s) {
 
 /*      Pools and stuff     */
 
+// Custom pool
+const Custom = {}
+
+/** The pool of all pools (from areas.js) */
+const allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Custom}
+/** The pool of all full area names. */
+const allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas ?? []), [])
+
+// Selected pools
+var selected = []
+
 
 function compileCustom(){    
     for( let prop of AREA_PROPS)
         Custom[prop] = document.getElementsByName(prop)[0].value.split(';').filter(x => x)
 }
-
 function saveCustom() {
     for( let prop of AREA_PROPS)
         window.localStorage.setItem(prop, document.getElementsByName(prop)[0].value)
 }
-
 function loadCustom() {
     for( let prop of AREA_PROPS)
         document.getElementsByName(prop)[0].value = window.localStorage.getItem(prop)
 }
 
 function isChecked(key){
-    return $(`input[target=${key}]`).prop("checked")
+    return $(`input[target=${key}]`).prop('checked')
 }
 
 function selectPools(){
@@ -236,43 +228,43 @@ function selectPools(){
         if( isChecked(key) )
             selected.push(allPools[key])
 
-    return selected;
+    return selected
 }
 
 
 /*      Easter eggs     */
 
 function worldFunc(){
-    $("#world-layer").css("background-image", $("body").css("background-image"));
-    $("#world-layer").removeClass("faded");
-    setTimeout(()=>$("#world-layer").addClass("faded"), 5000);
+    $("#world-layer").css("background-image", $("body").css("background-image"))
+    $("#world-layer").removeClass("faded")
+    setTimeout(()=>$("#world-layer").addClass("faded"), 5000)
 }
 
 // List of easter egg words, the audio they should play, and optionally the function they should call.
 var easterEggs = {
-    "The Wall"  : {audio: new Audio("the_wall.mp3")},
-    "The World" : {audio: new Audio("the_world.mp3"), func: worldFunc},
-    "The Doors" : {audio: new Audio("the_doors.mp3")},
+    "The Wall"  : {audio: new Audio("sound/the_wall.mp3")},
+    "The World" : {audio: new Audio("sound/the_world.mp3"), func: worldFunc},
+    "The Doors" : {audio: new Audio("sound/the_doors.mp3")},
 }
 
 /** 
  * The main function that motivates it all.  
  *  Generates a name (returned as a string), and performs easter-egg side effects based on the name it generates.
- * */
+ */
 function generateName() {
     let pools = selectPools()
-    if( !pools.length ) return "Tick one of the Checkboxes"
+    if( !pools.length ) return 'Tick one of the Checkboxes'
 
     // Add some generic bits too
     pools.push(Generic)
 
+    // Unify pools
     let pool = {}
-    // unify pools
     for( let prop of AREA_PROPS)
         pool[prop] = pools.reduce( (x, p) => x.concat(p[prop]), [])
     
 
-    // little methods
+    // Little methods
 
     const leftPossessive = () => {
         if( !pool.possessives.length ) return choose(pool.properNames) + "'s "
@@ -351,9 +343,9 @@ function generateName() {
         the = chance(1/2) && (sum < 2)
         if( isChecked('Sekiro') ) the &&= chance(0.5)
         if( sum === 0 && chance(9/10) ) the = true
-        if( name.startsWith('The') ) the = false
+        if( name.startsWith('The ') ) the = false
 
-        if( the ) name = "The " + name
+        if( the ) name = 'The ' + name
 
 
 
@@ -441,22 +433,22 @@ var fadeOutID = 0;
 // So you're free to call this function whenever you feel like
 function smartFadeOut(){
     // grab the desired fadeOutTime
-    fadeOutTime = parseFloat($("#fade-out-time").val());
+    fadeOutTime = parseFloat($("#fade-out-time").val())
     // default to 5 seconds if fadeOutTime could not be parsed or is negative
-    fadeOutTime = fadeOutTime > 0 ? fadeOutTime * 1000 : 5000;
+    fadeOutTime = fadeOutTime > 0 ? fadeOutTime * 1000 : 5000
     // Increment the ID to cancel out any previous fade-outs
-    let thisId = ++fadeOutID;
+    let thisId = ++fadeOutID
     setTimeout(
         () => { if (thisId == fadeOutID && $("#fade-out-check").prop("checked"))
             $("#name-underline-wrapper").addClass("faded-out") },
-        fadeOutTime);
+        fadeOutTime)
 }
 
 var count = 0
 var bgCooldown = 0
 
-// Called by the main "Travel somewhere else" button.
-function generate(){
+// Called by the main "Travel Somewhere Else" button.
+function generate() {
     newAreaSound.play()
     $("#name-underline-wrapper").removeClass("faded-out")
     setAreaName(generateName())
@@ -470,12 +462,12 @@ function generate(){
     // Don't swap if manual selection is enabled
     if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
         bgCooldown = 0
-        putRandomBackground()
+        randomiseBackground()
     }
 }
 
-// Called by the manual override button.
-function customGenerate(){
+// Called by the streamer "Override" button.
+function customGenerate() {
     newAreaSound.play()
     $("#name-underline-wrapper").removeClass("faded-out")
     setAreaName($("#custom-text").val())
