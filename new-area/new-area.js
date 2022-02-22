@@ -63,13 +63,13 @@ var backgrounds = [
 async function setBackground(bg, fade=true) {
     $('.background-item').removeClass('selected')
     bg.elem.classList.add('selected')
-    if(fade) {
+    if(fade && !isChecked('disable-anims') ) {
         $("#background-layer").css("background-image", $("body").css("background-image"))
         $("#background-layer").removeClass("faded")
         await sleep(100)
         $("#background-layer").addClass("faded")
     }
-    $("body").css("background-image", `url(${bg.url})`)
+    document.body.style.backgroundImage = `url(${bg.url})`
 }
 
 async function randomiseBackground(fade=true) {
@@ -419,7 +419,7 @@ function generateName() {
 
         $("#stars").prepend( $("<span>", {class: "easter-egg", "data-toggle": "tooltip", title: name}).text("★"))
         refreshTooltips()
-        
+
         if( !isChecked('disable-anims')) {
             newAreaSound.pause()
             playSound(easterEggs[name].audio)
@@ -442,10 +442,11 @@ function smartFadeOut(){
     fadeOutTime = fadeOutTime > 0 ? fadeOutTime * 1000 : 5000
     // Increment the ID to cancel out any previous fade-outs
     let thisId = ++fadeOutID
-    setTimeout(
-        () => { if (thisId == fadeOutID && $("#fade-out-check").prop("checked"))
-            $("#name-underline-wrapper").addClass("faded-out") },
-        fadeOutTime)
+    setTimeout( function() {
+        if (thisId == fadeOutID && $("#fade-out-check").prop("checked"))
+            $("#name-underline-wrapper").addClass("faded-out") 
+        }, fadeOutTime
+    )
 }
 
 var count = 0
@@ -460,12 +461,11 @@ function generate() {
     count++
     bgCooldown++
 
-    // Don't swap bg if disable-anims is on
     // Never swap bg within 10 clicks of last swap
     // Always swap bg after 30 clicks
     // 4% chance per click of swapping bg between 10 and 30 clicks
-    // Don't swap if manual selection is enabled
-    if( !isChecked('disable-anims') && bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && $("input[target=shuffle-bg]").prop('checked') ){
+    // Don't swap if manual selection is enabled, or animations are disabled
+    if( bgCooldown > 10 && (bgCooldown >= 30 || chance(0.04)) && isChecked('shuffle-bg') && !isChecked('disable-anims') ){
         bgCooldown = 0
         randomiseBackground()
     }
