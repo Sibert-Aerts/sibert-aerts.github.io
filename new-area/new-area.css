@@ -18,6 +18,9 @@
     #generate-button::after {
         border-bottom-width: 1px !important
     }
+    #main {
+        margin-top: 5vh;
+    }
     .credit > .dash {
         margin-left: 3px !important;
         margin-right: 3px !important;
@@ -36,12 +39,18 @@
     #generate-button {
         font-size: 20px;
     }
+    #main {
+        margin-top: 10vh;
+    }
 }
 
 @media screen and (min-width: 1000px) {  /** EVERYTHING AT LEAST 1000px WIDE */
     #name {
         font-size: 55px;
         height: 65px;
+    }
+    #main {
+        margin-top: 15vh;
     }
 }
 
@@ -84,7 +93,6 @@ body {
     position: relative;
     margin-bottom: 40px;
     margin-left: 5vw;
-    margin-top: 15vh;
     width: 90vw;
 }
 #main.transp { background: none }

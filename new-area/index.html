@@ -68,8 +68,9 @@
         </div>
 
         <div style="position:absolute;right:1%;bottom:3%;">
-            <button id=transpButton class=emoji-button onClick=toggleShade()>🕶️&#xFE0F;</button>
-            <button id=muteButton class=emoji-button onClick=toggleMute()>🔊&#xFE0F;</button>
+            <button id=tweetButton class=emoji-button onclick=tweetIntent() title="Share on Twitter" data-toggle=tooltip>🐦&#xFE0F;</button>
+            <button id=transpButton class=emoji-button onclick=toggleShade() title="Toggle Shade" data-toggle=tooltip>🕶️&#xFE0F;</button>
+            <button id=muteButton class=emoji-button onclick=toggleMute() title="Toggle Sound" data-toggle=tooltip>🔊&#xFE0F;</button>
         </div>
     </div>
 

@@ -127,6 +127,8 @@ $(document).ready(function () {
     
     // Put up a random background without fade-in
     randomiseBackground(false)
+
+    refreshTooltips()
 })
 
 // Chroma key background button
@@ -471,4 +473,9 @@ function customGenerate() {
     newAreaSound.play()
     $("#name-underline-wrapper").removeClass("faded-out")
     setAreaName($("#custom-text").val())
+}
+
+
+function tweetIntent() {
+    window.open(`https://twitter.com/intent/tweet?text=I%20just%20visited%20${location.hash.slice(1)}%0Ahttps://sibert-aerts.github.io/new-area/`)
 }
