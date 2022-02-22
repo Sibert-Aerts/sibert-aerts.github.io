@@ -1,6 +1,6 @@
 /*
     Script for the Dark Souls New Area Generator (https://sibert-aerts.github.io/new-area/)
-    Made by Sibert Aerts (Rezuaq), documented as well as I could.
+    Made by Sibert Aerts (Rezuaq), originally made ca. 2016, updated sporadically since then.
 */
 
 /*      Sound Stuff     */
@@ -33,10 +33,10 @@ function playSound(a){
 }
 
 // Toggles whether sounds are allowed to play.
-function mute(){
+function toggleMute(){
     newAreaSound.pause();
     muted = !muted;
-    $("#muteButton").html(muted? "🔇&#xFE0F;" : "🔊&#xFE0F;");
+    $("#muteButton").html(muted? "🔈&#xFE0F;" : "🔊&#xFE0F;");
 }
 
 
@@ -146,7 +146,7 @@ var selected = [];
 // chroma key background flag
 var chroma = false;
 
-function chromaToggle(){
+function toggleChroma(){
     chroma = !chroma;
     if(chroma)
         $("#main").addClass("chroma");
@@ -157,11 +157,11 @@ function chromaToggle(){
 
 var transp = false;
 
-function transpToggle(){
+function toggleShade(){
     transp ^= true;
     if(transp) $('#main').addClass('transp')
     else $("#main").removeClass('transp')
-    $("#transpButton").html(transp? '👁&#xFE0F;' : '👓&#xFE0F;');
+    $("#transpButton").html(transp? '👓&#xFE0F;' : '🕶️&#xFE0F;');
 }
 
 /*      Utility functions     */
