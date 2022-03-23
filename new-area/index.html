@@ -82,8 +82,38 @@
 
     <div id=lesser-content-wrapper>
 
+        <div id=background-select class="lesser content">
+            <h4>Background select</h4>
+            <button class="emoji-button minimise"></button>
+
+            <div class=body hidden>
+                <div id=background-list> <!-- script fills this up --> </div>
+                <br>
+                <label><input type=checkbox target=shuffle-bg checked> Occasionally change background when traveling</label>
+            </div>
+        </div>
+
+
+        <div id=image-gen class="lesser content">
+            <h4>Image macro generator</h4>
+            <button class="emoji-button minimise"></button>
+
+            <div class=body hidden>
+                <div class=help style=width:700px;max-width:80vw>
+                    Select an image to put a convincing area name pop-up on it. Right click the image to save it. <br>
+                    (Image composition happens locally; No data is ever sent to a server, all images remain 100% private.)
+                </div><br>
+
+                <canvas id=canvas width=1920px height=1080px></canvas><br>
+
+                <span class=input-title>Caption:</span> <input type=text id=image-caption value="Your Caption Here" size=32> <br>
+                <span class=input-title>Image:</span> <input type=file id=image-upload accept="image/*" style=display:inline>
+            </div>
+        </div>
+
+
         <div id=custom-input class="lesser content hidden">
-            <h4>Custom area parts:</h4> <button class="btn btn-success" style=float:right onclick=saveCustom()>Save</button>
+            <h4>Custom area parts</h4> <button class="btn btn-success" style=float:right onclick=saveCustom()>Save</button>
             <br>
 
             <div class=help style=width:700px;max-width:80vw>
@@ -120,56 +150,43 @@
         </div>
 
 
+        <div class="lesser content streamer-feature">
+            <h4>Streamer features</h4>
+            <button class="emoji-button minimise"></button>
 
-        <div class="lesser content streamer-feature hidden">
-            <h4>Custom text:</h4> <span class="help">Prints whatever text you put in.</span>
-            <br><br>
+            <div class=body hidden>
 
-            <button id="custom-button" class="btn btn-primary" onClick="customGenerate()">Override</button>
-            <input type="text" id="custom-text" size="40"></input>
-        </div>
+                <span class="help">Displays any name you put in.</span><br>
+                <input type="text" id="custom-text" size="40"></input>
+                <button id="custom-button" class="btn btn-primary" onclick=customGenerate()>Display</button>
 
+                <br><br>
 
-        <div class="lesser content streamer-feature hidden">
-            <h4>Fading:</h4>
+                <button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
+                    Fade in
+                </button>
 
-            <button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
-                Show
-            </button>
+                <button class="btn btn-danger" onClick="$('#name-underline-wrapper').addClass('faded-out');">
+                    Fade out
+                </button>
 
-            <button class="btn btn-danger" onClick="$('#name-underline-wrapper').addClass('faded-out');">
-                Hide
-            </button>
-
-            <br>
-
-            <label><input id="fade-out-check" type="checkbox"></input> Auto Fade-Out</label><br>
-            <label>Seconds before fade out &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
-            
-            <br>
-            
-            <button id=chromaButton style="margin-top:-15px" class="btn btn-primary" onClick=toggleChroma()>chroma</button>
-        </div>
-
-        <div id=background-select class="lesser content hidden">
-            <h4>Background select</h4>
-            <div id=background-list>
-                <!-- script fills this up -->
+                <label><input id="fade-out-check" type="checkbox"></input> Fade out automatically</label><br>
+                <label>Seconds before automatically fading out: &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
+                
+                <br>
+                
+                <button id=chromaButton style="margin-top:-15px; float:right" class="btn btn-primary" onClick=toggleChroma()>chroma</button>
             </div>
-            <br>
-            <label><input type=checkbox target=shuffle-bg checked> Occasionally change background when traveling</label>
         </div>
 
     </div>
 
     <div class=bottom-fade></div>
 
-    <div id=credits> 
+    <div id=credits>
         <div class="credit left" style=line-height:1em>
             <label style=font-weight:regular>Latest inclusion: Demon's Souls (2020)</label><br>
-            <label class=streamer-hide>Show Streamer Features: <input type=checkbox target="streamer-features"></label> <br class=streamer-hide>
-            <label>Show Background Selector: <input type=checkbox target="background-select"></label><br>
-            <label>Disable Animations and Surprises: <input type=checkbox target="disable-anims"></label>
+            <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick=disableAnims(this)></label>
         </div>
 
         <div class="credit right">
@@ -182,4 +199,8 @@
     </div>
 
 </body>
+
+<!-- My other script -->
+<script type="text/javascript" src="image-gen.js"></script>
+
 </html>

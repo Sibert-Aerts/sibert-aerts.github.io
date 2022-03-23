@@ -142,7 +142,8 @@ body {
 
 #lesser-content-wrapper {
     overflow-y: hidden;
-    margin-left: 5%;
+    margin-left: 5vw;
+    width: 90vw;
     margin-bottom: 200px;
 }
 
@@ -272,9 +273,12 @@ body {
 }
 
 textarea, input {
-    background-color: #d3cdb5;
+    background-color: #dfe0d9;
     font-family: Dejavu Sans Mono, Courier New;
     color: black;
+}
+label > input {
+    font-weight: normal;
 }
 
 #credits {
@@ -363,7 +367,9 @@ textarea, input {
     background: none;
     border: none;
     
+    font-family: Arial;
     font-size: 18px;
+    font-weight: bolder;
     height: 1.2em;
     width: 1.2em;
     margin: 0 .1em;
@@ -374,3 +380,14 @@ textarea, input {
     .emoji-button:hover {
         text-shadow: 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd, 0 0 2px #ffd;
     }
+
+.emoji-button.minimise {
+    text-shadow: none;
+    float: right;
+}
+
+canvas {
+    max-width: 720px;
+    max-height: 480px;
+    border: 1px solid #fff3;
+}

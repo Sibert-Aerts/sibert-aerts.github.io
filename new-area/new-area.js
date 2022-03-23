@@ -1,5 +1,5 @@
 /*
-    Script for the Dark Souls New Area Generator (https://sibert-aerts.github.io/new-area/)
+    Script for the FromSoft Area Name Generator (https://sibert-aerts.github.io/new-area/)
     Made by Sibert Aerts (Rezuaq), originally made ca. 2016, updated sporadically since then.
 */
 
@@ -95,7 +95,7 @@ function addBackgroundItem(bg){
     $('#background-list').append(e)
 }
 
-// Called when the page is loaded.
+// Called when the page is loaded
 $(document).ready(function () {
 
     // Bind the enter-key event to the custom-text input field
@@ -108,20 +108,29 @@ $(document).ready(function () {
         console.warn('Failed to load saved custom data:', e)
     }
 
-    // DO ANCHOR THINGS
+    // Hook up anchor logic
     window.onhashchange = parseAnchor
     parseAnchor()
     
     // Bind the checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
-    $("input[target=streamer-features]").on("click", function(){ setHidden(".streamer-feature", !this.checked) })
-    $("input[target=background-select]").on("click", function(){ setHidden("#background-select", !this.checked) })
+    $("input[target=disable-anims]").attr('checked', localStorage.getItem('disable-anims') === 'true')
+
+    // Add a "minimise" button to each lesser content box
+    $(".minimise").each( (i, m) => {
+        let val = true
+        m.onclick = function() {
+            val ^= true
+            $(m).parent().children('.body').attr('hidden', !val)
+            m.innerText = val? '➖': '➕'
+        }
+        m.onclick()
+    })
 
     // Fill up the 'background selection' element:
     for( let bg of backgrounds ){
         addBackgroundItem(bg)
     }
-
     // Not in the random bg circulation
     addBackgroundItem({url: 'https://i.imgur.com/qabmNjV.png', name: 'The Abyss'})
     
@@ -478,6 +487,10 @@ function customGenerate() {
     setAreaName($("#custom-text").val())
 }
 
+// Called by clicking the "disable animations" checkbox
+function disableAnims(checkbox) {
+    localStorage.setItem('disable-anims', checkbox.checked)
+}
 
 function tweetIntent() {
     window.open(`https://twitter.com/intent/tweet?text=I%20just%20visited%20${location.hash.slice(1)}%0Ahttps://sibert-aerts.github.io/new-area/`)
