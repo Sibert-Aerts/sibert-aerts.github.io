@@ -11,6 +11,8 @@ text.oninput = redrawImage
 const button = document.getElementById('image-upload')
 button.onchange = handleFileSelect
 
+const saveLink = document.createElement('a')
+
 var selectedImage = null
 
 function handleFileSelect(e) {
@@ -72,4 +74,8 @@ function drawText() {
     ctx.textAlign = 'center'
 
     ctx.fillText(text.value, w/2, h*0.507)
+
+    // UPDATE DOWNLOAD BUTTON
+    saveLink.setAttribute('download', text.value.replaceAll(/[^a-zA-Z ]/g, '') + '.png')
+    saveLink.setAttribute('href', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
 }

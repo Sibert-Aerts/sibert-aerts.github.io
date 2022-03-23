@@ -100,7 +100,7 @@
 
             <div class=body hidden>
                 <div class=help style=width:700px;max-width:80vw>
-                    Select an image to put a convincing area name pop-up on it. Right click the image to save it. <br>
+                    Select an image to put a convincing area name pop-up on it. <br>
                     (Image composition happens locally; No data is ever sent to a server, all images remain 100% private.)
                 </div><br>
 
@@ -108,6 +108,7 @@
 
                 <span class=input-title>Caption:</span> <input type=text id=image-caption value="Your Caption Here" size=32> <br>
                 <span class=input-title>Image:</span> <input type=file id=image-upload accept="image/*" style=display:inline>
+                <button id=image-save style=float:right class=emoji-button title="Download image" data-toggle=tooltip onclick=saveLink.click()>⬇️</button>
             </div>
         </div>
 
