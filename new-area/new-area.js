@@ -115,6 +115,7 @@ $(document).ready(function () {
     // Bind the checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
     $("input[target=disable-anims]").attr('checked', localStorage.getItem('disable-anims') === 'true')
+    $("input[target=disable-ga]").attr('checked', localStorage.getItem('disable-ga') === 'true')
 
     // Add a "minimise" button to each lesser content box
     $(".minimise").each( (i, m) => {
@@ -485,11 +486,6 @@ function customGenerate() {
     newAreaSound.play()
     $("#name-underline-wrapper").removeClass("faded-out")
     setAreaName($("#custom-text").val())
-}
-
-// Called by clicking the "disable animations" checkbox
-function disableAnims(checkbox) {
-    localStorage.setItem('disable-anims', checkbox.checked)
 }
 
 function tweetIntent() {

@@ -17,8 +17,9 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
+        window['ga-disable-G-HCGGJHJ3DR'] = JSON.parse(localStorage.getItem('disable-ga')) ?? false
         function gtag(){ dataLayer.push(arguments) }
-        gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR');
+        gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
     </script>
 
     <!-- My stylesheet and scripts -->
@@ -187,7 +188,8 @@
     <div id=credits>
         <div class="credit left" style=line-height:1em>
             <label style=font-weight:regular>Latest inclusion: Demon's Souls (2020)</label><br>
-            <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick=disableAnims(this)></label>
+            <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
+            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="localStorage.setItem('disable-ga', this.checked)"></label>
         </div>
 
         <div class="credit right">
