@@ -6,7 +6,8 @@ const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
 const text = document.getElementById('image-caption')
-text.oninput = redrawImage
+text.oninput = e => { if (!selectedImage || selectedImage.width * selectedImage.height < 2100000 ) redrawImage }
+text.onkeyup = e => { if (e.keyCode == 13) redrawImage() }
 
 const button = document.getElementById('image-upload')
 button.onchange = handleFileSelect
