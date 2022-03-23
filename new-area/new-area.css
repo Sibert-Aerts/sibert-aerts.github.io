@@ -289,6 +289,10 @@ label > input {
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
+    pointer-events: none;
+}
+#credits > * {
+    pointer-events: all;
 }
 
 .credit {

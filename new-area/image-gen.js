@@ -15,6 +15,7 @@ button.onchange = handleFileSelect
 const saveLink = document.createElement('a')
 
 var selectedImage = null
+var selectedImageType = null
 
 function handleFileSelect(e) {
     if( !e.target.files.length ) {
@@ -29,6 +30,7 @@ function handleFileSelect(e) {
         selectedImage.src = event.target.result
     }
     reader.readAsDataURL(e.target.files[0])
+    selectedImageType = e.target.files[0].type
 }
 
 function redrawImage() {
@@ -77,6 +79,8 @@ function drawText() {
     ctx.fillText(text.value, w/2, h*0.507)
 
     // UPDATE DOWNLOAD BUTTON
-    saveLink.setAttribute('download', text.value.replaceAll(/[^a-zA-Z ]/g, '') + '.png')
-    saveLink.setAttribute('href', canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+    let imageType = selectedImageType.replace(/(.*)\//g, '')
+    if( imageType !== 'jpeg' ) imageType = 'png'
+    saveLink.setAttribute('download', text.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
+    saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
 }
