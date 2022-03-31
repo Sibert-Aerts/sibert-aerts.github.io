@@ -3,7 +3,7 @@
 <head>
     <!-- Webpage meta -->
     <title>FromSoft Area Name Generator</title>
-    <meta name="description" content="Discover randomly generated areas from various FromSoftware games.">
+    <meta name="description" content="Discover randomly generated areas from FromSoftware games.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
 
@@ -37,7 +37,7 @@
     <meta name=twitter:site content=@rezuaq>
     <meta name=twitter:creator content=@rezuaq>
     <meta name=twitter:title content="FromSoft Area Name Generator">
-    <meta name=twitter:description content="Discover randomly generated areas from various FromSoftware games.">
+    <meta name=twitter:description content="Discover randomly generated areas from FromSoftware games.">
     <meta name=twitter:image content=https://i.imgur.com/zAaDhtT.png>
         
 </head>
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div style="position:absolute;right:1%;bottom:3%;">
+        <div style="position:absolute; right:15px; bottom:8px;">
             <button id=tweetButton class=emoji-button onclick=tweetIntent() title="Share on Twitter" data-toggle=tooltip>🐦&#xFE0F;</button>
             <button id=transpButton class=emoji-button onclick=toggleShade() title="Toggle Shade" data-toggle=tooltip>🕶️&#xFE0F;</button>
             <button id=muteButton class=emoji-button onclick=toggleMute() title="Toggle Sound" data-toggle=tooltip>🔊&#xFE0F;</button>
@@ -104,11 +104,13 @@
                     (Image composition happens locally; No data is ever sent to a server, all images remain 100% private.)
                 </div><br>
 
-                <canvas id=canvas width=1920px height=1080px></canvas><br>
+                <div style="overflow-x: auto">
+                    <canvas id=canvas width=1920px height=1080px></canvas><br>
+                </div>
 
                 <span class=input-title>Caption:</span> <input type=text id=image-caption value="Your Caption Here" size=32> <br>
                 <span class=input-title>Image:</span> <input type=file id=image-upload accept="image/*" style=display:inline>
-                <button id=image-save style=float:right class=emoji-button title="Download image" data-toggle=tooltip onclick=saveLink.click()>⬇️</button>
+                <button id=image-save style=float:right class=emoji-button title="Save image" data-toggle=tooltip onclick=saveLink.click()>⬇️</button>
             </div>
         </div>
 

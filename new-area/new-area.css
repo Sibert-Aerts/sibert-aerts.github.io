@@ -1,70 +1,4 @@
 /* 
- *   ADAPTIVE SCREEN SIZE STUFF 
- */
-@media screen and (max-width: 720px) { /** EVERYTHING AT MOST 720px WIDE */
-    #name {
-        font-size: 30px;
-        height: 40px;
-    }
-    .underline {
-        border-top: 2px solid white;
-    }
-    #generate-button {
-        padding: 2px;
-        padding-left: 4px;
-        padding-right: 4px;
-        font-size: 16px;
-    }
-    #generate-button::after {
-        border-bottom-width: 1px !important
-    }
-    #main {
-        margin-top: 5vh;
-    }
-    .credit > .dash {
-        margin-left: 3px !important;
-        margin-right: 3px !important;
-    }
-    .streamer-hide, .streamer-feature { display: none }
-}
-
-@media screen and (min-width: 720px) {  /** EVERYTHING AT LEAST 720px WIDE */
-    #name {
-        font-size: 40px;
-        height: 50px;
-    }
-    .underline {
-        border-top: 3px solid white;
-    }
-    #generate-button {
-        font-size: 20px;
-    }
-    #main {
-        margin-top: 10vh;
-    }
-}
-
-@media screen and (min-width: 1000px) {  /** EVERYTHING AT LEAST 1000px WIDE */
-    #name {
-        font-size: 55px;
-        height: 65px;
-    }
-    #main {
-        margin-top: 15vh;
-    }
-}
-
-@media screen and (min-width: 1300px) {  /** EVERYTHING AT LEAST 1300px WIDE */
-    #name {
-        font-size: 70px;
-        height: 80px;
-    }
-    #generate-button {
-        font-size: 24px;
-    }
-}
-
-/* 
 
     ACTUAL STYLE 
 
@@ -91,7 +25,8 @@ body {
 
 #main {
     position: relative;
-    margin-bottom: 40px;
+    margin-top: 6vw;
+    margin-bottom: 2vw;
     margin-left: 5vw;
     width: 90vw;
 }
@@ -103,6 +38,7 @@ body {
     background: url('noise.svg');
     padding: 20px;
     border-radius: 8px;
+    max-width: 90vw;
 }
 
     .content.lesser {
@@ -141,9 +77,9 @@ body {
 }
 
 #lesser-content-wrapper {
-    overflow-y: hidden;
-    margin-left: 5vw;
-    width: 90vw;
+    overflow: hidden;
+    padding-left: 5vw;
+    width: 95vw;
     margin-bottom: 200px;
 }
 
@@ -394,4 +330,73 @@ canvas {
     max-width: 720px;
     max-height: 480px;
     border: 1px solid #fff3;
+}
+
+
+
+/* 
+ *   ADAPTIVE SCREEN SIZE STUFF - NEEDS TO BE AT THE BOTTOM SO IT TAKES PRECEDENCE!
+ */
+ @media screen and (max-width: 720px) { /** EVERYTHING AT MOST 720px WIDE: PHONES */
+    #name {
+        font-size: 30px;
+        height: 40px;
+    }
+    .underline {
+        border-top: 2px solid white;
+    }
+    #generate-button {
+        padding: 2px;
+        padding-left: 4px;
+        padding-right: 4px;
+        font-size: 16px;
+    }
+    #generate-button::after {
+        border-bottom-width: 1px !important
+    }
+    #main {
+        padding-bottom: 30px; /* hack for the dumb emoji buttons to fit */
+    }
+    .credit {
+        font-size: 14px;
+        margin: 0px 10px 10px 10px;
+    }
+    .credit.left {
+        font-size: 14px;
+    }
+    .credit > .dash {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .streamer-hide, .streamer-feature { display: none }
+}
+
+@media screen and (min-width: 720px) {  /** EVERYTHING AT LEAST 720px WIDE */
+    #name {
+        font-size: 40px;
+        height: 50px;
+    }
+    .underline {
+        border-top: 3px solid white;
+    }
+    #generate-button {
+        font-size: 20px;
+    }
+}
+
+@media screen and (min-width: 1000px) {  /** EVERYTHING AT LEAST 1000px WIDE */
+    #name {
+        font-size: 55px;
+        height: 65px;
+    }
+}
+
+@media screen and (min-width: 1300px) {  /** EVERYTHING AT LEAST 1300px WIDE */
+    #name {
+        font-size: 70px;
+        height: 80px;
+    }
+    #generate-button {
+        font-size: 24px;
+    }
 }
