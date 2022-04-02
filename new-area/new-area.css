@@ -272,7 +272,7 @@ label > input {
     background: -webkit-linear-gradient(#0000, rgba(0,0,0,0.8));
     background: -o-linear-gradient(#0000, rgba(0,0,0,0.8));
     background: -moz-linear-gradient(#0000, rgba(0,0,0,0.8));
-    background: linear-gradient(#0000, rgba(0,0,0,0.8));
+    background: linear-gradient(#0000, #0005, rgba(0,0,0,0.8));
 }
 
 .background-item {
