@@ -235,7 +235,8 @@ Elden.possessives = ["Moghwyn", "Redmane"]
 Elden.prefixes = ["Storm", "Dragon"]
 Elden.positionals = []
 Elden.adjectives = [
-    "Weeping", "Royal", "Subterranean", "Wailing", "Ruin-Strewn", "Forbidden", "Flame", "Moonlight", "Consecrated", "Crumbling", "Liturgical", "Eternal",
+    "Weeping", "Royal", "Subterranean", "Wailing", "Ruin-Strewn", "Forbidden", "Flame", "Moonlight",
+    "Consecrated", "Crumbling", "Ashen", "Liturgical", "Eternal",
 ]
 
 Elden.appendices = [ "of the Lakes", "of Anticipation", "of the Giants", "of Rot", "of the Haligtree", "of Sorcery" ]
