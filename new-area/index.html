@@ -60,15 +60,15 @@
                 <button id=generate-button onClick=generate()>Travel Somewhere Else</button>
             </div>
             <div id=checkboxes-wrapper>
-                <label><input target="Dark1" checked type="checkbox"></input> Dark Souls</label>
-                <label><input target="Dark2" checked type="checkbox"></input> Dark Souls II</label>
-                <label><input target="Dark3" checked type="checkbox"></input> Dark Souls III</label>
-                <label class=hidden><input target="Elden" type="checkbox"></input> Elden Ring</label><br>
-                
-                <label class="special"><input target="Demons" type="checkbox"></input> Demon's Souls</label>
-                <label class="special"><input target="Blood" type="checkbox"></input> Bloodborne</label>
-                <label class="special"><input target="Sekiro" type="checkbox"></input> Sekiro</label>
-                <label class="custom"><input target="Custom" type="checkbox"></input> Custom</label>
+                <label><input target=Dark1 checked type=checkbox></input> Dark Souls</label>
+                <label><input target=Dark2 checked type=checkbox></input> Dark Souls II</label>
+                <label><input target=Dark3 checked type=checkbox></input> Dark Souls III</label>
+                <label class=elden><input target=Elden checked type=checkbox></input> Elden Ring</label>
+                <br>
+                <label class=special><input target=Demons type=checkbox></input> Demon's Souls</label>
+                <label class=special><input target=Blood  type=checkbox></input> Bloodborne</label>
+                <label class=special><input target=Sekiro type=checkbox></input> Sekiro</label>
+                <label class=custom> <input target=Custom type=checkbox></input> Custom</label>
             </div>
         </div>
 
@@ -188,7 +188,7 @@
 
     <div id=credits>
         <div class="credit left" style=line-height:1em>
-            <label style=font-weight:regular>Latest inclusion: Demon's Souls (2020)</label><br>
+            <label style=font-weight:regular>Latest inclusion: Elden Ring (2022)</label><br>
             <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
             <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="localStorage.setItem('disable-ga', this.checked)"></label>
         </div>

@@ -49,14 +49,19 @@ var backgrounds = [
     {url: "https://i.imgur.com/ic9I2Uu.jpg", name: 'Two Bridges of Lothric'},
     {url: "https://i.imgur.com/uNuqPte.jpg", name: 'Great Bridge from Above'},
     {url: "https://i.imgur.com/d8thQaE.jpg", name: 'Anor Londo in the Fog'},
-    {url: "https://i.imgur.com/qEk3cZa.jpg", name: 'Undead Settlement Hidden Bonfire'},
-    {url: "https://i.imgur.com/9gX5pBB.jpg", name: 'Undead Settlement Bridge'},
-    {url: "https://i.imgur.com/hjPuO8N.jpg", name: 'Sundowning Cathedral Ghoul'},
+    // {url: "https://i.imgur.com/qEk3cZa.jpg", name: 'Undead Settlement Hidden Bonfire'},
+    // {url: "https://i.imgur.com/9gX5pBB.jpg", name: 'Undead Settlement Bridge'},
+    // {url: "https://i.imgur.com/hjPuO8N.jpg", name: 'Sundowning Cathedral Ghoul'},
     {url: "https://i.imgur.com/cURcsam.jpg", name: 'Giant at Time\'s End'},
     {url: "https://i.imgur.com/baIPonl.jpg", name: 'Blue Skies of Archdragon Peak'},
     {url: "https://i.imgur.com/7qzGveQ.jpg", name: 'Grand Archives Steps'},
     {url: "https://i.imgur.com/ej8kxIW.jpg", name: 'Ruins of Lothric Beyond Time'},
-    {url: "https://i.imgur.com/kfTzoWv.jpg", name: 'Darkeater\'s Abode'},
+    {url: "https://i.imgur.com/kfTzoWv.jpg", name: 'Darkeater\'s Lair'},
+    {url: "https://i.imgur.com/Z3q2TlZ.jpg", name: 'Stormveil at Dusk'},
+    {url: "https://i.imgur.com/Fcq8N5o.jpg", name: 'Northern Liurnia'},
+    {url: "https://i.imgur.com/Veb34Uw.jpg", name: 'Windmill Village'},
+    {url: "https://i.imgur.com/CVRNi2P.jpg", name: 'Foggy Windmills'},
+    {url: "https://i.imgur.com/BycSJYz.jpg", name: 'Lower Farum Azula Ruins'},
 ]
 
 /** Changes the background to the given background object's image, optionally fading. */
@@ -203,7 +208,7 @@ function stringToProperCase(s) {
 const Custom = {}
 
 /** The pool of all pools (from areas.js) */
-const allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Custom}
+const allPools = {Dark1, Dark2, Dark3, Demons, Blood, Sekiro, Elden, Custom}
 /** The pool of all full area names. */
 const allAreas = Object.keys(allPools).reduce((tot, key) => tot.concat(allPools[key].areas ?? []), [])
 
@@ -367,9 +372,9 @@ function generateName() {
         let format = weightedIndex([
             10, // "Location"
             35, // "<adj> Location"
-            35, // "Location <subPlace>"
-            10, // "Location <subPlace> <subPlace>"
-            10, // "<adj> Location <subPlace>"
+            35, // "Location <Place>"
+            10, // "Location <Place> <subPlace>"
+            10, // "<adj> Location <Place>"
         ])
 
         const location = choose(pool.properLocations)
@@ -378,11 +383,11 @@ function generateName() {
         else if (format === 1)
             name = choose(chance(4, 5)? pool.adjectives: pool.positionals) + ' ' + location
         else if (format === 2)
-            name = location + ' ' + choose(pool.secondaryLocations)
+            name = location + ' ' + choose(pool.primaryLocations)
         else if (format === 3)
-            name = location + ' ' + choose(pool.secondaryLocations) + ' ' + choose(pool.secondaryLocations)
+            name = location + ' ' + choose(pool.primaryLocations) + ' ' + choose(pool.secondaryLocations)
         else if (format === 4)
-            name = choose(chance(4, 5)? pool.adjectives: pool.positionals) + ' ' + location + ' ' + choose(pool.secondaryLocations)
+            name = choose(chance(4, 5)? pool.adjectives: pool.positionals) + ' ' + location + ' ' + choose(pool.primaryLocations)
 
     } else {
         //// 2% chance of a formal Proper Location-type name
@@ -403,9 +408,12 @@ function generateName() {
             place = choose(pool.adjectives) + ' ' + place + ' ' + choose(pool.appendices)
 
         const location = choose(pool.properLocations)
-        if( chance(1/3) )
+        // Chance of either:
+        //      Name, Location    OR    Location, Name    OR    Location Name
+        //  (The latter literally is just to allow for "Brightstone Cove Tseldora")
+        if( chance(2/5) )
             name = location + ', ' + place
-        else if ( chance(1/2) )
+        else if ( chance(2/3) )
             name = place + ', ' + location
         else
             name = place + ' ' + location

@@ -16,11 +16,17 @@
 
 body {
     font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
-    background-attachment: fixed;
     font-weight: 400;
     font-style: normal;
     color: white;
     margin-bottom: 40px;
+    
+    background-attachment: fixed;
+    background-position-x: center;
+}
+#background-layer {
+    background-attachment: fixed;
+    background-position-x: center;
 }
 
 #main {
@@ -184,6 +190,7 @@ body {
     text-shadow: 0px 0px 4px #111f, 0px 0px 1px #111f;
 }
     #main label > input { margin-right: 2px }
+    label.elden   { color: #ddcd88; }
     label.special { color: #88BBDD; }
     label.custom  { color: #ffaaaa; }
 

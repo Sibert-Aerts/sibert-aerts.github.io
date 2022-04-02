@@ -117,7 +117,6 @@ Dark3.appendices = ["of Ash", "of the Boreal Valley", "of the Deep", "of Sacrifi
 // Demon's Souls
 var Demons = {}
 
-// There aren't a lot of area names in this game
 Demons.areas = ["Outpost Passage", "Forlorn Outpost", "Unknown Egress", "The Nexus", "Boletarian Palace", "Tower of Latria", "Valley of Defilement", "Stonefang Tunnel", 
     "Shrine of Storms", "Gates of Boletaria", "The Lord's Path", "Inner Ward", "The King's Tower", "Throne of the False King", "Smithing Grounds",
     "The Tunnel City", "Underground Temple", "Shrine of the Dragon God", "Prison of Hope", "Upper Latria", "The Ivory Tower", "Throne Room of Yormedaar",
@@ -192,6 +191,54 @@ Sekiro.positionals = []
 Sekiro.adjectives = ["Dilapidated", "Abandoned", "Sunken", "Fountainhead", "Senpou"]
 
 Sekiro.appendices = []
+
+
+
+// Demon's Souls
+var Elden = {}
+
+// These are, to the best of my knowledge, all LARGE area name pop-ups in the game
+Elden.areas = ["Limgrave", "Stormhill", "Weeping Peninsula", "Stormveil Castle", "Roundtable Hold", "Siofra River", "Liurnia of the Lakes",
+    "Academy of Raya Lucaria", "Bellum Highway", "Caelid", "Greyoll's Dragonbarrow", "Swamp of Aeonia", "Ainsel River", "Shrine of Anticipation",
+    "Altus Plateau", "Mt. Gelmir", "Volcano Manor", "Redmane Castle", "Leyndell, Royal Capital", "Deeproot Depths", "Nokron, Eternal City",
+    "Subterranean Shunning-Grounds", "Wailing Dunes",  "Moghwyn Palace", "Ruin-Strewn Precipice", "Capital Outskirts", "Forbidden Lands",
+    "Mountaintops of the Giants", "Flame Peak", "Lake of Rot", "Moonlight Altar", "Consecrated Snowfield", "Miquella's Haligtree",
+    "Elphael, Brace of the Haligtree", "Crumbling Farum Azula", "Leyndell, Ashen Capital",
+    // These ones are technically speaking small area name pop-ups, but they seem important anyway...
+    "Noxtella, Eternal City", "Sellia, Town of Sorcery", "Ordina, Liturgical Town", "Dominula, Windmill Village"
+]
+
+Elden.properLocations = [
+    "Limgrave", "Stormhill", "Siofra", "Liurnia", "Raya Lucaria", "Bellum", "Aeonia", "Ainsel", "Altus", "Mt. Gelmir",
+    "Leyndell", "Nokron", "Elphael", "Farum Azula", "Roundtable", "Deeproot",
+    "Noxtella", "Sellia", "Ordina", "Dominula"
+]
+Elden.primaryLocations =  [
+    "Hill", "Peninsula", "Castle", "Hold", "River", "Academy", "Highway", "Barrow", "Dragonbarrow", "Swamp", "Shrine", "Plateau", "Volcano", "Manor", "Capital",
+    "Depths", "City", "Shunning-Grounds", "Dunes", "Palace", "Precipice", "Outskirts", "Lands", "Mountaintops", "Peak", "Lake", "Altar", "Snowfield",
+    "Haligtree", "Brace", "Town",
+    // This one's never technically a pop-up but c'mon
+    "Erdtree",
+    // I think this is appropriate to include
+    "Cave", "Catacombs", "Tunnel", "Tunnels", "Ruins", "Shack"
+]
+Elden.secondaryLocations = [
+    "Hill", "Castle", "Hold", "Highway", "Barrow", "Swamp", "Shrine", "Manor",
+    "Depths", "Shunning-Grounds", "Palace", "Precipice", "Outskirts", "Peak", "Altar",
+    "Haligtree",
+    "Cave", "Catacombs", "Tunnel", "Tunnels", "Ruins", "Shack"
+]
+
+Elden.properNames = [ "Greyoll", "Miquella" ]
+
+Elden.possessives = ["Moghwyn", "Redmane"]
+Elden.prefixes = ["Storm", "Dragon"]
+Elden.positionals = []
+Elden.adjectives = [
+    "Weeping", "Royal", "Subterranean", "Wailing", "Ruin-Strewn", "Forbidden", "Flame", "Moonlight", "Consecrated", "Crumbling", "Liturgical", "Eternal",
+]
+
+Elden.appendices = [ "of the Lakes", "of Anticipation", "of the Giants", "of Rot", "of the Haligtree", "of Sorcery" ]
 
 
 
