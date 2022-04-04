@@ -199,7 +199,7 @@ var Elden = {}
 
 // These are, to the best of my knowledge, all LARGE area name pop-ups in the game
 Elden.areas = ["Limgrave", "Stormhill", "Weeping Peninsula", "Stormveil Castle", "Roundtable Hold", "Siofra River", "Liurnia of the Lakes",
-    "Academy of Raya Lucaria", "Bellum Highway", "Caelid", "Greyoll's Dragonbarrow", "Swamp of Aeonia", "Ainsel River", "Shrine of Anticipation",
+    "Academy of Raya Lucaria", "Bellum Highway", "Caelid", "Greyoll's Dragonbarrow", "Swamp of Aeonia", "Ainsel River", "Chapel of Anticipation",
     "Altus Plateau", "Mt. Gelmir", "Volcano Manor", "Redmane Castle", "Leyndell, Royal Capital", "Deeproot Depths", "Nokron, Eternal City",
     "Subterranean Shunning-Grounds", "Wailing Dunes",  "Moghwyn Palace", "Ruin-Strewn Precipice", "Capital Outskirts", "Forbidden Lands",
     "Mountaintops of the Giants", "Flame Peak", "Lake of Rot", "Moonlight Altar", "Consecrated Snowfield", "Miquella's Haligtree",
@@ -214,7 +214,7 @@ Elden.properLocations = [
     "Noxtella", "Sellia", "Ordina", "Dominula"
 ]
 Elden.primaryLocations =  [
-    "Hill", "Peninsula", "Castle", "Hold", "River", "Academy", "Highway", "Barrow", "Dragonbarrow", "Swamp", "Shrine", "Plateau", "Volcano", "Manor", "Capital",
+    "Hill", "Peninsula", "Castle", "Hold", "River", "Academy", "Highway", "Barrow", "Dragonbarrow", "Swamp", "Chapel", "Plateau", "Volcano", "Manor", "Capital",
     "Depths", "City", "Shunning-Grounds", "Dunes", "Palace", "Precipice", "Outskirts", "Lands", "Mountaintops", "Peak", "Lake", "Altar", "Snowfield",
     "Haligtree", "Brace", "Town",
     // This one's never technically a pop-up but c'mon
@@ -223,7 +223,7 @@ Elden.primaryLocations =  [
     "Cave", "Catacombs", "Tunnel", "Tunnels", "Ruins", "Shack"
 ]
 Elden.secondaryLocations = [
-    "Hill", "Castle", "Hold", "Highway", "Barrow", "Swamp", "Shrine", "Manor",
+    "Hill", "Castle", "Hold", "Highway", "Barrow", "Swamp", "Chapel", "Manor",
     "Depths", "Shunning-Grounds", "Palace", "Precipice", "Outskirts", "Peak", "Altar",
     "Haligtree",
     "Cave", "Catacombs", "Tunnel", "Tunnels", "Ruins", "Shack"
