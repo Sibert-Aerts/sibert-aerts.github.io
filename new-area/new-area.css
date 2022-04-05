@@ -364,6 +364,12 @@ canvas {
     #main {
         padding-bottom: 30px; /* hack for the dumb emoji buttons to fit */
     }
+    #credits {
+        position: inherit;
+    }
+    body {
+        margin-bottom: 0
+    }
     .credit {
         font-size: 14px;
         margin: 0px 10px 10px 10px;
