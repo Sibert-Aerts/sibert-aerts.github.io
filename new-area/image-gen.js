@@ -19,15 +19,18 @@ captionInput.onkeyup = e => { if (e.keyCode == 13) redrawImage() }
 
 const fileSelect = byId('image-upload')
 fileSelect.onchange = handleFileSelect
+const resolutionCheckbox = getInput('limit-resolution')
+resolutionCheckbox.onchange = redrawImage
 
 const x0Input = getInput('x-offset')
 const y0Input = getInput('y-offset')
 const scaleInput = getInput('scale')
 const underlineInput = getInput('underline')
-x0Input.onchange = y0Input.onchange = scaleInput.onchange = underlineInput.onchange
+const contrastInput = getInput('contrast')
+x0Input.onchange = y0Input.onchange = scaleInput.onchange = underlineInput.onchange = contrastInput.onchange
     = autoRedraw
 
-for( const name of ['x-offset', 'y-offset', 'scale', 'underline'] ) {
+for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast'] ) {
     const button = document.getElementsByTagName('button').namedItem(name)
     button.onclick = () => { getInput(name).value = button.value; redrawImage() }
 }
@@ -55,13 +58,17 @@ function handleFileSelect(e) {
     selectedImageType = e.target.files[0].type
 }
 
+/** Check whether the current canvas is too big to allow auto-rerendering. */
+function canvasTooBig() {
+    return (selectedImage && canvas.width*canvas.height >= 2100000)
+}
+
 /** 
  * Call after minor input changes;
- * Calls redrawImage() only if the underlying canvas isn't too huge for this to be laggy.
+ * Calls redrawImage() only if the underlying canvas isn't too huge for this feature to be laggy.
  */
 function autoRedraw() {
-    if (!selectedImage || selectedImage.width*selectedImage.height < 2100000 )
-        redrawImage()
+    if(!canvasTooBig()) redrawImage()
 }
 
 /** 
@@ -72,16 +79,29 @@ function redrawImage() {
     // Why is .resetTransform not standard??
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+
     if( selectedImage ) {
-        canvas.width = selectedImage.width
-        canvas.height = selectedImage.height
-        ctx.drawImage(selectedImage, 0, 0)
+        if( resolutionCheckbox.checked ) {
+            const scale = Math.min( 1920/selectedImage.width, 1080/selectedImage.height, 1)
+            canvas.width = selectedImage.width * scale
+            canvas.height = selectedImage.height * scale
+            ctx.scale(scale, scale)
+            ctx.drawImage(selectedImage, 0, 0)
+
+        } else {
+            canvas.width = selectedImage.width
+            canvas.height = selectedImage.height
+            ctx.drawImage(selectedImage, 0, 0)
+        }
     }
+    byId('resolution-warning').hidden = !canvasTooBig()
     drawText()
 }
 
 /** Called by redrawImage() */
 function drawText() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
@@ -93,6 +113,7 @@ function drawText() {
     ctx.translate(x0, y0)
     s *= s0
     const underline = parseFloat(underlineInput.value)/100
+    let contrast = parseFloat(contrastInput.value)
 
     // UNDERLINE
     if( underline > 0 ) {
@@ -101,16 +122,16 @@ function drawText() {
 
         const shadowGrad = ctx.createLinearGradient(left, 0, right, 0)
         shadowGrad.addColorStop(0,   '#0000')
-        shadowGrad.addColorStop(0.1, '#0004')
-        shadowGrad.addColorStop(0.9, '#0004')
+        shadowGrad.addColorStop(0.1, `rgba(0, 0, 0, ${.25 * contrast})`)
+        shadowGrad.addColorStop(0.9, `rgba(0, 0, 0, ${.25 * contrast})`)
         shadowGrad.addColorStop(1,   '#0000')
         ctx.fillStyle = shadowGrad
         ctx.fillRect(left, .51*h+5*s, length, 3*s)
 
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   '#fff0')
-        grad.addColorStop(0.1, '#fffb')
-        grad.addColorStop(0.9, '#fffb')
+        grad.addColorStop(0.1, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
         grad.addColorStop(1,   '#fff0')
         ctx.fillStyle = grad
         ctx.fillRect(left, .51*h, length, 5*s)
@@ -120,13 +141,18 @@ function drawText() {
     ctx.shadowOffsetX = 2*s
     ctx.shadowOffsetY = 1*s
     ctx.shadowBlur = 8*s
-    ctx.shadowColor = '#000d'
 
     ctx.font = Math.floor(96*s) + 'px adobe-garamond-pro'
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
 
-    ctx.fillText(captionInput.value, w/2, h*0.507)
+    // Apply contrast by just redrawing the same text so the shadow overlaps
+    //      0.85 * 1.17 ~= 1
+    while( contrast >= 0 ) {
+        ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(contrast, 1.17)})`
+        ctx.fillText(captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
+        contrast -= 1.17
+    }
 
     // UPDATE DOWNLOAD BUTTON
     let imageType = selectedImageType?.replace(/(.*)\//g, '')

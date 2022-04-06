@@ -339,6 +339,21 @@ canvas {
     border: 1px solid #fff3;
 }
 
+#image-input-wrapper > * {
+    padding-left: 5px; padding-right: 5px;
+    margin-bottom: 8px;
+}
+
+#image-input-wrapper > .smol {
+    float: left;
+    width: 100%; max-width: 200px;
+}
+
+#resolution-warning {
+    font-size: 15px;
+    color: rgb(255, 197, 197);
+}
+
 
 
 /* 
