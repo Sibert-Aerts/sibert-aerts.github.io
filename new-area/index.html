@@ -3,7 +3,7 @@
 <head>
     <!-- Webpage meta -->
     <title>FromSoft Area Name Generator</title>
-    <meta name="description" content="Discover randomly generated areas from FromSoftware games.">
+    <meta name="description" content="Discover randomly generated areas from FromSoftware games, or make image macros.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
 
@@ -37,7 +37,7 @@
     <meta name=twitter:site content=@rezuaq>
     <meta name=twitter:creator content=@rezuaq>
     <meta name=twitter:title content="FromSoft Area Name Generator">
-    <meta name=twitter:description content="Discover randomly generated areas from FromSoftware games.">
+    <meta name=twitter:description content="Discover randomly generated areas from FromSoftware games, or make image macros.">
     <meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png>
         
 </head>
@@ -112,11 +112,15 @@
                     <div id=image-input-wrapper style="width:100%; max-width:400px">
                         <div>
                             <span class=input-title>Caption:</span>
-                            <input type=text id=image-caption value="Enter Caption" size=32>
+                            <input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
                         </div>
                         <div>
-                            <span class=input-title>Image:</span>
-                            <input type=file id=image-upload accept="image/*" style=display:inline>
+                            <span class=input-title>Image URL:</span>
+                            <input type=text id=image-URL size=32 style="float:right">
+                        </div>
+                        <div>
+                            <span class=input-title>Image Upload:</span>
+                            <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
                         </div>
                         <div>
                             <span class=input-title>Limit image resolution:</span>
@@ -124,12 +128,12 @@
                             <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                         </div>
                         <div>
-                            <span class=input-title>X-offset:</span>
+                            <span class=input-title>Horizontal offset:</span>
                             <button class=emoji-button name=x-offset value=0 style="float:right">🔄</button>
                             <input type=range name=x-offset min=-60 max=60 value=0>
                         </div>
                         <div>
-                            <span class=input-title>Y-offset:</span>
+                            <span class=input-title>Vertical offset:</span>
                             <button class=emoji-button name=y-offset value=0 style="float:right">🔄</button>
                             <input type=range name=y-offset min=-60 max=60 value=0>
                         </div>
@@ -153,7 +157,7 @@
                 <div style="width:100%; text-align:center">
                 </div>
 
-                <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=saveLink.click()>Save image</button>
+                <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=saveImage()>Save image</button>
                 <button style=float:right class="btn btn-primary" onclick=redrawImage()>Render changes</button>
             </div>
         </div>

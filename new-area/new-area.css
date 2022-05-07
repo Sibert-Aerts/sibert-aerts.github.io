@@ -354,6 +354,9 @@ canvas {
     color: rgb(255, 197, 197);
 }
 
+input.bad-url {
+    background-color: #f88
+}
 
 
 /* 

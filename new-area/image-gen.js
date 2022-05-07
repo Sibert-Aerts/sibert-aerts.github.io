@@ -17,8 +17,13 @@ const captionInput = byId('image-caption')
 captionInput.oninput = autoRedraw
 captionInput.onkeyup = e => { if (e.keyCode == 13) redrawImage() }
 
+const imageURL = byId('image-URL')
+imageURL.onchange = handleImageURL
+imageURL.onkeyup = e => { if (e.keyCode == 13) handleImageURL() }
+
 const fileSelect = byId('image-upload')
 fileSelect.onchange = handleFileSelect
+
 const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
 
@@ -39,13 +44,21 @@ for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast'] ) 
 var selectedImage
 var selectedImageType
 
+function handleBlank() {
+    selectedImage = selectedImageType = null
+    canvas.width = 1920; canvas.height = 1080
+    redrawImage()
+}
+
 /** File Selector callback function. */
-function handleFileSelect(e) {
+function handleFileSelect() {
     selectedImage = selectedImageType = null
 
-    if( !e.target.files.length ) {
-        canvas.width = 1920; canvas.height = 1080
-        redrawImage()
+    if( !fileSelect.files.length ) {
+        if( imageURL.value )
+            handleImageURL()
+        else
+            handleBlank()
         return
     }
     var reader = new FileReader()
@@ -54,8 +67,36 @@ function handleFileSelect(e) {
         selectedImage.onload = redrawImage
         selectedImage.src = event.target.result
     }
-    reader.readAsDataURL(e.target.files[0])
-    selectedImageType = e.target.files[0].type
+    reader.readAsDataURL(fileSelect.files[0])
+    selectedImageType = fileSelect.files[0].type
+}
+
+/** Image URL callback function. */
+function handleImageURL() {
+    selectedImage = selectedImageType = null
+
+    if( !imageURL.value ) {
+        imageURL.classList.remove('bad-url')
+        if( fileSelect.files.length )
+            handleFileSelect()
+        else
+            handleBlank()
+        return
+    }
+    selectedImage = new Image()
+    selectedImage.crossOrigin = 'anonymous'
+    selectedImage.onload = function() {
+        redrawImage()
+        imageURL.classList.remove('bad-url')
+    }
+    selectedImage.onerror = function(e) {
+        console.error('Failed to load provided image URL:', imageURL.value, e)
+        imageURL.classList.add('bad-url')
+        handleBlank()
+    }
+    // Attempt to pull image type from URL
+    selectedImageType = imageURL.value.match(/\.(\w+)$/)?.[1]
+    selectedImage.src = imageURL.value
 }
 
 /** Check whether the current canvas is too big to allow auto-rerendering. */
@@ -153,10 +194,20 @@ function drawText() {
         ctx.fillText(captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
         contrast -= 1.17
     }
+}
 
-    // UPDATE DOWNLOAD BUTTON
+function saveImage() {
+    // Turn "image/xyz" to "xyz"
     let imageType = selectedImageType?.replace(/(.*)\//g, '')
-    if( imageType !== 'jpeg' ) imageType = 'png'
+
+    // Normalise to either "jpeg" or "png"
+    if( imageType === 'jpg' ) imageType = 'jpeg'
+    else if( imageType !== 'jpeg' ) imageType = 'png'
+
+    // Set the file name and put the image data
     saveLink.setAttribute('download', captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
     saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
+
+    //// Click it
+    saveLink.click()
 }
