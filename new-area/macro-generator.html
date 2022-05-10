@@ -22,7 +22,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.[0]?.endsWith('1') ?? false
+        disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.endsWith('1') ?? false
         window['ga-disable-G-HCGGJHJ3DR'] = disable
         function gtag(){ dataLayer.push(arguments) }
         gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
