@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Webpage meta -->
+    <title>FromSoft Image Macro Generator</title>
+    <meta name="description" content="Create realistic looking image macros based on FromSoft games.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
+
+    <!-- jQuery (TODO: get rid of this dependency) -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script> -->
+
+    <!-- Bootstrap (TODO: get rid of this dependency) -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+
+    <!-- Garamond font, care of Adobe. -->
+    <link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
+    
+    <!-- Google Analytics to track traffic -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        window['ga-disable-G-HCGGJHJ3DR'] = JSON.parse(localStorage.getItem('disable-ga')) ?? false
+        function gtag(){ dataLayer.push(arguments) }
+        gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
+    </script>
+
+    <!-- My stylesheet and scripts -->
+    <link rel="stylesheet" href="normal.css">
+    <link rel="stylesheet" href="new-area.css">
+
+    <!-- Twitter Card info -->
+    <meta name=twitter:card content=summary_large_image>
+    <meta name=twitter:site content=@rezuaq>
+    <meta name=twitter:creator content=@rezuaq>
+    <meta name=twitter:title content="FromSoft Image Macro Generator">
+    <meta name=twitter:description content="Create realistic looking image macros based on FromSoft games.">
+    <meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png> <!-- TODO: GET BETTER CARD -->
+        
+</head>
+
+<body style="background-image: url(https://i.imgur.com/Fcq8N5o.jpg)">
+    <div id=background-layer class="background-layer faded"></div>
+
+    <div class=content style="position: relative; margin-top: 2vw; margin-bottom: 200px; margin-left: 2vw; width: 94vw; max-width: none">
+        <h1>FromSoftware image macro generator</h1>
+        <button class="emoji-button minimise"></button>
+
+        <div class=body>
+            <div class=help>
+                Select an image to put convincing FromSoftware game overlays on it.
+                Currently implements only Dark Souls 3 style image macros.
+            </div><br>
+
+            <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
+                <canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
+            </div>
+
+            <div style="display:flex; flex-wrap: wrap; justify-content:center; margin:1em">
+                <div class=image-input-wrapper style="width:100%; max-width:400px">
+                    <div>
+                        <span class=input-title>Type:</span>
+                        <select id=macro-type width="288px" style="margin-left:30px">
+                            <option value=ds3-area>Area Name</option>
+                            <option value=ds3-death>You Died</option>
+                        </select>
+                    </div>
+                    <div>
+                        <span class=input-title>Caption:</span>
+                        <input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
+                    </div>
+                    <div>
+                        <span class=input-title>Image URL:</span>
+                        <input type=text id=image-URL size=32 style="float:right">
+                    </div>
+                    <div>
+                        <span class=input-title>Image Upload:</span>
+                        <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
+                    </div>
+                    <div>
+                        <span class=input-title>Limit image resolution:</span>
+                        <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+                        <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
+                    </div>
+                </div>
+                <div class=image-input-wrapper style="width:100%; max-width:400px">
+                    <div>
+                        <span class=input-title>Horizontal offset:</span>
+                        <button class=emoji-button name=x-offset value=0 style="float:right">🔄</button>
+                        <input type=range name=x-offset min=-60 max=60 step=0.2 value=0>
+                    </div>
+                    <div>
+                        <span class=input-title>Vertical offset:</span>
+                        <button class=emoji-button name=y-offset value=0 style="float:right">🔄</button>
+                        <input type=range name=y-offset min=-60 max=60 step=0.2 value=0>
+                    </div>
+                    <div>
+                        <span class=input-title>Scale:</span>
+                        <button class=emoji-button name=scale value=0 style="float:right">🔄</button>
+                        <input type=range name=scale min=-2 max=4 step=.01 value=0>
+                    </div>
+                    <div class=smol>
+                        <span class=input-title>Underline:</span>
+                        <button class=emoji-button name=underline value=32 style="float:right">🔄</button>
+                        <input type=range name=underline min=0 max=64 value=32>
+                    </div>
+                    <div class=smol>
+                        <span class=input-title>Contrast:</span>
+                        <button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
+                        <input type=range name=contrast min=0 max=3 step=0.1 value=1>
+                    </div>
+                </div>
+            </div>
+
+            <div style=position:absolute;right:30px;bottom:10px>
+                <button style=margin-left:20px id=generate-button onclick=saveImage()>Save image</button>
+                <button id=generate-button onclick=redrawImage()>Render changes</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class=bottom-fade></div>
+
+    <div id=credits>
+        <div class="credit left" style=line-height:1em>
+            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="localStorage.setItem('disable-ga', this.checked)"></label>
+            <br>
+            <span style="opacity: 0.8; font-size: 16px">
+                Image composition happens in-app; No data is ever sent to a server, all images are 100% private.
+            </span>
+        </div>
+
+        <div class="credit right">
+            <a href="http://twitter.com/rezuaq" target=_blank>Created by Rezuaq</a>
+            <span class=dash>-</span>
+            <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
+            <span class=dash>-</span>
+            <a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
+        </div>
+    </div>
+
+</body>
+
+<!-- My other script -->
+<script type="text/javascript" src="image-gen.js"></script>
+<script type="text/javascript">redrawImage()</script>
+
+</html>

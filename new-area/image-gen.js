@@ -13,6 +13,9 @@ const ctx = canvas.getContext('2d')
 const saveLink = document.createElement('a')
 
 // USER CONTROLS
+const macroTypeSelect = byId('macro-type')
+macroTypeSelect.onchange = redrawImage
+
 const captionInput = byId('image-caption')
 captionInput.oninput = autoRedraw
 captionInput.onkeyup = e => { if (e.keyCode == 13) redrawImage() }
@@ -27,6 +30,7 @@ fileSelect.onchange = handleFileSelect
 const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
 
+// SLIDERS
 const x0Input = getInput('x-offset')
 const y0Input = getInput('y-offset')
 const scaleInput = getInput('scale')
@@ -48,6 +52,17 @@ function handleBlank() {
     selectedImage = selectedImageType = null
     canvas.width = 1920; canvas.height = 1080
     redrawImage()
+}
+
+function resetCtxState() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.fillStyle = null
+    ctx.shadowBlur = null
+    ctx.shadowColor = null
+    ctx.shadowOffsetX = null
+    ctx.shadowOffsetY = null
+    ctx.font = null
+    ctx.textAlign = null
 }
 
 /** File Selector callback function. */
@@ -117,8 +132,7 @@ function autoRedraw() {
  * Blanks the canvas, redraws the selected image if any, and draws the text on top.
  */
 function redrawImage() {
-    // Why is .resetTransform not standard??
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    resetCtxState()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     if( selectedImage ) {
@@ -136,11 +150,17 @@ function redrawImage() {
         }
     }
     byId('resolution-warning').hidden = !canvasTooBig()
-    drawText()
+    
+    console.log(macroTypeSelect.value)
+
+    if( macroTypeSelect.value === 'ds3-area' )
+        drawDS3AreaName()
+    else if ( macroTypeSelect.value === 'ds3-death' )
+        drawDS3Death()
 }
 
 /** Called by redrawImage() */
-function drawText() {
+function drawDS3AreaName() {
     ctx.setTransform(1, 0, 0, 1, 0, 0)
 
     // CONSTANTS
@@ -196,6 +216,54 @@ function drawText() {
     }
 }
 
+/** Called by redrawImage() */
+function drawDS3Death() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const x0 = (parseFloat(x0Input.value) + .6)/100 * w
+    const y0 = (parseFloat(y0Input.value) + 1.8)/100 * h
+    const s0 = 2**parseFloat(scaleInput.value)
+    s *= s0
+    const shadeScale = parseFloat(underlineInput.value)/32 * s0
+    let contrast = parseFloat(contrastInput.value)
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    // SHADE
+    if( shadeScale > 0 ) {
+        const shadeHeight = shadeScale * .2*h
+        const top = .5*h-shadeHeight/2, bottom = .5*h+shadeHeight/2
+
+        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
+        shadowGrad.addColorStop(0,   '#0000')
+        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.5 * contrast**0.7})`)
+        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.5 * contrast**0.7})`)
+        shadowGrad.addColorStop(1,   '#0000')
+        ctx.fillStyle = shadowGrad
+        ctx.fillRect(0, top, w, shadeHeight)
+    }
+    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    // TEXT
+    ctx.font = Math.floor(148*s) + 'px adobe-garamond-pro'
+    ctx.fillStyle = `rgb(${120*contrast}, ${10*contrast}, ${20*contrast})`
+    ctx.textAlign = 'center'
+    
+    ctx.shadowBlur = 4*s
+    ctx.shadowColor = `rgba(255, 20, 20, .2)`
+
+    ctx.scale(1, 1.3)
+    ctx.fillText(captionInput.value, w/2, (h/2 + 50*s)/1.3 )
+}
+
+/** Save the current contents of the canvas to the user's computer. */
 function saveImage() {
     // Turn "image/xyz" to "xyz"
     let imageType = selectedImageType?.replace(/(.*)\//g, '')
@@ -208,6 +276,5 @@ function saveImage() {
     saveLink.setAttribute('download', captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
     saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
 
-    //// Click it
     saveLink.click()
 }

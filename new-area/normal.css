@@ -1,0 +1,39 @@
+/* 
+ *
+ *  I NABBED THESE FROM BOOTSTRAP ETC.
+ *
+**/
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+}
+button, input, select, textarea {
+    margin: 0;
+    font: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+input[type=range] {
+    display: block;
+    width: 100%;
+}
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+}

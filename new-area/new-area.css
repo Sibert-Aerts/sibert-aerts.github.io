@@ -14,6 +14,12 @@
     user-select: none;
 }
 
+a {
+    text-decoration: underline;
+    color: white;
+}
+    a:hover { color: orange }
+
 body {
     font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
     font-weight: 400;
@@ -38,6 +44,7 @@ body {
 }
 #main.transp { background: none }
 #main.chroma { background: none; background-color: #00f;  }
+
 
 .content {
     background-color: rgba(0, 8, 8, 0.7);
@@ -215,7 +222,7 @@ body {
     opacity: 0.6;
 }
 
-textarea, input {
+textarea, input, select {
     background-color: #dfe0d9;
     font-family: Dejavu Sans Mono, Courier New;
     color: black;
@@ -250,13 +257,6 @@ label > input {
         font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
         font-size: 18px;
     }
-
-    .credit > a {
-        text-decoration: underline;
-        color: white;
-    }
-        .credit > a:hover { color: orange }
-    
     .credit > .dash {
         margin-left: 10px;
         margin-right: 10px;
@@ -333,18 +333,23 @@ label > input {
     float: right;
 }
 
-canvas {
+canvas.small {
     max-width: 720px;
     max-height: 480px;
     border: 1px solid #fff3;
 }
+canvas.big {
+    max-height: 70vh;
+    max-width: 120vw;
+    border: 1px solid #fff3;
+}
 
-#image-input-wrapper > * {
+.image-input-wrapper > * {
     padding-left: 5px; padding-right: 5px;
     margin-bottom: 8px;
 }
 
-#image-input-wrapper > .smol {
+.image-input-wrapper > .smol {
     float: left;
     width: 100%; max-width: 200px;
 }
