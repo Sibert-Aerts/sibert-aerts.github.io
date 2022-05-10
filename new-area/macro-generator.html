@@ -22,7 +22,8 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        window['ga-disable-G-HCGGJHJ3DR'] = JSON.parse(localStorage.getItem('disable-ga')) ?? false
+        disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.[0]?.endsWith('1') ?? false
+        window['ga-disable-G-HCGGJHJ3DR'] = disable
         function gtag(){ dataLayer.push(arguments) }
         gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
     </script>
@@ -127,7 +128,7 @@
 
     <div id=credits>
         <div class="credit left" style=line-height:1em>
-            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="localStorage.setItem('disable-ga', this.checked)"></label>
+            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'disable-ga=' + +this.checked"></label>
             <br>
             <span style="opacity: 0.8; font-size: 16px">
                 Image composition happens in-app; No data is ever sent to a server, all images are 100% private.
@@ -148,5 +149,8 @@
 <!-- My other script -->
 <script type="text/javascript" src="image-gen.js"></script>
 <script type="text/javascript">redrawImage()</script>
+<script type="text/javascript">
+    document.querySelector("input[target=disable-ga]").checked = window['ga-disable-G-HCGGJHJ3DR']
+</script>
 
 </html>

@@ -120,7 +120,7 @@ $(document).ready(function () {
     // Bind the checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
     $("input[target=disable-anims]").attr('checked', localStorage.getItem('disable-anims') === 'true')
-    $("input[target=disable-ga]").attr('checked', localStorage.getItem('disable-ga') === 'true')
+    $("input[target=disable-ga]").attr('checked', window['ga-disable-G-HCGGJHJ3DR'])
 
     // Add a "minimise" button to each lesser content box
     $(".minimise").each( (i, m) => {

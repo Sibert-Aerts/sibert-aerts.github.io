@@ -22,7 +22,8 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        window['ga-disable-G-HCGGJHJ3DR'] = JSON.parse(localStorage.getItem('disable-ga')) ?? false
+        disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.[0]?.endsWith('1') ?? false
+        window['ga-disable-G-HCGGJHJ3DR'] = disable
         function gtag(){ dataLayer.push(arguments) }
         gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
     </script>
@@ -244,7 +245,7 @@
         <div class="credit left" style=line-height:1em>
             <label style=font-weight:regular>Latest inclusion: Elden Ring (2022)</label><br>
             <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
-            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="localStorage.setItem('disable-ga', this.checked)"></label>
+            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'disable-ga=' + +this.checked"></label>
         </div>
 
         <div class="credit right">
