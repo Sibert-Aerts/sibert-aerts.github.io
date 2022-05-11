@@ -38,26 +38,30 @@
     <meta name=twitter:creator content=@rezuaq>
     <meta name=twitter:title content="FromSoft Image Macro Generator">
     <meta name=twitter:description content="Create realistic looking image macros based on FromSoft games.">
-    <meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png> <!-- TODO: GET BETTER CARD -->
+    <meta name=twitter:image content=https://i.imgur.com/SQIbRCO.png> <!-- TEMP IMAGE -->
         
 </head>
 
 <body style="background-image: url(https://i.imgur.com/Fcq8N5o.jpg)">
-    <div id=background-layer class="background-layer faded"></div>
+<div id=background-layer class="background-layer faded"></div>
 
-    <div class=content style="position: relative; margin-top: 2vw; margin-bottom: 200px; margin-left: 2vw; width: 94vw; max-width: none">
+<div id=main>
+    <div class=content style="position: relative; margin-top: 2vw; margin-bottom: 100px; margin-left: 2vw; width: 94vw; max-width: none">
         <h1>FromSoftware image macro generator</h1>
         <button class="emoji-button minimise"></button>
 
         <div class=body>
             <div class=help>
-                Select an image to put convincing FromSoftware game overlays on it.
+                Select, link or paste an image to put convincing FromSoftware game overlays on it.
                 Currently implements only Dark Souls 3 style image macros.
             </div><br>
 
             <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
-                <canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
+                <canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas>
             </div>
+            
+            <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px</div>
+            
 
             <div style="display:flex; flex-wrap: wrap; justify-content:center; margin:1em">
                 <div class=image-input-wrapper style="width:100%; max-width:400px">
@@ -81,7 +85,7 @@
                         <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
                     </div>
                     <div>
-                        <span class=input-title>Limit image resolution:</span>
+                        <span class=input-title>Constrain resolution:</span>
                         <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
                         <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                     </div>
@@ -121,9 +125,10 @@
             </div>
         </div>
     </div>
+</div>
 
 
-
+<div id=footer class=never-fixed>
     <div class=bottom-fade></div>
 
     <div id=credits>
@@ -143,6 +148,7 @@
             <a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
         </div>
     </div>
+</div>
 
 </body>
 

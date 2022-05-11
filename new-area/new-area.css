@@ -21,11 +21,14 @@ a {
     a:hover { color: orange }
 
 body {
+    min-height: 100vh;
+    display: flex; 
+    flex-direction: column; 
+
     font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
     font-weight: 400;
     font-style: normal;
     color: white;
-    margin-bottom: 40px;
     
     background-attachment: fixed;
     background-position-x: center;
@@ -36,15 +39,17 @@ body {
 }
 
 #main {
-    position: relative;
-    margin-top: 6vw;
-    margin-bottom: 2vw;
-    margin-left: 5vw;
-    width: 90vw;
+    width: 100%
 }
-#main.transp { background: none }
-#main.chroma { background: none; background-color: #00f;  }
-
+#footer {
+    position: fixed;
+    bottom: 0;
+    margin-top: auto;
+    width: 100%;
+}
+    #footer.never-fixed {
+        position: relative;
+    }
 
 .content {
     background-color: rgba(0, 8, 8, 0.7);
@@ -53,7 +58,13 @@ body {
     border-radius: 8px;
     max-width: 90vw;
 }
-
+    .content.main {
+        position: relative;
+        margin-top: 6vw;
+        margin-bottom: 2vw;
+        margin-left: 5vw;
+        width: 90vw;
+    }
     .content.lesser {
         margin-top: 20px;
         margin-left: 0px;
@@ -61,8 +72,10 @@ body {
         float: left;
         width: auto;
     }
+    .content.transp { background: none }
+    .content.chroma { background: none; background-color: #00f;  }
 
-    .content h4 {
+    .content h4, .content h1 {
         margin-top: 0;
         display: inline-block;
         margin-right: 20px;
@@ -232,9 +245,7 @@ label > input {
 }
 
 #credits {
-    position: fixed;
-    bottom: 0px;
-    width: 100vw;
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -265,7 +276,7 @@ label > input {
 .bottom-fade {
     width: 100%;
     height: 80px;
-    position: fixed;
+    position: absolute;
     bottom: 0px;
     pointer-events: none;
 
@@ -387,8 +398,8 @@ input.bad-url {
     #main {
         padding-bottom: 30px; /* hack for the dumb emoji buttons to fit */
     }
-    #credits {
-        position: inherit;
+    #footer {
+        position: relative;
     }
     body {
         margin-bottom: 0

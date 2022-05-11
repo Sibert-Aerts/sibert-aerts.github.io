@@ -44,10 +44,11 @@
 </head>
 
 <body>
-    <div id=background-layer class="background-layer faded"></div>
-    <div id=world-layer class="background-layer faded"></div>
+<div id=background-layer class="background-layer faded"></div>
+<div id=world-layer class="background-layer faded"></div>
 
-    <div id=main class=content>
+<div id=main>
+    <div class='main content'>
         
         <div id=stars class=unselectable>&nbsp;</div>
 
@@ -101,13 +102,14 @@
 
             <div class=body hidden>
                 <div class=help style=width:700px;max-width:80vw>
-                    Select an image to put a convincing area name pop-up on it. <br>
+                    Select, link or paste an image to put a convincing area name pop-up on it. <br>
                     (Image composition happens in-app; No data is ever sent to a server, all images are 100% private.)
                 </div><br>
 
                 <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
                     <canvas id=canvas class=small width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
                 </div>
+                <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px</div>
 
                 <div style="display:flex; justify-content:center; margin:1em">
                     <div class=image-input-wrapper style="width:100%; max-width:400px">
@@ -238,7 +240,9 @@
         </div>
 
     </div>
+</div>
 
+<div id=footer>
     <div class=bottom-fade></div>
 
     <div id=credits>
@@ -256,6 +260,7 @@
             <a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
         </div>
     </div>
+</div>
 
 </body>
 

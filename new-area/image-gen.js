@@ -1,18 +1,22 @@
 /*
-    Script for the image macro generator on (https://sibert-aerts.github.io/new-area/)
+    Script for the image macro generator on (https://sibert-aerts.github.io/new-area/) and (https://sibert-aerts.github.io/new-area/macro-generator.html)
 */
 
+//// UTIL FUNCTIONS
 const byId = id => document.getElementById(id)
 const getInput = name => document.getElementsByTagName('input').namedItem(name)
 
-// INTERNALS
+
+//// DOM HOOKS
 /** @type HTMLCanvasElement */
 const canvas = byId('canvas')
 const ctx = canvas.getContext('2d')
 
 const saveLink = document.createElement('a')
 
-// USER CONTROLS
+const dimView = {x: byId('canv-dim-x'), y: byId('canv-dim-y') }
+
+//// USER CONTROLS
 const macroTypeSelect = byId('macro-type')
 macroTypeSelect.onchange = redrawImage
 
@@ -27,10 +31,12 @@ imageURL.onkeyup = e => { if (e.keyCode == 13) handleImageURL() }
 const fileSelect = byId('image-upload')
 fileSelect.onchange = handleFileSelect
 
+document.addEventListener('paste', handlePaste)
+
 const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
 
-// SLIDERS
+//// SLIDERS
 const x0Input = getInput('x-offset')
 const y0Input = getInput('y-offset')
 const scaleInput = getInput('scale')
@@ -114,6 +120,24 @@ function handleImageURL() {
     selectedImage.src = imageURL.value
 }
 
+/** Callback that checks if the user is pasting an image onto the page. */
+function handlePaste(e) {
+    /** @type DataTransferItemList */
+    const clipboardItems = e.clipboardData.items
+    const items = Array.from(clipboardItems).filter(item => item.type.startsWith('image'))
+    if ( !items.length ) return
+    const file = items[0].getAsFile()
+    
+    var reader = new FileReader()
+    reader.onload = function(event) {
+        selectedImage = new Image()
+        selectedImage.onload = redrawImage
+        selectedImage.src = event.target.result
+    }
+    reader.readAsDataURL(file)
+    selectedImageType = file.type
+}
+
 /** Check whether the current canvas is too big to allow auto-rerendering. */
 function canvasTooBig() {
     return (selectedImage && canvas.width*canvas.height >= 2100000)
@@ -150,6 +174,8 @@ function redrawImage() {
         }
     }
     byId('resolution-warning').hidden = !canvasTooBig()
+    dimView.x.textContent = canvas.width
+    dimView.y.textContent = canvas.height
     
     console.log(macroTypeSelect.value)
 
