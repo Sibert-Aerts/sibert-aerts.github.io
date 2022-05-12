@@ -64,12 +64,13 @@
             
 
             <div style="display:flex; flex-wrap: wrap; justify-content:center; margin:1em">
-                <div class=image-input-wrapper style="width:100%; max-width:400px">
+                <div class=image-input-wrapper>
+                    <h4 style="margin-bottom: .5em"> Configuration </h4>
                     <div>
-                        <span class=input-title>Type:</span>
-                        <select id=macro-type width="288px" style="margin-left:30px">
-                            <option value=ds3-area>Area Name</option>
-                            <option value=ds3-death>You Died</option>
+                        <span class=input-title>Macro type:</span>
+                        <select id=macro-type style="margin-left:25px">
+                            <option value=ds3-area>DS3 - Area Name</option>
+                            <option value=ds3-death>DS3 - You Died</option>
                         </select>
                     </div>
                     <div>
@@ -90,7 +91,8 @@
                         <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                     </div>
                 </div>
-                <div class=image-input-wrapper style="width:100%; max-width:400px">
+                <div class=image-input-wrapper>
+                    <h4> Overlay options </h4>
                     <div>
                         <span class=input-title>Horizontal offset:</span>
                         <button class=emoji-button name=x-offset value=0 style="float:right">🔄</button>
@@ -117,6 +119,24 @@
                         <input type=range name=contrast min=0 max=3 step=0.1 value=1>
                     </div>
                 </div>
+                <div class=image-input-wrapper>
+                    <h4> Image filters </h4>
+                    <div>
+                        <span class=input-title>Saturation:</span>
+                        <button class=emoji-button name=img-saturate value=100 style="float:right">🔄</button>
+                        <input type=range name=img-saturate min=0 max=200 step=1 value=100>
+                    </div>
+                    <div>
+                        <span class=input-title>Contrast:</span>
+                        <button class=emoji-button name=img-contrast value=100 style="float:right">🔄</button>
+                        <input type=range name=img-contrast min=0 max=200 step=1 value=100>
+                    </div>
+                    <div>
+                        <span class=input-title>Brightness:</span>
+                        <button class=emoji-button name=img-brightness value=100 style="float:right">🔄</button>
+                        <input type=range name=img-brightness min=0 max=200 step=1 value=100>
+                    </div>
+                </div>
             </div>
 
             <div style=position:absolute;right:30px;bottom:10px>
@@ -129,7 +149,7 @@
 
 
 <div id=footer class=never-fixed>
-    <div class=bottom-fade></div>
+    <div id=bottom-fade></div>
 
     <div id=credits>
         <div class="credit left" style=line-height:1em>

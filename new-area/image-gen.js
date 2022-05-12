@@ -37,17 +37,25 @@ const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
 
 //// SLIDERS
+////    MACRO SLIDERS
 const x0Input = getInput('x-offset')
 const y0Input = getInput('y-offset')
 const scaleInput = getInput('scale')
 const underlineInput = getInput('underline')
 const contrastInput = getInput('contrast')
+////    IMAGE SLIDERS
+const imgSaturate = getInput('img-saturate')
+const imgContrast = getInput('img-contrast')
+const imgBrightness = getInput('img-brightness')
+
 x0Input.onchange = y0Input.onchange = scaleInput.onchange = underlineInput.onchange = contrastInput.onchange
     = autoRedraw
+if( imgSaturate )
+    imgSaturate.onchange = imgContrast.onchange = imgBrightness.onchange = autoRedraw
 
-for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast'] ) {
+for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast', 'img-saturate', 'img-contrast', 'img-brightness'] ) {
     const button = document.getElementsByTagName('button').namedItem(name)
-    button.onclick = () => { getInput(name).value = button.value; redrawImage() }
+    if(button) button.onclick = () => { getInput(name).value = button.value; redrawImage() }
 }
 
 // STATE
@@ -69,6 +77,7 @@ function resetCtxState() {
     ctx.shadowOffsetY = null
     ctx.font = null
     ctx.textAlign = null
+    ctx.filter = 'none'
 }
 
 /** File Selector callback function. */
@@ -151,6 +160,12 @@ function autoRedraw() {
     if(!canvasTooBig()) redrawImage()
 }
 
+function resizeCanvas(width, height) {
+    if( canvas.width !== width || canvas.height !== height ) {
+        canvas.width = width; canvas.height = height
+    }
+}
+
 /** 
  * Call after major changes;
  * Blanks the canvas, redraws the selected image if any, and draws the text on top.
@@ -161,23 +176,25 @@ function redrawImage() {
 
     if( selectedImage ) {
         if( resolutionCheckbox.checked ) {
-            const scale = Math.min( 1920/selectedImage.width, 1080/selectedImage.height, 1)
-            canvas.width = selectedImage.width * scale
-            canvas.height = selectedImage.height * scale
+            // Constrain image to be no larger than 1920x1080
+            const scale = Math.min(1920/selectedImage.width, 1080/selectedImage.height, 1)
+            resizeCanvas(selectedImage.width*scale, selectedImage.height*scale)
             ctx.scale(scale, scale)
-            ctx.drawImage(selectedImage, 0, 0)
 
         } else {
-            canvas.width = selectedImage.width
-            canvas.height = selectedImage.height
-            ctx.drawImage(selectedImage, 0, 0)
+            resizeCanvas(selectedImage.width, selectedImage.height)
         }
+        
+        if( imgSaturate )
+            ctx.filter = `saturate(${imgSaturate.value}%) contrast(${imgContrast.value}%) brightness(${imgBrightness.value}%)`
+        
+        ctx.drawImage(selectedImage, 0, 0)
+        ctx.filter = 'none'
     }
     byId('resolution-warning').hidden = !canvasTooBig()
     dimView.x.textContent = canvas.width
     dimView.y.textContent = canvas.height
     
-    console.log(macroTypeSelect.value)
 
     if( macroTypeSelect.value === 'ds3-area' )
         drawDS3AreaName()

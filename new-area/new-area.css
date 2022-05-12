@@ -46,9 +46,13 @@ body {
     bottom: 0;
     margin-top: auto;
     width: 100%;
+    pointer-events: none;
 }
     #footer.never-fixed {
         position: relative;
+    }
+    #footer > * {
+        pointer-events: all;
     }
 
 .content {
@@ -273,7 +277,7 @@ label > input {
         margin-right: 10px;
     }
 
-.bottom-fade {
+#bottom-fade {
     width: 100%;
     height: 80px;
     position: absolute;
@@ -355,12 +359,24 @@ canvas.big {
     border: 1px solid #fff3;
 }
 
-.image-input-wrapper > * {
+.image-input-wrapper {
+    width: 100%; max-width: 400px;
+    margin-bottom: 1em;
+}
+
+.image-input-wrapper > h4 {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.image-input-wrapper > div {
     padding-left: 5px; padding-right: 5px;
     margin-bottom: 8px;
 }
 
-.image-input-wrapper > .smol {
+.image-input-wrapper > div.smol {
     float: left;
     width: 100%; max-width: 200px;
 }
