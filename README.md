@@ -1,8 +1,9 @@
-# Rezuaq.be (sibert-aerts.github.io)
+# Rezuaq.be
 my webzone
 
 ## Finished pages:
 * [FromSoftware area name generator](/new-area)
+* [FromSoftware image macro generator](/new-area/macro-generator.html)
 * [Evangelion title card generator](/evangelion)
 * [Affine fractal generator](/fractal)
 
