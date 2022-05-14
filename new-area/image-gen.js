@@ -2,20 +2,243 @@
     Script for the image macro generator on (https://sibert-aerts.github.io/new-area/) and (https://sibert-aerts.github.io/new-area/macro-generator.html)
 */
 
-//// UTIL FUNCTIONS
+///// TINY DOM UTIL FUNCTIONS
 const byId = id => document.getElementById(id)
-const makeElem = (tag, clss, text) => { let e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
 const getInput = name => document.getElementsByTagName('input').namedItem(name)
+const makeElem = (tag, clss, text) => { let e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
 
 
-//// DOM HOOKS
-/** @type HTMLCanvasElement */
-const canvas = byId('canvas')
-const ctx = canvas.getContext('2d')
+window.addEventListener('load', function() {
+    // Fill out the macro selection box.
+    if( macroTypeSelect ) {
+        for( const layerType of layerTypeList ) {
+            const elem = makeElem('option', null, layerType.name)
+            elem.value = layerType.key
+            macroTypeSelect.appendChild(elem)
+        }
+    }
+})
 
-const saveLink = document.createElement('a')
+/** Handles incoming images. */
+class ImageHandler {
+    /** @type ImageGenerator */
+    owner
+    /** @type HTMLImageElement */
+    image = null
+    /** @type string */
+    imageType = null
+    
+    URLinput = byId('image-URL')
+    fileSelect = byId('image-upload')
 
-const dimView = {x: byId('canv-dim-x'), y: byId('canv-dim-y') }
+    constructor(owner) {
+        this.owner = owner
+        // URL event bindings
+        this.URLinput.onchange = this.handleImageURL.bind(this)
+        this.URLinput.onkeyup = e => { if (e.keyCode == 13) this.handleImageURL() }
+        // File select event bindings
+        this.fileSelect.onchange = this.handleFileSelect.bind(this)
+        // Paste event bindings
+        document.addEventListener('paste', this.handlePaste.bind(this))        
+    }
+
+    /** File Selector callback function. */
+    handleFileSelect() {
+        this.image = this.imageType = null
+
+        if( !this.fileSelect.files.length ) {
+            if( this.URLinput.value )
+                this.handleImageURL()
+            else
+                this.onerror()
+            return
+        }
+        const reader = new FileReader()
+        reader.onload = e => {
+            this.image = new Image()
+            this.image.onload = this.onload.bind(this)
+            this.image.src = event.target.result
+        }
+        reader.readAsDataURL(this.fileSelect.files[0])
+        this.imageType = this.fileSelect.files[0].type
+    }
+
+    /** Image URL callback function. */
+    handleImageURL() {
+        this.image = this.imageType = null
+        this.URLinput.classList.remove('bad-url')
+
+        if( !this.URLinput.value ) {
+            if( this.fileSelect.files.length )
+                this.handleFileSelect()
+            else
+                this.onerror()
+            return
+        }
+        this.image = new Image()
+        this.image.crossOrigin = 'anonymous'
+
+        this.image.onload = this.onload.bind(this)
+        this.image.onerror = e => {
+            console.error('Failed to load provided image URL:', this.URLinput.value, e)
+            this.URLinput.classList.add('bad-url')
+            this.onerror()
+        }
+        // Attempt to pull image type from URL
+        this.imageType = this.URLinput.value.match(/\.(\w+)$/)?.[1]
+        this.image.src = this.URLinput.value
+    }
+
+    /** Callback that checks if the user is pasting an image onto the page. */
+    handlePaste(e) {
+        /** @type DataTransferItemList */
+        const clipboardItems = e.clipboardData.items
+        const items = Array.from(clipboardItems).filter(item => item.type.startsWith('image'))
+        if ( !items.length ) return
+        const file = items[0].getAsFile()
+        
+        var reader = new FileReader()
+        reader.onload = e => {
+            this.image = new Image()
+            this.image.onload = this.onload.bind(this)
+            this.image.src = e.target.result
+        }
+        reader.readAsDataURL(file)
+        this.imageType = file.type
+    }
+
+    onload() {
+        this.owner.redrawImage()
+    }
+    onerror() {
+        this.image = this.imageType = undefined
+        this.owner.clear()
+    }
+}
+
+
+class ImageGenerator {
+    /** @type readonly HTMLCanvasElement */
+    canvas = byId('canvas')
+    /** @type readonly CanvasRenderingContext2D  */
+    ctx = this.canvas.getContext('2d')
+
+    /** @type readonly HTMLAnchorElement   */
+    saveLink = document.createElement('a')
+    /** The two dimension view elements */
+    dimView = {x: byId('canv-dim-x'), y: byId('canv-dim-y')}
+
+    /** @type ImageHandler */
+    imageHandler
+
+    constructor() {
+        this.imageHandler = new ImageHandler(this)
+    }
+
+    /** Check whether the current canvas is too big to allow auto-rerendering. */
+    canvasTooBig() {
+        return (this.imageHandler.image && this.canvas.width*this.canvas.height >= 2100000)
+    }
+    
+    /** Resize the canvas only if necessary. */
+    resizeCanvas(width, height) {
+        if( this.canvas.width !== width || this.canvas.height !== height ) {
+            this.canvas.width = width; this.canvas.height = height
+        }
+    }
+    
+    /** Called when no image is drawn */
+    clear() {
+        this.canvas.width = 1920; this.canvas.height = 1080
+        this.redrawImage()
+    }
+
+    /** Wipes all `ctx` and `canvas` properties that may affect drawing to the canvas. */
+    resetDrawingState() {
+        // Clear out the ctx drawing state
+        const ctx = this.ctx
+        ctx.setTransform(1, 0, 0, 1, 0, 0)
+        ctx.fillStyle = null
+        ctx.shadowBlur = null
+        ctx.shadowColor = null
+        ctx.shadowOffsetX = null
+        ctx.shadowOffsetY = null
+        ctx.font = null
+        ctx.textAlign = null
+        ctx.textBaseline = 'alphabetic'
+        ctx.filter = 'none'
+    
+        // On Chrome the canvas styling may affect drawing
+        if( !!window.chrome ) {
+            this.canvas.style.letterSpacing = null
+        }
+    }
+
+    /** 
+     * Call after minor input changes;
+     * Calls redrawImage() only if the underlying canvas isn't too huge for this feature to be laggy.
+     */
+    autoRedraw() {
+        if(!this.canvasTooBig()) this.redrawImage()
+    }
+
+    /** 
+     * Call after major changes;
+     * Blanks the canvas, redraws the selected image if any, and draws the text on top.
+     */
+    redrawImage() {
+        const ctx = this.ctx
+        this.resetDrawingState()
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+    
+        if( this.imageHandler.image ) {
+            const image = this.imageHandler.image
+
+            if( resolutionCheckbox.checked ) {
+                // Constrain image to be no larger than 1920x1080
+                const scale = Math.min(1920/image.width, 1080/image.height, 1)
+                this.resizeCanvas(image.width*scale, image.height*scale)
+                ctx.scale(scale, scale)
+    
+            } else {
+                this.resizeCanvas(image.width, image.height)
+            }
+            
+            if( imgSaturate )
+                ctx.filter = `saturate(${imgSaturate.value}%) contrast(${imgContrast.value}%) brightness(${imgBrightness.value}%)`
+            
+            ctx.drawImage(image, 0, 0)
+            ctx.filter = 'none'
+        }
+        // UI changes
+        byId('resolution-warning').hidden = !this.canvasTooBig()
+        this.dimView.x.textContent = canvas.width
+        this.dimView.y.textContent = canvas.height        
+    
+        this.resetDrawingState()
+        layerTypes[macroTypeSelect.value].draw(ctx, this.canvas)
+    }
+
+    /** Save the current contents of the canvas to the user's computer. */
+    saveImage() {
+        // Turn "image/xyz" to "xyz"
+        let imageType = this.imageHandler.imageType?.replace(/(.*)\//g, '')
+
+        // Normalise to either "jpeg" or "png"
+        if( imageType === 'jpg' ) imageType = 'jpeg'
+        else if( imageType !== 'jpeg' ) imageType = 'png'
+
+        // Set the file name and put the image data
+        this.saveLink.setAttribute('download', captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
+        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
+
+        this.saveLink.click()
+    }
+}
+
+const imageGen = new ImageGenerator()
+const redrawImage = imageGen.redrawImage.bind(imageGen)
+const autoRedraw = imageGen.autoRedraw.bind(imageGen)
 
 //// USER CONTROLS
 const macroTypeSelect = byId('macro-type')
@@ -24,15 +247,6 @@ macroTypeSelect.onchange = redrawImage
 const captionInput = byId('image-caption')
 captionInput.oninput = autoRedraw
 captionInput.onkeyup = e => { if (e.keyCode == 13) redrawImage() }
-
-const imageURL = byId('image-URL')
-imageURL.onchange = handleImageURL
-imageURL.onkeyup = e => { if (e.keyCode == 13) handleImageURL() }
-
-const fileSelect = byId('image-upload')
-fileSelect.onchange = handleFileSelect
-
-document.addEventListener('paste', handlePaste)
 
 const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
@@ -59,198 +273,7 @@ for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast', 'i
     if(button) button.onclick = () => { getInput(name).value = button.value; redrawImage() }
 }
 
-// STATE
-var selectedImage
-var selectedImageType
 
-function handleBlank() {
-    selectedImage = selectedImageType = undefined
-    canvas.width = 1920; canvas.height = 1080
-    redrawImage()
-}
-
-function resetDrawingState() {
-    // Clear out the ctx drawing state
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.fillStyle = null
-    ctx.shadowBlur = null
-    ctx.shadowColor = null
-    ctx.shadowOffsetX = null
-    ctx.shadowOffsetY = null
-    ctx.font = null
-    ctx.textAlign = null
-    ctx.filter = 'none'
-
-    // On Chrome the canvas styling may affect drawing
-    if( !!window.chrome ) {
-        canvas.style.letterSpacing = null
-    }
-}
-
-/** File Selector callback function. */
-function handleFileSelect() {
-    selectedImage = selectedImageType = null
-
-    if( !fileSelect.files.length ) {
-        if( imageURL.value )
-            handleImageURL()
-        else
-            handleBlank()
-        return
-    }
-    var reader = new FileReader()
-    reader.onload = function(event) {
-        selectedImage = new Image()
-        selectedImage.onload = redrawImage
-        selectedImage.src = event.target.result
-    }
-    reader.readAsDataURL(fileSelect.files[0])
-    selectedImageType = fileSelect.files[0].type
-}
-
-/** Image URL callback function. */
-function handleImageURL() {
-    selectedImage = selectedImageType = null
-
-    if( !imageURL.value ) {
-        imageURL.classList.remove('bad-url')
-        if( fileSelect.files.length )
-            handleFileSelect()
-        else
-            handleBlank()
-        return
-    }
-    selectedImage = new Image()
-    selectedImage.crossOrigin = 'anonymous'
-    selectedImage.onload = function() {
-        redrawImage()
-        imageURL.classList.remove('bad-url')
-    }
-    selectedImage.onerror = function(e) {
-        console.error('Failed to load provided image URL:', imageURL.value, e)
-        imageURL.classList.add('bad-url')
-        handleBlank()
-    }
-    // Attempt to pull image type from URL
-    selectedImageType = imageURL.value.match(/\.(\w+)$/)?.[1]
-    selectedImage.src = imageURL.value
-}
-
-/** Callback that checks if the user is pasting an image onto the page. */
-function handlePaste(e) {
-    /** @type DataTransferItemList */
-    const clipboardItems = e.clipboardData.items
-    const items = Array.from(clipboardItems).filter(item => item.type.startsWith('image'))
-    if ( !items.length ) return
-    const file = items[0].getAsFile()
-    
-    var reader = new FileReader()
-    reader.onload = function(event) {
-        selectedImage = new Image()
-        selectedImage.onload = redrawImage
-        selectedImage.src = event.target.result
-    }
-    reader.readAsDataURL(file)
-    selectedImageType = file.type
-}
-
-/** Check whether the current canvas is too big to allow auto-rerendering. */
-function canvasTooBig() {
-    return (selectedImage && canvas.width*canvas.height >= 2100000)
-}
-
-/** 
- * Call after minor input changes;
- * Calls redrawImage() only if the underlying canvas isn't too huge for this feature to be laggy.
- */
-function autoRedraw() {
-    if(!canvasTooBig()) redrawImage()
-}
-
-function resizeCanvas(width, height) {
-    if( canvas.width !== width || canvas.height !== height ) {
-        canvas.width = width; canvas.height = height
-    }
-}
-
-/** 
- * Call after major changes;
- * Blanks the canvas, redraws the selected image if any, and draws the text on top.
- */
-function redrawImage() {
-    resetDrawingState()
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    if( selectedImage ) {
-        if( resolutionCheckbox.checked ) {
-            // Constrain image to be no larger than 1920x1080
-            const scale = Math.min(1920/selectedImage.width, 1080/selectedImage.height, 1)
-            resizeCanvas(selectedImage.width*scale, selectedImage.height*scale)
-            ctx.scale(scale, scale)
-
-        } else {
-            resizeCanvas(selectedImage.width, selectedImage.height)
-        }
-        
-        if( imgSaturate )
-            ctx.filter = `saturate(${imgSaturate.value}%) contrast(${imgContrast.value}%) brightness(${imgBrightness.value}%)`
-        
-        ctx.drawImage(selectedImage, 0, 0)
-        ctx.filter = 'none'
-    }
-    // UI changes
-    byId('resolution-warning').hidden = !canvasTooBig()
-    dimView.x.textContent = canvas.width
-    dimView.y.textContent = canvas.height
-    
-
-    layerTypes[macroTypeSelect.value].draw()
-}
-
-/** Save the current contents of the canvas to the user's computer. */
-function saveImage() {
-    // Turn "image/xyz" to "xyz"
-    let imageType = selectedImageType?.replace(/(.*)\//g, '')
-
-    // Normalise to either "jpeg" or "png"
-    if( imageType === 'jpg' ) imageType = 'jpeg'
-    else if( imageType !== 'jpeg' ) imageType = 'png'
-
-    // Set the file name and put the image data
-    saveLink.setAttribute('download', captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
-    saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
-
-    saveLink.click()
-}
-
-
-window.addEventListener('load', function() {
-    if( macroTypeSelect ) {
-        for( const layerType of layerTypeList ) {
-            const elem = makeElem('option', null, layerType.name)
-            elem.value = layerType.key
-            macroTypeSelect.appendChild(elem)
-        }
-    }
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////// NEO
 
 
 
@@ -267,9 +290,7 @@ const ds1Victory = {
     key: 'ds1-victory',
     name: 'DS1 - Victory',
 
-    draw() {
-        resetDrawingState()
-    
+    draw(ctx, canvas) {
         // Prefer all-caps caption
         if( captionInput.value === 'Enter Caption' )
             captionInput.value = 'ENTER CAPTION'
@@ -291,7 +312,7 @@ const ds1Victory = {
         // SHADE
         if( shadeScale > 0 ) {
             const shadeHeight = shadeScale * .25*h
-            const SHADECENTER = .525*h
+            const SHADECENTER = .53*h
             const top = SHADECENTER-shadeHeight/2, bottom = SHADECENTER+shadeHeight/2
     
             const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
@@ -317,12 +338,15 @@ const ds1Victory = {
     
         ctx.font = Math.floor(92*s) + 'px adobe-garamond-pro'
         ctx.textAlign = 'center'
-        const MAGICOFFSET = 69*s
+        ctx.textBaseline = 'middle'
+
+        const MAGICOFFSET = .032*h
         ctx.translate(0, MAGICOFFSET)
         
         const VSCALE = 1.5
         ctx.scale(1, VSCALE)
-            
+        ctx.save()
+
         // Emulate the zoom blur effect
         const zoomSteps = Math.floor(20 * Math.pow(s, 1/4))
         const ZOOMSIZE = 1.10
@@ -330,7 +354,7 @@ const ds1Victory = {
         const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
         // Zoom blur center offset
         const VOFFSET = MAGICOFFSET
-    
+
         for( let i=0; i<=zoomSteps; i++ ) {
             if( i ) ctx.scale(zoomFactor, zoomFactor)
             // `product` ranges from 1 up to and including ZOOMSIZE
@@ -342,11 +366,8 @@ const ds1Victory = {
             ctx.fillStyle = `rgba(255, 180, 60, ${0.1 / fatProduct})`
             ctx.fillText(caption, w/2/product, ((h/2-VOFFSET)/product+VOFFSET)/VSCALE)
         }
-    
-        resetDrawingState()
-        ctx.filter = 'none'
-        ctx.translate(x0, y0 + MAGICOFFSET)
-        ctx.scale(1, VSCALE)
+        
+        ctx.restore()
         ctx.fillStyle = `rgba(255, 255, 107, 0.9)`
         ctx.fillText(caption, w/2, h/2/VSCALE )
     }
@@ -357,9 +378,7 @@ const ds3Death = {
     key: 'ds3-death',
     name: 'DS3 - Death',
 
-    draw() {
-        resetDrawingState()
-
+    draw(ctx, canvas) {
         // Prefer all-caps caption
         if( captionInput.value === 'Enter Caption' )
             captionInput.value = 'ENTER CAPTION'
@@ -413,9 +432,7 @@ const ds3Area = {
     key: 'ds3-area',
     name: 'DS3 - Area Name',
 
-    draw() {
-        resetDrawingState()
-    
+    draw(ctx, canvas) {
         // Prefer title-case caption
         if( captionInput.value === 'ENTER CAPTION' )
             captionInput.value = 'Enter Caption'
