@@ -117,6 +117,39 @@ class ImageHandler {
 }
 
 
+class Sliders {
+
+    /** @type {HTMLInputElement[]} */
+    sliders = []
+
+    /**
+     * @param {HTMLElement} parent 
+     * @param {string[]} names 
+     */
+    constructor(parent, names) {
+        for( const name of names ) {
+            const slider = parent.getElementsByTagName('input').namedItem(name)
+            this.sliders.push(slider)
+            
+            const button = parent.getElementsByTagName('button').namedItem(name)
+            if (button) button.onclick = () => { slider.value = button.value; slider.onchange() }
+        }
+        this.usable = this.sliders.some(x => x)
+    }
+
+    values() {
+        const values = {}
+        for( const slider of this.sliders )
+            values[slider.name] = parseFloat(slider.value)
+        return values
+    }
+
+    setOnChange(callback) {
+        for( const slider of this.sliders ) if( slider ) slider.onchange = callback
+    }
+}   
+
+
 class ImageGenerator {
     /** @type readonly HTMLCanvasElement */
     canvas = byId('canvas')
@@ -204,8 +237,10 @@ class ImageGenerator {
                 this.resizeCanvas(image.width, image.height)
             }
             
-            if( imgSaturate )
-                ctx.filter = `saturate(${imgSaturate.value}%) contrast(${imgContrast.value}%) brightness(${imgBrightness.value}%)`
+            if( imageSliders.usable ) {
+                const {imgSaturate, imgContrast, imgBrightness} = imageSliders.values()
+                ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
+            }
             
             ctx.drawImage(image, 0, 0)
             ctx.filter = 'none'
@@ -252,27 +287,11 @@ const resolutionCheckbox = getInput('limit-resolution')
 resolutionCheckbox.onchange = redrawImage
 
 //// SLIDERS
-////    MACRO SLIDERS
-const x0Input = getInput('x-offset')
-const y0Input = getInput('y-offset')
-const scaleInput = getInput('scale')
-const underlineInput = getInput('underline')
-const contrastInput = getInput('contrast')
-////    IMAGE SLIDERS
-const imgSaturate = getInput('img-saturate')
-const imgContrast = getInput('img-contrast')
-const imgBrightness = getInput('img-brightness')
+const macroSliders = new Sliders(document, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
+macroSliders.setOnChange(autoRedraw)
 
-x0Input.onchange = y0Input.onchange = scaleInput.onchange = underlineInput.onchange = contrastInput.onchange
-    = autoRedraw
-if( imgSaturate )
-    imgSaturate.onchange = imgContrast.onchange = imgBrightness.onchange = autoRedraw
-
-for( const name of ['x-offset', 'y-offset', 'scale', 'underline', 'contrast', 'img-saturate', 'img-contrast', 'img-brightness'] ) {
-    const button = document.getElementsByTagName('button').namedItem(name)
-    if(button) button.onclick = () => { getInput(name).value = button.value; redrawImage() }
-}
-
+const imageSliders = new Sliders(document, ['imgSaturate', 'imgContrast', 'imgBrightness'])
+imageSliders.setOnChange(autoRedraw)
 
 
 
@@ -300,12 +319,13 @@ const ds1Victory = {
         let s = h/1080
     
         // USER INPUT
-        const x0 = (parseFloat(x0Input.value) + .4)/100 * w
-        const y0 = (parseFloat(y0Input.value))/100 * h
-        const s0 = 2**parseFloat(scaleInput.value)
+        const { xOffset, yOffset, scale, underline, contrast } = macroSliders.values()
+
+        const x0 = (xOffset + .4)/100 * w
+        const y0 = (yOffset)/100 * h
+        const s0 = 2**scale
         s *= s0
-        const shadeScale = parseFloat(underlineInput.value)/32 * s0
-        let contrast = parseFloat(contrastInput.value)
+        const shadeScale = underline/32 * s0
     
         // The shade only moves up or down
         ctx.translate(0, y0)
@@ -388,12 +408,13 @@ const ds3Death = {
         let s = h/1080
 
         // USER INPUT
-        const x0 = (parseFloat(x0Input.value) + .6)/100 * w
-        const y0 = (parseFloat(y0Input.value) + 1.8)/100 * h
-        const s0 = 2**parseFloat(scaleInput.value)
+        const { xOffset, yOffset, scale, underline, contrast } = macroSliders.values()
+        
+        const x0 = (xOffset + .6)/100 * w
+        const y0 = (yOffset + 1.8)/100 * h
+        const s0 = 2**scale
         s *= s0
-        const shadeScale = parseFloat(underlineInput.value)/32 * s0
-        let contrast = parseFloat(contrastInput.value)
+        const shadeScale = underline/32 * s0
 
         // The shade only moves up or down
         ctx.translate(0, y0)
@@ -442,13 +463,14 @@ const ds3Area = {
         let s = h/1080
     
         // USER INPUT
-        const x0 = parseFloat(x0Input.value)/100 * w
-        const y0 = parseFloat(y0Input.value)/100 * h
-        const s0 = 2**parseFloat(scaleInput.value)
+        let { xOffset, yOffset, scale, underline, contrast } = macroSliders.values()
+
+        const x0 = xOffset/100 * w
+        const y0 = yOffset/100 * h
+        const s0 = 2**scale
+        underline = underline/100
         ctx.translate(x0, y0)
         s *= s0
-        const underline = parseFloat(underlineInput.value)/100
-        let contrast = parseFloat(contrastInput.value)
     
         // UNDERLINE
         if( underline > 0 ) {
