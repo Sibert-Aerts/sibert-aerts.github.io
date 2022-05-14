@@ -63,12 +63,13 @@ var selectedImage
 var selectedImageType
 
 function handleBlank() {
-    selectedImage = selectedImageType = null
+    selectedImage = selectedImageType = undefined
     canvas.width = 1920; canvas.height = 1080
     redrawImage()
 }
 
-function resetCtxState() {
+function resetDrawingState() {
+    // Clear out the ctx drawing state
     ctx.setTransform(1, 0, 0, 1, 0, 0)
     ctx.fillStyle = null
     ctx.shadowBlur = null
@@ -78,6 +79,11 @@ function resetCtxState() {
     ctx.font = null
     ctx.textAlign = null
     ctx.filter = 'none'
+
+    // On Chrome the canvas styling may affect drawing
+    if( !!window.chrome ) {
+        canvas.style.letterSpacing = null
+    }
 }
 
 /** File Selector callback function. */
@@ -171,7 +177,7 @@ function resizeCanvas(width, height) {
  * Blanks the canvas, redraws the selected image if any, and draws the text on top.
  */
 function redrawImage() {
-    resetCtxState()
+    resetDrawingState()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     if( selectedImage ) {
@@ -200,11 +206,19 @@ function redrawImage() {
         drawDS3AreaName()
     else if ( macroTypeSelect.value === 'ds3-death' )
         drawDS3Death()
+    else if ( macroTypeSelect.value === 'ds1-victory' )
+        drawDS1Victory()
 }
+
+
 
 /** Called by redrawImage() */
 function drawDS3AreaName() {
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    resetDrawingState()
+
+    // Prefer title-case caption
+    if( captionInput.value === 'ENTER CAPTION' )
+        captionInput.value = 'Enter Caption'
 
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -261,7 +275,11 @@ function drawDS3AreaName() {
 
 /** Called by redrawImage() */
 function drawDS3Death() {
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    resetDrawingState()
+
+    // Prefer all-caps caption
+    if( captionInput.value === 'Enter Caption' )
+        captionInput.value = 'ENTER CAPTION'
 
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -304,6 +322,91 @@ function drawDS3Death() {
 
     ctx.scale(1, 1.3)
     ctx.fillText(captionInput.value, w/2, (h/2 + 50*s)/1.3 )
+}
+
+/** Called by redrawImage() */
+function drawDS1Victory() {
+    resetDrawingState()
+
+    // Prefer all-caps caption
+    if( captionInput.value === 'Enter Caption' )
+        captionInput.value = 'ENTER CAPTION'
+
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const x0 = (parseFloat(x0Input.value) + .4)/100 * w
+    const y0 = (parseFloat(y0Input.value))/100 * h
+    const s0 = 2**parseFloat(scaleInput.value)
+    s *= s0
+    const shadeScale = parseFloat(underlineInput.value)/32 * s0
+    let contrast = parseFloat(contrastInput.value)
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    // SHADE
+    if( shadeScale > 0 ) {
+        const shadeHeight = shadeScale * .25*h
+        const SHADECENTER = .525*h
+        const top = SHADECENTER-shadeHeight/2, bottom = SHADECENTER+shadeHeight/2
+
+        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
+        shadowGrad.addColorStop(0,   '#0000')
+        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * contrast**0.4})`)
+        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.7 * contrast**0.4})`)
+        shadowGrad.addColorStop(1,   '#0000')
+        ctx.fillStyle = shadowGrad
+        ctx.fillRect(0, top, w, shadeHeight)
+    }
+    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    // TEXT
+    caption = captionInput.value
+
+    // This feature only works on chromia, otherwise just inject hair-spaces between letters
+    if( !!window.chrome )
+        canvas.style.letterSpacing = Math.floor(8*s) + 'px'
+    else
+        caption = caption.split('').join(' ')
+
+    ctx.font = Math.floor(92*s) + 'px adobe-garamond-pro'
+    ctx.textAlign = 'center'
+    const MAGICOFFSET = 69*s
+    ctx.translate(0, MAGICOFFSET)
+    
+    const VSCALE = 1.5
+    ctx.scale(1, VSCALE)
+        
+    // Emulate the zoom blur effect
+    const zoomSteps = Math.floor(20 * Math.pow(s, 1/4))
+    const ZOOMSIZE = 1.10
+    // zoomFactor**zoomSteps = ZOOMSIZE
+    const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
+    // Zoom blur center offset
+    const VOFFSET = MAGICOFFSET
+
+    for( let i=0; i<=zoomSteps; i++ ) {
+        if( i ) ctx.scale(zoomFactor, zoomFactor)
+        // `product` ranges from 1 up to and including ZOOMSIZE
+        const product = Math.pow(ZOOMSIZE, i/zoomSteps)
+        // `fatProduct` ranges from 1 up to and including ±2
+        const fatProduct = product ** 7
+
+        ctx.filter = `blur(${Math.floor(s*fatProduct)}px`
+        ctx.fillStyle = `rgba(255, 180, 60, ${0.1 / fatProduct})`
+        ctx.fillText(caption, w/2/product, ((h/2-VOFFSET)/product+VOFFSET)/VSCALE)
+    }
+
+    resetDrawingState()
+    ctx.filter = 'none'
+    ctx.translate(x0, y0 + MAGICOFFSET)
+    ctx.scale(1, VSCALE)
+    ctx.fillStyle = `rgba(255, 255, 107, 0.9)`
+    ctx.fillText(caption, w/2, h/2/VSCALE )
 }
 
 /** Save the current contents of the canvas to the user's computer. */

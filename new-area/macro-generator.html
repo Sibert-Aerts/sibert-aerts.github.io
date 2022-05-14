@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Encoding -->
+    <meta charset="utf-8"/>
+
     <!-- Webpage meta -->
     <title>FromSoft Image Macro Generator</title>
     <meta name="description" content="Create realistic looking image macros based on FromSoft games.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
-
-    <!-- jQuery (TODO: get rid of this dependency) -->
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script> -->
-
-    <!-- Bootstrap (TODO: get rid of this dependency) -->
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
 
     <!-- Garamond font, care of Adobe. -->
     <link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
@@ -69,8 +64,10 @@
                     <div>
                         <span class=input-title>Macro type:</span>
                         <select id=macro-type style="margin-left:25px">
+                            <option value=ds1-victory>DS1 - Victory</option>
                             <option value=ds3-area>DS3 - Area Name</option>
                             <option value=ds3-death>DS3 - You Died</option>
+                            <option value=none>Nothing</option>
                         </select>
                     </div>
                     <div>
@@ -174,7 +171,9 @@
 
 <!-- My other script -->
 <script type="text/javascript" src="image-gen.js"></script>
-<script type="text/javascript">redrawImage()</script>
+<script type="text/javascript">
+    window.addEventListener('load', redrawImage)
+</script>
 <script type="text/javascript">
     document.querySelector("input[target=disable-ga]").checked = window['ga-disable-G-HCGGJHJ3DR']
 </script>
