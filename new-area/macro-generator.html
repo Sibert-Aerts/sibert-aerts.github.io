@@ -37,7 +37,7 @@
         window.addEventListener('load', function() {
             // Create the global ImageGenerator
             imageGen = new ImageGenerator()
-            imageGen.redrawImage()
+            imageGen.redrawMacro()
         })
     </script>
 
@@ -100,7 +100,7 @@
                     <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                 </div>
             </div>
-            <div class=image-input-wrapper>
+            <div id=area-name class=image-input-wrapper>
                 <h4> Overlay options </h4>
                 <div>
                     <span class=input-title>Horizontal offset:</span>
@@ -128,7 +128,7 @@
                     <input type=range name=contrast min=0 max=3 step=0.1 value=1>
                 </div>
             </div>
-            <div class=image-input-wrapper>
+            <div id=image class=image-input-wrapper hidden>
                 <h4> Image filters </h4>
                 <div>
                     <span class=input-title>Saturation:</span>
@@ -150,7 +150,7 @@
 
         <div style=position:absolute;right:30px;bottom:10px>
             <button style=margin-left:20px id=generate-button onclick=imageGen.saveImage()>Save image</button>
-            <button id=generate-button onclick=imageGen.redrawImage()>Render changes</button>
+            <button id=generate-button onclick=imageGen.redrawMacro()>Render changes</button>
         </div>
     </div>
 </div>

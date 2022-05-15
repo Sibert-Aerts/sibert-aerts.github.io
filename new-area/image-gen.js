@@ -97,7 +97,8 @@ class ImageHandler {
     }
 
     onload() {
-        this.owner.redrawImage()
+        this.owner.imageSliders.show()
+        this.owner.redrawMacro()
     }
     onerror() {
         this.image = this.imageType = undefined
@@ -107,6 +108,10 @@ class ImageHandler {
 
 
 class Sliders {
+    /** @type {string} */
+    name
+    /** @type {HTMLElement} */
+    element
 
     /** @type {HTMLInputElement[]} */
     sliders = []
@@ -119,17 +124,19 @@ class Sliders {
     onchange = null
 
     /**
+     * @param {name} name
      * @param {HTMLElement} parent 
      * @param {string[]} names 
      */
-    constructor(parent, names) {
+    constructor(name, parent, names) {
         if( !parent ) {
             this.usable = false
             return
         }
+        this.element = parent.getElementById(name)
         /// Find each slider 
         for( const name of names ) {
-            const slider = parent.getElementsByTagName('input').namedItem(name)
+            const slider = this.element.getElementsByTagName('input').namedItem(name)
 
             if( !slider ) {
                 this.usable = false
@@ -141,9 +148,16 @@ class Sliders {
             slider.onchange = e => this.onchange(e)
 
             /// Hook up reset button
-            const button = parent.getElementsByTagName('button').namedItem(name)
+            const button = this.element.getElementsByTagName('button').namedItem(name)
             if (button) button.onclick = () => { slider.value = button.value; slider.onchange() }
         }
+    }
+
+    hide() {
+        this.element.hidden = true
+    }
+    show() {
+        this.element.hidden = false
     }
 
     /**
@@ -169,15 +183,17 @@ class Sliders {
  *  The class that puts it all to work.
  */
 class ImageGenerator {
-    /** @type readonly HTMLCanvasElement */
+    /** @type {readonly HTMLCanvasElement} */
     canvas
-    /** @type readonly CanvasRenderingContext2D  */
+    /** @type {readonly CanvasRenderingContext2D}  */
     ctx
 
-    /** @type readonly HTMLAnchorElement   */
+    /** @type {readonly HTMLAnchorElement}   */
     saveLink = document.createElement('a')
     /** The two dimension view elements */
     dimView
+    /** @type {{ [name: string]: Sliders }} */
+    sliders
 
     /** @type ImageHandler */
     imageHandler = new ImageHandler(this)
@@ -197,7 +213,7 @@ class ImageGenerator {
         //// USER CONTROLS
         this.macroTypeSelect = child('macro-type')
         if( this.macroTypeSelect ) {
-            this.macroTypeSelect.onchange = () => this.redrawImage()
+            this.macroTypeSelect.onchange = e => this.changeMacroType(e)
             for( const layerType of layerTypeList ) {
                 const elem = makeElem('option', null, layerType.name)
                 elem.value = layerType.key
@@ -207,17 +223,31 @@ class ImageGenerator {
 
         this.captionInput = childInput('image-caption')
         this.captionInput.oninput = () => this.autoRedraw()
-        this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawImage() }
+        this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
 
         this.resolutionCheckbox = childInput('limit-resolution')
-        this.resolutionCheckbox.onchange = () => this.redrawImage()
+        this.resolutionCheckbox.onchange = () => this.redrawMacro()
 
         //// SLIDERS
-        this.macroSliders = new Sliders(parent, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
+        this.macroSliders = new Sliders('area-name', parent, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
         this.macroSliders.onchange = () => this.autoRedraw()
         
-        this.imageSliders = new Sliders(parent, ['imgSaturate', 'imgContrast', 'imgBrightness'])
+        this.imageSliders = new Sliders('image', parent, ['imgSaturate', 'imgContrast', 'imgBrightness'])
         this.imageSliders.onchange = () => this.autoRedraw()
+
+        this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders}
+    }
+
+    /** Callback from the macro type select */
+    changeMacroType(e) {
+        const oldType = this.macroTypeSelect.oldValue
+        const newType = this.macroTypeSelect.value
+        this.macroTypeSelect.oldValue = newType
+        if( oldType )
+            layerTypes[oldType].sliders.forEach(n => this.sliders[n].hide())
+        layerTypes[newType].sliders.forEach(n => this.sliders[n].show())
+
+        this.redrawMacro()
     }
 
     /** Check whether the current canvas is too big to allow auto-rerendering. */
@@ -233,10 +263,11 @@ class ImageGenerator {
         }
     }
     
-    /** Called when there is no image to draw. */
+    /** Called when there is no longer an image to draw. */
     clear() {
         this.canvas.width = 1920; this.canvas.height = 1080
-        this.redrawImage()
+        this.imageSliders.hide()
+        this.redrawMacro()
     }
 
     /** Wipes all `ctx` and `canvas` properties that may affect how things are drawn to the canvas. */
@@ -262,42 +293,49 @@ class ImageGenerator {
 
     /** 
      * Call after minor input changes;
-     * Calls redrawImage() only if the underlying canvas isn't too huge for this feature to be laggy.
+     * Calls redrawMacro() only if the underlying canvas isn't too huge for this feature to be laggy.
      */
     autoRedraw() {
-        if(!this.tooBig()) this.redrawImage()
+        if( !this.tooBig() ) this.redrawMacro()
+    }
+
+    /** Redraw the underlying image, if any. */
+    drawImage() {
+        if( !this.imageHandler.image ) return
+        const image = this.imageHandler.image
+        const ctx = this.ctx
+
+        if( this.resolutionCheckbox.checked ) {
+            // Constrain image to be no larger than 1920x1080
+            const scale = Math.min(1920/image.width, 1080/image.height, 1)
+            this.resizeCanvas(image.width*scale, image.height*scale)
+            ctx.scale(scale, scale)
+
+        } else {
+            this.resizeCanvas(image.width, image.height)
+        }
+        
+        if( this.imageSliders.usable ) {
+            const {imgSaturate, imgContrast, imgBrightness} = this.imageSliders.getValues()
+            ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
+        }
+        
+        ctx.drawImage(image, 0, 0)
+        ctx.filter = 'none'
     }
 
     /** 
      * Call after major changes;
      * Blanks the canvas, redraws the selected image if any, and draws the text on top.
      */
-    redrawImage() {
+    redrawMacro() {
         const ctx = this.ctx
         this.resetDrawingState()
         ctx.clearRect(0, 0, canvas.width, canvas.height)
     
-        if( this.imageHandler.image ) {
-            const image = this.imageHandler.image
+        // May alter the resolution
+        this.drawImage()
 
-            if( this.resolutionCheckbox.checked ) {
-                // Constrain image to be no larger than 1920x1080
-                const scale = Math.min(1920/image.width, 1080/image.height, 1)
-                this.resizeCanvas(image.width*scale, image.height*scale)
-                ctx.scale(scale, scale)
-    
-            } else {
-                this.resizeCanvas(image.width, image.height)
-            }
-            
-            if( this.imageSliders.usable ) {
-                const {imgSaturate, imgContrast, imgBrightness} = this.imageSliders.getValues()
-                ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
-            }
-            
-            ctx.drawImage(image, 0, 0)
-            ctx.filter = 'none'
-        }
         // UI changes
         byId('resolution-warning').hidden = !this.tooBig()
         this.dimView.x.textContent = canvas.width
@@ -336,6 +374,7 @@ class ImageGenerator {
  * @typedef {Object} DrawableLayer
  * @prop {string} key
  * @prop {string} name
+ * @prop {string[]} sliders
  * @prop {() => void} draw()
  */
 
@@ -344,6 +383,7 @@ class ImageGenerator {
 const ds1Victory = {
     key: 'ds1-victory',
     name: 'DS1 - Victory',
+    sliders: ['area-name'],
 
     draw(ctx, canvas, gen) {
         // Prefer all-caps caption
@@ -433,6 +473,7 @@ const ds1Victory = {
 const ds3Death = {
     key: 'ds3-death',
     name: 'DS3 - Death',
+    sliders: ['area-name'],
 
     draw(ctx, canvas, gen) {
         // Prefer all-caps caption
@@ -488,6 +529,7 @@ const ds3Death = {
 const ds3Area = {
     key: 'ds3-area',
     name: 'DS3 - Area Name',
+    sliders: ['area-name'],
 
     draw(ctx, canvas, gen) {
         // Prefer title-case caption
@@ -552,6 +594,8 @@ const ds3Area = {
 const emptyLayer = {
     key: 'none',
     name: 'Nothing',
+    sliders: [],
+
     draw() {}
 }
 

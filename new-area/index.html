@@ -46,7 +46,7 @@
                 parent.removeEventListener('click', callback)
 
                 imageGen = new ImageGenerator()
-                imageGen.redrawImage()
+                imageGen.redrawMacro()
             }
             parent.addEventListener('click', callback)
         })
@@ -185,7 +185,7 @@
                 </div>
 
                 <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=imageGen.saveImage()>Save image</button>
-                <button style=float:right class="btn btn-primary" onclick=imageGen.redrawImage()>Render changes</button>
+                <button style=float:right class="btn btn-primary" onclick=imageGen.redrawMacro()>Render changes</button>
                 <a style="float:left" href="macro-generator.html" target="_blank">For more options: FromSoft Image Macro Generator</a>
             </div>
         </div>
