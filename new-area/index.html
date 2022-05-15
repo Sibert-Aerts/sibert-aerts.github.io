@@ -35,6 +35,22 @@
     <link rel="stylesheet" href="new-area.css">
     <script type="text/javascript" src="areas.js"></script>
     <script type="text/javascript" src="new-area.js"></script>
+    <script type="text/javascript" src="image-gen.js"></script>
+
+    <!-- Specific page-setup script -->
+    <script type="text/javascript">
+        window.addEventListener('DOMContentLoaded', function() {
+            // Set up event to only instantiate the ImageGenerator once the little modal is opened.
+            const parent = byId('image-gen')
+            function callback() {
+                parent.removeEventListener('click', callback)
+
+                imageGen = new ImageGenerator()
+                imageGen.redrawImage()
+            }
+            parent.addEventListener('click', callback)
+        })
+    </script>
 
     <!-- Twitter Card info -->
     <meta name=twitter:card content=summary_large_image>
@@ -47,6 +63,7 @@
 </head>
 
 <body>
+
 <div id=background-layer class="background-layer faded"></div>
 <div id=world-layer class="background-layer faded"></div>
 
@@ -112,7 +129,7 @@
                 <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
                     <canvas id=canvas class=small width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
                 </div>
-                <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px</div>
+                <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x">1920</span> × <span id="canv-dim-y">1080</span>px</div>
 
                 <div style="display:flex; justify-content:center; margin:1em">
                     <div class=image-input-wrapper>
@@ -120,7 +137,6 @@
                             <span class=input-title>Type:</span>
                             <select id=macro-type width="288px" style="margin-left:30px">
                                 <option value=ds3-area>Area Name</option>
-                                <option value=ds3-death>You Died</option>
                             </select>
                         </div>
                         <div>
@@ -168,9 +184,9 @@
                     </div>
                 </div>
 
-                <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=saveImage()>Save image</button>
-                <button style=float:right class="btn btn-primary" onclick=redrawImage()>Render changes</button>
-                <a style="float:left" href="macro-generator.html" target="_blank">For more options: Visit FromSoft image macro generator</a>
+                <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=imageGen.saveImage()>Save image</button>
+                <button style=float:right class="btn btn-primary" onclick=imageGen.redrawImage()>Render changes</button>
+                <a style="float:left" href="macro-generator.html" target="_blank">For more options: FromSoft Image Macro Generator</a>
             </div>
         </div>
 
@@ -266,8 +282,5 @@
 </div>
 
 </body>
-
-<!-- My other script -->
-<script type="text/javascript" src="image-gen.js"></script>
 
 </html>

@@ -26,14 +26,28 @@
     <!-- My stylesheet and scripts -->
     <link rel="stylesheet" href="normal.css">
     <link rel="stylesheet" href="new-area.css">
+    <script type="text/javascript" src="image-gen.js"></script>
+    
+    <!-- Specific page-setup script -->
+    <script type="text/javascript">
+        window.addEventListener('DOMContentLoaded', function() {
+            // Recall whether that box is checked
+            document.querySelector('input[target=disable-ga]').checked = window['ga-disable-G-HCGGJHJ3DR']
+        })
+        window.addEventListener('load', function() {
+            // Create the global ImageGenerator
+            imageGen = new ImageGenerator()
+            imageGen.redrawImage()
+        })
+    </script>
 
     <!-- Twitter Card info -->
-    <meta name=twitter:card content=summary_large_image>
-    <meta name=twitter:site content=@rezuaq>
-    <meta name=twitter:creator content=@rezuaq>
-    <meta name=twitter:title content="FromSoft Image Macro Generator">
+    <meta name=twitter:card     content=summary_large_image>
+    <meta name=twitter:site     content=@rezuaq>
+    <meta name=twitter:creator  content=@rezuaq>
+    <meta name=twitter:title    content="FromSoft Image Macro Generator">
     <meta name=twitter:description content="Create convincing looking image macros based on FromSoft games.">
-    <meta name=twitter:image content=https://i.imgur.com/SDngnwG.png> <!-- TEMP IMAGE -->
+    <meta name=twitter:image    content=https://i.imgur.com/SDngnwG.png> <!-- TEMP IMAGE -->
         
 </head>
 
@@ -41,102 +55,102 @@
 <div id=background-layer class="background-layer faded"></div>
 
 <div id=main>
-    <div class=content style="position: relative; margin-top: 2vw; margin-bottom: 100px; margin-left: 2vw; width: 94vw; max-width: none">
+    <div class=content style="position: relative; margin-top: 2vw; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none">
         <h1>FromSoftware image macro generator</h1>
         <button class="emoji-button minimise"></button>
 
-        <div class=body>
-            <div class=help>
-                Select, link or paste an image to put convincing FromSoftware game overlays on it.
-                Currently implements only Dark Souls 3 style image macros.
-            </div><br>
+        <div class=help>
+            Select, link or paste an image to put convincing FromSoftware game overlays on it.
+            Work in progress, currently only implements a limited set of overlay types.
+        </div><br>
 
-            <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
-                <canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas>
-            </div>
-            
-            <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px</div>
-            
+        <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
+            <canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas>
+        </div>
+        
+        <div class=info style="text-align:center">
+            Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px
+        </div>
+        
 
-            <div style="display:flex; flex-wrap: wrap; justify-content:center; margin:1em">
-                <div class=image-input-wrapper>
-                    <h4 style="margin-bottom: .5em"> Configuration </h4>
-                    <div>
-                        <span class=input-title>Macro type:</span>
-                        <select id=macro-type style="margin-left:25px">
-                            <!-- Filled in by script -->
-                        </select>
-                    </div>
-                    <div>
-                        <span class=input-title>Caption:</span>
-                        <input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
-                    </div>
-                    <div>
-                        <span class=input-title>Image URL:</span>
-                        <input type=text id=image-URL size=32 style="float:right">
-                    </div>
-                    <div>
-                        <span class=input-title>Image Upload:</span>
-                        <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
-                    </div>
-                    <div>
-                        <span class=input-title>Constrain resolution:</span>
-                        <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
-                        <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
-                    </div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
+            <div class=image-input-wrapper>
+                <h4 style="margin-bottom: .5em"> Configuration </h4>
+                <div>
+                    <span class=input-title>Macro type:</span>
+                    <select id=macro-type style="margin-left:25px">
+                        <!-- Filled in by script -->
+                    </select>
                 </div>
-                <div class=image-input-wrapper>
-                    <h4> Overlay options </h4>
-                    <div>
-                        <span class=input-title>Horizontal offset:</span>
-                        <button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
-                        <input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
-                    </div>
-                    <div>
-                        <span class=input-title>Vertical offset:</span>
-                        <button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
-                        <input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
-                    </div>
-                    <div>
-                        <span class=input-title>Scale:</span>
-                        <button class=emoji-button name=scale value=0 style="float:right">🔄</button>
-                        <input type=range name=scale min=-2 max=4 step=.01 value=0>
-                    </div>
-                    <div class=smol>
-                        <span class=input-title>Underline:</span>
-                        <button class=emoji-button name=underline value=32 style="float:right">🔄</button>
-                        <input type=range name=underline min=0 max=64 value=32>
-                    </div>
-                    <div class=smol>
-                        <span class=input-title>Contrast:</span>
-                        <button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
-                        <input type=range name=contrast min=0 max=3 step=0.1 value=1>
-                    </div>
+                <div>
+                    <span class=input-title>Caption:</span>
+                    <input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
                 </div>
-                <div class=image-input-wrapper>
-                    <h4> Image filters </h4>
-                    <div>
-                        <span class=input-title>Saturation:</span>
-                        <button class=emoji-button name=imgSaturate value=100 style="float:right">🔄</button>
-                        <input type=range name=imgSaturate min=0 max=200 step=1 value=100>
-                    </div>
-                    <div>
-                        <span class=input-title>Contrast:</span>
-                        <button class=emoji-button name=imgContrast value=100 style="float:right">🔄</button>
-                        <input type=range name=imgContrast min=0 max=200 step=1 value=100>
-                    </div>
-                    <div>
-                        <span class=input-title>Brightness:</span>
-                        <button class=emoji-button name=imgBrightness value=100 style="float:right">🔄</button>
-                        <input type=range name=imgBrightness min=0 max=200 step=1 value=100>
-                    </div>
+                <div>
+                    <span class=input-title>Image URL:</span>
+                    <input type=text id=image-URL size=32 style="float:right">
+                </div>
+                <div>
+                    <span class=input-title>Image Upload:</span>
+                    <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
+                </div>
+                <div>
+                    <span class=input-title>Constrain resolution:</span>
+                    <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+                    <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                 </div>
             </div>
-
-            <div style=position:absolute;right:30px;bottom:10px>
-                <button style=margin-left:20px id=generate-button onclick=saveImage()>Save image</button>
-                <button id=generate-button onclick=redrawImage()>Render changes</button>
+            <div class=image-input-wrapper>
+                <h4> Overlay options </h4>
+                <div>
+                    <span class=input-title>Horizontal offset:</span>
+                    <button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
+                    <input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
+                </div>
+                <div>
+                    <span class=input-title>Vertical offset:</span>
+                    <button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
+                    <input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
+                </div>
+                <div>
+                    <span class=input-title>Scale:</span>
+                    <button class=emoji-button name=scale value=0 style="float:right">🔄</button>
+                    <input type=range name=scale min=-2 max=4 step=.01 value=0>
+                </div>
+                <div class=smol>
+                    <span class=input-title>Underline:</span>
+                    <button class=emoji-button name=underline value=32 style="float:right">🔄</button>
+                    <input type=range name=underline min=0 max=64 value=32>
+                </div>
+                <div class=smol>
+                    <span class=input-title>Contrast:</span>
+                    <button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
+                    <input type=range name=contrast min=0 max=3 step=0.1 value=1>
+                </div>
             </div>
+            <div class=image-input-wrapper>
+                <h4> Image filters </h4>
+                <div>
+                    <span class=input-title>Saturation:</span>
+                    <button class=emoji-button name=imgSaturate value=100 style="float:right">🔄</button>
+                    <input type=range name=imgSaturate min=0 max=200 step=1 value=100>
+                </div>
+                <div>
+                    <span class=input-title>Contrast:</span>
+                    <button class=emoji-button name=imgContrast value=100 style="float:right">🔄</button>
+                    <input type=range name=imgContrast min=0 max=200 step=1 value=100>
+                </div>
+                <div>
+                    <span class=input-title>Brightness:</span>
+                    <button class=emoji-button name=imgBrightness value=100 style="float:right">🔄</button>
+                    <input type=range name=imgBrightness min=0 max=200 step=1 value=100>
+                </div>
+            </div>
+        </div>
+
+        <div style=position:absolute;right:30px;bottom:10px>
+            <button style=margin-left:20px id=generate-button onclick=imageGen.saveImage()>Save image</button>
+            <button id=generate-button onclick=imageGen.redrawImage()>Render changes</button>
         </div>
     </div>
 </div>
@@ -165,14 +179,5 @@
 </div>
 
 </body>
-
-<!-- My other script -->
-<script type="text/javascript" src="image-gen.js"></script>
-<script type="text/javascript">
-    window.addEventListener('load', redrawImage)
-</script>
-<script type="text/javascript">
-    document.querySelector("input[target=disable-ga]").checked = window['ga-disable-G-HCGGJHJ3DR']
-</script>
 
 </html>

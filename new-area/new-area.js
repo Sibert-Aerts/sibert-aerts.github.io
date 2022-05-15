@@ -119,6 +119,7 @@ $(document).ready(function () {
     
     // Bind the checkboxes to hide/unhide parts of the page when clicked.
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
+    // Remember these checkboxes
     $("input[target=disable-anims]").attr('checked', localStorage.getItem('disable-anims') === 'true')
     $("input[target=disable-ga]").attr('checked', window['ga-disable-G-HCGGJHJ3DR'])
 
@@ -150,8 +151,8 @@ $(document).ready(function () {
 var chroma = false
 function toggleChroma(){
     chroma ^= true
-    if(chroma) $("#main").addClass("chroma")
-    else $("#main").removeClass("chroma")
+    if(chroma) $(".main.content").addClass("chroma")
+    else $(".main.content").removeClass("chroma")
     $("#chromaButton").text(chroma? "no chroma" : "chroma")
 }
 
@@ -159,8 +160,8 @@ function toggleChroma(){
 var shaded = false
 function toggleShade(){
     shaded ^= true;
-    if(shaded) $('#main').addClass('transp')
-    else $("#main").removeClass('transp')
+    if(shaded) $('.main.content').addClass('transp')
+    else $(".main.content").removeClass('transp')
     $("#transpButton").html(shaded? '👓&#xFE0F;' : '🕶️&#xFE0F;')
 }
 
