@@ -130,17 +130,18 @@ class Sliders {
      */
     constructor(name, parent, names) {
         if( !parent ) {
-            this.usable = false
-            return
+            this.usable = false; return
         }
         this.element = parent.getElementById(name)
+        if( !this.element ) {
+            this.usable = false; return
+        }
         /// Find each slider 
         for( const name of names ) {
             const slider = this.element.getElementsByTagName('input').namedItem(name)
 
             if( !slider ) {
-                this.usable = false
-                break
+                this.usable = false; return
             }
             /// Add to our collections
             this.sliders.push(slider)
@@ -154,10 +155,10 @@ class Sliders {
     }
 
     hide() {
-        this.element.hidden = true
+        if( this.usable ) this.element.hidden = true
     }
     show() {
-        this.element.hidden = false
+        if( this.usable ) this.element.hidden = false
     }
 
     /**
@@ -219,6 +220,7 @@ class ImageGenerator {
                 elem.value = layerType.key
                 this.macroTypeSelect.appendChild(elem)
             }
+            this.macroTypeSelect.oldValue = this.macroTypeSelect.value
         }
 
         this.captionInput = childInput('image-caption')

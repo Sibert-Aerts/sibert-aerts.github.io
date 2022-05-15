@@ -131,7 +131,7 @@
                 </div>
                 <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x">1920</span> × <span id="canv-dim-y">1080</span>px</div>
 
-                <div style="display:flex; justify-content:center; margin:1em">
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
                     <div class=image-input-wrapper>
                         <div hidden>
                             <span class=input-title>Type:</span>
@@ -156,6 +156,8 @@
                             <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
                             <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
                         </div>
+                    </div>
+                    <div id=area-name class=image-input-wrapper>
                         <div>
                             <span class=input-title>Horizontal offset:</span>
                             <button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
