@@ -36,7 +36,7 @@
 		})
 		window.addEventListener('load', function() {
 			// Create the global ImageGenerator
-			imageGen = new ImageGenerator()
+			imageGen = new ImageGenerator(document.getElementById('main-content'))
 			imageGen.redrawMacro()
 		})
 	</script>
@@ -69,12 +69,12 @@
 		</div>
 		
 		<div class=info style="text-align:center">
-			Canvas resolution: <span id="canv-dim-x"></span> × <span id="canv-dim-y"></span>px
+			Canvas resolution: <span id="canv-res-x"></span> × <span id="canv-res-y"></span>px
 		</div>
 		
 
 		<div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
-			<div class=image-input-wrapper>
+			<div id=global-sliders class=sliders-container>
 				<h4 style="margin-bottom: .5em"> Configuration </h4>
 				<div>
 					<span class=input-title>Macro type:</span>
@@ -100,7 +100,7 @@
 					<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
 				</div>
 			</div>
-			<div id=area-name class=image-input-wrapper>
+			<div id=area-name class=sliders-container>
 				<h4> Overlay options </h4>
 				<div>
 					<span class=input-title>Horizontal offset:</span>
@@ -128,7 +128,7 @@
 					<input type=range name=contrast min=0 max=3 step=0.1 value=1>
 				</div>
 			</div>
-			<div id=image class=image-input-wrapper hidden>
+			<div id=image class=sliders-container hidden>
 				<h4> Image filters </h4>
 				<div>
 					<span class=input-title>Saturation:</span>

@@ -358,24 +358,24 @@ canvas.big {
     border: 1px solid #fff3;
 }
 
-.image-input-wrapper {
+.sliders-container {
     width: 100%; max-width: 400px;
     margin-bottom: 1em;
 }
 
-.image-input-wrapper > h4 {
+.sliders-container > h4 {
     width: 100%;
     margin-bottom: 0;
     font-size: 1.5em;
     text-align: center;
 }
 
-.image-input-wrapper > div {
+.sliders-container > div {
     padding-left: 5px; padding-right: 5px;
     margin-bottom: 8px;
 }
 
-.image-input-wrapper > div.smol {
+.sliders-container > div.smol {
     float: left;
     width: 100%; max-width: 200px;
 }

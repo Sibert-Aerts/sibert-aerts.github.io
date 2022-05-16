@@ -4,31 +4,46 @@
 
 ///// TINY DOM UTIL FUNCTIONS
 const byId = id => document.getElementById(id)
-const getInput = name => document.getElementsByTagName('input').namedItem(name)
 const makeElem = (tag, clss, text) => { let e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
 
 
 /** Handles incoming images. */
 class ImageHandler {
     /** @type ImageGenerator */
-    owner
+    imageGen
+
+    /** @type HTMLElement */
+    parent
+    /** @type HTMLInputElement */
+    URLinput
+    /** @type HTMLInputElement */
+    fileSelect
+
     /** @type HTMLImageElement */
     image = null
     /** @type string */
-    imageType = null
-    
-    URLinput = byId('image-URL')
-    fileSelect = byId('image-upload')
+    imageType = null    
 
-    constructor(owner) {
-        this.owner = owner
-        // URL event bindings
+    /**
+     * @param {ImageGenerator} imageGen 
+     * @param {HTMLElement} parent
+     */
+    constructor(imageGen, parent) {
+        this.imageGen = imageGen
+        this.parent = parent
+
+        /// URL event bindings
+        this.URLinput = parent.getElementsByTagName('input').namedItem('image-URL')
         this.URLinput.onchange = this.handleImageURL.bind(this)
         this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
-        // File select event bindings
+
+        /// File select event bindings
+        this.fileSelect = parent.getElementsByTagName('input').namedItem('image-upload')
         this.fileSelect.onchange = this.handleFileSelect.bind(this)
-        // Paste event bindings
-        document.addEventListener('paste', this.handlePaste.bind(this))        
+
+        /// Paste event bindings
+        // Currently binds to document because there's no other ImageHandler to need to contest with
+        document.addEventListener('paste', this.handlePaste.bind(this))
     }
 
     /** File Selector callback function. */
@@ -97,12 +112,12 @@ class ImageHandler {
     }
 
     onload() {
-        this.owner.imageSliders.show()
-        this.owner.redrawMacro()
+        this.imageGen.imageSliders.show()
+        this.imageGen.redrawMacro()
     }
     onerror() {
         this.image = this.imageType = undefined
-        this.owner.clear()
+        this.imageGen.clear()
     }
 }
 
@@ -115,34 +130,31 @@ class Sliders {
 
     /** @type {HTMLInputElement[]} */
     sliders = []
-    /** @type {{ [name: string]: HTMLInputElement }} */
+    /** @type {{[name: string]: HTMLInputElement}} */
     byName = {}
     /** @type {boolean} */
-    usable = true
+    usable = false
 
     /** @type {Callback} */
     onchange = null
 
     /**
-     * @param {name} name
+     * @param {string} name
      * @param {HTMLElement} parent 
      * @param {string[]} names 
      */
     constructor(name, parent, names) {
-        if( !parent ) {
-            this.usable = false; return
-        }
-        this.element = parent.getElementById(name)
-        if( !this.element ) {
-            this.usable = false; return
-        }
+        if( !parent ) return
+
+        this.element = parent.getElementsByClassName('sliders-container').namedItem(name)
+        if( !this.element ) return
+
         /// Find each slider 
         for( const name of names ) {
             const slider = this.element.getElementsByTagName('input').namedItem(name)
 
-            if( !slider ) {
-                this.usable = false; return
-            }
+            if( !slider ) return
+
             /// Add to our collections
             this.sliders.push(slider)
             this.byName[name] = slider
@@ -152,6 +164,8 @@ class Sliders {
             const button = this.element.getElementsByTagName('button').namedItem(name)
             if (button) button.onclick = () => { slider.value = button.value; slider.onchange() }
         }
+        // If we make it through the whole thing without an early return, we're usable!
+        this.usable = true
     }
 
     hide() {
@@ -184,6 +198,8 @@ class Sliders {
  *  The class that puts it all to work.
  */
 class ImageGenerator {
+    /** @type {readonly HTMLElement | Document} */
+    element
     /** @type {readonly HTMLCanvasElement} */
     canvas
     /** @type {readonly CanvasRenderingContext2D}  */
@@ -191,30 +207,36 @@ class ImageGenerator {
 
     /** @type {readonly HTMLAnchorElement}   */
     saveLink = document.createElement('a')
-    /** The two dimension view elements */
-    dimView
+
     /** @type {{ [name: string]: Sliders }} */
     sliders
-
     /** @type ImageHandler */
-    imageHandler = new ImageHandler(this)
+    imageHandler
 
-    constructor(parent=document) {
-        // oops, getElementById only works for `document` since IDs are supposed to be unique
-        const child = id => parent.getElementById(id)
-        const childInput = name => parent.getElementsByTagName('input').namedItem(name)
+    /**
+     * @param {HTMLElement | Document} element
+     */
+    constructor(element=document) {
+        this.element = element
+
+        /** my(t, n) = "my element `<t>` named `n`" */
+        const my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
         //// CANVAS
-        this.canvas = child('canvas')
+        this.canvas = my('canvas', 'canvas')
         this.ctx = this.canvas.getContext('2d')
 
         //// VIEW ELEMS
-        this.dimView = { x: child('canv-dim-x'), y: child('canv-dim-y') }
+        this.resView = { x: my('span', 'canv-res-x'), y: my('span', 'canv-res-y') }
+        this.resWarning = my('*', 'resolution-warning')
+
+        //// IMAGE HANDLER
+        this.imageHandler = new ImageHandler(this, my('div', 'global-sliders'))
 
         //// USER CONTROLS
-        this.macroTypeSelect = child('macro-type')
+        this.macroTypeSelect = my('select', 'macro-type')
         if( this.macroTypeSelect ) {
-            this.macroTypeSelect.onchange = e => this.changeMacroType(e)
+            this.macroTypeSelect.onchange = e => this.onMacroTypeChange(e)
             for( const layerType of layerTypeList ) {
                 const elem = makeElem('option', null, layerType.name)
                 elem.value = layerType.key
@@ -223,25 +245,25 @@ class ImageGenerator {
             this.macroTypeSelect.oldValue = this.macroTypeSelect.value
         }
 
-        this.captionInput = childInput('image-caption')
+        this.captionInput = my('input', 'image-caption')
         this.captionInput.oninput = () => this.autoRedraw()
         this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
 
-        this.resolutionCheckbox = childInput('limit-resolution')
+        this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = () => this.redrawMacro()
 
         //// SLIDERS
-        this.macroSliders = new Sliders('area-name', parent, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
+        this.macroSliders = new Sliders('area-name', element, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
         this.macroSliders.onchange = () => this.autoRedraw()
         
-        this.imageSliders = new Sliders('image', parent, ['imgSaturate', 'imgContrast', 'imgBrightness'])
+        this.imageSliders = new Sliders('image', element, ['imgSaturate', 'imgContrast', 'imgBrightness'])
         this.imageSliders.onchange = () => this.autoRedraw()
 
         this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders}
     }
 
     /** Callback from the macro type select */
-    changeMacroType(e) {
+    onMacroTypeChange(e) {
         const oldType = this.macroTypeSelect.oldValue
         const newType = this.macroTypeSelect.value
         this.macroTypeSelect.oldValue = newType
@@ -339,9 +361,9 @@ class ImageGenerator {
         this.drawImage()
 
         // UI changes
-        byId('resolution-warning').hidden = !this.tooBig()
-        this.dimView.x.textContent = canvas.width
-        this.dimView.y.textContent = canvas.height        
+        this.resWarning.hidden = !this.tooBig()
+        this.resView.x.textContent = canvas.width
+        this.resView.y.textContent = canvas.height        
     
         this.resetDrawingState()
         layerTypes[this.macroTypeSelect.value].draw(ctx, this.canvas, this)
