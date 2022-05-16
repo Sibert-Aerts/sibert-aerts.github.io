@@ -1,65 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Encoding -->
-    <meta charset="utf-8"/>
+	<!-- Encoding -->
+	<meta charset="utf-8"/>
 
-    <!-- Webpage meta -->
-    <title>FromSoft Area Name Generator</title>
-    <meta name="description" content="Discover randomly generated location names based on Dark Souls, Bloodborne, Elden Ring and others. Also includes image macro/text generator features.">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
+	<!-- Webpage meta -->
+	<title>FromSoft Area Name Generator</title>
+	<meta name="description" content="Discover randomly generated location names based on Dark Souls, Bloodborne, Elden Ring and others. Also includes image macro/text generator features.">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
 
-    <!-- jQuery (TODO: get rid of this dependency) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+	<!-- jQuery (TODO: get rid of this dependency) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
 
-    <!-- Bootstrap (TODO: get rid of this dependency) -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<!-- Bootstrap (TODO: get rid of this dependency) -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-    <!-- Garamond font, care of Adobe. -->
-    <link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
-    
-    <!-- Google Analytics to track traffic -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.endsWith('1') ?? false
-        window['ga-disable-G-HCGGJHJ3DR'] = disable
-        function gtag(){ dataLayer.push(arguments) }
-        gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
-    </script>
+	<!-- Garamond font, care of Adobe. -->
+	<link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
+	
+	<!-- Google Analytics to track traffic -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.endsWith('1') ?? false
+		window['ga-disable-G-HCGGJHJ3DR'] = disable
+		function gtag(){ dataLayer.push(arguments) }
+		gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
+	</script>
 
-    <!-- My stylesheet and scripts -->
-    <link rel="stylesheet" href="new-area.css">
-    <script type="text/javascript" src="areas.js"></script>
-    <script type="text/javascript" src="new-area.js"></script>
-    <script type="text/javascript" src="image-gen.js"></script>
+	<!-- My stylesheet and scripts -->
+	<link rel="stylesheet" href="new-area.css">
+	<script type="text/javascript" src="areas.js"></script>
+	<script type="text/javascript" src="new-area.js"></script>
+	<script type="text/javascript" src="image-gen.js"></script>
 
-    <!-- Specific page-setup script -->
-    <script type="text/javascript">
-        window.addEventListener('DOMContentLoaded', function() {
-            // Set up event to only instantiate the ImageGenerator once the little modal is opened.
-            const parent = byId('image-gen')
-            function callback() {
-                parent.removeEventListener('click', callback)
+	<!-- Specific page-setup script -->
+	<script type="text/javascript">
+		window.addEventListener('DOMContentLoaded', function() {
+			// Set up event to only instantiate the ImageGenerator once the little modal is opened.
+			const parent = byId('image-gen')
+			function callback() {
+				parent.removeEventListener('click', callback)
 
-                imageGen = new ImageGenerator()
-                imageGen.redrawMacro()
-            }
-            parent.addEventListener('click', callback)
-        })
-    </script>
+				imageGen = new ImageGenerator()
+				imageGen.redrawMacro()
+			}
+			parent.addEventListener('click', callback)
+		})
+	</script>
 
-    <!-- Twitter Card info -->
-    <meta name=twitter:card content=summary_large_image>
-    <meta name=twitter:site content=@rezuaq>
-    <meta name=twitter:creator content=@rezuaq>
-    <meta name=twitter:title content="FromSoft Area Name Generator">
-    <meta name=twitter:description content="Discover randomly generated areas from FromSoftware games, or make image macros.">
-    <meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png>
-        
+	<!-- Twitter Card info -->
+	<meta name=twitter:card content=summary_large_image>
+	<meta name=twitter:site content=@rezuaq>
+	<meta name=twitter:creator content=@rezuaq>
+	<meta name=twitter:title content="FromSoft Area Name Generator">
+	<meta name=twitter:description content="Discover randomly generated areas from FromSoftware games, or make image macros.">
+	<meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png>
+		
 </head>
 
 <body>
@@ -68,219 +68,219 @@
 <div id=world-layer class="background-layer faded"></div>
 
 <div id=main>
-    <div class='main content'>
-        
-        <div id=stars class=unselectable>&nbsp;</div>
+	<div class='main content'>
+		
+		<div id=stars class=unselectable>&nbsp;</div>
 
-        <div id=name-underline-wrapper class=faded-out>
-            <div id=name></div>
-            <div class=underline></div>
-        </div>
+		<div id=name-underline-wrapper class=faded-out>
+			<div id=name></div>
+			<div class=underline></div>
+		</div>
 
-        <div id=generate-input-wrapper>
-            <div id=generate-button-wrapper>
-                <button id=generate-button onclick=generate()>Travel Somewhere Else</button>
-            </div>
-            <div id=checkboxes-wrapper>
-                <label><input target=Dark1 checked type=checkbox></input> Dark Souls</label>
-                <label><input target=Dark2 checked type=checkbox></input> Dark Souls II</label>
-                <label><input target=Dark3 checked type=checkbox></input> Dark Souls III</label>
-                <label class=elden><input target=Elden checked type=checkbox></input> Elden Ring</label>
-                <br>
-                <label class=special><input target=Demons type=checkbox></input> Demon's Souls</label>
-                <label class=special><input target=Blood  type=checkbox></input> Bloodborne</label>
-                <label class=special><input target=Sekiro type=checkbox></input> Sekiro</label>
-                <label class=custom> <input target=Custom type=checkbox></input> Custom</label>
-            </div>
-        </div>
+		<div id=generate-input-wrapper>
+			<div id=generate-button-wrapper>
+				<button id=generate-button onclick=generate()>Travel Somewhere Else</button>
+			</div>
+			<div id=checkboxes-wrapper>
+				<label><input target=Dark1 checked type=checkbox></input> Dark Souls</label>
+				<label><input target=Dark2 checked type=checkbox></input> Dark Souls II</label>
+				<label><input target=Dark3 checked type=checkbox></input> Dark Souls III</label>
+				<label class=elden><input target=Elden checked type=checkbox></input> Elden Ring</label>
+				<br>
+				<label class=special><input target=Demons type=checkbox></input> Demon's Souls</label>
+				<label class=special><input target=Blood  type=checkbox></input> Bloodborne</label>
+				<label class=special><input target=Sekiro type=checkbox></input> Sekiro</label>
+				<label class=custom> <input target=Custom type=checkbox></input> Custom</label>
+			</div>
+		</div>
 
-        <div style="position:absolute; right:15px; bottom:8px;">
-            <button id=tweetButton class=emoji-button onclick=tweetIntent() title="Share on Twitter" data-toggle=tooltip>🐦&#xFE0F;</button>
-            <button id=transpButton class=emoji-button onclick=toggleShade() title="Toggle Shade" data-toggle=tooltip>🕶️&#xFE0F;</button>
-            <button id=muteButton class=emoji-button onclick=toggleMute() title="Toggle Sound" data-toggle=tooltip>🔊&#xFE0F;</button>
-        </div>
-    </div>
-
-
-    <div id=lesser-content-wrapper>
-
-        <div id=background-select class="lesser content">
-            <h4>Background select</h4>
-            <button class="emoji-button minimise"></button>
-
-            <div class=body hidden>
-                <div id=background-list> <!-- script fills this up --> </div>
-                <br>
-                <label><input type=checkbox target=shuffle-bg checked> Occasionally change background when traveling</label>
-            </div>
-        </div>
+		<div style="position:absolute; right:15px; bottom:8px;">
+			<button id=tweetButton class=emoji-button onclick=tweetIntent() title="Share on Twitter" data-toggle=tooltip>🐦&#xFE0F;</button>
+			<button id=transpButton class=emoji-button onclick=toggleShade() title="Toggle Shade" data-toggle=tooltip>🕶️&#xFE0F;</button>
+			<button id=muteButton class=emoji-button onclick=toggleMute() title="Toggle Sound" data-toggle=tooltip>🔊&#xFE0F;</button>
+		</div>
+	</div>
 
 
-        <div id=image-gen class="lesser content">
-            <h4>Image macro generator</h4>
-            <button class="emoji-button minimise"></button>
+	<div id=lesser-content-wrapper>
 
-            <div class=body hidden>
-                <div class=help style=width:700px;max-width:80vw>
-                    Select, link or paste an image to put a convincing area name pop-up on it. <br>
-                    (Image composition happens in-app; No data is ever sent to a server, all images are 100% private.)
-                </div><br>
+		<div id=background-select class="lesser content">
+			<h4>Background select</h4>
+			<button class="emoji-button minimise"></button>
 
-                <div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
-                    <canvas id=canvas class=small width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
-                </div>
-                <div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x">1920</span> × <span id="canv-dim-y">1080</span>px</div>
-
-                <div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
-                    <div class=image-input-wrapper>
-                        <div hidden>
-                            <span class=input-title>Type:</span>
-                            <select id=macro-type width="288px" style="margin-left:30px">
-                                <option value=ds3-area>Area Name</option>
-                            </select>
-                        </div>
-                        <div>
-                            <span class=input-title>Caption:</span>
-                            <input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
-                        </div>
-                        <div>
-                            <span class=input-title>Image URL:</span>
-                            <input type=text id=image-URL size=32 style="float:right">
-                        </div>
-                        <div>
-                            <span class=input-title>Image Upload:</span>
-                            <input type=file id=image-upload accept="image/*" style=display:inline;float:right>
-                        </div>
-                        <div>
-                            <span class=input-title>Limit image resolution:</span>
-                            <input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
-                            <div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
-                        </div>
-                    </div>
-                    <div id=area-name class=image-input-wrapper>
-                        <div>
-                            <span class=input-title>Horizontal offset:</span>
-                            <button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
-                            <input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
-                        </div>
-                        <div>
-                            <span class=input-title>Vertical offset:</span>
-                            <button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
-                            <input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
-                        </div>
-                        <div>
-                            <span class=input-title>Scale:</span>
-                            <button class=emoji-button name=scale value=0 style="float:right">🔄</button>
-                            <input type=range name=scale min=-2 max=4 step=.01 value=0>
-                        </div>
-                        <div class=smol>
-                            <span class=input-title>Underline:</span>
-                            <button class=emoji-button name=underline value=32 style="float:right">🔄</button>
-                            <input type=range name=underline min=0 max=64 value=32>
-                        </div>
-                        <div class=smol>
-                            <span class=input-title>Contrast:</span>
-                            <button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
-                            <input type=range name=contrast min=0 max=3 step=0.1 value=1>
-                        </div>
-                    </div>
-                </div>
-
-                <button style=float:right;margin-left:.5em class="btn btn-primary" onclick=imageGen.saveImage()>Save image</button>
-                <button style=float:right class="btn btn-primary" onclick=imageGen.redrawMacro()>Render changes</button>
-                <a style="float:left" href="macro-generator.html" target="_blank">For more options: FromSoft Image Macro Generator</a>
-            </div>
-        </div>
+			<div class=body hidden>
+				<div id=background-list> <!-- script fills this up --> </div>
+				<br>
+				<label><input type=checkbox target=shuffle-bg checked> Occasionally change background when traveling</label>
+			</div>
+		</div>
 
 
-        <div id=custom-input class="lesser content hidden">
-            <h4>Custom area parts</h4> <button class="btn btn-success" style=float:right onclick=saveCustom()>Save</button>
-            <br>
+		<div id=image-gen class="lesser content">
+			<h4>Image macro generator</h4>
+			<button class="emoji-button minimise"></button>
 
-            <div class=help style=width:700px;max-width:80vw>
-                Use semicolons to separate pieces. Don't leave spaces before/after semicolons. Trailing semicolon optional.
-                Capitalisation matters. Does not auto-save.
-            </div><br>
+			<div class=body hidden>
+				<div class=help style=width:700px;max-width:80vw>
+					Select, link or paste an image to put a convincing area name pop-up on it. <br>
+					(Image composition happens in-app; No data is ever sent to a server, all images are 100% private.)
+				</div><br>
 
-            <span class=input-title>Proper Locations:</span> <span class=example>e.g. "Anor Londo;Majula;Lothric"</span> <br>
-            <textarea name=properLocations cols=90 rows=1></textarea><br>
+				<div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
+					<canvas id=canvas class=small width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas><br>
+				</div>
+				<div class=info style="text-align:center">Canvas resolution: <span id="canv-dim-x">1920</span> × <span id="canv-dim-y">1080</span>px</div>
 
-            <span class=input-title>Places:</span> <span class=example>e.g. "World;Chasm;Forest"</span> <br>
-            <textarea name=primaryLocations cols=90 rows=2></textarea><br>
-            <span class=input-title>Sub-places:</span> <span class=example>e.g. "Chasm;Forest;Road"</span> <br>
-            <div class=help style=width:700px;max-width:90vw>
-                This should contain all the same parts as the previous box, except for the few ones that don't work for describing a sub-area of a larger area.<br>
-                e.g. "Lothric Town" works, so "Town" fits in here, "Lothric World" does not, so "World" is excluded.
-            </div>
-            <textarea name=secondaryLocations cols=90 rows=2></textarea><br><br>
-            
-            <span class=input-title>Personal names:</span> <span class=example>e.g. "Quelaag;Aldia;Ariandel"</span> <br>
-            <textarea name=properNames cols=90 rows=1></textarea><br><br>
-            
-            <span class=input-title>Possessives:</span> <span class=example>e.g. "No-Man's;Duke's;The King's"</span> <br>
-            <textarea name=possessives cols=90 rows=1></textarea><br>
-            <span class=input-title>Prefixes:</span> <span class=example>e.g. "Blight;Byrgen"</span> <span class=help>(These are glued directly onto a place name e.g. Blightcity)</span> <br>
-            <textarea name=prefixes cols=90 rows=1></textarea><br>
-            <span class=input-title>Positional descriptors:</span> <span class=example>e.g. "Northern;Upper;Inner"</span> <br>
-            <textarea name=positionals cols=90 rows=1></textarea><br>
-            <span class=input-title>Adjectives:</span> <span class=example>e.g. "New;Great;Frozen"</span> <span class=help>(Don't include anything from the previous three boxes.)</span> <br> 
-            <textarea name=adjectives cols=90 rows=2></textarea><br><br>
-            
-            <span class=input-title>Appendices:</span> <span class=example>e.g. "of the Giants;Betwixt;of Flame"</span> <br>
-            <textarea name=appendices cols=90 rows=2></textarea>
-        </div>
+				<div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
+					<div class=image-input-wrapper>
+						<div hidden>
+							<span class=input-title>Type:</span>
+							<select id=macro-type width="288px" style="margin-left:30px">
+								<option value=ds3-area>Area Name</option>
+							</select>
+						</div>
+						<div>
+							<span class=input-title>Caption:</span>
+							<input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
+						</div>
+						<div>
+							<span class=input-title>Image URL:</span>
+							<input type=text id=image-URL size=32 style="float:right">
+						</div>
+						<div>
+							<span class=input-title>Image Upload:</span>
+							<input type=file id=image-upload accept="image/*" style=display:inline;float:right>
+						</div>
+						<div>
+							<span class=input-title>Limit image resolution:</span>
+							<input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+							<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
+						</div>
+					</div>
+					<div id=area-name class=image-input-wrapper>
+						<div>
+							<span class=input-title>Horizontal offset:</span>
+							<button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
+							<input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
+						</div>
+						<div>
+							<span class=input-title>Vertical offset:</span>
+							<button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
+							<input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
+						</div>
+						<div>
+							<span class=input-title>Scale:</span>
+							<button class=emoji-button name=scale value=0 style="float:right">🔄</button>
+							<input type=range name=scale min=-2 max=4 step=.01 value=0>
+						</div>
+						<div class=smol>
+							<span class=input-title>Underline:</span>
+							<button class=emoji-button name=underline value=32 style="float:right">🔄</button>
+							<input type=range name=underline min=0 max=64 value=32>
+						</div>
+						<div class=smol>
+							<span class=input-title>Contrast:</span>
+							<button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
+							<input type=range name=contrast min=0 max=3 step=0.1 value=1>
+						</div>
+					</div>
+				</div>
+
+				<button style=float:right;margin-left:.5em class="btn btn-primary" onclick=imageGen.saveImage()>Save image</button>
+				<button style=float:right class="btn btn-primary" onclick=imageGen.redrawMacro()>Render changes</button>
+				<a style="float:left" href="macro-generator.html" target="_blank">For more options: FromSoft Image Macro Generator</a>
+			</div>
+		</div>
 
 
-        <div class="lesser content streamer-feature">
-            <h4>Streamer features</h4>
-            <button class="emoji-button minimise"></button>
+		<div id=custom-input class="lesser content hidden">
+			<h4>Custom area parts</h4> <button class="btn btn-success" style=float:right onclick=saveCustom()>Save</button>
+			<br>
 
-            <div class=body hidden>
+			<div class=help style=width:700px;max-width:80vw>
+				Use semicolons to separate pieces. Don't leave spaces before/after semicolons. Trailing semicolon optional.
+				Capitalisation matters. Does not auto-save.
+			</div><br>
 
-                <span class="help">Displays any name you put in.</span><br>
-                <input type="text" id="custom-text" size="40"></input>
-                <button id="custom-button" class="btn btn-primary" onclick=customGenerate()>Display</button>
+			<span class=input-title>Proper Locations:</span> <span class=example>e.g. "Anor Londo;Majula;Lothric"</span> <br>
+			<textarea name=properLocations cols=90 rows=1></textarea><br>
 
-                <br><br>
+			<span class=input-title>Places:</span> <span class=example>e.g. "World;Chasm;Forest"</span> <br>
+			<textarea name=primaryLocations cols=90 rows=2></textarea><br>
+			<span class=input-title>Sub-places:</span> <span class=example>e.g. "Chasm;Forest;Road"</span> <br>
+			<div class=help style=width:700px;max-width:90vw>
+				This should contain all the same parts as the previous box, except for the few ones that don't work for describing a sub-area of a larger area.<br>
+				e.g. "Lothric Town" works, so "Town" fits in here, "Lothric World" does not, so "World" is excluded.
+			</div>
+			<textarea name=secondaryLocations cols=90 rows=2></textarea><br><br>
+			
+			<span class=input-title>Personal names:</span> <span class=example>e.g. "Quelaag;Aldia;Ariandel"</span> <br>
+			<textarea name=properNames cols=90 rows=1></textarea><br><br>
+			
+			<span class=input-title>Possessives:</span> <span class=example>e.g. "No-Man's;Duke's;The King's"</span> <br>
+			<textarea name=possessives cols=90 rows=1></textarea><br>
+			<span class=input-title>Prefixes:</span> <span class=example>e.g. "Blight;Byrgen"</span> <span class=help>(These are glued directly onto a place name e.g. Blightcity)</span> <br>
+			<textarea name=prefixes cols=90 rows=1></textarea><br>
+			<span class=input-title>Positional descriptors:</span> <span class=example>e.g. "Northern;Upper;Inner"</span> <br>
+			<textarea name=positionals cols=90 rows=1></textarea><br>
+			<span class=input-title>Adjectives:</span> <span class=example>e.g. "New;Great;Frozen"</span> <span class=help>(Don't include anything from the previous three boxes.)</span> <br> 
+			<textarea name=adjectives cols=90 rows=2></textarea><br><br>
+			
+			<span class=input-title>Appendices:</span> <span class=example>e.g. "of the Giants;Betwixt;of Flame"</span> <br>
+			<textarea name=appendices cols=90 rows=2></textarea>
+		</div>
 
-                <button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
-                    Fade in
-                </button>
 
-                <button class="btn btn-danger" onClick="$('#name-underline-wrapper').addClass('faded-out');">
-                    Fade out
-                </button>
+		<div class="lesser content streamer-feature">
+			<h4>Streamer features</h4>
+			<button class="emoji-button minimise"></button>
 
-                <label><input id="fade-out-check" type="checkbox"></input> Fade out automatically</label><br>
-                <label>Seconds before automatically fading out: &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
-                
-                <br>
-                
-                <button id=chromaButton style="margin-top:-15px; float:right" class="btn btn-primary" onClick=toggleChroma()>chroma</button>
-            </div>
-        </div>
+			<div class=body hidden>
 
-    </div>
+				<span class="help">Displays any name you put in.</span><br>
+				<input type="text" id="custom-text" size="40"></input>
+				<button id="custom-button" class="btn btn-primary" onclick=customGenerate()>Display</button>
+
+				<br><br>
+
+				<button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
+					Fade in
+				</button>
+
+				<button class="btn btn-danger" onClick="$('#name-underline-wrapper').addClass('faded-out');">
+					Fade out
+				</button>
+
+				<label><input id="fade-out-check" type="checkbox"></input> Fade out automatically</label><br>
+				<label>Seconds before automatically fading out: &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
+				
+				<br>
+				
+				<button id=chromaButton style="margin-top:-15px; float:right" class="btn btn-primary" onClick=toggleChroma()>chroma</button>
+			</div>
+		</div>
+
+	</div>
 </div>
 
 <div id=footer>
-    <div id=bottom-fade></div>
+	<div id=bottom-fade></div>
 
-    <div id=credits>
-        <div class="credit left" style=line-height:1em>
-            <label style=font-weight:regular>Latest inclusion: Elden Ring (2022)</label><br>
-            <label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
-            <label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'ga-disable='+ +this.checked"></label>
-        </div>
+	<div id=credits>
+		<div class="credit left" style=line-height:1em>
+			<label style=font-weight:regular>Latest inclusion: Elden Ring (2022)</label><br>
+			<label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
+			<label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'ga-disable='+ +this.checked"></label>
+		</div>
 
-        <div class="credit right">
-            <a href="http://twitter.com/rezuaq" target=_blank>Created by Rezuaq</a>
-            <span class=dash>-</span>
-            <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
-            <span class=dash>-</span>
-            <a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
-        </div>
-    </div>
+		<div class="credit right">
+			<a href="http://twitter.com/rezuaq" target=_blank>Created by Rezuaq</a>
+			<span class=dash>-</span>
+			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
+			<span class=dash>-</span>
+			<a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
+		</div>
+	</div>
 </div>
 
 </body>
