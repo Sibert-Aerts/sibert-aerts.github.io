@@ -413,7 +413,8 @@ class MacroGenerator {
         else if( imageType !== 'jpeg' ) imageType = 'png'
 
         // Set the file name and put the image data
-        this.saveLink.setAttribute('download', this.captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') + '.' + imageType)
+        const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') || 'macro'
+        this.saveLink.setAttribute('download', fileName + '.' + imageType)
         this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
 
         this.saveLink.click()
