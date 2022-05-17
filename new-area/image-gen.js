@@ -180,7 +180,10 @@ class Sliders {
 
             /// Hook up reset button
             const button = this.element.getElementsByTagName('button').namedItem(name)
-            if (button) button.onclick = () => { slider.value = button.value; slider.onchange() }
+            if (button) {
+                button.value = slider.value
+                button.onclick = () => { slider.value = button.value; slider.onchange() }
+            }
         }
         // If we make it through the whole thing without an early return, we're usable!
         this.usable = true
@@ -279,7 +282,7 @@ class MacroGenerator {
         this.macroSliders = new Sliders('area-name', element, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
         this.macroSliders.onchange = () => this.autoRedraw()
         
-        this.victorySliders = new Sliders('victory', element, ['xOffset', 'yOffset', 'scale', 'color', 'blurTint', 'shadowSize', 'shadowOpacity'])
+        this.victorySliders = new Sliders('victory', element, ['xOffset', 'yOffset', 'scale', 'color', 'blurTint', 'blurSize', 'blurOpacity', 'shadowSize', 'shadowOpacity'])
         this.victorySliders.onchange = () => this.autoRedraw()
         
         this.imageSliders = new Sliders('image', element, ['imgSaturate', 'imgContrast', 'imgBrightness'])
@@ -301,10 +304,18 @@ class MacroGenerator {
         const oldType = this.macroTypeSelect.oldValue
         const newType = this.macroTypeSelect.value
         this.macroTypeSelect.oldValue = newType
-        if( oldType )
-            layerTypes[oldType].sliders.forEach(n => this.sliders[n].hide())
+        
+        //// Hide/Show necessary sliders
+        if( oldType ) layerTypes[oldType].sliders.forEach(n => this.sliders[n].hide())
         layerTypes[newType].sliders.forEach(n => this.sliders[n].show())
 
+        //// Update generic caption
+        if( this.captionInput.value === 'ENTER CAPTION' && layerTypes[newType].preferCase === 'title case' )
+            this.captionInput.value = 'Enter Caption'
+        else if( this.captionInput.value === 'Enter Caption' && layerTypes[newType].preferCase === 'all caps' )
+            this.captionInput.value = 'ENTER CAPTION'
+
+        //// Redraw (if desired)
         if (redraw) this.redrawMacro()
     }
 
@@ -413,10 +424,9 @@ class MacroGenerator {
         else if( imageType !== 'jpeg' ) imageType = 'png'
 
         // Set the file name and put the image data
-        const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z ]/g, '') || 'macro'
+        const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z0-9 ]/g, '') || 'macro'
         this.saveLink.setAttribute('download', fileName + '.' + imageType)
-        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType).replace('image/' + imageType, 'image/octet-stream'))
-
+        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType))        
         this.saveLink.click()
     }
 }
@@ -433,6 +443,7 @@ class MacroGenerator {
  * @typedef {Object} DrawableLayer
  * @prop {string} key
  * @prop {string} name
+ * @prop {string} preferCase
  * @prop {string[]} sliders
  * 
  * @prop {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} draw()
@@ -443,19 +454,16 @@ class MacroGenerator {
 const ds1Victory = {
     key: 'ds1-victory',
     name: 'DS1 - Victory',
+    preferCase: 'all caps',
     sliders: ['victory'],
 
     draw(ctx, canvas, gen) {
-        // Prefer all-caps caption
-        if( gen.captionInput.value === 'Enter Caption' )
-            gen.captionInput.value = 'ENTER CAPTION'
-    
         // CONSTANTS
         const w = canvas.width, h = canvas.height
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale, color, blurTint, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
+        const { xOffset, yOffset, scale, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
         const x0 = (xOffset + .4)/100 * w
         const y0 = (yOffset)/100 * h
@@ -498,7 +506,7 @@ const ds1Victory = {
         else
             caption = caption.split('').join(' ')
     
-        ctx.font = Math.floor(92*s) + 'px adobe-garamond-pro'
+        ctx.font = (92*s) + 'px adobe-garamond-pro'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         
@@ -507,13 +515,13 @@ const ds1Victory = {
         ctx.save()
 
         //// Emulate the zoom blur effect
-        const zoomSteps = Math.floor(20 * Math.pow(s, 1/4))
-        const ZOOMSIZE = 1.1
+        const ZOOMSIZE = blurSize
+        const zoomSteps = Math.floor(20*ZOOMSIZE * Math.pow(s, 1/4))
         // zoomFactor**zoomSteps = ZOOMSIZE
         const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
         // Zoom blur vertical distance
         const VOFFSET = 1
-        const VOFF = VOFFSET*s/(ZOOMSIZE-1)
+        const voff = VOFFSET*s/(ZOOMSIZE-1)
         const blurColor = RGBMul(color, blurTint).map(byteClamp)
 
         for( let i=0; i<=zoomSteps; i++ ) {
@@ -521,11 +529,11 @@ const ds1Victory = {
             // `product` ranges from 1 up to and including ZOOMSIZE
             const product = Math.pow(ZOOMSIZE, i/zoomSteps)
             // `fatProduct` ranges from 1 up to and including ±2
-            const fatProduct = product ** 7
+            const fatProduct = Math.pow(product, 1/Math.log2(ZOOMSIZE))
     
-            ctx.filter = `blur(${Math.floor(s*fatProduct)}px`
-            ctx.fillStyle = `rgba(${blurColor.join()}, ${0.1 / fatProduct})`
-            ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-VOFF)/product+VOFF)/VSCALE)
+            ctx.filter = `blur(${Math.floor(s*product**4)}px`
+            ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
+            ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/VSCALE)
         }
         
         ctx.restore()
@@ -538,13 +546,10 @@ const ds1Victory = {
 const ds3Death = {
     key: 'ds3-death',
     name: 'DS3 - Death',
+    preferCase: 'all caps',
     sliders: ['area-name'],
 
     draw(ctx, canvas, gen) {
-        // Prefer all-caps caption
-        if( gen.captionInput.value === 'Enter Caption' )
-            gen.captionInput.value = 'ENTER CAPTION'
-
         // CONSTANTS
         const w = canvas.width, h = canvas.height
         let s = h/1080
@@ -601,13 +606,10 @@ const ds3Death = {
 const ds3Area = {
     key: 'ds3-area',
     name: 'DS3 - Area Name',
+    preferCase: 'title case',
     sliders: ['area-name'],
 
     draw(ctx, canvas, gen) {
-        // Prefer title-case caption
-        if( gen.captionInput.value === 'ENTER CAPTION' )
-            gen.captionInput.value = 'Enter Caption'
-    
         // CONSTANTS
         const w = canvas.width, h = canvas.height
         let s = h/1080
@@ -671,6 +673,7 @@ const emptyLayer = {
     draw() {}
 }
 
+/** Keep this up-to-date manually. */
 const layerTypeList = [ds1Victory, ds3Area, ds3Death, emptyLayer]
 
 /** 
