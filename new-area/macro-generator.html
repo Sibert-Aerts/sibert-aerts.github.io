@@ -35,9 +35,9 @@
 			document.querySelector('input[target=disable-ga]').checked = window['ga-disable-G-HCGGJHJ3DR']
 		})
 		window.addEventListener('load', function() {
-			// Create the global ImageGenerator
-			imageGen = new ImageGenerator(document.getElementById('main-content'))
-			imageGen.redrawMacro()
+			// Create the global MacroGenerator
+			macroGen = new MacroGenerator(document.getElementById('main-content'))
+			macroGen.redrawMacro()
 		})
 	</script>
 
@@ -55,7 +55,7 @@
 <div id=background-layer class="background-layer faded"></div>
 
 <div id=main>
-	<div id=main-content class=content style="position: relative; margin-top: 2vw; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none">
+	<div id=main-content class=content style="position: relative; margin-top: 1%; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none">
 		<h1>FromSoftware image macro generator</h1>
 		<button class="emoji-button minimise"></button>
 
@@ -74,6 +74,7 @@
 		
 
 		<div style="display:flex; flex-wrap:wrap; justify-content:center; margin:1em">
+
 			<div id=global-sliders class=sliders-container>
 				<h4 style="margin-bottom: .5em"> Configuration </h4>
 				<div>
@@ -100,34 +101,75 @@
 					<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
 				</div>
 			</div>
-			<div id=area-name class=sliders-container>
+
+			<div id=victory class=sliders-container hidden>
 				<h4> Overlay options </h4>
 				<div>
 					<span class=input-title>Horizontal offset:</span>
-					<button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
+					<button class=emoji-button name=xOffset value=0 style=float:right>🔄</button>
 					<input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
 				</div>
 				<div>
 					<span class=input-title>Vertical offset:</span>
-					<button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
+					<button class=emoji-button name=yOffset value=0 style=float:right>🔄</button>
 					<input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
 				</div>
 				<div>
 					<span class=input-title>Scale:</span>
-					<button class=emoji-button name=scale value=0 style="float:right">🔄</button>
-					<input type=range name=scale min=-2 max=4 step=.01 value=0>
+					<button class=emoji-button name=scale value=0 style=float:right>🔄</button>
+					<input type=range name=scale min=-5 max=4 step=.01 value=0>
+				</div>
+				<div class=smol>
+					<span class=input-title>Main color:</span>
+					<button class=emoji-button name=color value=#ffff6b style=float:right>🔄</button>
+					<input type=color name=color as=rgb value=#ffff6b>
+				</div>
+				<div class=smol>
+					<span class=input-title>Blur tint:</span>
+					<button class=emoji-button name=blurTint value=#ffb299 style=float:right>🔄</button>
+					<input type=color name=blurTint as=rgb value=#ffb299>
+				</div>
+				<div class=smol>
+					<span class=input-title>Shadow size:</span>
+					<button class=emoji-button name=shadowSize value=1 style=float:right>🔄</button>
+					<input type=range name=shadowSize min=0 max=8 step=.1 value=1>
+				</div>
+				<div class=smol>
+					<span class=input-title>Shadow opacity:</span>
+					<button class=emoji-button name=shadowOpacity value=1 style=float:right>🔄</button>
+					<input type=range name=shadowOpacity min=0 max=3 step=0.1 value=1>
+				</div>
+			</div>
+
+			<div id=area-name class=sliders-container hidden>
+				<h4> Overlay options </h4>
+				<div>
+					<span class=input-title>Horizontal offset:</span>
+					<button class=emoji-button name=xOffset value=0 style=float:right>🔄</button>
+					<input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
+				</div>
+				<div>
+					<span class=input-title>Vertical offset:</span>
+					<button class=emoji-button name=yOffset value=0 style=float:right>🔄</button>
+					<input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
+				</div>
+				<div>
+					<span class=input-title>Scale:</span>
+					<button class=emoji-button name=scale value=0 style=float:right>🔄</button>
+					<input type=range name=scale min=-5 max=4 step=.01 value=0>
 				</div>
 				<div class=smol>
 					<span class=input-title>Underline:</span>
-					<button class=emoji-button name=underline value=32 style="float:right">🔄</button>
+					<button class=emoji-button name=underline value=32 style=float:right>🔄</button>
 					<input type=range name=underline min=0 max=64 value=32>
 				</div>
 				<div class=smol>
 					<span class=input-title>Contrast:</span>
-					<button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
+					<button class=emoji-button name=contrast value=1 style=float:right>🔄</button>
 					<input type=range name=contrast min=0 max=3 step=0.1 value=1>
 				</div>
 			</div>
+
 			<div id=image class=sliders-container hidden>
 				<h4> Image filters </h4>
 				<div>
@@ -146,11 +188,12 @@
 					<input type=range name=imgBrightness min=0 max=200 step=1 value=100>
 				</div>
 			</div>
+
 		</div>
 
 		<div style=position:absolute;right:30px;bottom:10px>
-			<button style=margin-left:20px id=generate-button onclick=imageGen.saveImage()>Save image</button>
-			<button id=generate-button onclick=imageGen.redrawMacro()>Render changes</button>
+			<button style=margin-left:20px id=generate-button onclick=macroGen.saveImage()>Save image</button>
+			<button id=generate-button onclick=macroGen.redrawMacro()>Render changes</button>
 		</div>
 	</div>
 </div>

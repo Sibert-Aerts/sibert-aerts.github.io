@@ -347,6 +347,12 @@ label > input {
     float: right;
 }
 
+/* 
+ *
+ * IMAGE GENERATOR STUFF
+ *
+ */
+
 canvas.small {
     max-width: 720px;
     max-height: 480px;
@@ -362,23 +368,31 @@ canvas.big {
     width: 100%; max-width: 400px;
     margin-bottom: 1em;
 }
+    .sliders-container > h4 {
+        width: 100%;
+        margin-bottom: 0;
+        font-size: 1.5em;
+        text-align: center;
+    }
 
-.sliders-container > h4 {
-    width: 100%;
-    margin-bottom: 0;
-    font-size: 1.5em;
-    text-align: center;
-}
+    .sliders-container > div {
+        padding-left: 5px; padding-right: 5px;
+        margin-bottom: 8px;
+    }
+    .sliders-container > div.smol {
+        float: left;
+        width: 100%; max-width: 200px;
+    }
 
-.sliders-container > div {
-    padding-left: 5px; padding-right: 5px;
-    margin-bottom: 8px;
-}
+    .sliders-container input[type=color] {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
 
-.sliders-container > div.smol {
-    float: left;
-    width: 100%; max-width: 200px;
-}
 
 #resolution-warning {
     font-size: 15px;

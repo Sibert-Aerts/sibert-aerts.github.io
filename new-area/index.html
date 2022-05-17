@@ -40,13 +40,13 @@
 	<!-- Specific page-setup script -->
 	<script type="text/javascript">
 		window.addEventListener('DOMContentLoaded', function() {
-			// Set up event to only instantiate the ImageGenerator once the little modal is opened.
+			// Set up event to only instantiate the MacroGenerator once the little modal is opened.
 			const parent = byId('image-gen')
 			function callback() {
 				parent.removeEventListener('click', callback)
 
-				imageGen = new ImageGenerator()
-				imageGen.redrawMacro()
+				macroGen = new MacroGenerator()
+				macroGen.redrawMacro()
 			}
 			parent.addEventListener('click', callback)
 		})
@@ -186,7 +186,7 @@
 					</div>
 				</div>
 
-				<button style=float:right;margin-left:.5em class="btn btn-primary" onclick=imageGen.saveImage()>Save image</button>
+				<button style=float:right;margin-left:.5em class="btn btn-primary" onclick=macroGen.saveImage()>Save image</button>
 				<a style="float:left" href="macro-generator.html" target="_blank">For more features: FromSoft Image Macro Generator</a>
 			</div>
 		</div>

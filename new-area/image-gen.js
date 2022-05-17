@@ -2,15 +2,32 @@
     Script for the image macro generator on (https://sibert-aerts.github.io/new-area/) and (https://sibert-aerts.github.io/new-area/macro-generator.html)
 */
 
-///// TINY DOM UTIL FUNCTIONS
+///// TINY UTILS
+const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
+
+///// TINY DOM UTILS
 const byId = id => document.getElementById(id)
 const makeElem = (tag, clss, text) => { let e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
 
 
+///// TINY COLOR UTILS
+
+/** Must be used EXCLUSIVELY with strings of the form '#abcdef', such as input.color. */
+const hexToRGB = (h) => Array.from( h.matchAll(/[^#]{2}/g) ).map( x => parseInt(x[0], 16) )
+/** Must be used EXCLUSIVELY with integers [0, 255]. */
+const RGBToHex = (r, g, b) => '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0') ).join('')
+/** May be used with any numbers; floors and clamps them first. */
+const laxRGBToHex = (r=0, g=0, b=0) => RGBToHex(...[r, g, b].map(byteClamp))
+
+/** Multiply two lax RGB arrays into a lax RGB array. */
+const RGBMul = (c, d) => [c[0]*d[0]/255, c[1]*d[1]/255, c[2]*d[2]/255]
+
+
+
 /** Handles incoming images. */
 class ImageHandler {
-    /** @type ImageGenerator */
-    imageGen
+    /** @type MacroGenerator */
+    macroGen
 
     /** @type HTMLElement */
     parent
@@ -25,11 +42,11 @@ class ImageHandler {
     imageType = null    
 
     /**
-     * @param {ImageGenerator} imageGen 
+     * @param {MacroGenerator} macroGen 
      * @param {HTMLElement} parent
      */
-    constructor(imageGen, parent) {
-        this.imageGen = imageGen
+    constructor(macroGen, parent) {
+        this.macroGen = macroGen
         this.parent = parent
 
         /// URL event bindings
@@ -61,7 +78,7 @@ class ImageHandler {
         reader.onload = e => {
             this.image = new Image()
             this.image.onload = this.onload.bind(this)
-            this.image.src = event.target.result
+            this.image.src = e.target.result
         }
         reader.readAsDataURL(this.fileSelect.files[0])
         this.imageType = this.fileSelect.files[0].type
@@ -112,12 +129,12 @@ class ImageHandler {
     }
 
     onload() {
-        this.imageGen.imageSliders.show()
-        this.imageGen.redrawMacro()
+        this.macroGen.imageSliders.show()
+        this.macroGen.redrawMacro()
     }
     onerror() {
         this.image = this.imageType = undefined
-        this.imageGen.clear()
+        this.macroGen.clear()
     }
 }
 
@@ -149,7 +166,8 @@ class Sliders {
         this.element = parent.getElementsByClassName('sliders-container').namedItem(name)
         if( !this.element ) return
 
-        /// Find each slider 
+        /// Find each slider
+        // TODO: No more list of names, it should be able to find these itself
         for( const name of names ) {
             const slider = this.element.getElementsByTagName('input').namedItem(name)
 
@@ -180,8 +198,14 @@ class Sliders {
      */
     getValues() {
         const values = {}
-        for( const slider of this.sliders )
-            values[slider.name] = parseFloat(slider.value)
+        for( const slider of this.sliders ) {
+            if( slider.type === 'range' )
+                values[slider.name] = parseFloat(slider.value)
+            else if( slider.type === 'color' && slider.getAttribute('as') === 'rgb' )
+                values[slider.name] = hexToRGB(slider.value)
+            else
+                values[slider.name] = slider.value
+        }
         return values
     }
 
@@ -197,7 +221,7 @@ class Sliders {
 /**
  *  The class that puts it all to work.
  */
-class ImageGenerator {
+class MacroGenerator {
     /** @type {readonly HTMLElement | Document} */
     element
     /** @type {readonly HTMLCanvasElement} */
@@ -242,7 +266,6 @@ class ImageGenerator {
                 elem.value = layerType.key
                 this.macroTypeSelect.appendChild(elem)
             }
-            this.macroTypeSelect.oldValue = this.macroTypeSelect.value
         }
 
         this.captionInput = my('input', 'image-caption')
@@ -256,14 +279,25 @@ class ImageGenerator {
         this.macroSliders = new Sliders('area-name', element, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
         this.macroSliders.onchange = () => this.autoRedraw()
         
+        this.victorySliders = new Sliders('victory', element, ['xOffset', 'yOffset', 'scale', 'color', 'blurTint', 'shadowSize', 'shadowOpacity'])
+        this.victorySliders.onchange = () => this.autoRedraw()
+        
         this.imageSliders = new Sliders('image', element, ['imgSaturate', 'imgContrast', 'imgBrightness'])
         this.imageSliders.onchange = () => this.autoRedraw()
 
-        this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders}
+        this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
+        this.onMacroTypeChange(null, false)
+
+        //// IN CASE OF TESTING ENVIRONMENT
+        if( window['TESTING'] ){
+            this.macroTypeSelect.value = TESTING.type
+            this.captionInput.value = TESTING.caption
+        }
+
     }
 
     /** Callback from the macro type select */
-    onMacroTypeChange(e) {
+    onMacroTypeChange(e, redraw=true) {
         const oldType = this.macroTypeSelect.oldValue
         const newType = this.macroTypeSelect.value
         this.macroTypeSelect.oldValue = newType
@@ -271,7 +305,7 @@ class ImageGenerator {
             layerTypes[oldType].sliders.forEach(n => this.sliders[n].hide())
         layerTypes[newType].sliders.forEach(n => this.sliders[n].show())
 
-        this.redrawMacro()
+        if (redraw) this.redrawMacro()
     }
 
     /** Check whether the current canvas is too big to allow auto-rerendering. */
@@ -399,7 +433,8 @@ class ImageGenerator {
  * @prop {string} key
  * @prop {string} name
  * @prop {string[]} sliders
- * @prop {() => void} draw()
+ * 
+ * @prop {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} draw()
  */
 
 
@@ -407,7 +442,7 @@ class ImageGenerator {
 const ds1Victory = {
     key: 'ds1-victory',
     name: 'DS1 - Victory',
-    sliders: ['area-name'],
+    sliders: ['victory'],
 
     draw(ctx, canvas, gen) {
         // Prefer all-caps caption
@@ -419,26 +454,32 @@ const ds1Victory = {
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale, underline, contrast } = gen.macroSliders.getValues()
+        const { xOffset, yOffset, scale, color, blurTint, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
         const x0 = (xOffset + .4)/100 * w
         const y0 = (yOffset)/100 * h
         const s0 = 2**scale
         s *= s0
-        const shadeScale = underline/32 * s0
+
+        // Center to which things align and also scale
+        VERTICALCENTER = .532
     
         // The shade only moves up or down
         ctx.translate(0, y0)
         // SHADE
-        if( shadeScale > 0 ) {
-            const shadeHeight = shadeScale * .25*h
-            const SHADECENTER = .53*h
-            const top = SHADECENTER-shadeHeight/2, bottom = SHADECENTER+shadeHeight/2
+        if( shadowSize > 0 ) {
+            const shadeHeight = shadowSize * .25*h * s0
+            // Offset from the top of the frame when s0=1
+            const shadeCentering = .53
+            // Voodoo
+            const shadeCenter = ( shadeCentering*s0 - VERTICALCENTER*(s0-1) ) * h
+            // Duh
+            const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
     
             const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
             shadowGrad.addColorStop(0,   '#0000')
-            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * contrast**0.4})`)
-            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.7 * contrast**0.4})`)
+            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
+            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
             shadowGrad.addColorStop(1,   '#0000')
             ctx.fillStyle = shadowGrad
             ctx.fillRect(0, top, w, shadeHeight)
@@ -459,21 +500,20 @@ const ds1Victory = {
         ctx.font = Math.floor(92*s) + 'px adobe-garamond-pro'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-
-        const MAGICOFFSET = .032*h
-        ctx.translate(0, MAGICOFFSET)
         
         const VSCALE = 1.5
         ctx.scale(1, VSCALE)
         ctx.save()
 
-        // Emulate the zoom blur effect
+        //// Emulate the zoom blur effect
         const zoomSteps = Math.floor(20 * Math.pow(s, 1/4))
-        const ZOOMSIZE = 1.10
+        const ZOOMSIZE = 1.1
         // zoomFactor**zoomSteps = ZOOMSIZE
         const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
-        // Zoom blur center offset
-        const VOFFSET = MAGICOFFSET
+        // Zoom blur vertical distance
+        const VOFFSET = 1
+        const VOFF = VOFFSET*s/(ZOOMSIZE-1)
+        const blurColor = RGBMul(color, blurTint).map(byteClamp)
 
         for( let i=0; i<=zoomSteps; i++ ) {
             if( i ) ctx.scale(zoomFactor, zoomFactor)
@@ -483,13 +523,13 @@ const ds1Victory = {
             const fatProduct = product ** 7
     
             ctx.filter = `blur(${Math.floor(s*fatProduct)}px`
-            ctx.fillStyle = `rgba(255, 180, 60, ${0.1 / fatProduct})`
-            ctx.fillText(caption, w/2/product, ((h/2-VOFFSET)/product+VOFFSET)/VSCALE)
+            ctx.fillStyle = `rgba(${blurColor.join()}, ${0.1 / fatProduct})`
+            ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-VOFF)/product+VOFF)/VSCALE)
         }
         
         ctx.restore()
-        ctx.fillStyle = `rgba(255, 255, 107, 0.9)`
-        ctx.fillText(caption, w/2, h/2/VSCALE )
+        ctx.fillStyle = `rgba(${color.join()}, 0.9)`
+        ctx.fillText(caption, w/2, h*VERTICALCENTER/VSCALE )
     }
 }
 
@@ -511,23 +551,29 @@ const ds3Death = {
         // USER INPUT
         const { xOffset, yOffset, scale, underline, contrast } = gen.macroSliders.getValues()
         
-        const x0 = (xOffset + .6)/100 * w
+        const x0 = (xOffset + .4)/100 * w
         const y0 = (yOffset + 1.8)/100 * h
         const s0 = 2**scale
         s *= s0
-        const shadeScale = underline/32 * s0
+        const shadeScale = underline/32
 
         // The shade only moves up or down
         ctx.translate(0, y0)
         // SHADE
         if( shadeScale > 0 ) {
-            const shadeHeight = shadeScale * .2*h
-            const top = .5*h-shadeHeight/2, bottom = .5*h+shadeHeight/2
+            const shadeHeight = shadeScale*.17* h*s0
+            // Offset from the top of the frame when s0=1
+            const shadeCentering = .485
+            const scaleCenter = .5
+            // Voodoo
+            const shadeCenter = ( shadeCentering*s0 - scaleCenter*(s0-1) ) * h
+            // Duh
+            const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
 
             const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
             shadowGrad.addColorStop(0,   '#0000')
-            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.5 * contrast**0.7})`)
-            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.5 * contrast**0.7})`)
+            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.6 * contrast**0.5})`)
+            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.6 * contrast**0.5})`)
             shadowGrad.addColorStop(1,   '#0000')
             ctx.fillStyle = shadowGrad
             ctx.fillRect(0, top, w, shadeHeight)
@@ -537,15 +583,16 @@ const ds3Death = {
         ctx.translate(x0, 0)
 
         // TEXT
-        ctx.font = Math.floor(148*s) + 'px adobe-garamond-pro'
-        ctx.fillStyle = `rgb(${120*contrast}, ${10*contrast}, ${20*contrast})`
+        ctx.font = Math.floor(150*s) + 'px adobe-garamond-pro'
+        ctx.fillStyle = `rgb(${100*contrast}, ${10*contrast}, ${10*contrast})`
         ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
         
-        ctx.shadowBlur = 4*s
-        ctx.shadowColor = `rgba(255, 20, 20, .2)`
+        // ctx.shadowBlur = 4*s
+        // ctx.shadowColor = `rgba(255, 20, 20, .2)`
 
         ctx.scale(1, 1.3)
-        ctx.fillText(gen.captionInput.value, w/2, (h/2 + 50*s)/1.3 )
+        ctx.fillText(gen.captionInput.value, w/2, h/2/1.3 )
     }
 }
 
@@ -631,3 +678,11 @@ const layerTypeList = [ds1Victory, ds3Area, ds3Death, emptyLayer]
  */
 const layerTypes = {}
 layerTypeList.map( macro => layerTypes[macro.key] = macro)
+
+
+//// TESTING ENVIRONMENT
+
+// window['TESTING'] = {
+//     type: 'ds1-victory',
+//     caption: 'VICTORY ACHIEVED'
+// }
