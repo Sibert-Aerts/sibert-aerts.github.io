@@ -282,7 +282,8 @@ class MacroGenerator {
         this.macroSliders = new Sliders('area-name', element, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
         this.macroSliders.onchange = () => this.autoRedraw()
         
-        this.victorySliders = new Sliders('victory', element, ['xOffset', 'yOffset', 'scale', 'color', 'blurTint', 'blurSize', 'blurOpacity', 'shadowSize', 'shadowOpacity'])
+        this.victorySliders = new Sliders('victory', element, 
+            ['xOffset', 'yOffset', 'scale', 'vScale', 'charSpacing', 'color', 'blurTint', 'blurSize', 'blurOpacity', 'shadowSize', 'shadowOpacity'])
         this.victorySliders.onchange = () => this.autoRedraw()
         
         this.imageSliders = new Sliders('image', element, ['imgSaturate', 'imgContrast', 'imgBrightness'])
@@ -463,9 +464,9 @@ const ds1Victory = {
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
+        const { xOffset, yOffset, scale, vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
-        const x0 = (xOffset + .4)/100 * w
+        const x0 = (xOffset +.2)/100 * w
         const y0 = (yOffset)/100 * h
         const s0 = 2**scale
         s *= s0
@@ -500,17 +501,25 @@ const ds1Victory = {
         // TEXT
         caption = gen.captionInput.value
     
-        // This feature only works on chromia, otherwise just inject hair-spaces between letters
-        if( !!window.chrome )
-            canvas.style.letterSpacing = Math.floor(8*s) + 'px'
-        else
-            caption = caption.split('').join(' ')
+        if( charSpacing ) {
+            if( !!window.chrome && true ) {
+                //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
+                canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
+                ctx.translate(charSpacing*s/2, 0)
+                // TODO: this throws off the glow-blur centering
+
+            } else if( charSpacing > 0 ) {
+                //// Otherwise: simply inject little hair spaces in between each character
+                const space = ' '.repeat(Math.floor(charSpacing/5))
+                caption = caption.split('').join(space)
+            }
+        }
     
         ctx.font = (92*s) + 'px adobe-garamond-pro'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         
-        const VSCALE = 1.5
+        const VSCALE = vScale
         ctx.scale(1, VSCALE)
         ctx.save()
 

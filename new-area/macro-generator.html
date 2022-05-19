@@ -30,13 +30,13 @@
 	
 	<!-- Specific page-setup script -->
 	<script type="text/javascript">
-		window.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function() {
 			// Recall whether that box is checked
 			document.querySelector('input[target=disable-ga]').checked = window['ga-disable-G-HCGGJHJ3DR']
+			macroGen = new MacroGenerator(document.getElementById('main-content'))
 		})
 		window.addEventListener('load', function() {
 			// Create the global MacroGenerator
-			macroGen = new MacroGenerator(document.getElementById('main-content'))
 			macroGen.redrawMacro()
 		})
 	</script>
@@ -119,8 +119,20 @@
 					<button class=emoji-button name=scale style=float:right>🔄</button>
 					<input type=range name=scale min=-2 max=4 step=.01 value=0>
 				</div>
+
 				<div class=smol>
-					<span class=input-title>Main color:</span>
+					<span class=input-title>Vertical scale:</span>
+					<button class=emoji-button name=vScale style=float:right>🔄</button>
+					<input type=range name=vScale min=0.5 max=2 step=.02 value=1.5>
+				</div>
+				<div class=smol>
+					<span class=input-title>Letter spacing:</span>
+					<button class=emoji-button name=charSpacing style=float:right>🔄</button>
+					<input type=range name=charSpacing min=-10 max=40 step=.5 value=8>
+				</div>
+
+				<div class=smol>
+					<span class=input-title>Text color:</span>
 					<button class=emoji-button name=color style=float:right>🔄</button>
 					<input type=color name=color as=rgb value=#ffff6b>
 				</div>
