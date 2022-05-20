@@ -32,6 +32,7 @@
 	</script>
 
 	<!-- My stylesheet and scripts -->
+	<link rel="stylesheet" href="soulsy-input.css">
 	<link rel="stylesheet" href="new-area.css">
 	<script type="text/javascript" src="areas.js"></script>
 	<script type="text/javascript" src="new-area.js"></script>
@@ -79,7 +80,7 @@
 
 		<div id=generate-input-wrapper>
 			<div id=generate-button-wrapper>
-				<button id=generate-button onclick=generate()>Travel Somewhere Else</button>
+				<button id=generate-button class=soulsy onclick=generate()>Travel Somewhere Else</button>
 			</div>
 			<div id=checkboxes-wrapper>
 				<label><input target=Dark1 checked type=checkbox></input> Dark Souls</label>
@@ -186,7 +187,7 @@
 					</div>
 				</div>
 
-				<button style=float:right;margin-left:.5em class="btn btn-primary" onclick=macroGen.saveImage()>Save image</button>
+				<button style=float:right;margin-left:.5em;font-size:20px class=soulsy onclick=macroGen.saveImage()>Save image</button>
 				<a style="float:left" href="macro-generator.html" target="_blank">For more features: FromSoft Image Macro Generator</a>
 			</div>
 		</div>

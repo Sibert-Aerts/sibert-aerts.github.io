@@ -181,7 +181,7 @@ class Sliders {
             /// Hook up reset button
             const button = this.element.getElementsByTagName('button').namedItem(name)
             if (button) {
-                button.value = slider.value
+                // button.value = slider.value
                 button.onclick = () => { slider.value = button.value; slider.onchange() }
             }
         }

@@ -148,37 +148,8 @@ body {
 #generate-button {
     position: relative;
     float: right;
-    height: 1.45em;
     margin-top: -.5em;
-    white-space: nowrap;
-
-    font-family: Garamond;
-    color: #ffe;
-    border: none;
-    border-radius: 6px;
-
-    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
 }
-    #generate-button:hover {
-        background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .8) 0%, rgba(204, 80, 8, .4) 50%, transparent );
-    }
-    #generate-button:active {
-        background: radial-gradient( ellipse farthest-side at 50% 100%, rgb(255, 143, 51, .9) 0%, rgba(238, 94, 11, .5) 50%, transparent );
-    }
-    #generate-button::after {
-        content: "";
-        position: absolute;
-        left: -10%; bottom: 0;
-
-        width: 120%;
-        border-bottom: 2px solid #feea;
-
-        mask-image: radial-gradient( ellipse 50% 20px at 50% 100%, #000 0, #000 50%, transparent 100%);
-        -webkit-mask-image: radial-gradient( ellipse 50% 20px at 50% 100%, #000 0, #000 50%, transparent 100%);
-    }
-    #generate-button:active::after {
-        border-bottom: 2px solid #feed;
-    }
 
 .btn {
     opacity: 0.9;
@@ -385,11 +356,10 @@ canvas.big {
     }
 
     .sliders-container input[type=color] {
-        width: 100%;
-        margin: 0;
+        width: 80%;
+        height: 1.6em;
+        margin: 5px 10%;
         padding: 0;
-        border: none;
-        outline: none;
         cursor: pointer;
     }
 

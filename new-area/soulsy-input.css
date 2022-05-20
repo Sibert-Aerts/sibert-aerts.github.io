@@ -1,0 +1,102 @@
+
+/* BUTTON */
+
+button.soulsy {
+    position: relative;
+    font-size: 24px;
+    height: 1.45em;
+    padding: 2px 6px;
+    white-space: nowrap;
+
+    font-family: Garamond;
+    color: #ffe;
+    border: none;
+
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
+}
+button.soulsy:hover {
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .8) 0%, rgba(204, 80, 8, .4) 50%, transparent );
+}
+button.soulsy:active {
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgb(255, 143, 51, .9) 0%, rgba(238, 94, 11, .5) 50%, transparent );
+}
+button.soulsy::after {
+    content: "";
+    position: absolute;
+    left: -10%; bottom: 0;
+
+    width: 120%;
+    border-bottom: 2px solid #feea;
+
+    mask-image: radial-gradient( ellipse 50% 20px at 50% 100%, #000 0, #000 50%, transparent 100%);
+    -webkit-mask-image: radial-gradient( ellipse 50% 20px at 50% 100%, #000 0, #000 50%, transparent 100%);
+}
+button.soulsy:active::after {
+    border-bottom: 2px solid #feed;
+}
+
+
+
+/* RANGE INPUT */
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    margin-top: 6px;
+    background: transparent;
+}
+input[type=range]:focus {
+    outline: none;
+}
+
+/* THE THUMB */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    margin-top: 5px;
+
+    background-image: radial-gradient(circle at 15% 50%, rgb(255, 247, 228), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
+    border: 1px solid #534333;
+    box-shadow: 1.5px 1.5px 2px #0008;
+    border-radius: 0;
+    transform: scaleX(0.66) rotate(45deg);
+    cursor: pointer;
+}
+
+input[type=range]::-moz-range-thumb {
+    width: 14px; height: 14px;
+    /* COPY-PASTE THE OTHER RULES HERE */
+
+    background-image: radial-gradient(circle at 15% 50%, rgb(255, 247, 228), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
+    border: 1px solid #534333;
+    box-shadow: 1.5px 1.5px 2px #0008;
+    border-radius: 0;
+    transform: scaleX(0.66) rotate(45deg);
+    cursor: pointer;
+}
+
+/* THE TRACK */
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%; height: 15px;
+    margin-top: -5px;
+
+    cursor: pointer;
+    border-bottom: solid 2px #c29137;
+}  
+input[type=range]:focus::-webkit-slider-runnable-track {
+    border-bottom: solid 2px #ffb62e;
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
+}
+  
+input[type=range]::-moz-range-track {
+    width: 100%; height: 0;
+    padding-top: 15px;
+
+    cursor: pointer;
+    border-bottom: solid 2px #c29137;
+}
+input[type=range]:focus::-moz-range-track {
+    border-bottom: solid 2px #ffb62e;
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
+}
