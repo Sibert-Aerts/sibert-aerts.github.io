@@ -171,7 +171,7 @@ body {
     margin-left: 8px;
 }
 
-#main label {
+.main label {
     display: inline-block;
     min-width: 120px;
     margin-right: 20px;
@@ -180,7 +180,7 @@ body {
     font-weight: normal;
     text-shadow: 0px 0px 4px #111f, 0px 0px 1px #111f;
 }
-    #main label > input { margin-right: 2px }
+    .main label > input { margin-right: 4px }
     label.elden   { color: #ddcd88; }
     label.special { color: #88BBDD; }
     label.custom  { color: #ffaaaa; }
@@ -188,6 +188,7 @@ body {
 .input-title{
     font-size: 16px;
     display: inline-block;
+    font-weight: normal;
     min-width: 60px;
 }
 
@@ -204,15 +205,6 @@ body {
     font-family: Arial;
     font-size: 13px;
     opacity: 0.6;
-}
-
-textarea, input, select {
-    background-color: #dfe0d9;
-    font-family: Dejavu Sans Mono, Courier New;
-    color: black;
-}
-label > input {
-    font-weight: normal;
 }
 
 #credits {
@@ -366,11 +358,12 @@ canvas.big {
 
 #resolution-warning {
     font-size: 15px;
-    color: rgb(255, 197, 197);
+    color: #fcc;
 }
 
 input.bad-url {
-    background-color: #f88
+    color: #fcc;
+    background-color: rgb(73, 0, 22)
 }
 
 
@@ -392,7 +385,7 @@ input.bad-url {
         font-size: 16px;
     }
     #generate-button::after {
-        border-bottom-width: 1px !important
+        border-bottom-width: 1px
     }
     #main {
         padding-bottom: 30px; /* hack for the dumb emoji buttons to fit */

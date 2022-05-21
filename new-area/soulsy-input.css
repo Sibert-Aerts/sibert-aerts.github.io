@@ -1,14 +1,13 @@
 
-/* BUTTON */
+/************************************** BUTTON TYPE 1 **************************************/
 
 button.soulsy {
     position: relative;
-    font-size: 24px;
     height: 1.45em;
     padding: 2px 6px;
     white-space: nowrap;
 
-    font-family: Garamond;
+    font-family: adobe-garamond-pro;
     color: #ffe;
     border: none;
 
@@ -36,11 +35,31 @@ button.soulsy:active::after {
 }
 
 
+/************************************** BUTTON TYPE 2 **************************************/
 
-/* RANGE INPUT */
+button.soulsy-box {
+    padding: .1em .4em;
+    color: #ddc;
+    font-family: adobe-garamond-pro;
+    border: double 6px #dfa02d2e;
+    background: rgba(26, 23, 25, 70%)
+}
+button.soulsy-box:hover {
+    border-color: #dfa12d3b;
+    background: radial-gradient(ellipse 90% .95em, rgb(36, 29, 26) 0%, rgb(48, 30, 23) 60%, rgb(70, 35, 21) );
+}
+button.soulsy-box:active {
+    border-color: #dfa12d62;
+    background: radial-gradient(ellipse 90% .95em, rgb(36, 29, 26) 0%, rgb(48, 30, 23) 35%, rgb(70, 35, 21) 70%, rgb(192, 48, 4) 100%);
+}
+
+
+/************************************** RANGE INPUT **************************************/
 
 input[type=range] {
     -webkit-appearance: none;
+    position: relative;
+    z-index: 10;
     width: 100%;
     height: 10px;
     margin-top: 6px;
@@ -50,53 +69,140 @@ input[type=range]:focus {
     outline: none;
 }
 
-/* THE THUMB */
+/***** THE THUMB *****/
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 16px; height: 16px;
     margin-top: 5px;
 
-    background-image: radial-gradient(circle at 15% 50%, rgb(255, 247, 228), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
+    /* IDENTICAL PART */
+    background-image: radial-gradient(circle at 15% 50%, rgb(221, 210, 184), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
     border: 1px solid #534333;
-    box-shadow: 1.5px 1.5px 2px #0008;
+    box-shadow: 1.5px 1.5px 1px #0008;
     border-radius: 0;
     transform: scaleX(0.66) rotate(45deg);
     cursor: pointer;
 }
-
 input[type=range]::-moz-range-thumb {
     width: 14px; height: 14px;
-    /* COPY-PASTE THE OTHER RULES HERE */
-
-    background-image: radial-gradient(circle at 15% 50%, rgb(255, 247, 228), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
+    
+    /* IDENTICAL PART */
+    background-image: radial-gradient(circle at 15% 50%, rgb(221, 210, 184), rgb(177, 140, 73) 20%, rgb(104, 81, 46) 60%, rgb(105, 97, 80));
     border: 1px solid #534333;
-    box-shadow: 1.5px 1.5px 2px #0008;
+    box-shadow: 1.5px 1.5px 1px #0008;
     border-radius: 0;
     transform: scaleX(0.66) rotate(45deg);
     cursor: pointer;
 }
 
-/* THE TRACK */
+/***** THE TRACK *****/
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%; height: 15px;
     margin-top: -5px;
-
+    /* IDENTICAL PART */
     cursor: pointer;
-    border-bottom: solid 2px #c29137;
-}  
-input[type=range]:focus::-webkit-slider-runnable-track {
-    border-bottom: solid 2px #ffb62e;
-    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
+    border-bottom: solid 2px #977f52;
 }
-  
+input[type=range]:focus::-webkit-slider-runnable-track {
+    border-bottom: solid 2px #c29137;
+    background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
+}  
 input[type=range]::-moz-range-track {
     width: 100%; height: 0;
     padding-top: 15px;
-
+    /* IDENTICAL PART */
     cursor: pointer;
-    border-bottom: solid 2px #c29137;
+    border-bottom: solid 2px #977f52;
 }
 input[type=range]:focus::-moz-range-track {
-    border-bottom: solid 2px #ffb62e;
+    border-bottom: solid 2px #c29137;
     background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
 }
+
+
+
+/************************************** TEXT INPUT-LIKES **************************************/
+
+
+textarea, input[type=text], input[type=file], select {
+    background-color: #1d1c1ccc;
+    font-family: Dejavu Sans Mono, Courier New;
+    color: white;
+    padding: 1px 6px;
+    border: solid 2px #0006;
+    border-bottom-color: rgba(100, 95, 80, 0.4);
+    border-right-color: rgba(100, 95, 80, 0.4);
+}
+textarea:focus, input[type=text]:focus, input[type=file]:focus, select:focus {
+    background-color: #1a1417ff;
+}
+input[type=file] {
+    width: auto;
+    padding: initial;
+}
+input[type=file]::file-selector-button {
+    box-sizing: content-box;
+    margin: 0; padding: 2px 6px;
+    margin-right: 6px;
+    color: #ffe;
+    font-family: adobe-garamond-pro;
+    border: double 3px #ecb64144;
+    background: rgb(36, 29, 26);
+}
+input[type=file]::file-selector-button:hover {
+    border-color: #dfa12d3b;
+    background: radial-gradient(ellipse 90% .95em, rgb(36, 29, 26) 0%, rgb(48, 30, 23) 60%, rgb(70, 35, 21) );
+}
+input[type=file]::file-selector-button:active {
+    border-color: #dfa12d62;
+    background: radial-gradient(ellipse 90% .95em, rgb(36, 29, 26) 0%, rgb(48, 30, 23) 35%, rgb(70, 35, 21) 70%, rgb(192, 48, 4) 100%);
+}
+select {
+    padding: 2px;
+}
+
+
+
+/************************************** CHECKBOXES **************************************/
+
+input[type=checkbox] {
+    -webkit-appearance: none; appearance: none;
+    position: relative;
+    top: .25em;
+    width: 1em; height: 1em;
+    margin: 1px 2px 1px 2px;
+    border: 1px solid #fff8;
+    background: rgba(34, 20, 8, 0.4);
+    cursor: pointer;
+}
+input[type=checkbox]:hover {
+    background: linear-gradient(rgba(34, 20, 8, 0.4), rgba(255, 81, 1, 0.2));
+}
+input[type=checkbox]:active {
+    background: linear-gradient(rgba(99, 65, 14, 0.4), rgba(255, 81, 1, 0.4));
+}
+input[type=checkbox]:checked {
+    border-color: #fffc;
+    background: linear-gradient(rgba(99, 65, 14, 0.4), rgba(255, 81, 1, 0.637));
+}
+input[type=checkbox]:checked:hover {
+    background: linear-gradient(rgba(99, 65, 14, 0.4), rgba(255, 81, 1, 0.8));
+}
+input[type=checkbox]:focus {
+    outline: 2px solid rgba(255, 145, 0, 0.8);
+}
+input[type=checkbox]::before {
+    position: absolute;
+    pointer-events: none;
+    content: "";
+    top: -35%; left: 0;
+    width: 100%; height: 100%;
+    border-left: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+    transform: scaleY(1.1) scaleX(.71) rotate(-45deg);
+    visibility: hidden;
+  }
+  
+input[type="checkbox"]:checked::before {
+    visibility: visible;
+  }
