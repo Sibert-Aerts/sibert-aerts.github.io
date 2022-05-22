@@ -327,6 +327,13 @@ canvas.big {
     border: 1px solid #fff3;
 }
 
+.sliders-supercontainer {
+    margin: 1em -1em 2em -1em;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
 .sliders-container {
     width: 100%; max-width: 400px;
     margin-bottom: 1em;
