@@ -351,7 +351,7 @@ canvas.big {
     }
     .sliders-container > div.smol {
         float: left;
-        width: 100%; max-width: 200px;
+        width: 50%; max-width: 200px;
     }
 
     .sliders-container input[type=color] {
@@ -394,6 +394,9 @@ input.bad-url {
     #generate-button::after {
         border-bottom-width: 1px
     }
+    .save-buttons {
+        font-size: 16px;
+    }
     #main {
         padding-bottom: 30px; /* hack for the dumb emoji buttons to fit */
     }
@@ -425,9 +428,10 @@ input.bad-url {
     .underline {
         border-top: 3px solid white;
     }
-    #generate-button {
+    #generate-button, .save-buttons {
         font-size: 20px;
     }
+    
 }
 
 @media screen and (min-width: 1000px) {  /** EVERYTHING AT LEAST 1000px WIDE */
@@ -442,7 +446,7 @@ input.bad-url {
         font-size: 70px;
         height: 80px;
     }
-    #generate-button {
+    #generate-button, .save-buttons {
         font-size: 24px;
     }
 }
