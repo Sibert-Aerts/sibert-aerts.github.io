@@ -138,6 +138,47 @@ class ImageHandler {
     }
 }
 
+/** 
+ * @typedef {Object} Converter<T>
+ * @prop { (string) => T }  parse 
+ * @prop { (string) => T }  interpret
+ * @prop { (T) => string | number }  toString 
+*/
+
+/** @type {{ [name: string]: { new(string) => Converter } }}  */
+const CONVERTERS = {
+    string: class {
+        parse = x => x
+        interpret = x => x
+        toString = x => x
+    },
+    float: class {
+        parse = parseFloat
+        interpret = parseFloat
+        toString = x => x.toString()
+    },
+    rgb: class {
+        parse = hexToRGB
+        interpret = x => x
+        toString([r, g, b]){ return RGBToHex(r, g, b) }
+    },
+    log: class {
+        constructor(string) {
+            this.base = parseFloat(string.slice(3))
+            this.logb = Math.log(this.base)
+        }   
+        parse(value) { return Math.pow(this.base, parseFloat(value)) }
+        interpret(value) { return Math.log(value)/this.logb }
+        toString(value) { return Math.log(parseFloat(value))/this.logb }
+    }
+}
+
+const DEFAULT_CONVERTERS = {
+    text: 'string',
+    range: 'float',
+    color: 'rgb'
+}
+
 
 class Sliders {
     /** @type {string} */
@@ -178,10 +219,19 @@ class Sliders {
             this.byName[name] = slider
             slider.onchange = e => this.onchange(e)
 
+            /// Assign its converter instance
+            let as = slider.getAttribute('as') || DEFAULT_CONVERTERS[slider.type] || 'string'
+            for( const conv in CONVERTERS )
+                if( as.startsWith(conv) )
+                    { slider.converter = new CONVERTERS[conv](as); break }
+
+            /// Assign its default
+            slider.value = slider.converter.interpret( slider.getAttribute('default') )
+
             /// Hook up reset button
             const button = this.element.getElementsByTagName('button').namedItem(name)
             if (button) {
-                // button.value = slider.value
+                button.value = slider.value
                 button.onclick = () => { slider.value = button.value; slider.onchange() }
             }
         }
@@ -197,27 +247,24 @@ class Sliders {
     }
 
     /**
-     *  @returns  {{ [name: string]: number }}
+     *  @returns  {{ [name: string]: any }}
      */
     getValues() {
         const values = {}
         for( const slider of this.sliders ) {
-            if( slider.type === 'range' )
-                values[slider.name] = parseFloat(slider.value)
-            else if( slider.type === 'color' && slider.getAttribute('as') === 'rgb' )
-                values[slider.name] = hexToRGB(slider.value)
-            else
-                values[slider.name] = slider.value
+            values[slider.name] = slider.converter.parse(slider.value)
         }
         return values
     }
 
     /**
-     *  @param  {{ [name: string]: number }} values
+     *  @param  {{ [name: string]: any }} values
      */
     setValues(values) {
-        for( const name of values )
-            this.byName[name].value = values[name]
+        for( const name in values ) {
+            const slider = this.byName[name]
+            slider.value = slider.converter.toString(values[name])
+        }
     }
 }   
 
@@ -468,7 +515,7 @@ const ds1Victory = {
 
         const x0 = (xOffset +.2)/100 * w
         const y0 = (yOffset)/100 * h
-        const s0 = 2**scale
+        const s0 = scale
         s *= s0
 
         // Center to which things align and also scale
@@ -628,7 +675,7 @@ const ds3Area = {
 
         const x0 = xOffset/100 * w
         const y0 = yOffset/100 * h
-        const s0 = 2**scale
+        const s0 = scale
         underline = underline/100
         ctx.translate(x0, y0)
         s *= s0
