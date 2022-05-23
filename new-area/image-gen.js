@@ -141,7 +141,6 @@ class ImageHandler {
 /** 
  * @typedef {Object} Converter<T>
  * @prop { (string) => T }  parse 
- * @prop { (string) => T }  interpret
  * @prop { (T) => string | number }  toString 
 */
 
@@ -149,17 +148,14 @@ class ImageHandler {
 const CONVERTERS = {
     string: class {
         parse = x => x
-        interpret = x => x
         toString = x => x
     },
     float: class {
         parse = parseFloat
-        interpret = parseFloat
         toString = x => x.toString()
     },
     rgb: class {
         parse = hexToRGB
-        interpret = x => x
         toString([r, g, b]){ return RGBToHex(r, g, b) }
     },
     log: class {
@@ -168,7 +164,6 @@ const CONVERTERS = {
             this.logb = Math.log(this.base)
         }   
         parse(value) { return Math.pow(this.base, parseFloat(value)) }
-        interpret(value) { return Math.log(value)/this.logb }
         toString(value) { return Math.log(parseFloat(value))/this.logb }
     }
 }
@@ -201,22 +196,23 @@ class Sliders {
      * @param {HTMLElement} parent 
      * @param {string[]} names 
      */
-    constructor(name, parent, names) {
+    constructor(name, parent) {
+        this.name = name
         if( !parent ) return
 
         this.element = parent.getElementsByClassName('sliders-container').namedItem(name)
         if( !this.element ) return
 
         /// Find each slider
-        // TODO: No more list of names, it should be able to find these itself
-        for( const name of names ) {
-            const slider = this.element.getElementsByTagName('input').namedItem(name)
+        for( const div of this.element.children ) {
+            if( div.tagName !== 'DIV' ) continue
 
+            const slider = div.getElementsByTagName('input')[0]
             if( !slider ) return
 
             /// Add to our collections
             this.sliders.push(slider)
-            this.byName[name] = slider
+            this.byName[slider.name] = slider
             slider.onchange = e => this.onchange(e)
 
             /// Assign its converter instance
@@ -226,10 +222,10 @@ class Sliders {
                     { slider.converter = new CONVERTERS[conv](as); break }
 
             /// Assign its default
-            slider.value = slider.converter.interpret( slider.getAttribute('default') )
+            slider.value = slider.getAttribute('default')
 
             /// Hook up reset button
-            const button = this.element.getElementsByTagName('button').namedItem(name)
+            const button = div.getElementsByClassName('reset-button')[0]
             if (button) {
                 button.value = slider.value
                 button.onclick = () => { slider.value = button.value; slider.onchange() }
@@ -326,18 +322,16 @@ class MacroGenerator {
         this.resolutionCheckbox.onchange = () => this.redrawMacro()
 
         //// SLIDERS
-        this.macroSliders = new Sliders('area-name', element, ['xOffset', 'yOffset', 'scale', 'underline', 'contrast'])
+        this.macroSliders = new Sliders('area-name', element)
         this.macroSliders.onchange = () => this.autoRedraw()
         
-        this.victorySliders = new Sliders('victory', element, 
-            ['xOffset', 'yOffset', 'scale', 'vScale', 'charSpacing', 'color', 'blurTint', 'blurSize', 'blurOpacity', 'shadowSize', 'shadowOpacity'])
+        this.victorySliders = new Sliders('victory', element)
         this.victorySliders.onchange = () => this.autoRedraw()
         
-        this.imageSliders = new Sliders('image', element, ['imgSaturate', 'imgContrast', 'imgBrightness'])
+        this.imageSliders = new Sliders('image', element)
         this.imageSliders.onchange = () => this.autoRedraw()
 
         this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
-        this.onMacroTypeChange(null, false)
 
         //// IN CASE OF TESTING ENVIRONMENT
         if( window['TESTING'] ){
@@ -345,6 +339,7 @@ class MacroGenerator {
             this.captionInput.value = TESTING.caption
         }
 
+        this.onMacroTypeChange(null, false)
     }
 
     /** Callback from the macro type select */
@@ -511,11 +506,10 @@ const ds1Victory = {
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale, vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
+        const { xOffset, yOffset, scale: s0, vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
         const x0 = (xOffset +.2)/100 * w
         const y0 = (yOffset)/100 * h
-        const s0 = scale
         s *= s0
 
         // Center to which things align and also scale
@@ -611,13 +605,12 @@ const ds3Death = {
         let s = h/1080
 
         // USER INPUT
-        const { xOffset, yOffset, scale, underline, contrast } = gen.macroSliders.getValues()
+        const { xOffset, yOffset, scale: s0, underline, contrast } = gen.macroSliders.getValues()
         
         const x0 = (xOffset + .4)/100 * w
         const y0 = (yOffset + 1.8)/100 * h
-        const s0 = 2**scale
         s *= s0
-        const shadeScale = underline/32
+        const shadeScale = underline/.32
 
         // The shade only moves up or down
         ctx.translate(0, y0)
@@ -671,12 +664,10 @@ const ds3Area = {
         let s = h/1080
     
         // USER INPUT
-        let { xOffset, yOffset, scale, underline, contrast } = gen.macroSliders.getValues()
+        const { xOffset, yOffset, scale: s0, underline, contrast } = gen.macroSliders.getValues()
 
         const x0 = xOffset/100 * w
         const y0 = yOffset/100 * h
-        const s0 = scale
-        underline = underline/100
         ctx.translate(x0, y0)
         s *= s0
     
@@ -713,10 +704,10 @@ const ds3Area = {
     
         // Apply contrast by just redrawing the same text so the shadow overlaps
         //      0.85 * 1.17 ~= 1
-        while( contrast >= 0 ) {
-            ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(contrast, 1.17)})`
+        for( let c = contrast; c > 0; ) {
+            ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
             ctx.fillText(gen.captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
-            contrast -= 1.17
+            c -= 1.17
         }
     }
 }
@@ -742,7 +733,7 @@ layerTypeList.map( macro => layerTypes[macro.key] = macro)
 
 //// TESTING ENVIRONMENT
 
-// window['TESTING'] = {
-//     type: 'ds1-victory',
-//     caption: 'VICTORY ACHIEVED'
-// }
+window['TESTING'] = {
+    type: 'ds3-area',
+    caption: 'Area Name'
+}

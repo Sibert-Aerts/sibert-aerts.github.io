@@ -361,6 +361,9 @@ canvas.big {
         padding: 0;
         cursor: pointer;
     }
+    .sliders-container .reset-button {
+        float: right;
+    }
 
 
 #resolution-warning {
