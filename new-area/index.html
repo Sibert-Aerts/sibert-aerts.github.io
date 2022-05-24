@@ -158,31 +158,33 @@
 							<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
 						</div>
 					</div>
-					<div id=area-name class=sliders-container>
+
+					<div id=area-name class=sliders-container hidden>
+						<h4> Overlay options </h4>
 						<div>
 							<span class=input-title>Horizontal offset:</span>
-							<button class=emoji-button name=xOffset value=0 style="float:right">🔄</button>
-							<input type=range name=xOffset min=-60 max=60 step=0.2 value=0>
+							<button class=reset-button></button>
+							<input type=range name=xOffset min=-60 max=60 step=0.2 default=0>
 						</div>
 						<div>
 							<span class=input-title>Vertical offset:</span>
-							<button class=emoji-button name=yOffset value=0 style="float:right">🔄</button>
-							<input type=range name=yOffset min=-60 max=60 step=0.2 value=0>
+							<button class=reset-button></button>
+							<input type=range name=yOffset min=-60 max=60 step=0.2 default=0>
 						</div>
 						<div>
 							<span class=input-title>Scale:</span>
-							<button class=emoji-button name=scale value=0 style="float:right">🔄</button>
-							<input type=range name=scale min=-2 max=4 step=.01 value=0>
+							<button class=reset-button></button>
+							<input type=range name=scale min=-3 max=4 step=.01 default=0 as=log2>
 						</div>
 						<div class=smol>
 							<span class=input-title>Underline:</span>
-							<button class=emoji-button name=underline value=32 style="float:right">🔄</button>
-							<input type=range name=underline min=0 max=64 value=32>
+							<button class=reset-button></button>
+							<input type=range name=underline min=0 max=.64 step=.01 default=.32>
 						</div>
 						<div class=smol>
 							<span class=input-title>Contrast:</span>
-							<button class=emoji-button name=contrast value=1 style="float:right">🔄</button>
-							<input type=range name=contrast min=0 max=3 step=0.1 value=1>
+							<button class=reset-button></button>
+							<input type=range name=contrast min=0 max=3 step=0.1 default=1>
 						</div>
 					</div>
 				</div>

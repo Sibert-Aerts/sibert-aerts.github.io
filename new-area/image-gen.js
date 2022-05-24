@@ -213,8 +213,10 @@ class Sliders {
             /// Add to our collections
             this.sliders.push(slider)
             this.byName[slider.name] = slider
-            slider.onchange = e => this.onchange(e)
-
+            slider.onchange = e => {
+                if( slider.resetButton ) slider.resetButton.disabled = false
+                this.onchange(e)
+            }
             /// Assign its converter instance
             let as = slider.getAttribute('as') || DEFAULT_CONVERTERS[slider.type] || 'string'
             for( const conv in CONVERTERS )
@@ -225,10 +227,18 @@ class Sliders {
             slider.value = slider.getAttribute('default')
 
             /// Hook up reset button
-            const button = div.getElementsByClassName('reset-button')[0]
-            if (button) {
-                button.value = slider.value
-                button.onclick = () => { slider.value = button.value; slider.onchange() }
+            /** @type {HTMLButtonElement} */
+            const resetButton = div.getElementsByClassName('reset-button')[0]
+            if (resetButton) {
+                slider.resetButton = resetButton
+                resetButton.value = slider.value
+                resetButton.disabled = true
+
+                resetButton.onclick = () => {
+                    slider.value = resetButton.value
+                    slider.onchange()
+                    resetButton.disabled = true
+                }
             }
         }
         // If we make it through the whole thing without an early return, we're usable!
@@ -733,7 +743,7 @@ layerTypeList.map( macro => layerTypes[macro.key] = macro)
 
 //// TESTING ENVIRONMENT
 
-window['TESTING'] = {
-    type: 'ds3-area',
-    caption: 'Area Name'
-}
+// window['TESTING'] = {
+//     type: 'ds3-area',
+//     caption: 'Area Name'
+// }

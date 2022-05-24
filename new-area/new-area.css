@@ -361,9 +361,26 @@ canvas.big {
         padding: 0;
         cursor: pointer;
     }
-    .sliders-container .reset-button {
-        float: right;
-    }
+
+.reset-button {
+    float: right;
+    margin: 4px 2px 0 0;
+    border: none; padding: none;
+    cursor: pointer;
+
+    width: 16px; height: 16px;
+    background: none;
+    background-image: url(soulsy-icons.png);
+    background-size: 128px;             /* 256 / 2 */
+    background-position: -32px -16px;   /* Orange 🔄 */
+}
+.reset-button:hover {
+    background-position: -32px 0px;     /* White 🔄 */
+}
+.reset-button:disabled {
+    cursor: initial;
+    background-position: -32px -32px;   /* Greyish 🔄 */
+}
 
 
 #resolution-warning {
