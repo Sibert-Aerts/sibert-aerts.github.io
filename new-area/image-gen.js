@@ -272,6 +272,21 @@ class Sliders {
             slider.value = slider.converter.toString(values[name])
         }
     }
+
+    /**
+     *  @param  {{ [name: string]: any }} values
+     */
+    setDefaults(values) {
+        for( const name in values ) {
+            const slider = this.byName[name]
+            if( slider.resetButton ) {
+                const val = slider.converter.toString(values[name])
+                slider.resetButton.value = val
+                if( slider.resetButton.disabled )
+                    slider.value = val
+            }
+        }
+    }
 }   
 
 /**
@@ -332,16 +347,19 @@ class MacroGenerator {
         this.resolutionCheckbox.onchange = () => this.redrawMacro()
 
         //// SLIDERS
-        this.macroSliders = new Sliders('area-name', element)
-        this.macroSliders.onchange = () => this.autoRedraw()
+        this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
         
-        this.victorySliders = new Sliders('victory', element)
+        this.positionSliders = new Sliders('position', this.macroSliders)
+        this.positionSliders.onchange = () => this.autoRedraw()
+        this.areaSliders = new Sliders('area-name', this.macroSliders)
+        this.areaSliders.onchange = () => this.autoRedraw()
+        this.victorySliders = new Sliders('victory', this.macroSliders)
         this.victorySliders.onchange = () => this.autoRedraw()
         
         this.imageSliders = new Sliders('image', element)
         this.imageSliders.onchange = () => this.autoRedraw()
 
-        this.sliders = {'area-name': this.macroSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
+        this.sliders = {'position': this.positionSliders, 'area-name': this.areaSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
 
         //// IN CASE OF TESTING ENVIRONMENT
         if( window['TESTING'] ){
@@ -359,14 +377,21 @@ class MacroGenerator {
         this.macroTypeSelect.oldValue = newType
         
         //// Hide/Show necessary sliders
-        if( oldType ) layerTypes[oldType].sliders.forEach(n => this.sliders[n].hide())
-        layerTypes[newType].sliders.forEach(n => this.sliders[n].show())
+        if( oldType ) 
+            for( let n in layerTypes[oldType].sliders )
+                this.sliders[n].hide()
+        for( let n in layerTypes[newType].sliders ) {
+            this.sliders[n].setDefaults(layerTypes[newType].sliders[n])
+            this.sliders[n].show()
+        }
 
         //// Update generic caption
         if( this.captionInput.value === 'ENTER CAPTION' && layerTypes[newType].preferCase === 'title case' )
             this.captionInput.value = 'Enter Caption'
         else if( this.captionInput.value === 'Enter Caption' && layerTypes[newType].preferCase === 'all caps' )
             this.captionInput.value = 'ENTER CAPTION'
+
+
 
         //// Redraw (if desired)
         if (redraw) this.redrawMacro()
@@ -508,7 +533,17 @@ const ds1Victory = {
     key: 'ds1-victory',
     name: 'DS1 - Victory',
     preferCase: 'all caps',
-    sliders: ['victory'],
+    sliders: {
+        position: { 
+            xOffset: .002, yOffset: 0.032, scale: 1 
+        }, 
+        victory: {
+            vScale: 1.5, charSpacing: 8,
+            color: [255, 255, 107], blurTint: [255, 178, 153],
+            blurSize: 1.1, blurOpacity: 0.08, 
+            shadowSize: 1, shadowOpacity: 1
+        }
+    },
 
     draw(ctx, canvas, gen) {
         // CONSTANTS
@@ -516,14 +551,15 @@ const ds1Victory = {
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale: s0, vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
+        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
+        const { vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
-        const x0 = (xOffset +.2)/100 * w
-        const y0 = (yOffset)/100 * h
+        const x0 = xOffset * w
+        const y0 = yOffset * h
         s *= s0
 
         // Center to which things align and also scale
-        VERTICALCENTER = .532
+        VERTICALCENTER = .5
     
         // The shade only moves up or down
         ctx.translate(0, y0)
@@ -531,7 +567,7 @@ const ds1Victory = {
         if( shadowSize > 0 ) {
             const shadeHeight = shadowSize * .25*h * s0
             // Offset from the top of the frame when s0=1
-            const shadeCentering = .53
+            const shadeCentering = .498
             // Voodoo
             const shadeCenter = ( shadeCentering*s0 - VERTICALCENTER*(s0-1) ) * h
             // Duh
@@ -607,7 +643,14 @@ const ds3Death = {
     key: 'ds3-death',
     name: 'DS3 - Death',
     preferCase: 'all caps',
-    sliders: ['area-name'],
+    sliders: {
+        position: {
+            xOffset: .004, yOffset: .018, scale: 1
+        }, 
+        'area-name': { 
+            underline: .32, contrast: 1 
+        }
+    },
 
     draw(ctx, canvas, gen) {
         // CONSTANTS
@@ -615,10 +658,11 @@ const ds3Death = {
         let s = h/1080
 
         // USER INPUT
-        const { xOffset, yOffset, scale: s0, underline, contrast } = gen.macroSliders.getValues()
+        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
+        const { underline, contrast } = gen.areaSliders.getValues()
         
-        const x0 = (xOffset + .4)/100 * w
-        const y0 = (yOffset + 1.8)/100 * h
+        const x0 = xOffset * w
+        const y0 = yOffset * h
         s *= s0
         const shadeScale = underline/.32
 
@@ -666,7 +710,14 @@ const ds3Area = {
     key: 'ds3-area',
     name: 'DS3 - Area Name',
     preferCase: 'title case',
-    sliders: ['area-name'],
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0, scale: 1 
+        },
+        'area-name': {
+            underline: .32, contrast: 1
+        }
+    },
 
     draw(ctx, canvas, gen) {
         // CONSTANTS
@@ -674,10 +725,11 @@ const ds3Area = {
         let s = h/1080
     
         // USER INPUT
-        const { xOffset, yOffset, scale: s0, underline, contrast } = gen.macroSliders.getValues()
+        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
+        const { underline, contrast } = gen.areaSliders.getValues()
 
-        const x0 = xOffset/100 * w
-        const y0 = yOffset/100 * h
+        const x0 = xOffset * w
+        const y0 = yOffset * h
         ctx.translate(x0, y0)
         s *= s0
     
@@ -714,7 +766,7 @@ const ds3Area = {
     
         // Apply contrast by just redrawing the same text so the shadow overlaps
         //      0.85 * 1.17 ~= 1
-        for( let c = contrast; c > 0; ) {
+        for( let c = contrast; c >= 0; ) {
             ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
             ctx.fillText(gen.captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
             c -= 1.17
