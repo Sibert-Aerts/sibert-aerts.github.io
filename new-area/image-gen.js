@@ -712,7 +712,7 @@ const ds3Area = {
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: 0, yOffset: 0, scale: 1 
+            xOffset: 0.001, yOffset: 0.003, scale: 1 
         },
         'area-name': {
             underline: .32, contrast: 1
