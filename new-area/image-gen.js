@@ -639,6 +639,44 @@ const ds1Victory = {
 }
 
 /** @type DrawableLayer */
+const ds1Humanity = {
+    key: 'ds1-humanity',
+    name: 'DS1 - Humanity',
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset:-0.001, yOffset: 0.038, scale: 1.109569472067845
+        }, 
+        victory: {
+            vScale: 1.5,charSpacing: 0,
+            color: [129, 187, 153], blurTint: [187, 201, 192],
+            blurSize: 1.16, blurOpacity: 0.08, 
+            shadowSize: 1, shadowOpacity: 1
+        }
+    },
+    draw: ds1Victory.draw
+}
+
+/** @type DrawableLayer */
+const ds3Victory = {
+    key: 'ds3-victory',
+    name: 'DS3 - Victory',
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.012, scale: 1.101
+        }, 
+        victory: {
+            vScale: 1.317, charSpacing: 1.5,
+            color: [255, 255, 100], blurTint: [242, 194, 255],
+            blurSize: 1.18, blurOpacity: 0.08, 
+            shadowSize: 0.7, shadowOpacity: .95
+        }
+    },
+    draw: ds1Victory.draw
+}
+
+/** @type DrawableLayer */
 const ds3Death = {
     key: 'ds3-death',
     name: 'DS3 - Death',
@@ -703,6 +741,22 @@ const ds3Death = {
         ctx.scale(1, 1.3)
         ctx.fillText(gen.captionInput.value, w/2, h/2/1.3 )
     }
+}
+
+/** @type DrawableLayer */
+const ds1Death = {
+    key: 'ds1-death',
+    name: 'DS1 - Death',
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: .003, yOffset: .036, scale: 0.993
+        }, 
+        'area-name': { 
+            underline: .49, contrast: 1 
+        }
+    },
+    draw: ds3Death.draw
 }
 
 /** @type DrawableLayer */
@@ -774,6 +828,22 @@ const ds3Area = {
     }
 }
 
+/** @type DrawableLayer */
+const ds1Area = {
+    key: 'ds1-area',
+    name: 'DS1 - Area Name',
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: .001, yOffset: -.004, scale: 1.0281
+        }, 
+        'area-name': { 
+            underline: .3, contrast: 0
+        }
+    },
+    draw: ds3Area.draw
+}
+
 const emptyLayer = {
     key: 'none',
     name: 'Nothing',
@@ -783,7 +853,7 @@ const emptyLayer = {
 }
 
 /** Keep this up-to-date manually. */
-const layerTypeList = [ds1Victory, ds3Area, ds3Death, emptyLayer]
+const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death, emptyLayer]
 
 /** 
  * Object containing all types of drawable layers, indexed by key.
