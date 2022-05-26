@@ -76,12 +76,20 @@
 		<div class=sliders-supercontainer>
 			<div id=global-sliders class=sliders-container>
 				<h4 style="margin-bottom: .5em"> Configuration </h4>
+
 				<div>
-					<span class=input-title style=margin-right:25px>Macro type:</span>
-					<select id=macro-type>
-						<!-- Filled in by script -->
-					</select>
+					<span class=input-title style=min-width:100px>Macro type:</span>
+					<select name=macro-type></select>
 				</div>
+				<div>
+					<span class=input-title style=min-width:100px>Game:</span>
+					<select name=macro-type-game></select>
+				</div>
+				<div>
+					<span class=input-title style=min-width:100px>Preset:</span>
+					<div name=macro-type-preset-holder style=display:inline-block></div>
+				</div>
+
 				<div>
 					<span class=input-title>Caption:</span>
 					<input type=text id=image-caption value="Enter Caption" size=32 style="float:right">

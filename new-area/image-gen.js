@@ -1,13 +1,15 @@
 /*
     Script for the image macro generator on (https://sibert-aerts.github.io/new-area/) and (https://sibert-aerts.github.io/new-area/macro-generator.html)
 */
+'use strict';
 
 ///// TINY UTILS
 const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
 
 ///// TINY DOM UTILS
 const byId = id => document.getElementById(id)
-const makeElem = (tag, clss, text) => { let e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
+const makeElem = (tag, clss, text) => { const e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
+const makeOption = (value, text) => { const o = document.createElement('option'); o.textContent = text; o.value = value; o.setAttribute('name', value); return o }
 
 
 ///// TINY COLOR UTILS
@@ -305,8 +307,20 @@ class MacroGenerator {
 
     /** @type {{ [name: string]: Sliders }} */
     sliders
-    /** @type ImageHandler */
+    /** @type {ImageHandler} */
     imageHandler
+
+    /** @type {HTMLSelectElement} */
+    macroTypeSelect
+    /** @type {HTMLSelectElement} */
+    gameSelect
+    /** @type { {[type in keyof MacroType]: {[game in keyof Game]: HTMLSelectElement}} } */
+    presetSelects
+    /** @type {HTMLElement} */
+    presetHolder
+
+    /** @type {DrawableLayer} */
+    previousLayerType
 
     /**
      * @param {HTMLElement | Document} element
@@ -315,7 +329,7 @@ class MacroGenerator {
         this.element = element
 
         /** my(t, n) = "my element `<t>` named `n`" */
-        const my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
+        const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
         //// CANVAS
         this.canvas = my('canvas', 'canvas')
@@ -328,20 +342,15 @@ class MacroGenerator {
         //// IMAGE HANDLER
         this.imageHandler = new ImageHandler(this, my('div', 'global-sliders'))
 
-        //// USER CONTROLS
-        this.macroTypeSelect = my('select', 'macro-type')
-        if( this.macroTypeSelect ) {
-            this.macroTypeSelect.onchange = e => this.onMacroTypeChange(e)
-            for( const layerType of layerTypeList ) {
-                const elem = makeElem('option', null, layerType.name)
-                elem.value = layerType.key
-                this.macroTypeSelect.appendChild(elem)
-            }
-        }
+        //// MACRO TYPE SELECTION
+        this.createSelects()
 
+        //// OTHER CONTROLS
         this.captionInput = my('input', 'image-caption')
         this.captionInput.oninput = () => this.autoRedraw()
         this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
+        if( window.MACROGEN_DEFAULTS?.caption )
+            this.captionInput.value = window.MACROGEN_DEFAULTS.caption
 
         this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = () => this.redrawMacro()
@@ -361,40 +370,111 @@ class MacroGenerator {
 
         this.sliders = {'position': this.positionSliders, 'area-name': this.areaSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
 
-        //// IN CASE OF TESTING ENVIRONMENT
-        if( window['TESTING'] ){
-            this.macroTypeSelect.value = TESTING.type
-            this.captionInput.value = TESTING.caption
-        }
-
         this.onMacroTypeChange(null, false)
+    }
+
+    createSelects() {
+        const onchange = e => this.onMacroTypeChange(e)
+
+        //// Macro Type
+        this.macroTypeSelect = this.my('select', 'macro-type')
+        this.macroTypeSelect.onchange = onchange
+
+        for( const key in MacroType )
+            this.macroTypeSelect.appendChild(makeOption(key, macroTypeName[key]))
+
+        this.macroTypeSelect.value = window.MACROGEN_DEFAULTS.macroType
+
+        //// Game
+        this.gameSelect = this.my('select', 'macro-type-game')
+        this.gameSelect.onchange = onchange
+
+        for( const key in Game )
+            this.gameSelect.appendChild(makeOption(key, gameName[key]))
+
+        this.gameSelect.value = window.MACROGEN_DEFAULTS.game
+
+        //// Preset (depends on combination of type+game)
+        this.presetSelects = {}
+        this.presetHolder = this.my('div', 'macro-type-preset-holder')
+
+        for( const type in MacroType ) {
+            this.presetSelects[type] = {}
+
+            for( const game in Game ) {
+                if( !layerTypes[type][game] ) continue
+
+                const select = makeElem('select')
+                for( const preset in layerTypes[type][game] )
+                    select.appendChild(makeOption(preset, preset))
+
+                this.presetHolder.appendChild(select)
+                this.presetSelects[type][game] = select
+                select.onchange = onchange
+            }
+        }
     }
 
     /** Callback from the macro type select */
     onMacroTypeChange(e, redraw=true) {
-        const oldType = this.macroTypeSelect.oldValue
-        const newType = this.macroTypeSelect.value
-        this.macroTypeSelect.oldValue = newType
-        
+        const oldType = this.previousLayerType
+        const newType = this.getLayerType()
+        this.previousLayerType = newType
+
+        const [macroType, game] = this.getLayerTypeKeys()
+
         //// Hide/Show necessary sliders
-        if( oldType ) 
-            for( let n in layerTypes[oldType].sliders )
-                this.sliders[n].hide()
-        for( let n in layerTypes[newType].sliders ) {
-            this.sliders[n].setDefaults(layerTypes[newType].sliders[n])
+        for( let n in oldType?.sliders )
+            this.sliders[n].hide()
+
+        for( let n in newType.sliders ) {
+            this.sliders[n].setDefaults(newType.sliders[n])
             this.sliders[n].show()
         }
 
+        //// Hide/Show relevant Preset selects (if any)
+        if( macroType !== MacroType.nounVerbed) {
+            this.presetHolder.parentNode.hidden = true
+        } else {
+            for( const typeKey in MacroType ) for( const gameKey in Game ) {
+                if( this.presetSelects[typeKey][gameKey] ) {
+                    this.presetSelects[typeKey][gameKey].hidden = (typeKey !== macroType || gameKey !== game)
+                }
+            }
+        }
+        //// Enable/disable Game options
+        for( const gameKey in Game )
+            this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
+
         //// Update generic caption
-        if( this.captionInput.value === 'ENTER CAPTION' && layerTypes[newType].preferCase === 'title case' )
+        if( this.captionInput.value === 'ENTER CAPTION' && newType.preferCase === 'title case' )
             this.captionInput.value = 'Enter Caption'
-        else if( this.captionInput.value === 'Enter Caption' && layerTypes[newType].preferCase === 'all caps' )
+        else if( this.captionInput.value === 'Enter Caption' && newType.preferCase === 'all caps' )
             this.captionInput.value = 'ENTER CAPTION'
-
-
 
         //// Redraw (if desired)
         if (redraw) this.redrawMacro()
+    }
+
+    /** @returns {[ keyof MacroType, keyof Game, string ]} */
+    getLayerTypeKeys() {
+        const macroType = this.macroTypeSelect.value
+        let game = this.gameSelect.value
+        if( !this.presetSelects[macroType][game] ) {
+            for( const newGame in Game )
+                if( this.presetSelects[macroType][newGame] ) {
+                    game = this.gameSelect.value = newGame; break
+                }
+        }
+        const preset = this.presetSelects[macroType][game].value
+
+        return [macroType, game, preset]
+    }
+
+    /** @returns {DrawableLayer} */
+    getLayerType() {
+        const [macroType, game, preset] = this.getLayerTypeKeys()
+        return layerTypes[macroType][game]?.[preset]
     }
 
     /** Check whether the current canvas is too big to allow auto-rerendering. */
@@ -489,7 +569,8 @@ class MacroGenerator {
         this.resView.y.textContent = canvas.height        
     
         this.resetDrawingState()
-        layerTypes[this.macroTypeSelect.value].draw(ctx, this.canvas, this)
+        const layerType = this.getLayerType()
+        layerType.draw(ctx, this.canvas, this)
     }
 
     /** Save the current contents of the canvas to the user's computer. */
@@ -517,10 +598,36 @@ class MacroGenerator {
 //========================================================================
 
 
+// Best shot at an enum type thing
+const MacroType = {
+    nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied',
+}
+const macroTypeName = {
+    nounVerbed: 'NOUN VERBED',
+    areaName: 'Area Name',
+    youDied: 'YOU DIED'
+}
+
+const Game = {
+    des: 'des', ds1: 'ds1', ds2: 'ds2', ds3: 'ds3', bb: 'bb', se: 'se', er: 'er'
+}
+const gameName = {
+    des: "Demon's Souls",
+    ds1: 'Dark Souls',
+    ds2: 'Dark Souls II',
+    ds3: 'Dark Souls III',
+    bb:  'Bloodborne',
+    se:  'Sekiro',
+    er:  'Elden Ring',
+}
+
 /** 
  * @typedef {Object} DrawableLayer
- * @prop {string} key
- * @prop {string} name
+ * 
+ * @prop {keyof MacroType} type
+ * @prop {keyof Game} game
+ * @prop {string} preset
+ * 
  * @prop {string} preferCase
  * @prop {string[]} sliders
  * 
@@ -530,8 +637,10 @@ class MacroGenerator {
 
 /** @type DrawableLayer */
 const ds1Victory = {
-    key: 'ds1-victory',
-    name: 'DS1 - Victory',
+    type: MacroType.nounVerbed,
+    game: Game.ds1,
+    preset: 'VICTORY ACHIEVED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
@@ -559,7 +668,7 @@ const ds1Victory = {
         s *= s0
 
         // Center to which things align and also scale
-        VERTICALCENTER = .5
+        const VERTICALCENTER = .5
     
         // The shade only moves up or down
         ctx.translate(0, y0)
@@ -586,7 +695,7 @@ const ds1Victory = {
         ctx.translate(x0, 0)
     
         // TEXT
-        caption = gen.captionInput.value
+        let caption = gen.captionInput.value
     
         if( charSpacing ) {
             if( !!window.chrome && true ) {
@@ -640,8 +749,10 @@ const ds1Victory = {
 
 /** @type DrawableLayer */
 const ds1Humanity = {
-    key: 'ds1-humanity',
-    name: 'DS1 - Humanity',
+    type: MacroType.nounVerbed,
+    game: Game.ds1,
+    preset: 'HUMANITY RESTORED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
@@ -659,8 +770,10 @@ const ds1Humanity = {
 
 /** @type DrawableLayer */
 const ds3Victory = {
-    key: 'ds3-victory',
-    name: 'DS3 - Victory',
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'HEIR OF FIRE DEFEATED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
@@ -678,8 +791,10 @@ const ds3Victory = {
 
 /** @type DrawableLayer */
 const ds3Death = {
-    key: 'ds3-death',
-    name: 'DS3 - Death',
+    type: MacroType.youDied,
+    game: Game.ds3,
+    preset: 'YOU DIED',
+
     preferCase: 'all caps',
     sliders: {
         position: {
@@ -745,8 +860,10 @@ const ds3Death = {
 
 /** @type DrawableLayer */
 const ds1Death = {
-    key: 'ds1-death',
-    name: 'DS1 - Death',
+    type: MacroType.youDied,
+    game: Game.ds1,
+    preset: 'YOU DIED',
+
     preferCase: 'all caps',
     sliders: {
         position: {
@@ -761,8 +878,10 @@ const ds1Death = {
 
 /** @type DrawableLayer */
 const ds3Area = {
-    key: 'ds3-area',
-    name: 'DS3 - Area Name',
+    type: MacroType.areaName,
+    game: Game.ds3,
+    preset: 'Area Name',
+
     preferCase: 'title case',
     sliders: {
         position: { 
@@ -830,8 +949,10 @@ const ds3Area = {
 
 /** @type DrawableLayer */
 const ds1Area = {
-    key: 'ds1-area',
-    name: 'DS1 - Area Name',
+    type: MacroType.areaName,
+    game: Game.ds1,
+    preset: 'Area Name',
+
     preferCase: 'title case',
     sliders: {
         position: {
@@ -844,28 +965,53 @@ const ds1Area = {
     draw: ds3Area.draw
 }
 
-const emptyLayer = {
-    key: 'none',
-    name: 'Nothing',
-    sliders: [],
 
-    draw() {}
+/** @type DrawableLayer */
+const ds2Area = {
+    type: MacroType.areaName,
+    game: Game.ds2,
+    preset: 'Area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: .01, yOffset: -.01, scale: 1.5
+        }, 
+        'area-name': { 
+            underline: .5, contrast: 3
+        }
+    },
+    draw: ds3Area.draw
 }
 
-/** Keep this up-to-date manually. */
-const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death, emptyLayer]
+
+
+/** ⚠ Keep this up-to-date manually. ⚠ */
+const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death]
+
+
+
+//// Automatically create indexes of all the different layer types by various properties.
 
 /** 
- * Object containing all types of drawable layers, indexed by key.
- * @type {{[key: string] : DrawableLayer}} 
+ * Object containing all types of drawable layers, indexed by type, game (and preset)
+ * @type { {[type in keyof MacroType] : {[type in keyof Game]: {[preset: string]: DrawableLayer }? }} } } 
  */
 const layerTypes = {}
-layerTypeList.map( macro => layerTypes[macro.key] = macro)
+
+for( const type in MacroType )
+    for( const game in Game )
+        layerTypes[type] = {[game]: null}
+
+for( const layer of layerTypeList ) {
+    layerTypes[layer.type][layer.game] ??= {}
+    layerTypes[layer.type][layer.game][layer.preset] = layer
+}
 
 
-//// TESTING ENVIRONMENT
 
-// window['TESTING'] = {
-//     type: 'ds3-area',
-//     caption: 'Area Name'
-// }
+
+window.MACROGEN_DEFAULTS = {
+    macroType: MacroType.nounVerbed,
+    game: Game.ds1
+}

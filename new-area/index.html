@@ -46,6 +46,9 @@
 			function callback() {
 				parent.removeEventListener('click', callback)
 
+				window.MACROGEN_DEFAULTS = {
+					macroType: 'areaName', game: 'ds1',
+				}
 				macroGen = new MacroGenerator()
 				macroGen.redrawMacro()
 			}
@@ -135,11 +138,18 @@
 				<div class=sliders-supercontainer>
 					<div id=global-sliders class=sliders-container>
 						<div hidden>
-							<span class=input-title>Type:</span>
-							<select id=macro-type width="288px" style="margin-left:30px">
-								<option value=ds3-area>Area Name</option>
-							</select>
+							<span class=input-title style=min-width:100px>Macro type:</span>
+							<select name=macro-type></select>
 						</div>
+						<div>
+							<span class=input-title style=min-width:100px>Game:</span>
+							<select name=macro-type-game></select>
+						</div>
+						<div hidden>
+							<span class=input-title style=min-width:100px>Preset:</span>
+							<div name=macro-type-preset-holder style=display:inline-block></div>
+						</div>
+
 						<div>
 							<span class=input-title>Caption:</span>
 							<input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
