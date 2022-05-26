@@ -360,15 +360,20 @@ class MacroGenerator {
         
         this.positionSliders = new Sliders('position', this.macroSliders)
         this.positionSliders.onchange = () => this.autoRedraw()
-        this.areaSliders = new Sliders('area-name', this.macroSliders)
+        this.areaSliders = new Sliders('areaName', this.macroSliders)
         this.areaSliders.onchange = () => this.autoRedraw()
+        this.fontSliders = new Sliders('font', this.macroSliders)
+        this.fontSliders.onchange = () => this.autoRedraw()
         this.victorySliders = new Sliders('victory', this.macroSliders)
         this.victorySliders.onchange = () => this.autoRedraw()
         
         this.imageSliders = new Sliders('image', element)
         this.imageSliders.onchange = () => this.autoRedraw()
 
-        this.sliders = {'position': this.positionSliders, 'area-name': this.areaSliders, 'image': this.imageSliders, 'victory': this.victorySliders }
+        this.sliders = {
+            position: this.positionSliders, areaName: this.areaSliders, image: this.imageSliders,
+            victory: this.victorySliders, font: this.fontSliders
+        }
 
         this.onMacroTypeChange(null, false)
     }
@@ -640,14 +645,17 @@ const ds1Victory = {
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'VICTORY ACHIEVED',
-
     preferCase: 'all caps',
     sliders: {
         position: { 
             xOffset: .002, yOffset: 0.032, scale: 1 
-        }, 
-        victory: {
+        },
+        font: {
+            fontSize: 92, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 8,
+            fontWeight: 100,
+        },
+        victory: {
             color: [255, 255, 107], blurTint: [255, 178, 153],
             blurSize: 1.1, blurOpacity: 0.08, 
             shadowSize: 1, shadowOpacity: 1
@@ -661,7 +669,8 @@ const ds1Victory = {
     
         // USER INPUT
         const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
-        const { vScale, charSpacing, color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
+        const { fontSize, fontFamily, vScale, charSpacing, fontWeight } = gen.fontSliders.getValues()
+        const { color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
 
         const x0 = xOffset * w
         const y0 = yOffset * h
@@ -711,11 +720,13 @@ const ds1Victory = {
             }
         }
     
-        ctx.font = (92*s) + 'px adobe-garamond-pro'
+        ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
+        // ctx.font = `500 ${120*s}px Kozuka Mincho Pro`
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         
         const VSCALE = vScale
+        // const VSCALE = 1/1.1
         ctx.scale(1, VSCALE)
         ctx.save()
 
@@ -752,17 +763,44 @@ const ds1Humanity = {
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'HUMANITY RESTORED',
-
     preferCase: 'all caps',
     sliders: {
         position: { 
-            xOffset:-0.001, yOffset: 0.038, scale: 1.109569472067845
-        }, 
+            xOffset: -0.001, yOffset: 0.038, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 0,
+            fontWeight: 100,
+        },
         victory: {
-            vScale: 1.5,charSpacing: 0,
             color: [129, 187, 153], blurTint: [187, 201, 192],
             blurSize: 1.16, blurOpacity: 0.08, 
             shadowSize: 1, shadowOpacity: 1
+        }
+    },
+    draw: ds1Victory.draw
+}
+
+/** @type DrawableLayer */
+const bbSlaughtered = {
+    type: MacroType.nounVerbed,
+    game: Game.bb,
+    preset: 'PREY SLAUGHTERED',
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.004, yOffset: -.258, scale: 1
+        },
+        font: {
+            fontSize: 133, fontFamily: 'Kozuka Mincho Pro',
+            vScale: 0.937, charSpacing: 9,
+            fontWeight: 500,
+        },
+        victory: {
+            color: [184, 255, 209], blurTint: [255, 255, 255],
+            blurSize: 1.02, blurOpacity: 0.08, 
+            shadowSize: 0, shadowOpacity: 1
         }
     },
     draw: ds1Victory.draw
@@ -778,9 +816,13 @@ const ds3Victory = {
     sliders: {
         position: { 
             xOffset: 0, yOffset: 0.012, scale: 1.101
-        }, 
-        victory: {
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.317, charSpacing: 1.5,
+            fontWeight: 100,
+        },
+        victory: {
             color: [255, 255, 100], blurTint: [242, 194, 255],
             blurSize: 1.18, blurOpacity: 0.08, 
             shadowSize: 0.7, shadowOpacity: .95
@@ -800,7 +842,7 @@ const ds3Death = {
         position: {
             xOffset: .004, yOffset: .018, scale: 1
         }, 
-        'area-name': { 
+        areaName: { 
             underline: .32, contrast: 1 
         }
     },
@@ -869,7 +911,7 @@ const ds1Death = {
         position: {
             xOffset: .003, yOffset: .036, scale: 0.993
         }, 
-        'area-name': { 
+        areaName: { 
             underline: .49, contrast: 1 
         }
     },
@@ -887,7 +929,7 @@ const ds3Area = {
         position: { 
             xOffset: 0.001, yOffset: 0.003, scale: 1 
         },
-        'area-name': {
+        areaName: {
             underline: .32, contrast: 1
         }
     },
@@ -958,7 +1000,7 @@ const ds1Area = {
         position: {
             xOffset: .001, yOffset: -.004, scale: 1.0281
         }, 
-        'area-name': { 
+        areaName: { 
             underline: .3, contrast: 0
         }
     },
@@ -977,7 +1019,7 @@ const ds2Area = {
         position: {
             xOffset: .01, yOffset: -.01, scale: 1.5
         }, 
-        'area-name': { 
+        areaName: { 
             underline: .5, contrast: 3
         }
     },
@@ -987,7 +1029,7 @@ const ds2Area = {
 
 
 /** ⚠ Keep this up-to-date manually. ⚠ */
-const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death]
+const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death, bbSlaughtered]
 
 
 

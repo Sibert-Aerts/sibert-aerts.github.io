@@ -116,7 +116,7 @@
 
 			<div id=macro-sliders style=width:400px>
 
-				<div id=position class=sliders-container hidden>
+				<div name=position class=sliders-container hidden>
 					<h4> Overlay options </h4>
 					<div>
 						<span class=input-title>Horizontal offset:</span>
@@ -135,18 +135,41 @@
 					</div>
 				</div>
 
-				<div id=victory class=sliders-container hidden>
+				<div name=font class=sliders-container hidden>
+					<!-- <h4 style="margin-bottom:10px"> Font </h4> -->
+					<div class=smol>
+						<span class=input-title>Font family:</span>
+						<button class=reset-button></button>
+						<input type=text name=fontFamily>
+					</div>
+					<div class=smol>
+						<span class=input-title>Text color:</span>
+						<button class=reset-button></button>
+						<input type=color name=textColor>
+					</div>
+					<div class=smol>
+						<span class=input-title>Font size:</span>
+						<button class=reset-button></button>
+						<input type=range name=fontSize min=10 max=300 step=1>
+					</div>
+					<div class=smol>
+						<span class=input-title>Font weight:</span>
+						<button class=reset-button></button>
+						<input type=range name=fontWeight min=100 max=900 step=100>
+					</div>
 					<div class=smol>
 						<span class=input-title>Vertical scale:</span>
 						<button class=reset-button></button>
-						<input type=range name=vScale min=-2 max=2 step=.02 default=1 as=log1.5>
+						<input type=range name=vScale min=-2 max=2 step=.02 as=log1.5>
 					</div>
 					<div class=smol>
 						<span class=input-title>Letter spacing:</span>
 						<button class=reset-button></button>
-						<input type=range name=charSpacing min=-10 max=40 step=.5 default=8>
+						<input type=range name=charSpacing min=-10 max=40 step=.5>
 					</div>
+				</div>
 
+				<div name=victory class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Text color:</span>
 						<button class=reset-button></button>
@@ -179,7 +202,7 @@
 					</div>
 				</div>
 
-				<div id=area-name class=sliders-container hidden>
+				<div name=areaName class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Underline:</span>
 						<button class=reset-button></button>
