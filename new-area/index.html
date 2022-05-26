@@ -6,7 +6,9 @@
 
 	<!-- Webpage meta -->
 	<title>FromSoft Area Name Generator</title>
-	<meta name="description" content="Discover randomly generated location names based on Dark Souls, Bloodborne, Elden Ring and others. Also includes image macro/text generator features.">
+	<meta name="description" content=
+		"Discover randomly generated location names based on FromSoftware games like Dark Souls, Bloodborne and Elden Ring.
+		Also includes features to create image macros and generate text overlays.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href=favicon.ico type="image/x-icon" />
 
@@ -40,9 +42,11 @@
 
 	<!-- Specific page-setup script -->
 	<script type="text/javascript">
+
 		window.addEventListener('DOMContentLoaded', function() {
 			// Set up event to only instantiate the MacroGenerator once the little modal is opened.
 			const parent = byId('image-gen')
+
 			function callback() {
 				parent.removeEventListener('click', callback)
 
@@ -52,8 +56,10 @@
 				macroGen = new MacroGenerator()
 				macroGen.redrawMacro()
 			}
+
 			parent.addEventListener('click', callback)
 		})
+	
 	</script>
 
 	<!-- Twitter Card info -->

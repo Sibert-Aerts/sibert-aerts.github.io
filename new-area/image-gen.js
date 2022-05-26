@@ -772,7 +772,7 @@ const ds1Humanity = {
 const ds3Victory = {
     type: MacroType.nounVerbed,
     game: Game.ds3,
-    preset: 'HEIR OF FIRE DEFEATED',
+    preset: 'HEIR OF FIRE DESTROYED',
 
     preferCase: 'all caps',
     sliders: {
