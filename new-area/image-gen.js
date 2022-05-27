@@ -358,22 +358,16 @@ class MacroGenerator {
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
         
-        this.positionSliders = new Sliders('position', this.macroSliders)
-        this.positionSliders.onchange = () => this.autoRedraw()
-        this.areaSliders = new Sliders('areaName', this.macroSliders)
-        this.areaSliders.onchange = () => this.autoRedraw()
-        this.fontSliders = new Sliders('font', this.macroSliders)
-        this.fontSliders.onchange = () => this.autoRedraw()
-        this.victorySliders = new Sliders('victory', this.macroSliders)
-        this.victorySliders.onchange = () => this.autoRedraw()
+        this.sliders = {}
+        for( const slidersName of ['position', 'font', 'zoomBlur' ,'area', 'shadow'] ) {
+            const sliders = new Sliders(slidersName, this.macroSliders)
+            this.sliders[slidersName] = sliders
+            sliders.onchange = () => this.autoRedraw()
+        }
         
         this.imageSliders = new Sliders('image', element)
         this.imageSliders.onchange = () => this.autoRedraw()
 
-        this.sliders = {
-            position: this.positionSliders, areaName: this.areaSliders, image: this.imageSliders,
-            victory: this.victorySliders, font: this.fontSliders
-        }
 
         this.onMacroTypeChange(null, false)
     }
@@ -407,10 +401,10 @@ class MacroGenerator {
             this.presetSelects[type] = {}
 
             for( const game in Game ) {
-                if( !layerTypes[type][game] ) continue
+                if( !layerTypesMap[type][game] ) continue
 
                 const select = makeElem('select')
-                for( const preset in layerTypes[type][game] )
+                for( const preset in layerTypesMap[type][game] )
                     select.appendChild(makeOption(preset, preset))
 
                 this.presetHolder.appendChild(select)
@@ -438,9 +432,10 @@ class MacroGenerator {
         }
 
         //// Hide/Show relevant Preset selects (if any)
-        if( macroType !== MacroType.nounVerbed) {
-            this.presetHolder.parentNode.hidden = true
-        } else {
+        const usingNounVerbed = (macroType === MacroType.nounVerbed)
+
+        this.presetHolder.parentNode.hidden = !usingNounVerbed
+        if( usingNounVerbed ) {
             for( const typeKey in MacroType ) for( const gameKey in Game ) {
                 if( this.presetSelects[typeKey][gameKey] ) {
                     this.presetSelects[typeKey][gameKey].hidden = (typeKey !== macroType || gameKey !== game)
@@ -479,7 +474,7 @@ class MacroGenerator {
     /** @returns {DrawableLayer} */
     getLayerType() {
         const [macroType, game, preset] = this.getLayerTypeKeys()
-        return layerTypes[macroType][game]?.[preset]
+        return layerTypesMap[macroType][game]?.[preset]
     }
 
     /** Check whether the current canvas is too big to allow auto-rerendering. */
@@ -516,6 +511,7 @@ class MacroGenerator {
         ctx.textAlign = 'center'
         ctx.textBaseline = 'alphabetic'
         ctx.filter = 'none'
+        ctx.globalCompositeOperation = 'source-over'
     
         // On Chrome the canvas styling may affect drawing
         if( !!window.chrome ) {
@@ -603,7 +599,8 @@ class MacroGenerator {
 //========================================================================
 
 
-// Best shot at an enum type thing
+// Artisanal enum-type things
+
 const MacroType = {
     nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied',
 }
@@ -614,7 +611,7 @@ const macroTypeName = {
 }
 
 const Game = {
-    des: 'des', ds1: 'ds1', ds2: 'ds2', ds3: 'ds3', bb: 'bb', se: 'se', er: 'er'
+    des: 'des', ds1: 'ds1', ds2: 'ds2', ds3: 'ds3', bb: 'bb', se: 'se', er: 'er',
 }
 const gameName = {
     des: "Demon's Souls",
@@ -633,18 +630,229 @@ const gameName = {
  * @prop {keyof Game} game
  * @prop {string} preset
  * 
- * @prop {string} preferCase
- * @prop {string[]} sliders
+ * @prop {'all caps' | 'title case'} preferCase
+ * @prop {object} sliders
  * 
  * @prop {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} draw()
  */
 
+/** @type {DrawableLayer[]} */
+const layerTypes = []
 
-/** @type DrawableLayer */
-const ds1Victory = {
+
+
+/** Function which draws a NOUN VERBED. */
+function drawNounVerbed(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { fontSize, fontFamily, vScale, charSpacing, fontWeight } = gen.sliders.font.getValues()
+    const { color, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+    const { shadowSize, shadowOpacity } = gen.sliders.shadow.getValues()
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    s *= s0
+
+    // Center to which things align and also scale
+    const VERTICALCENTER = .5
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    // SHADE
+    if( shadowSize > 0 ) {
+        const shadeHeight = shadowSize * .25*h * s0
+        // Offset from the top of the frame when s0=1
+        const shadeCentering = .498
+        // Voodoo
+        const shadeCenter = ( shadeCentering*s0 - VERTICALCENTER*(s0-1) ) * h
+        // Duh
+        const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
+
+        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
+        shadowGrad.addColorStop(0,   '#0000')
+        // shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
+        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${shadowOpacity})`)
+        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${shadowOpacity})`)
+        shadowGrad.addColorStop(1,   '#0000')
+        ctx.fillStyle = shadowGrad
+        ctx.fillRect(0, top, w, shadeHeight)
+    }
+    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    // TEXT
+    let caption = gen.captionInput.value
+
+    if( charSpacing ) {
+        if( !!window.chrome && true ) {
+            //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
+            canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
+            ctx.translate(charSpacing*s/2, 0)
+            // TODO: this throws off the glow-blur centering
+
+        } else if( charSpacing > 0 ) {
+            //// Otherwise: simply inject little hair spaces in between each character
+            const space = ' '.repeat(Math.floor(charSpacing/5))
+            caption = caption.split('').join(space)
+        }
+    }
+
+    ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    // ctx.globalCompositeOperation = 'lighter'
+    
+    const VSCALE = vScale
+    ctx.scale(1, VSCALE)
+    ctx.save()
+
+
+    //// Emulate the zoom blur effect
+    const ZOOMSIZE = blurSize
+    const zoomSteps = Math.floor(20*ZOOMSIZE * Math.pow(s, 1/4))
+    // zoomFactor**zoomSteps = ZOOMSIZE
+    const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
+    // Zoom blur vertical distance
+    const VOFFSET = 1
+    const voff = VOFFSET*s/(ZOOMSIZE-1)
+    const blurColor = RGBMul(color, blurTint).map(byteClamp)
+
+    for( let i=0; i<=zoomSteps; i++ ) {
+        if( i ) ctx.scale(zoomFactor, zoomFactor)
+        // `product` ranges from 1 up to and including ZOOMSIZE
+        const product = Math.pow(ZOOMSIZE, i/zoomSteps)
+        // `fatProduct` ranges from 1 up to and including ±2
+        const fatProduct = Math.pow(product, 1/Math.log2(ZOOMSIZE))
+
+        ctx.filter = `blur(${Math.floor(s*product**4)}px`
+        ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
+        ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/VSCALE)
+    }
+    
+    ctx.restore()
+    ctx.fillStyle = `rgba(${color.join()}, 0.9)`
+    ctx.fillText(caption, w/2, h*VERTICALCENTER/VSCALE )
+}
+
+function drawAreaName(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { underline, contrast } = gen.sliders.area.getValues()
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    ctx.translate(x0, y0)
+    s *= s0
+
+    // UNDERLINE
+    if( underline > 0 ) {
+        const left = (.5-underline)*w, right = (.5+underline)*w
+        const length = 2*underline*w
+
+        const shadowGrad = ctx.createLinearGradient(left, 0, right, 0)
+        shadowGrad.addColorStop(0,   '#0000')
+        shadowGrad.addColorStop(0.1, `rgba(0, 0, 0, ${.25 * contrast})`)
+        shadowGrad.addColorStop(0.9, `rgba(0, 0, 0, ${.25 * contrast})`)
+        shadowGrad.addColorStop(1,   '#0000')
+        ctx.fillStyle = shadowGrad
+        ctx.fillRect(left, .51*h+5*s, length, 3*s)
+
+        const grad = ctx.createLinearGradient(left, 0, right, 0)
+        grad.addColorStop(0,   '#fff0')
+        grad.addColorStop(0.1, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(1,   '#fff0')
+        ctx.fillStyle = grad
+        ctx.fillRect(left, .51*h, length, 5*s)
+    }
+
+    // TEXT
+    ctx.shadowOffsetX = 2*s
+    ctx.shadowOffsetY = 1*s
+    ctx.shadowBlur = 8*s
+
+    ctx.font = Math.floor(96*s) + 'px adobe-garamond-pro'
+    ctx.fillStyle = 'white'
+    ctx.textAlign = 'center'
+
+    // Apply contrast by just redrawing the same text so the shadow overlaps
+    //      0.85 * 1.17 ~= 1
+    for( let c = contrast; c >= 0; ) {
+        ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
+        ctx.fillText(gen.captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
+        c -= 1.17
+    }
+}
+
+function drawYouDied(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { shadowSize, shadowOpacity } = gen.sliders.shadow.getValues()
+    
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    s *= s0
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    // SHADE
+    if( shadowSize > 0 ) {
+        const shadeHeight = shadowSize*.17* h*s0
+        // Offset from the top of the frame when s0=1
+        const shadeCentering = .485
+        const scaleCenter = .5
+        // Voodoo
+        const shadeCenter = ( shadeCentering*s0 - scaleCenter*(s0-1) ) * h
+        // Duh
+        const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
+
+        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
+        shadowGrad.addColorStop(0,   '#0000')
+        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${shadowOpacity})`)
+        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${shadowOpacity})`)
+        shadowGrad.addColorStop(1,   '#0000')
+        ctx.fillStyle = shadowGrad
+        ctx.fillRect(0, top, w, shadeHeight)
+    }
+    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    // TEXT
+    ctx.font = Math.floor(150*s) + 'px adobe-garamond-pro'
+    ctx.fillStyle = `rgb(${100*shadowOpacity*2}, ${10*shadowOpacity*2}, ${10*shadowOpacity*2})`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    
+    // ctx.shadowBlur = 4*s
+    // ctx.shadowColor = `rgba(255, 20, 20, .2)`
+
+    ctx.scale(1, 1.3)
+    ctx.fillText(gen.captionInput.value, w/2, h/2/1.3 )
+}
+
+
+////////////////////// Actually define them //////////////////////
+
+
+layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'VICTORY ACHIEVED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
@@ -655,114 +863,22 @@ const ds1Victory = {
             vScale: 1.5, charSpacing: 8,
             fontWeight: 100,
         },
-        victory: {
+        zoomBlur: {
             color: [255, 255, 107], blurTint: [255, 178, 153],
-            blurSize: 1.1, blurOpacity: 0.08, 
-            shadowSize: 1, shadowOpacity: 1
+            blurSize: 1.1, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .7
         }
     },
+    draw: drawNounVerbed
+})
 
-    draw(ctx, canvas, gen) {
-        // CONSTANTS
-        const w = canvas.width, h = canvas.height
-        let s = h/1080
-    
-        // USER INPUT
-        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
-        const { fontSize, fontFamily, vScale, charSpacing, fontWeight } = gen.fontSliders.getValues()
-        const { color, blurTint, blurSize, blurOpacity, shadowSize, shadowOpacity } = gen.victorySliders.getValues()
-
-        const x0 = xOffset * w
-        const y0 = yOffset * h
-        s *= s0
-
-        // Center to which things align and also scale
-        const VERTICALCENTER = .5
-    
-        // The shade only moves up or down
-        ctx.translate(0, y0)
-        // SHADE
-        if( shadowSize > 0 ) {
-            const shadeHeight = shadowSize * .25*h * s0
-            // Offset from the top of the frame when s0=1
-            const shadeCentering = .498
-            // Voodoo
-            const shadeCenter = ( shadeCentering*s0 - VERTICALCENTER*(s0-1) ) * h
-            // Duh
-            const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
-    
-            const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
-            shadowGrad.addColorStop(0,   '#0000')
-            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
-            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
-            shadowGrad.addColorStop(1,   '#0000')
-            ctx.fillStyle = shadowGrad
-            ctx.fillRect(0, top, w, shadeHeight)
-        }
-        
-        // The text also moves left or right
-        ctx.translate(x0, 0)
-    
-        // TEXT
-        let caption = gen.captionInput.value
-    
-        if( charSpacing ) {
-            if( !!window.chrome && true ) {
-                //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
-                canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
-                ctx.translate(charSpacing*s/2, 0)
-                // TODO: this throws off the glow-blur centering
-
-            } else if( charSpacing > 0 ) {
-                //// Otherwise: simply inject little hair spaces in between each character
-                const space = ' '.repeat(Math.floor(charSpacing/5))
-                caption = caption.split('').join(space)
-            }
-        }
-    
-        ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
-        // ctx.font = `500 ${120*s}px Kozuka Mincho Pro`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        
-        const VSCALE = vScale
-        // const VSCALE = 1/1.1
-        ctx.scale(1, VSCALE)
-        ctx.save()
-
-        //// Emulate the zoom blur effect
-        const ZOOMSIZE = blurSize
-        const zoomSteps = Math.floor(20*ZOOMSIZE * Math.pow(s, 1/4))
-        // zoomFactor**zoomSteps = ZOOMSIZE
-        const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
-        // Zoom blur vertical distance
-        const VOFFSET = 1
-        const voff = VOFFSET*s/(ZOOMSIZE-1)
-        const blurColor = RGBMul(color, blurTint).map(byteClamp)
-
-        for( let i=0; i<=zoomSteps; i++ ) {
-            if( i ) ctx.scale(zoomFactor, zoomFactor)
-            // `product` ranges from 1 up to and including ZOOMSIZE
-            const product = Math.pow(ZOOMSIZE, i/zoomSteps)
-            // `fatProduct` ranges from 1 up to and including ±2
-            const fatProduct = Math.pow(product, 1/Math.log2(ZOOMSIZE))
-    
-            ctx.filter = `blur(${Math.floor(s*product**4)}px`
-            ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
-            ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/VSCALE)
-        }
-        
-        ctx.restore()
-        ctx.fillStyle = `rgba(${color.join()}, 0.9)`
-        ctx.fillText(caption, w/2, h*VERTICALCENTER/VSCALE )
-    }
-}
-
-/** @type DrawableLayer */
-const ds1Humanity = {
+layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'HUMANITY RESTORED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
@@ -773,41 +889,44 @@ const ds1Humanity = {
             vScale: 1.5, charSpacing: 0,
             fontWeight: 100,
         },
-        victory: {
+        zoomBlur: {
             color: [129, 187, 153], blurTint: [187, 201, 192],
-            blurSize: 1.16, blurOpacity: 0.08, 
-            shadowSize: 1, shadowOpacity: 1
+            blurSize: 1.16, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .7
         }
     },
-    draw: ds1Victory.draw
-}
+    draw: drawNounVerbed
+})
 
-/** @type DrawableLayer */
-const bbSlaughtered = {
+layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.bb,
     preset: 'PREY SLAUGHTERED',
+
     preferCase: 'all caps',
     sliders: {
         position: { 
-            xOffset: -0.004, yOffset: -.258, scale: 1
+            xOffset: 0, yOffset: -.258, scale: 1
         },
         font: {
-            fontSize: 133, fontFamily: 'Kozuka Mincho Pro',
-            vScale: 0.937, charSpacing: 9,
+            fontSize: 139, fontFamily: 'Kozuka Mincho Pro',
+            vScale: 0.922, charSpacing: 6,
             fontWeight: 500,
         },
-        victory: {
-            color: [184, 255, 209], blurTint: [255, 255, 255],
-            blurSize: 1.02, blurOpacity: 0.08, 
-            shadowSize: 0, shadowOpacity: 1
+        zoomBlur: {
+            color: [144, 208, 166], blurTint: [255, 255, 255],
+            blurSize: 1, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0, shadowOpacity: .7
         }
     },
-    draw: ds1Victory.draw
-}
+    draw: drawNounVerbed
+})
 
-/** @type DrawableLayer */
-const ds3Victory = {
+layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'HEIR OF FIRE DESTROYED',
@@ -822,17 +941,18 @@ const ds3Victory = {
             vScale: 1.317, charSpacing: 1.5,
             fontWeight: 100,
         },
-        victory: {
+        zoomBlur: {
             color: [255, 255, 100], blurTint: [242, 194, 255],
-            blurSize: 1.18, blurOpacity: 0.08, 
-            shadowSize: 0.7, shadowOpacity: .95
+            blurSize: 1.18, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.7, shadowOpacity: .6
         }
     },
-    draw: ds1Victory.draw
-}
+    draw: drawNounVerbed
+})
 
-/** @type DrawableLayer */
-const ds3Death = {
+layerTypes.push({
     type: MacroType.youDied,
     game: Game.ds3,
     preset: 'YOU DIED',
@@ -841,67 +961,16 @@ const ds3Death = {
     sliders: {
         position: {
             xOffset: .004, yOffset: .018, scale: 1
-        }, 
-        areaName: { 
-            underline: .32, contrast: 1 
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .6
         }
     },
 
-    draw(ctx, canvas, gen) {
-        // CONSTANTS
-        const w = canvas.width, h = canvas.height
-        let s = h/1080
+    draw: drawYouDied
+})
 
-        // USER INPUT
-        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
-        const { underline, contrast } = gen.areaSliders.getValues()
-        
-        const x0 = xOffset * w
-        const y0 = yOffset * h
-        s *= s0
-        const shadeScale = underline/.32
-
-        // The shade only moves up or down
-        ctx.translate(0, y0)
-        // SHADE
-        if( shadeScale > 0 ) {
-            const shadeHeight = shadeScale*.17* h*s0
-            // Offset from the top of the frame when s0=1
-            const shadeCentering = .485
-            const scaleCenter = .5
-            // Voodoo
-            const shadeCenter = ( shadeCentering*s0 - scaleCenter*(s0-1) ) * h
-            // Duh
-            const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
-
-            const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
-            shadowGrad.addColorStop(0,   '#0000')
-            shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.6 * contrast**0.5})`)
-            shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${.6 * contrast**0.5})`)
-            shadowGrad.addColorStop(1,   '#0000')
-            ctx.fillStyle = shadowGrad
-            ctx.fillRect(0, top, w, shadeHeight)
-        }
-        
-        // The text also moves left or right
-        ctx.translate(x0, 0)
-
-        // TEXT
-        ctx.font = Math.floor(150*s) + 'px adobe-garamond-pro'
-        ctx.fillStyle = `rgb(${100*contrast}, ${10*contrast}, ${10*contrast})`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        
-        // ctx.shadowBlur = 4*s
-        // ctx.shadowColor = `rgba(255, 20, 20, .2)`
-
-        ctx.scale(1, 1.3)
-        ctx.fillText(gen.captionInput.value, w/2, h/2/1.3 )
-    }
-}
-
-/** @type DrawableLayer */
-const ds1Death = {
+layerTypes.push({
     type: MacroType.youDied,
     game: Game.ds1,
     preset: 'YOU DIED',
@@ -910,16 +979,15 @@ const ds1Death = {
     sliders: {
         position: {
             xOffset: .003, yOffset: .036, scale: 0.993
-        }, 
-        areaName: { 
-            underline: .49, contrast: 1 
+        },
+        shadow: {
+            shadowSize: 1.5, shadowOpacity: .6
         }
     },
-    draw: ds3Death.draw
-}
+    draw: drawYouDied
+})
 
-/** @type DrawableLayer */
-const ds3Area = {
+layerTypes.push({
     type: MacroType.areaName,
     game: Game.ds3,
     preset: 'Area Name',
@@ -929,68 +997,14 @@ const ds3Area = {
         position: { 
             xOffset: 0.001, yOffset: 0.003, scale: 1 
         },
-        areaName: {
+        area: {
             underline: .32, contrast: 1
         }
     },
+    draw: drawAreaName
+})
 
-    draw(ctx, canvas, gen) {
-        // CONSTANTS
-        const w = canvas.width, h = canvas.height
-        let s = h/1080
-    
-        // USER INPUT
-        const { xOffset, yOffset, scale: s0 } = gen.positionSliders.getValues()
-        const { underline, contrast } = gen.areaSliders.getValues()
-
-        const x0 = xOffset * w
-        const y0 = yOffset * h
-        ctx.translate(x0, y0)
-        s *= s0
-    
-        // UNDERLINE
-        if( underline > 0 ) {
-            const left = (.5-underline)*w, right = (.5+underline)*w
-            const length = 2*underline*w
-    
-            const shadowGrad = ctx.createLinearGradient(left, 0, right, 0)
-            shadowGrad.addColorStop(0,   '#0000')
-            shadowGrad.addColorStop(0.1, `rgba(0, 0, 0, ${.25 * contrast})`)
-            shadowGrad.addColorStop(0.9, `rgba(0, 0, 0, ${.25 * contrast})`)
-            shadowGrad.addColorStop(1,   '#0000')
-            ctx.fillStyle = shadowGrad
-            ctx.fillRect(left, .51*h+5*s, length, 3*s)
-    
-            const grad = ctx.createLinearGradient(left, 0, right, 0)
-            grad.addColorStop(0,   '#fff0')
-            grad.addColorStop(0.1, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
-            grad.addColorStop(0.9, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
-            grad.addColorStop(1,   '#fff0')
-            ctx.fillStyle = grad
-            ctx.fillRect(left, .51*h, length, 5*s)
-        }
-    
-        // TEXT
-        ctx.shadowOffsetX = 2*s
-        ctx.shadowOffsetY = 1*s
-        ctx.shadowBlur = 8*s
-    
-        ctx.font = Math.floor(96*s) + 'px adobe-garamond-pro'
-        ctx.fillStyle = 'white'
-        ctx.textAlign = 'center'
-    
-        // Apply contrast by just redrawing the same text so the shadow overlaps
-        //      0.85 * 1.17 ~= 1
-        for( let c = contrast; c >= 0; ) {
-            ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
-            ctx.fillText(gen.captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
-            c -= 1.17
-        }
-    }
-}
-
-/** @type DrawableLayer */
-const ds1Area = {
+layerTypes.push({
     type: MacroType.areaName,
     game: Game.ds1,
     preset: 'Area Name',
@@ -1000,37 +1014,12 @@ const ds1Area = {
         position: {
             xOffset: .001, yOffset: -.004, scale: 1.0281
         }, 
-        areaName: { 
+        area: {
             underline: .3, contrast: 0
         }
     },
-    draw: ds3Area.draw
-}
-
-
-/** @type DrawableLayer */
-const ds2Area = {
-    type: MacroType.areaName,
-    game: Game.ds2,
-    preset: 'Area Name',
-
-    preferCase: 'title case',
-    sliders: {
-        position: {
-            xOffset: .01, yOffset: -.01, scale: 1.5
-        }, 
-        areaName: { 
-            underline: .5, contrast: 3
-        }
-    },
-    draw: ds3Area.draw
-}
-
-
-
-/** ⚠ Keep this up-to-date manually. ⚠ */
-const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds1Death, ds3Death, bbSlaughtered]
-
+    draw: drawAreaName
+})
 
 
 //// Automatically create indexes of all the different layer types by various properties.
@@ -1039,15 +1028,15 @@ const layerTypeList = [ds1Victory, ds1Humanity, ds3Victory, ds1Area, ds3Area, ds
  * Object containing all types of drawable layers, indexed by type, game (and preset)
  * @type { {[type in keyof MacroType] : {[type in keyof Game]: {[preset: string]: DrawableLayer }? }} } } 
  */
-const layerTypes = {}
+const layerTypesMap = {}
 
 for( const type in MacroType )
     for( const game in Game )
-        layerTypes[type] = {[game]: null}
+        layerTypesMap[type] = {[game]: null}
 
-for( const layer of layerTypeList ) {
-    layerTypes[layer.type][layer.game] ??= {}
-    layerTypes[layer.type][layer.game][layer.preset] = layer
+for( const layer of layerTypes ) {
+    layerTypesMap[layer.type][layer.game] ??= {}
+    layerTypesMap[layer.type][layer.game][layer.preset] = layer
 }
 
 
@@ -1055,5 +1044,15 @@ for( const layer of layerTypeList ) {
 
 window.MACROGEN_DEFAULTS = {
     macroType: MacroType.nounVerbed,
-    game: Game.ds1
+    game: Game.bb
+}
+
+window.EXPORT_SLIDERS = () => {
+    console.log({
+        position:   macroGen.sliders.position.getValues(),
+        font:       macroGen.sliders.font.getValues(),
+        zoomBlur:   macroGen.sliders.zoomBlur.getValues(),
+        area:       macroGen.sliders.area.getValues(),
+        shadow:     macroGen.sliders.shadow.getValues(),
+    })
 }
