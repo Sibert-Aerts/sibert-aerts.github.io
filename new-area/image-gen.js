@@ -359,7 +359,7 @@ class MacroGenerator {
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
         
         this.sliders = {}
-        for( const slidersName of ['position', 'font', 'zoomBlur' ,'area', 'shadow'] ) {
+        for( const slidersName of ['position', 'font', 'zoomBlur', 'slaughter', 'area', 'shadow'] ) {
             const sliders = new Sliders(slidersName, this.macroSliders)
             this.sliders[slidersName] = sliders
             sliders.onchange = () => this.autoRedraw()
@@ -624,6 +624,10 @@ const gameName = {
 }
 
 /** 
+ * @typedef {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} drawFun
+ */
+
+/** 
  * @typedef {Object} DrawableLayer
  * 
  * @prop {keyof MacroType} type
@@ -633,59 +637,48 @@ const gameName = {
  * @prop {'all caps' | 'title case'} preferCase
  * @prop {object} sliders
  * 
- * @prop {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} draw()
+ * @prop {drawFun} draw()
  */
 
 /** @type {DrawableLayer[]} */
 const layerTypes = []
 
 
-
-/** Function which draws a NOUN VERBED. */
-function drawNounVerbed(ctx, canvas, gen) {
-    // CONSTANTS
+/** PARTIAL: Draws a horizontal shadow bar at y=50%. */
+function drawShadowBar(ctx, canvas, gen, s0) {
     const w = canvas.width, h = canvas.height
-    let s = h/1080
+    const { shadowSize, shadowOpacity, shadowOffset, shadowSoftness } = gen.sliders.shadow.getValues()
 
-    // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { fontSize, fontFamily, vScale, charSpacing, fontWeight } = gen.sliders.font.getValues()
-    const { color, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
-    const { shadowSize, shadowOpacity } = gen.sliders.shadow.getValues()
+    if( shadowSize === 0 ) return
 
-    const x0 = xOffset * w
-    const y0 = yOffset * h
-    s *= s0
+    const shadowHeight = shadowSize * .25*h * s0
+    const targetCenter = .5 + shadowOffset
+    const SCALECENTER = .5
+    // Voodoo to account for the manual scaling factor
+    const shadowCenter = (targetCenter*s0 - SCALECENTER*(s0-1)) * h
+    const top = shadowCenter-shadowHeight/2, bottom = shadowCenter+shadowHeight/2
 
-    // Center to which things align and also scale
-    const VERTICALCENTER = .5
+    const softnessLow  = Math.min(1, shadowSoftness)
+    const softnessHigh = Math.max(1, shadowSoftness) - 1
 
-    // The shade only moves up or down
-    ctx.translate(0, y0)
-    // SHADE
-    if( shadowSize > 0 ) {
-        const shadeHeight = shadowSize * .25*h * s0
-        // Offset from the top of the frame when s0=1
-        const shadeCentering = .498
-        // Voodoo
-        const shadeCenter = ( shadeCentering*s0 - VERTICALCENTER*(s0-1) ) * h
-        // Duh
-        const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
+    const gradient = ctx.createLinearGradient(0, top, 0, bottom)
+    gradient.addColorStop(0, '#0000')
+    gradient.addColorStop(  .25*softnessLow, `rgba(0, 0, 0, ${shadowOpacity})`)
+    gradient.addColorStop(1-.25*softnessLow, `rgba(0, 0, 0, ${shadowOpacity})`)
+    gradient.addColorStop(1, '#0000')
+    ctx.fillStyle = gradient
 
-        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
-        shadowGrad.addColorStop(0,   '#0000')
-        // shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${.7 * shadowOpacity**0.4})`)
-        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${shadowOpacity})`)
-        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${shadowOpacity})`)
-        shadowGrad.addColorStop(1,   '#0000')
-        ctx.fillStyle = shadowGrad
-        ctx.fillRect(0, top, w, shadeHeight)
-    }
-    
-    // The text also moves left or right
-    ctx.translate(x0, 0)
+    if( softnessHigh > 0 )
+        ctx.filter = `blur(${Math.floor(shadowHeight*softnessHigh/4)}px)`
 
-    // TEXT
+    ctx.fillRect(-shadowHeight/2, top, w+shadowHeight, shadowHeight)    
+    ctx.filter = 'none'
+}
+
+/** PARTIAL: Sets the appropriate ctx properties. */
+function applyFontSliders(ctx, canvas, gen, s) {
+    const { fontSize, textColor, fontFamily, vScale, charSpacing, fontWeight } = gen.sliders.font.getValues()
+
     let caption = gen.captionInput.value
 
     if( charSpacing ) {
@@ -703,14 +696,45 @@ function drawNounVerbed(ctx, canvas, gen) {
     }
 
     ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
+    ctx.fillStyle = `rgb(${textColor.join()})`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    // ctx.globalCompositeOperation = 'lighter'
     
-    const VSCALE = vScale
-    ctx.scale(1, VSCALE)
-    ctx.save()
+    ctx.scale(1, vScale)
 
+    return [caption, vScale]
+}
+
+
+/** @type {drawFun} Function which draws a NOUN VERBED.  */
+function drawNounVerbed(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { color, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    s *= s0
+
+    // Center to which things align and also scale
+    const VERTICALCENTER = .5
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+
+    //// SHADE
+    drawShadowBar(ctx, canvas, gen, s0)
+    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    //// TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.save()
 
     //// Emulate the zoom blur effect
     const ZOOMSIZE = blurSize
@@ -729,16 +753,59 @@ function drawNounVerbed(ctx, canvas, gen) {
         // `fatProduct` ranges from 1 up to and including ±2
         const fatProduct = Math.pow(product, 1/Math.log2(ZOOMSIZE))
 
-        ctx.filter = `blur(${Math.floor(s*product**4)}px`
+        ctx.filter = `blur(${Math.floor(s*product**4)}px)`
         ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
-        ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/VSCALE)
+        ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/vScale)
     }
     
     ctx.restore()
     ctx.fillStyle = `rgba(${color.join()}, 0.9)`
-    ctx.fillText(caption, w/2, h*VERTICALCENTER/VSCALE )
+    ctx.fillText(caption, w/2, h*VERTICALCENTER/vScale )
 }
 
+
+/** @type {drawFun} Function which draws Bloodborne's PREY SLAUGHTERED.  */
+function drawPreySlaughtered(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.slaughter.getValues()
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    s *= s0
+
+    ctx.translate(x0, y0)
+
+    //// TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.globalCompositeOperation = 'lighter' // blend mode: Add
+    ctx.filter = `blur(${s/2}px)`
+
+    /// First: Just draw the text, no glow
+    const [r, g, b] = gen.sliders.font.getValues().textColor
+    ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
+    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
+    ctx.fillText(caption, w/2-s, h/2/vScale)
+
+    /// Then: Draw the text black (invisible) multiple times to get more glow.
+    ctx.fillStyle = `#000`
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0
+
+    for( let opacity=glowOpacity; opacity > 0; ) {
+        // Extending the blur size for over-opacity gives a nicer, smoother effect
+        ctx.shadowBlur = glowSize * Math.max(Math.sqrt(opacity), 1)
+        ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
+        ctx.fillText(caption, w/2, h/2/vScale)
+        opacity--
+    }
+}
+
+/** @type {drawFun} Function which draws an Area Name. */
 function drawAreaName(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -780,73 +847,46 @@ function drawAreaName(ctx, canvas, gen) {
     ctx.shadowOffsetY = 1*s
     ctx.shadowBlur = 8*s
 
-    ctx.font = Math.floor(96*s) + 'px adobe-garamond-pro'
-    ctx.fillStyle = 'white'
-    ctx.textAlign = 'center'
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
 
     // Apply contrast by just redrawing the same text so the shadow overlaps
     //      0.85 * 1.17 ~= 1
     for( let c = contrast; c >= 0; ) {
         ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
-        ctx.fillText(gen.captionInput.value, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 ))
+        // The y-coordinate here is just magic numbers nonsense I found...
+        ctx.fillText(caption, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 )/vScale)
         c -= 1.17
     }
 }
 
+/** @type {drawFun} Function which draws an YOU DIED. */
 function drawYouDied(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { shadowSize, shadowOpacity } = gen.sliders.shadow.getValues()
-    
-    const x0 = xOffset * w
-    const y0 = yOffset * h
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()    
+    const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
 
     // The shade only moves up or down
     ctx.translate(0, y0)
     // SHADE
-    if( shadowSize > 0 ) {
-        const shadeHeight = shadowSize*.17* h*s0
-        // Offset from the top of the frame when s0=1
-        const shadeCentering = .485
-        const scaleCenter = .5
-        // Voodoo
-        const shadeCenter = ( shadeCentering*s0 - scaleCenter*(s0-1) ) * h
-        // Duh
-        const top = shadeCenter-shadeHeight/2, bottom = shadeCenter+shadeHeight/2
-
-        const shadowGrad = ctx.createLinearGradient(0, top, 0, bottom)
-        shadowGrad.addColorStop(0,   '#0000')
-        shadowGrad.addColorStop(0.25, `rgba(0, 0, 0, ${shadowOpacity})`)
-        shadowGrad.addColorStop(0.75, `rgba(0, 0, 0, ${shadowOpacity})`)
-        shadowGrad.addColorStop(1,   '#0000')
-        ctx.fillStyle = shadowGrad
-        ctx.fillRect(0, top, w, shadeHeight)
-    }
-    
+    drawShadowBar(ctx, canvas, gen, s0)
     // The text also moves left or right
     ctx.translate(x0, 0)
 
     // TEXT
-    ctx.font = Math.floor(150*s) + 'px adobe-garamond-pro'
-    ctx.fillStyle = `rgb(${100*shadowOpacity*2}, ${10*shadowOpacity*2}, ${10*shadowOpacity*2})`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    
-    // ctx.shadowBlur = 4*s
-    // ctx.shadowColor = `rgba(255, 20, 20, .2)`
-
-    ctx.scale(1, 1.3)
-    ctx.fillText(gen.captionInput.value, w/2, h/2/1.3 )
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)    
+    ctx.fillText(caption, w/2, h/2/vScale)
 }
 
 
 ////////////////////// Actually define them //////////////////////
 
+//////// NOUN VERBED
 
 layerTypes.push({
     type: MacroType.nounVerbed,
@@ -868,7 +908,8 @@ layerTypes.push({
             blurSize: 1.1, blurOpacity: 0.08,
         },
         shadow: {
-            shadowSize: 1, shadowOpacity: .7
+            shadowSize: 1, shadowOpacity: .7,
+            shadowOffset: -.002, shadowSoftness: 1,
         }
     },
     draw: drawNounVerbed
@@ -894,7 +935,35 @@ layerTypes.push({
             blurSize: 1.16, blurOpacity: 0.08,
         },
         shadow: {
-            shadowSize: 1, shadowOpacity: .7
+            shadowSize: 1, shadowOpacity: .7,
+            shadowOffset: -.002, shadowSoftness: 1,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'HEIR OF FIRE DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.317, charSpacing: 1.5,
+            fontWeight: 100,
+        },
+        zoomBlur: {
+            color: [255, 255, 100], blurTint: [240, 190, 254],
+            blurSize: 1.18, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
+            shadowOffset: -.008, shadowSoftness: 1.24,
         }
     },
     draw: drawNounVerbed
@@ -911,45 +980,41 @@ layerTypes.push({
             xOffset: 0, yOffset: -.258, scale: 1
         },
         font: {
-            fontSize: 139, fontFamily: 'Kozuka Mincho Pro',
+            fontSize: 139, fontFamily: 'Kozuka Mincho Pro, Yu Mincho, Georgia',
             vScale: 0.922, charSpacing: 6,
-            fontWeight: 500,
+            fontWeight: 500, textColor: [144, 208, 166]
         },
-        zoomBlur: {
-            color: [144, 208, 166], blurTint: [255, 255, 255],
-            blurSize: 1, blurOpacity: 0.08,
-        },
-        shadow: {
-            shadowSize: 0, shadowOpacity: .7
+        slaughter: {
+            textOpacity: .6, glowColor: [144, 208, 166],
+            glowSize: 30, glowOpacity: 1.1,
         }
     },
-    draw: drawNounVerbed
+    draw: drawPreySlaughtered
 })
 
+//////// YOU DIED
+
 layerTypes.push({
-    type: MacroType.nounVerbed,
-    game: Game.ds3,
-    preset: 'HEIR OF FIRE DESTROYED',
+    type: MacroType.youDied,
+    game: Game.ds1,
+    preset: 'YOU DIED',
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.012, scale: 1.101
+        position: {
+            xOffset: .003, yOffset: .036, scale: 1
         },
         font: {
-            fontSize: 102, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.317, charSpacing: 1.5,
-            fontWeight: 100,
-        },
-        zoomBlur: {
-            color: [255, 255, 100], blurTint: [242, 194, 255],
-            blurSize: 1.18, blurOpacity: 0.08,
+            fontFamily: 'adobe-garamond-pro', textColor: [100, 10, 10],
+            fontSize: 148, fontWeight: 100,
+            vScale: 1.3, charSpacing: 0,
         },
         shadow: {
-            shadowSize: 0.7, shadowOpacity: .6
+            shadowSize: 1, shadowOpacity: .6,
+            shadowOffset: -0.015, shadowSoftness: 1,
         }
     },
-    draw: drawNounVerbed
+    draw: drawYouDied
 })
 
 layerTypes.push({
@@ -962,30 +1027,21 @@ layerTypes.push({
         position: {
             xOffset: .004, yOffset: .018, scale: 1
         },
-        shadow: {
-            shadowSize: 1, shadowOpacity: .6
-        }
-    },
-
-    draw: drawYouDied
-})
-
-layerTypes.push({
-    type: MacroType.youDied,
-    game: Game.ds1,
-    preset: 'YOU DIED',
-
-    preferCase: 'all caps',
-    sliders: {
-        position: {
-            xOffset: .003, yOffset: .036, scale: 0.993
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [100, 10, 10],
+            fontSize: 150, fontWeight: 100,
+            vScale: 1.3, charSpacing: 0,
         },
         shadow: {
-            shadowSize: 1.5, shadowOpacity: .6
+            shadowSize: .66, shadowOpacity: .6,
+            shadowOffset: -0.015, shadowSoftness: 1.24,
         }
     },
+
     draw: drawYouDied
 })
+
+//////// New Area
 
 layerTypes.push({
     type: MacroType.areaName,
@@ -996,6 +1052,11 @@ layerTypes.push({
     sliders: {
         position: { 
             xOffset: 0.001, yOffset: 0.003, scale: 1 
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
+            fontSize: 96, fontWeight: 100,
+            vScale: 1, charSpacing: 0,
         },
         area: {
             underline: .32, contrast: 1
@@ -1012,8 +1073,13 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: {
-            xOffset: .001, yOffset: -.004, scale: 1.0281
-        }, 
+            xOffset: .001, yOffset: -.004, scale: 1
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
+            fontSize: 98, fontWeight: 100,
+            vScale: 1, charSpacing: 0,
+        },
         area: {
             underline: .3, contrast: 0
         }
@@ -1044,15 +1110,13 @@ for( const layer of layerTypes ) {
 
 window.MACROGEN_DEFAULTS = {
     macroType: MacroType.nounVerbed,
-    game: Game.bb
+    game: Game.ds1,
 }
 
 window.EXPORT_SLIDERS = () => {
-    console.log({
-        position:   macroGen.sliders.position.getValues(),
-        font:       macroGen.sliders.font.getValues(),
-        zoomBlur:   macroGen.sliders.zoomBlur.getValues(),
-        area:       macroGen.sliders.area.getValues(),
-        shadow:     macroGen.sliders.shadow.getValues(),
-    })
+    const obj = {}
+    for( const slidersName of ['position', 'font', 'zoomBlur', 'slaughter', 'area', 'shadow'] )
+        if( !macroGen.sliders[slidersName].element.hidden )
+            obj[slidersName] = macroGen.sliders[slidersName].getValues()
+    console.log(obj)
 }

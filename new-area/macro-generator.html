@@ -192,6 +192,29 @@
 					</div>
 				</div>
 
+				<div name=slaughter class=sliders-container hidden>
+					<div class=smol>
+						<span class=input-title>Text opacity:</span>
+						<button class=reset-button></button>
+						<input type=range name=textOpacity min=0 max=1 step=.02 default=.7>
+					</div>
+					<div class=smol>
+						<span class=input-title>Glow color:</span>
+						<button class=reset-button></button>
+						<input type=color name=glowColor as=rgb default=#ffffff>
+					</div>
+					<div class=smol>
+						<span class=input-title>Glow size:</span>
+						<button class=reset-button></button>
+						<input type=range name=glowSize min=0 max=100 step=1 default=40>
+					</div>
+					<div class=smol>
+						<span class=input-title>Glow opacity:</span>
+						<button class=reset-button></button>
+						<input type=range name=glowOpacity min=0 max=5 step=.1 default=1>
+					</div>
+				</div>
+
 				<div name=area class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Underline:</span>
@@ -209,12 +232,22 @@
 					<div class=smol>
 						<span class=input-title>Shadow size:</span>
 						<button class=reset-button></button>
-						<input type=range name=shadowSize min=0 max=8 step=.1>
+						<input name=shadowSize type=range min=0 max=8 step=.02>
 					</div>
 					<div class=smol>
 						<span class=input-title>Shadow opacity:</span>
 						<button class=reset-button></button>
-						<input type=range name=shadowOpacity min=0 max=1 step=.01>
+						<input name=shadowOpacity type=range min=0 max=1 step=.01>
+					</div>
+					<div class=smol>
+						<span class=input-title>Shadow offset:</span>
+						<button class=reset-button></button>
+						<input name=shadowOffset type=range min=-.2 max=.2 step=.002>
+					</div>
+					<div class=smol>
+						<span class=input-title>Shadow softness:</span>
+						<button class=reset-button></button>
+						<input name=shadowSoftness type=range min=0 max=2 step=.01>
 					</div>
 				</div>
 
