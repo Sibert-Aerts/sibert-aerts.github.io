@@ -946,6 +946,8 @@ function drawSekiroYouDied(ctx, canvas, gen) {
 
 //////// NOUN VERBED
 
+//// DARK SOULS 1
+
 layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.ds1,
@@ -994,11 +996,69 @@ layerTypes.push({
         },
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
-            shadowOffset: -.002, shadowSoftness: 1,
+            shadowOffset: -.006, shadowSoftness: 1,
         }
     },
     draw: drawNounVerbed
 })
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds1,
+    preset: 'BONFIRE LIT',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0.001, yOffset: 0.037, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 1,
+            fontWeight: 100,
+        },
+        zoomBlur: {
+            color: [255, 228, 92], blurTint: [251, 149, 131],
+            blurSize: 1.14, blurOpacity: 0.1,
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .7,
+            shadowOffset: -.004, shadowSoftness: 1,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+//// DARK SOULS 2
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'BONFIRE LIT',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.003, yOffset: 0.217, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 1,
+            fontWeight: 100,
+        },
+        zoomBlur: {
+            color: [255, 177, 68], blurTint: [255, 198, 168],
+            blurSize: 1.07, blurOpacity: 0.02,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+//// DARK SOULS 3
 
 layerTypes.push({
     type: MacroType.nounVerbed,
@@ -1012,7 +1072,7 @@ layerTypes.push({
         },
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.317, charSpacing: 1.5,
+            vScale: 1.317, charSpacing: 1,
             fontWeight: 100,
         },
         zoomBlur: {
@@ -1026,6 +1086,62 @@ layerTypes.push({
     },
     draw: drawNounVerbed
 })
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'EMBER RESTORED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -0.001, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 3,
+            fontWeight: 100,
+        },
+        zoomBlur: {
+            color: [251, 82, 19], blurTint: [206, 202, 211],
+            blurSize: 1.16, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'BONFIRE LIT',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 2,
+            fontWeight: 100,
+        },
+        zoomBlur: {
+            color: [255, 206, 86], blurTint: [227, 166, 146],
+            blurSize: 1.16, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .72,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+//// BLOODBORNE
 
 layerTypes.push({
     type: MacroType.nounVerbed,
@@ -1172,6 +1288,28 @@ layerTypes.push({
 
 layerTypes.push({
     type: MacroType.areaName,
+    game: Game.ds1,
+    preset: 'Area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: .001, yOffset: -.004, scale: 1
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
+            fontSize: 98, fontWeight: 100,
+            vScale: 1, charSpacing: 0,
+        },
+        area: {
+            underline: .3, contrast: 0
+        }
+    },
+    draw: drawAreaName
+})
+
+layerTypes.push({
+    type: MacroType.areaName,
     game: Game.ds3,
     preset: 'Area Name',
 
@@ -1194,23 +1332,24 @@ layerTypes.push({
 
 layerTypes.push({
     type: MacroType.areaName,
-    game: Game.ds1,
+    game: Game.se,
     preset: 'Area Name',
 
     preferCase: 'title case',
     sliders: {
-        position: {
-            xOffset: .001, yOffset: -.004, scale: 1
+        position: { 
+            xOffset: 0.001, yOffset: -0.020, scale: 1 
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 98, fontWeight: 100,
+            fontFamily: 'adobe-garamond-pro', textColor: [202, 204, 203],
+            fontSize: 85, fontWeight: 100,
             vScale: 1, charSpacing: 0,
         },
         area: {
-            underline: .3, contrast: 0
+            underline: 0, contrast: 1
         }
     },
+    // TODO: this needs a back image ofc
     draw: drawAreaName
 })
 
