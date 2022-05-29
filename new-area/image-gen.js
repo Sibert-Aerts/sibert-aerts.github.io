@@ -254,7 +254,13 @@ class Sliders {
         if( this.usable ) this.element.hidden = false
     }
 
+    /** Get a specific slider's value. */
+    get(key) {
+        return this.byName[key].converter.parse(this.byName[key].value)
+    }
+
     /**
+     *  Get all slider values bundled as an object.
      *  @returns  {{ [name: string]: any }}
      */
     getValues() {
@@ -358,8 +364,11 @@ class MacroGenerator {
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
         
+        // Buh find this one from the DOM names
+        const MACRO_SLIDER_NAMES = ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow', 'sekiroDeath'] 
+
         this.sliders = {}
-        for( const slidersName of ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow'] ) {
+        for( const slidersName of MACRO_SLIDER_NAMES ) {
             const sliders = new Sliders(slidersName, this.macroSliders)
             this.sliders[slidersName] = sliders
             sliders.onchange = () => this.autoRedraw()
@@ -763,7 +772,6 @@ function drawNounVerbed(ctx, canvas, gen) {
     ctx.fillText(caption, w/2, h*VERTICALCENTER/vScale )
 }
 
-
 /** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
 function drawGlowyText(ctx, canvas, gen) {
     // CONSTANTS
@@ -786,7 +794,7 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.filter = `blur(${s/2}px)`
 
     /// First: Just draw the text, no glow
-    const [r, g, b] = gen.sliders.font.getValues().textColor
+    const [r, g, b] = gen.sliders.font.get('textColor')
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
     ctx.fillText(caption, w/2, h/2/vScale)
     ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
@@ -819,33 +827,31 @@ function drawAreaName(ctx, canvas, gen) {
     const y0 = yOffset * h
     ctx.translate(x0, y0)
     s *= s0
+    
+    // Shadow style
+    ctx.shadowOffsetX = 2*s
+    ctx.shadowOffsetY = 1*s
+    ctx.shadowBlur = 8*s
 
     // UNDERLINE
     if( underline > 0 ) {
         const left = (.5-underline)*w, right = (.5+underline)*w
         const length = 2*underline*w
 
-        const shadowGrad = ctx.createLinearGradient(left, 0, right, 0)
-        shadowGrad.addColorStop(0,   '#0000')
-        shadowGrad.addColorStop(0.1, `rgba(0, 0, 0, ${.25 * contrast})`)
-        shadowGrad.addColorStop(0.9, `rgba(0, 0, 0, ${.25 * contrast})`)
-        shadowGrad.addColorStop(1,   '#0000')
-        ctx.fillStyle = shadowGrad
-        ctx.fillRect(left, .51*h+5*s, length, 3*s)
-
+        // The underline
+        const colorTuple = gen.sliders.font.get('textColor').join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
-        grad.addColorStop(0,   '#fff0')
-        grad.addColorStop(0.1, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
-        grad.addColorStop(0.9, `rgba(255, 255, 255, ${.75 * Math.max(1, contrast)})`)
-        grad.addColorStop(1,   '#fff0')
+        grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
+        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(1,   `rgba(${colorTuple}, 0)`)
         ctx.fillStyle = grad
+        ctx.shadowColor = `rgba(0, 0, 0, ${contrast/2})`
         ctx.fillRect(left, .51*h, length, 5*s)
     }
 
     // TEXT
-    ctx.shadowOffsetX = 2*s
-    ctx.shadowOffsetY = 1*s
-    ctx.shadowBlur = 8*s
+    ctx.shadowColor = `rgba(0, 0, 0, ${contrast})`
 
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
     ctx.textBaseline = 'alphabetic'
@@ -883,6 +889,58 @@ function drawYouDied(ctx, canvas, gen) {
     ctx.fillText(caption, w/2, h/2/vScale)
 }
 
+
+/** @type {drawFun} Function which draws Sekiro's iconic 死. */
+function drawSekiroYouDied(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate(xOffset * w, yOffset * h)
+    s *= s0
+
+    //// TEXT
+    const { symbol, glowColor, glowSize, glowOpacity } = gen.sliders.sekiroDeath.getValues()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const textColor = gen.sliders.font.get('textColor')
+    ctx.filter = `blur(${s/2}px)`
+
+    const textFont = ctx.font
+    const symbolFont = `800 ${345*s}px hot-gfkaishokk`
+    ctx.font = symbolFont
+
+    // Trick to make the font work good (for lack of a proper API)
+    byId('adobe-font-trick').innerText = symbol
+    
+
+    /// First: Draw the text black (invisible) multiple times to get more glow.
+    ctx.fillStyle = `#000`
+    ctx.shadowOffsetX = ctx.shadowOffsetY = 0
+    ctx.globalCompositeOperation = 'lighter' // blend mode: Add
+
+    for( let opacity=glowOpacity; opacity > 0; ) {
+        // Extending the blur size for over-opacity gives a nicer, smoother effect
+        ctx.shadowBlur = glowSize * Math.max(opacity, 1)
+        ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
+        ctx.fillText(symbol, w/2, h/2/vScale)
+        opacity--
+    }
+    /// Turn off the shadow and blend mode
+    ctx.shadowBlur = 0
+    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
+
+    /// Then: Just draw the symbol
+    ctx.fillStyle = `rgb(${textColor.join()})`
+    ctx.fillText(symbol, w/2, h/2/vScale)
+
+    /// Finally: Just draw the caption    
+    ctx.fillStyle = `rgb(${textColor.join()}, 0.6)`
+    ctx.font = textFont
+    ctx.fillText(caption, w/2, (h/2 + 0.196*h) /vScale)
+
+}
 
 ////////////////////// Actually define them //////////////////////
 
@@ -992,7 +1050,6 @@ layerTypes.push({
     draw: drawGlowyText
 })
 
-
 layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.bb,
@@ -1088,6 +1145,29 @@ layerTypes.push({
     draw: drawGlowyText
 })
 
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.se,
+    preset: 'YOU DIED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0.001, yOffset: -.065, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 23,
+            fontWeight: 800, textColor: [183, 48, 44]
+        },
+        sekiroDeath: {
+            symbol: '死', glowColor: [168, 41, 41],
+            glowSize: 27, glowOpacity: 1,
+        }
+    },
+    draw: drawSekiroYouDied
+})
+
 //////// New Area
 
 layerTypes.push({
@@ -1098,10 +1178,10 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: 0.001, yOffset: 0.003, scale: 1 
+            xOffset: 0.001, yOffset: 0.001, scale: 1 
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
+            fontFamily: 'adobe-garamond-pro', textColor: [248, 248, 248],
             fontSize: 96, fontWeight: 100,
             vScale: 1, charSpacing: 0,
         },
@@ -1123,7 +1203,7 @@ layerTypes.push({
             xOffset: .001, yOffset: -.004, scale: 1
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
+            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
             fontSize: 98, fontWeight: 100,
             vScale: 1, charSpacing: 0,
         },
@@ -1145,7 +1225,6 @@ const layerTypesMap = {}
 
 for( const type in MacroType ) for( const game in Game )
     layerTypesMap[type] = {[game]: null}
-
 for( const layer of layerTypes ) {
     layerTypesMap[layer.type][layer.game] ??= {}
     layerTypesMap[layer.type][layer.game][layer.preset] = layer
@@ -1161,7 +1240,7 @@ window.MACROGEN_DEFAULTS = {
 
 window.EXPORT_SLIDERS = () => {
     const obj = {}
-    for( const slidersName of ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow'] )
+    for( const slidersName in macroGen.sliders )
         if( !macroGen.sliders[slidersName].element.hidden )
             obj[slidersName] = macroGen.sliders[slidersName].getValues()
     console.log(obj)
