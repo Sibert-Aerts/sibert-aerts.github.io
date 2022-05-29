@@ -359,7 +359,7 @@ class MacroGenerator {
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
         
         this.sliders = {}
-        for( const slidersName of ['position', 'font', 'zoomBlur', 'slaughter', 'area', 'shadow'] ) {
+        for( const slidersName of ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow'] ) {
             const sliders = new Sliders(slidersName, this.macroSliders)
             this.sliders[slidersName] = sliders
             sliders.onchange = () => this.autoRedraw()
@@ -764,15 +764,15 @@ function drawNounVerbed(ctx, canvas, gen) {
 }
 
 
-/** @type {drawFun} Function which draws Bloodborne's PREY SLAUGHTERED.  */
-function drawPreySlaughtered(ctx, canvas, gen) {
+/** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
+function drawGlowyText(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.slaughter.getValues()
+    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.glowy.getValues()
 
     const x0 = xOffset * w
     const y0 = yOffset * h
@@ -798,7 +798,7 @@ function drawPreySlaughtered(ctx, canvas, gen) {
 
     for( let opacity=glowOpacity; opacity > 0; ) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
-        ctx.shadowBlur = glowSize * Math.max(Math.sqrt(opacity), 1)
+        ctx.shadowBlur = glowSize * Math.max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
         ctx.fillText(caption, w/2, h/2/vScale)
         opacity--
@@ -984,12 +984,36 @@ layerTypes.push({
             vScale: 0.922, charSpacing: 6,
             fontWeight: 500, textColor: [144, 208, 166]
         },
-        slaughter: {
-            textOpacity: .6, glowColor: [144, 208, 166],
-            glowSize: 30, glowOpacity: 1.1,
+        glowy: {
+            textOpacity: .5, glowColor: [144, 208, 166],
+            glowSize: 17, glowOpacity: 1.1,
         }
     },
-    draw: drawPreySlaughtered
+    draw: drawGlowyText
+})
+
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.bb,
+    preset: 'NIGHTMARE SLAIN',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -.003, yOffset: -.265, scale: 1
+        },
+        font: {
+            fontSize: 115, fontFamily: 'Kozuka Mincho Pro, Yu Mincho, Georgia',
+            vScale: 1.12, charSpacing: 2,
+            fontWeight: 500, textColor: [255, 51, 0]
+        },
+        glowy: {
+            textOpacity: .26, glowColor: [156, 45, 17],
+            glowSize: 12, glowOpacity: 1,
+        }
+    },
+    draw: drawGlowyText
 })
 
 //////// YOU DIED
@@ -1039,6 +1063,29 @@ layerTypes.push({
     },
 
     draw: drawYouDied
+})
+
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.bb,
+    preset: 'YOU DIED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: -.265, scale: 1
+        },
+        font: {
+            fontSize: 139, fontFamily: 'Kozuka Mincho Pro, Yu Mincho, Georgia',
+            vScale: 0.922, charSpacing: 6,
+            fontWeight: 500, textColor: [255, 0, 0]
+        },
+        glowy: {
+            textOpacity: .3, glowColor: [149, 24, 24],
+            glowSize: 22, glowOpacity: 1.2,
+        }
+    },
+    draw: drawGlowyText
 })
 
 //////// New Area
@@ -1096,9 +1143,8 @@ layerTypes.push({
  */
 const layerTypesMap = {}
 
-for( const type in MacroType )
-    for( const game in Game )
-        layerTypesMap[type] = {[game]: null}
+for( const type in MacroType ) for( const game in Game )
+    layerTypesMap[type] = {[game]: null}
 
 for( const layer of layerTypes ) {
     layerTypesMap[layer.type][layer.game] ??= {}
@@ -1115,7 +1161,7 @@ window.MACROGEN_DEFAULTS = {
 
 window.EXPORT_SLIDERS = () => {
     const obj = {}
-    for( const slidersName of ['position', 'font', 'zoomBlur', 'slaughter', 'area', 'shadow'] )
+    for( const slidersName of ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow'] )
         if( !macroGen.sliders[slidersName].element.hidden )
             obj[slidersName] = macroGen.sliders[slidersName].getValues()
     console.log(obj)
