@@ -14,6 +14,14 @@
 
 	<!-- Garamond font, care of Adobe. -->
 	<link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
+
+	<!-- Adobe's system for loading Japanese fonts... for lack of an API that I could bother looking into. -->
+	<script>
+		(function(d) {
+		var config = { kitId: 'rdo0gmf', scriptTimeout: 3000, async: true },
+		h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+		})(document)
+	</script>
 	
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
@@ -45,14 +53,6 @@
 			macroGen.redrawMacro()
 		})
 		
-	</script>
-
-	<!-- Adobe's system for loading Japanese fonts... for lack of an API that I could bother looking into. -->
-	<script>
-		(function(d) {
-		var config = { kitId: 'rdo0gmf', scriptTimeout: 3000, async: true };
-		h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-		})(document)
 	</script>
 
 	<!-- Twitter Card info -->
