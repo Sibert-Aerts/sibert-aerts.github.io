@@ -198,12 +198,10 @@ class Sliders {
      * @param {HTMLElement} parent 
      * @param {string[]} names 
      */
-    constructor(name, parent) {
-        this.name = name
-        if( !parent ) return
-
-        this.element = parent.getElementsByClassName('sliders-container').namedItem(name)
+    constructor(element) {
+        this.element = element
         if( !this.element ) return
+        this.name = this.element.getAttribute('name')
 
         /// Find each slider
         for( const div of this.element.children ) {
@@ -334,7 +332,7 @@ class MacroGenerator {
     constructor(element=document) {
         this.element = element
 
-        /** my(t, n) = "my element `<t>` named `n`" */
+        /** my(t, n) = my element `<t>` named `n` */
         const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
         //// CANVAS
@@ -363,18 +361,15 @@ class MacroGenerator {
 
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
-        
-        // Buh find this one from the DOM names
-        const MACRO_SLIDER_NAMES = ['position', 'font', 'zoomBlur', 'glowy', 'area', 'shadow', 'sekiroDeath'] 
 
         this.sliders = {}
-        for( const slidersName of MACRO_SLIDER_NAMES ) {
-            const sliders = new Sliders(slidersName, this.macroSliders)
-            this.sliders[slidersName] = sliders
+        for( const child of this.macroSliders.children ) {
+            const sliders = new Sliders(child)
+            this.sliders[sliders.name] = sliders
             sliders.onchange = () => this.autoRedraw()
         }
         
-        this.imageSliders = new Sliders('image', element)
+        this.imageSliders = new Sliders(my('div', 'image'))
         this.imageSliders.onchange = () => this.autoRedraw()
 
 
@@ -440,18 +435,22 @@ class MacroGenerator {
             this.sliders[n].show()
         }
 
-        //// Hide/Show relevant Preset selects (if any)
+        //// Hide/Show relevant selects (if any)
         const usingNounVerbed = (macroType === MacroType.nounVerbed)
+        const usingSpecial = (macroType === MacroType.special)
 
-        this.presetHolder.parentNode.hidden = !usingNounVerbed
-        if( usingNounVerbed ) {
+        this.presetHolder.parentNode.hidden = !(usingNounVerbed || usingSpecial)
+        this.gameSelect.parentNode.hidden = usingSpecial
+        
+        //// Show relevant Preset: selects
+        if( usingNounVerbed || usingSpecial ) {
             for( const typeKey in MacroType ) for( const gameKey in Game ) {
                 if( this.presetSelects[typeKey][gameKey] ) {
                     this.presetSelects[typeKey][gameKey].hidden = (typeKey !== macroType || gameKey !== game)
                 }
             }
         }
-        //// Enable/disable Game options
+        //// Enable/disable Games
         for( const gameKey in Game )
             this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
 
@@ -470,10 +469,11 @@ class MacroGenerator {
         const macroType = this.macroTypeSelect.value
         let game = this.gameSelect.value
         if( !this.presetSelects[macroType][game] ) {
-            for( const newGame in Game )
+            for( const newGame in Game ) {
                 if( this.presetSelects[macroType][newGame] ) {
                     game = this.gameSelect.value = newGame; break
                 }
+            }
         }
         const preset = this.presetSelects[macroType][game].value
 
@@ -611,12 +611,13 @@ class MacroGenerator {
 // Artisanal enum-type things
 
 const MacroType = {
-    nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied',
+    nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied', special: 'special'
 }
 const macroTypeName = {
-    nounVerbed: 'NOUN VERBED',
-    areaName: 'Area Name',
-    youDied: 'YOU DIED'
+    nounVerbed: '"NOUN VERBED"',
+    areaName: 'Area name',
+    youDied: 'Death screen',
+    special: 'Non-FromSoft',
 }
 
 const Game = {
@@ -889,7 +890,6 @@ function drawYouDied(ctx, canvas, gen) {
     ctx.fillText(caption, w/2, h/2/vScale)
 }
 
-
 /** @type {drawFun} Function which draws Sekiro's iconic 死. */
 function drawSekiroYouDied(ctx, canvas, gen) {
     // CONSTANTS
@@ -938,8 +938,31 @@ function drawSekiroYouDied(ctx, canvas, gen) {
     /// Finally: Just draw the caption    
     ctx.fillStyle = `rgb(${textColor.join()}, 0.6)`
     ctx.font = textFont
-    ctx.fillText(caption, w/2, (h/2 + 0.196*h) /vScale)
+    ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
 
+}
+
+/** @type {drawFun} Function which draws simple outlined text. */
+function drawOutlined(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate(xOffset*w, yOffset*h)
+    s *= s0
+
+    // TEXT
+    const { lineWidth, lineColor } = gen.sliders.outline.getValues()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    if( lineWidth > 0 ) {
+        ctx.strokeStyle = lineColor
+        ctx.lineWidth = lineWidth * s
+        ctx.miterLimit = 5
+        ctx.strokeText(caption, w/2, h/2/vScale)
+    }
+    ctx.fillText(caption, w/2, h/2/vScale)
 }
 
 ////////////////////// Actually define them //////////////////////
@@ -961,7 +984,7 @@ layerTypes.push({
         font: {
             fontSize: 92, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 8,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [255, 255, 107], blurTint: [255, 178, 153],
@@ -988,7 +1011,7 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 0,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [129, 187, 153], blurTint: [187, 201, 192],
@@ -1015,7 +1038,7 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 1,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [255, 228, 92], blurTint: [251, 149, 131],
@@ -1044,7 +1067,7 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 1,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [255, 177, 68], blurTint: [255, 198, 168],
@@ -1073,7 +1096,7 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.317, charSpacing: 1,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [255, 255, 100], blurTint: [240, 190, 254],
@@ -1100,7 +1123,7 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 3,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [251, 82, 19], blurTint: [206, 202, 211],
@@ -1127,7 +1150,7 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 2,
-            fontWeight: 100,
+            fontWeight: 400,
         },
         zoomBlur: {
             color: [255, 206, 86], blurTint: [227, 166, 146],
@@ -1203,7 +1226,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [100, 10, 10],
-            fontSize: 148, fontWeight: 100,
+            fontSize: 148, fontWeight: 400,
             vScale: 1.3, charSpacing: 0,
         },
         shadow: {
@@ -1226,7 +1249,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [100, 10, 10],
-            fontSize: 150, fontWeight: 100,
+            fontSize: 150, fontWeight: 400,
             vScale: 1.3, charSpacing: 0,
         },
         shadow: {
@@ -1278,7 +1301,7 @@ layerTypes.push({
         },
         sekiroDeath: {
             symbol: '死', glowColor: [168, 41, 41],
-            glowSize: 27, glowOpacity: 1,
+            glowSize: 30, glowOpacity: 0.9,
         }
     },
     draw: drawSekiroYouDied
@@ -1298,7 +1321,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 98, fontWeight: 100,
+            fontSize: 98, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
         area: {
@@ -1320,7 +1343,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [248, 248, 248],
-            fontSize: 96, fontWeight: 100,
+            fontSize: 96, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
         area: {
@@ -1342,7 +1365,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [202, 204, 203],
-            fontSize: 85, fontWeight: 100,
+            fontSize: 85, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
         area: {
@@ -1352,6 +1375,54 @@ layerTypes.push({
     // TODO: this needs a back image ofc
     draw: drawAreaName
 })
+
+//////// Special
+
+layerTypes.push({
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'Snapchat',
+
+    preferCase: 'title case',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0, scale: 1 
+        },
+        font: {
+            fontFamily: 'Helvetica, Arial, sans-serif', textColor: [255, 255, 255],
+            fontSize: 60, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        shadow: {
+            shadowSize: .4, shadowOpacity: .5,
+            shadowOffset: 0, shadowSoftness: 0,
+        }
+    },
+    draw: drawYouDied
+})
+
+layerTypes.push({
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'Image macro',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0, scale: 1 
+        },
+        font: {
+            fontFamily: 'Impact, "Arial Black"', textColor: [255, 255, 255],
+            fontSize: 140, fontWeight: 500,
+            vScale: 1, charSpacing: 0,
+        },
+        outline: {
+            lineWidth: 20, lineColor: '#000'
+        }
+    },
+    draw: drawOutlined
+})
+
 
 
 //// Automatically create indexes of all the different layer types by various properties.
