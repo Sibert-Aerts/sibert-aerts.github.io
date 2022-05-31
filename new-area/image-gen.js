@@ -1052,6 +1052,60 @@ layerTypes.push({
     draw: drawNounVerbed
 })
 
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds1,
+    preset: 'RETRIEVAL',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0.001, yOffset: 0.037, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 6,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [146, 215, 227], blurTint: [154, 158, 167],
+            blurSize: 1.14, blurOpacity: 0.1,
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .7,
+            shadowOffset: -.004, shadowSoftness: 1,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds1,
+    preset: 'TARGET DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0.001, yOffset: 0.037, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 5,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [250, 201, 91], blurTint: [231, 133, 115],
+            blurSize: 1.1, blurOpacity: 0.1,
+        },
+        shadow: {
+            shadowSize: 1, shadowOpacity: .7,
+            shadowOffset: -.004, shadowSoftness: 1,
+        }
+    },
+    draw: drawNounVerbed
+})
+
 //// DARK SOULS 2
 
 layerTypes.push({
@@ -1081,6 +1135,114 @@ layerTypes.push({
     draw: drawNounVerbed
 })
 
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'HUMANITY RESTORED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.009, yOffset: 0.217, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 1,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [169, 254, 236], blurTint: [102, 255, 166],
+            blurSize: 1.07, blurOpacity: 0.05,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'RETRIEVAL',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.005, yOffset: 0.220, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 5,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [169, 240, 254], blurTint: [159, 213, 254],
+            blurSize: 1.16, blurOpacity: 0.05,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'TARGET WAS DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.004, yOffset: 0.225, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 5,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [255, 210, 87], blurTint: [254, 132, 118],
+            blurSize: 1.12, blurOpacity: 0.05,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'INVADER BANISHED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.013, yOffset: 0.221, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 2,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [255, 255, 98], blurTint: [255, 176, 102],
+            blurSize: 1.08, blurOpacity: 0.12,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
 //// DARK SOULS 3
 
 layerTypes.push({
@@ -1101,6 +1263,33 @@ layerTypes.push({
         zoomBlur: {
             color: [255, 255, 100], blurTint: [240, 190, 254],
             blurSize: 1.18, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'LORD OF CINDER FALLEN',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -0.002, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 3,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [255, 75, 12], blurTint: [206, 202, 211],
+            blurSize: 1.19, blurOpacity: 0.08,
         },
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
@@ -1158,6 +1347,60 @@ layerTypes.push({
         },
         shadow: {
             shadowSize: 0.8, shadowOpacity: .72,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'HOST OF EMBERS DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.001, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 107, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 2,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [255, 187, 92], blurTint: [255, 184, 184],
+            blurSize: 1.20, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'DARK SPIRIT DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 3,
+            fontWeight: 400,
+        },
+        zoomBlur: {
+            color: [254, 252, 150], blurTint: [254, 227, 190],
+            blurSize: 1.16, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
         }
     },
