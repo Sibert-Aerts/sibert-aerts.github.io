@@ -376,6 +376,27 @@ class MacroGenerator {
         this.imageSliders = new Sliders(my('div', 'image'))
         this.imageSliders.onchange = autoRedraw
 
+        //// UHH THE LITTLE TAB RADIO BUTTONS ?
+        const tabs = my('div', 'sliders-tabs')
+        const tabbedDivs = {
+            'global-sliders': my('div', 'global-sliders'),
+            'macro-sliders': my('div', 'macro-sliders'),
+            'background-stuff': my('div', 'background-stuff')
+        }
+
+        if( tabs ) 
+        for( const tab of tabs.children ) {
+            const radio = tab.children[0]
+            radio.onchange = function() {
+                for( const otherTab of tabs.children )
+                    otherTab.classList.remove('checked')
+                tab.classList.add('checked')
+
+                for( const t in tabbedDivs )
+                    tabbedDivs[t].hidden = (radio.value !== 'all') && (radio.value !== t)
+            }
+        }
+
 
         this.onMacroTypeChange(null, false)
     }

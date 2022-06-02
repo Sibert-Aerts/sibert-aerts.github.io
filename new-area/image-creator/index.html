@@ -45,6 +45,7 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			// Recall whether that box is checked
 			document.querySelector('input[target=disable-ga]').checked = window['ga-disable-G-HCGGJHJ3DR']
+			// Instantiate the global MacroGenerator
 			macroGen = new MacroGenerator(document.getElementById('main-content'))
 		})
 
@@ -71,11 +72,9 @@
 <div id=main>
 	<div id=main-content class=content style="position: relative; margin-top: 1%; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none; overflow: hidden">
 		
-		<div style=width:100%>
-			<h1>FromSoftware image macro creator</h1>
-		</div>
-
 		<div class=canvas-pane>
+			<h1>FromSoftware image macro creator</h1>
+
 			<div class=help>
 				Select, link or paste an image to put convincing FromSoftware game overlays on it.
 				Work in progress, currently only implements a limited set of overlay types.
@@ -97,9 +96,28 @@
 			</div>
 		</div>
 
-		<div class=sliders-pane>
+		<div id=sliders-pane class=sliders-pane>			
 
-			<div id=global-sliders class=sliders-container>
+			<div id=sliders-tabs class=tabs>
+				<label class='tab checked'>
+					<input type=radio name=tabs value=all checked>
+					<div class="icon icon-all"></div>
+				</label>
+				<label class=tab> 
+					<input type=radio name=tabs value=global-sliders>
+					<div class="icon icon-selects"></div>
+				</label>
+				<label class=tab> 
+					<input type=radio name=tabs value=macro-sliders>
+					<div class="icon icon-sliders"></div>
+				</label>
+				<label class=tab> 
+					<input type=radio name=tabs value=background-stuff>
+					<div class="icon icon-background"></div>
+				</label>
+			</div>
+
+			<div id=global-sliders class=sliders-container style="margin-bottom:1em">
 				<h4 style="margin-bottom: .5em"> Configuration </h4>
 
 				<div>
@@ -121,10 +139,10 @@
 				</div>
 			</div>
 
-			<div id=macro-sliders style=width:400px>
+			<div id=macro-sliders style=width:400px;margin-bottom:1em>
 
 				<div name=position class=sliders-container hidden>
-					<h4> Overlay options </h4>
+					<h4 style="margin-bottom: .5em"> Overlay options </h4>
 					<div>
 						<span class=input-title>Horizontal offset:</span>
 						<button class=reset-button></button>
@@ -297,7 +315,7 @@
 			</div>
 
 			<div id=background-stuff>
-				<div id=background-image class=sliders-container style="margin-top: 1em">
+				<div id=background-image class=sliders-container>
 					<h4 style="margin-bottom: .5em"> Background </h4>
 					<div>
 						<span class=input-title style=min-width:100px>Image URL:</span>
