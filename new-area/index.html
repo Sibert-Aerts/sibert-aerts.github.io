@@ -141,107 +141,115 @@
 				</div>
 				<div class=info style="text-align:center">Canvas resolution: <span id="canv-res-x">1920</span> × <span id="canv-res-y">1080</span>px</div>
 
-				<div class=sliders-supercontainer>
-					<div id=global-sliders class=sliders-container>
-						<div hidden>
-							<span class=input-title style=min-width:100px>Macro type:</span>
-							<select name=macro-type></select>
-						</div>
-						<div>
-							<span class=input-title style=min-width:100px>Game:</span>
-							<select name=macro-type-game></select>
-						</div>
-						<div hidden>
-							<span class=input-title style=min-width:100px>Preset:</span>
-							<div name=macro-type-preset-holder style=display:inline-block></div>
-						</div>
+				<div style="margin: 1em -1em 2em -1em; display: flex; flex-wrap: wrap; justify-content: center;">
+					<div style="width:400px">
 
-						<div>
-							<span class=input-title>Caption:</span>
-							<input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
-						</div>
-						<div>
-							<span class=input-title>Image URL:</span>
-							<input type=text id=image-URL size=32 style="float:right">
-						</div>
-						<div>
-							<span class=input-title>Image Upload:</span>
-							<input type=file id=image-upload accept="image/*" style=display:inline;float:right>
-						</div>
-						<div hidden>
-							<span class=input-title>Limit image resolution:</span>
-							<input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
-							<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
-						</div>
-					</div>
-
-					<div id=macro-sliders style=width:400px;margin-top:1em>
-
-						<div id=position class=sliders-container hidden>
-							<h4> Overlay options </h4>
-							<div>
-								<span class=input-title>Horizontal offset:</span>
-								<button class=reset-button></button>
-								<input type=range name=xOffset min=-.60 max=.60 step=0.001 default=0>
+						<div id=global-sliders class=sliders-container>
+							<div hidden>
+								<span class=input-title style=min-width:100px>Macro type:</span>
+								<select name=macro-type></select>
 							</div>
 							<div>
-								<span class=input-title>Vertical offset:</span>
-								<button class=reset-button></button>
-								<input type=range name=yOffset min=-.60 max=.60 step=0.001 default=0>
+								<span class=input-title style=min-width:100px>Game:</span>
+								<select name=macro-type-game></select>
+							</div>
+							<div hidden>
+								<span class=input-title style=min-width:100px>Preset:</span>
+								<div name=macro-type-preset-holder style=display:inline-block></div>
+							</div>
+
+							<div>
+								<span class=input-title>Caption:</span>
+								<input type=text id=image-caption value="Enter Caption" size=32 style="float:right">
+							</div>
+
+						</div>
+					
+						<div id=background-image class=sliders-container>
+							<div>
+								<span class=input-title>Image URL:</span>
+								<input type=text id=image-URL size=32 style="float:right">
 							</div>
 							<div>
-								<span class=input-title>Scale:</span>
-								<button class=reset-button></button>
-								<input type=range name=scale min=-3 max=4 step=.01 default=0 as=log2>
+								<span class=input-title>Image Upload:</span>
+								<input type=file id=image-upload accept="image/*" style=display:inline;float:right>
+							</div>
+							<div hidden>
+								<span class=input-title>Limit image resolution:</span>
+								<input type=checkbox id=limit-resolution checked> <span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+								<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
 							</div>
 						</div>
 
-						<div name=font class='sliders-container hidden' hidden>
-							<div class=smol>
-								<span class=input-title>Font family:</span>
-								<button class=reset-button></button>
-								<input type=text name=fontFamily>
+						<div id=macro-sliders style=width:400px;margin-top:1em>
+
+							<div name=position class=sliders-container hidden>
+								<h4> Overlay options </h4>
+								<div>
+									<span class=input-title>Horizontal offset:</span>
+									<button class=reset-button></button>
+									<input type=range name=xOffset min=-.60 max=.60 step=0.001 default=0>
+								</div>
+								<div>
+									<span class=input-title>Vertical offset:</span>
+									<button class=reset-button></button>
+									<input type=range name=yOffset min=-.60 max=.60 step=0.001 default=0>
+								</div>
+								<div>
+									<span class=input-title>Scale:</span>
+									<button class=reset-button></button>
+									<input type=range name=scale min=-3 max=4 step=.01 default=0 as=log2>
+								</div>
 							</div>
-							<div class=smol>
-								<span class=input-title>Text color:</span>
-								<button class=reset-button></button>
-								<input type=color name=textColor>
+
+							<div name=font class='sliders-container hidden' hidden>
+								<div class=smol>
+									<span class=input-title>Font family:</span>
+									<button class=reset-button></button>
+									<input type=text name=fontFamily>
+								</div>
+								<div class=smol>
+									<span class=input-title>Text color:</span>
+									<button class=reset-button></button>
+									<input type=color name=textColor>
+								</div>
+								<div class=smol>
+									<span class=input-title>Font size:</span>
+									<button class=reset-button></button>
+									<input type=range name=fontSize min=10 max=300 step=1>
+								</div>
+								<div class=smol>
+									<span class=input-title>Font weight:</span>
+									<button class=reset-button></button>
+									<input type=range name=fontWeight min=100 max=900 step=100>
+								</div>
+								<div class=smol>
+									<span class=input-title>Vertical scale:</span>
+									<button class=reset-button></button>
+									<input type=range name=vScale min=-2 max=2 step=.02 as=log1.5>
+								</div>
+								<div class=smol>
+									<span class=input-title>Letter spacing:</span>
+									<button class=reset-button></button>
+									<input type=range name=charSpacing min=-10 max=40 step=.5>
+								</div>
 							</div>
-							<div class=smol>
-								<span class=input-title>Font size:</span>
-								<button class=reset-button></button>
-								<input type=range name=fontSize min=10 max=300 step=1>
+
+							<div name=area class=sliders-container hidden>
+								<div class=smol>
+									<span class=input-title>Underline:</span>
+									<button class=reset-button></button>
+									<input type=range name=underline min=0 max=.64 step=.01 default=.32>
+								</div>
+								<div class=smol>
+									<span class=input-title>Contrast:</span>
+									<button class=reset-button></button>
+									<input type=range name=contrast min=0 max=3 step=0.1 default=1>
+								</div>
 							</div>
-							<div class=smol>
-								<span class=input-title>Font weight:</span>
-								<button class=reset-button></button>
-								<input type=range name=fontWeight min=100 max=900 step=100>
-							</div>
-							<div class=smol>
-								<span class=input-title>Vertical scale:</span>
-								<button class=reset-button></button>
-								<input type=range name=vScale min=-2 max=2 step=.02 as=log1.5>
-							</div>
-							<div class=smol>
-								<span class=input-title>Letter spacing:</span>
-								<button class=reset-button></button>
-								<input type=range name=charSpacing min=-10 max=40 step=.5>
-							</div>
+			
 						</div>
 
-						<div name=area class=sliders-container hidden>
-							<div class=smol>
-								<span class=input-title>Underline:</span>
-								<button class=reset-button></button>
-								<input type=range name=underline min=0 max=.64 step=.01 default=.32>
-							</div>
-							<div class=smol>
-								<span class=input-title>Contrast:</span>
-								<button class=reset-button></button>
-								<input type=range name=contrast min=0 max=3 step=0.1 default=1>
-							</div>
-						</div>
-		
 					</div>
 				</div>
 

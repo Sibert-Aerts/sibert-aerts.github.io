@@ -10,7 +10,7 @@ const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
 const byId = id => document.getElementById(id)
 const makeElem = (tag, clss, text) => { const e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
 const makeOption = (value, text) => { const o = document.createElement('option'); o.textContent = text; o.value = value; o.setAttribute('name', value); return o }
-
+const setPhantom = (elem, val=true) => { if (val) elem.classList.add('phantom'); else elem.classList.remove('phantom') }
 
 ///// TINY COLOR UTILS
 
@@ -335,6 +335,8 @@ class MacroGenerator {
         /** my(t, n) = my element `<t>` named `n` */
         const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
+        const autoRedraw = () => this.autoRedraw()
+
         //// CANVAS
         this.canvas = my('canvas', 'canvas')
         this.ctx = this.canvas.getContext('2d')
@@ -344,14 +346,16 @@ class MacroGenerator {
         this.resWarning = my('*', 'resolution-warning')
 
         //// IMAGE HANDLER
-        this.imageHandler = new ImageHandler(this, my('div', 'global-sliders'))
+        this.imageHandler = new ImageHandler(this, my('div', 'background-image'))
+        this.bgColorSliders = new Sliders(my('div', 'background-color'))
+        this.bgColorSliders.onchange = autoRedraw
 
         //// MACRO TYPE SELECTION
-        this.createSelects()
+        this.createMacroTypeSelects()
 
         //// OTHER CONTROLS
         this.captionInput = my('input', 'image-caption')
-        this.captionInput.oninput = () => this.autoRedraw()
+        this.captionInput.oninput = autoRedraw
         this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
         if( window.MACROGEN_DEFAULTS?.caption )
             this.captionInput.value = window.MACROGEN_DEFAULTS.caption
@@ -366,17 +370,17 @@ class MacroGenerator {
         for( const child of this.macroSliders.children ) {
             const sliders = new Sliders(child)
             this.sliders[sliders.name] = sliders
-            sliders.onchange = () => this.autoRedraw()
+            sliders.onchange = autoRedraw
         }
         
         this.imageSliders = new Sliders(my('div', 'image'))
-        this.imageSliders.onchange = () => this.autoRedraw()
+        this.imageSliders.onchange = autoRedraw
 
 
         this.onMacroTypeChange(null, false)
     }
 
-    createSelects() {
+    createMacroTypeSelects() {
         const onchange = e => this.onMacroTypeChange(e)
 
         //// Macro Type
@@ -439,8 +443,8 @@ class MacroGenerator {
         const usingNounVerbed = (macroType === MacroType.nounVerbed)
         const usingSpecial = (macroType === MacroType.special)
 
-        this.presetHolder.parentNode.hidden = !(usingNounVerbed || usingSpecial)
-        this.gameSelect.parentNode.hidden = usingSpecial
+        setPhantom(this.presetHolder.parentNode, !(usingNounVerbed || usingSpecial))
+        setPhantom(this.gameSelect.parentNode, usingSpecial)
         
         //// Show relevant Preset: selects
         if( usingNounVerbed || usingSpecial ) {
@@ -536,9 +540,19 @@ class MacroGenerator {
         if( !this.tooBig() ) this.redrawMacro()
     }
 
+    drawFlatColor() {
+        if( this.bgColorSliders.usable ) {
+            const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
+            if( bgColorOpacity === 0 ) return
+            this.ctx.fillStyle = `rgba(${bgColor.join()}, ${bgColorOpacity}`
+            this.ctx.fillRect(0, 0, canvas.width, canvas.height)
+        }
+    }
+
     /** Redraw the underlying image, if any. */
     drawImage() {
         if( !this.imageHandler.image ) return
+
         const image = this.imageHandler.image
         const ctx = this.ctx
 
@@ -551,12 +565,14 @@ class MacroGenerator {
         } else {
             this.resizeCanvas(image.width, image.height)
         }
+
+        this.drawFlatColor()
         
         if( this.imageSliders.usable ) {
             const {imgSaturate, imgContrast, imgBrightness} = this.imageSliders.getValues()
             ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
         }
-        
+
         ctx.drawImage(image, 0, 0)
         ctx.filter = 'none'
     }
@@ -569,6 +585,7 @@ class MacroGenerator {
         const ctx = this.ctx
         this.resetDrawingState()
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.drawFlatColor()
     
         // May alter the resolution
         this.drawImage()

@@ -1,8 +1,5 @@
-/* 
 
-    ACTUAL STYLE 
-
-*/
+/* Generic utility classes */
 
 .unselectable {
     cursor: default;
@@ -13,6 +10,12 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+.phantom {
+    visibility: hidden;
+}
+
+/* Standard HTML elements */
 
 a {
     text-decoration: underline;
@@ -33,6 +36,8 @@ body {
     background-attachment: fixed;
     background-position-x: center;
 }
+
+/* Page layout */
 
 #main {
     width: 100%
@@ -322,17 +327,46 @@ canvas.small {
     border: 1px solid #fff3;
 }
 canvas.big {
-    max-height: 70vh;
+    max-height: 75vh;
     max-width: 120vw;
     border: 1px solid #fff3;
 }
 
-.sliders-supercontainer {
-    margin: 1em -1em 2em -1em;
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
+.canvas-pane {
+    float: left;
+    width: calc(100% - 420px);
 }
+.canvas-wrapper {
+    width: 100%;
+    min-height: 60vh;
+    display: flex;
+    overflow-x: auto;
+}
+
+.sliders-pane {
+    float: right; width: 400px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media screen and (max-width: 1320px) {  /** SMALL SCREEN LAYOUT */
+    .canvas-pane {
+        float: left;
+        width: 100%;
+    }
+    .canvas-wrapper {
+        min-height: initial;
+    }
+    
+    .sliders-pane {
+        float: left; width: 100%;
+        margin: 1em -1em 2em -1em;
+    }
+}
+
 
 .sliders-container {
     width: 100%; max-width: 400px;
@@ -347,12 +381,13 @@ canvas.big {
     }
 
     .sliders-container > div {
+        float: left;
+        width: 100%; max-width: 400px;
         padding-left: 5px; padding-right: 5px;
         margin-bottom: 8px;
         max-height: 50px;
     }
     .sliders-container > div.smol {
-        float: left;
         width: 50%; max-width: 200px;
     }
 
@@ -467,8 +502,5 @@ input.bad-url {
     #name {
         font-size: 70px;
         height: 80px;
-    }
-    #generate-button, .save-buttons {
-        font-size: 24px;
     }
 }

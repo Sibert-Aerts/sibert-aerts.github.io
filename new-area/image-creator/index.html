@@ -69,24 +69,36 @@
 <div id=background-layer class="background-layer faded"></div>
 
 <div id=main>
-	<div id=main-content class=content style="position: relative; margin-top: 1%; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none">
-		<h1>FromSoftware image macro generator</h1>
-
-		<div class=help>
-			Select, link or paste an image to put convincing FromSoftware game overlays on it.
-			Work in progress, currently only implements a limited set of overlay types.
-		</div><br>
-
-		<div style="display:flex; overflow-x:auto; width:calc(100% + 40px); position: relative; left:-20px">
-			<canvas id=canvas class=big width=1920px height=1080px style="margin-left: auto; margin-right: auto"></canvas>
-		</div>
+	<div id=main-content class=content style="position: relative; margin-top: 1%; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none; overflow: hidden">
 		
-		<div class=info style="text-align:center">
-			Canvas resolution: <span id="canv-res-x"></span> × <span id="canv-res-y"></span>px
+		<div style=width:100%>
+			<h1>FromSoftware image macro creator</h1>
 		</div>
-		
 
-		<div class=sliders-supercontainer>
+		<div class=canvas-pane>
+			<div class=help>
+				Select, link or paste an image to put convincing FromSoftware game overlays on it.
+				Work in progress, currently only implements a limited set of overlay types.
+			</div><br>
+
+			<div class=canvas-wrapper>
+				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto"></canvas>
+			</div>
+			
+			<div style="text-align:center">
+				<div class=info>
+					Canvas resolution: <span id="canv-res-x"></span> × <span id="canv-res-y"></span>px
+				</div>
+				
+				<div class=save-buttons>
+					<button class=soulsy-box onclick=macroGen.redrawMacro()>Render changes</button>
+					<button style=margin-left:20px class=soulsy-box onclick=macroGen.saveImage()>Save image</button>
+				</div>
+			</div>
+		</div>
+
+		<div class=sliders-pane>
+
 			<div id=global-sliders class=sliders-container>
 				<h4 style="margin-bottom: .5em"> Configuration </h4>
 
@@ -106,19 +118,6 @@
 				<div>
 					<span class=input-title style=min-width:100px>Caption:</span>
 					<input type=text id=image-caption value="Enter Caption" style="min-width:280px">
-				</div>
-				<div>
-					<span class=input-title style=min-width:100px>Image URL:</span>
-					<input type=text id=image-URL style="min-width:280px">
-				</div>
-				<div>
-					<span class=input-title style=min-width:100px>Image Upload:</span>
-					<input type=file id=image-upload accept="image/*" style=display:inline;width:280px>
-				</div>
-				<div style=margin-top:1em>
-					<label class=input-title>Constrain resolution: <input type=checkbox id=limit-resolution checked></label> 
-					<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
-					<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
 				</div>
 			</div>
 
@@ -297,31 +296,57 @@
 
 			</div>
 
-			<div id=image class=sliders-container hidden>
-				<h4> Image filters </h4>
-				<div>
-					<span class=input-title>Saturation:</span>
-					<button class=reset-button></button>
-					<input type=range name=imgSaturate min=0 max=200 step=1 default=100>
+			<div id=background-stuff>
+				<div id=background-image class=sliders-container style="margin-top: 1em">
+					<h4 style="margin-bottom: .5em"> Background </h4>
+					<div>
+						<span class=input-title style=min-width:100px>Image URL:</span>
+						<input type=text name=image-URL style="min-width:280px">
+					</div>
+					<div>
+						<span class=input-title style=min-width:100px>Image Upload:</span>
+						<input type=file name=image-upload accept="image/*" style=display:inline;width:280px>
+					</div>
+					<div>
+						<label class=input-title>Constrain resolution: <input type=checkbox id=limit-resolution checked></label> 
+						<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+						<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
+					</div>
 				</div>
-				<div>
-					<span class=input-title>Contrast:</span>
-					<button class=reset-button></button>
-					<input type=range name=imgContrast min=0 max=200 step=1 default=100>
+	
+				<div id=background-color class=sliders-container>
+					<div class=smol>
+						<span class=input-title>Color:</span>
+						<input type=color name=bgColor default=#888888>
+					</div>
+					<div class=smol>
+						<span class=input-title>Opacity:</span>
+						<input type=range name=bgColorOpacity min=0 max=1 step=.01 default=0>
+					</div>
 				</div>
-				<div>
-					<span class=input-title>Brightness:</span>
-					<button class=reset-button></button>
-					<input type=range name=imgBrightness min=0 max=200 step=1 default=100>
+				
+				<div id=image class=sliders-container hidden>
+					<h4> Background image filters </h4>
+					<div>
+						<span class=input-title>Saturation:</span>
+						<button class=reset-button></button>
+						<input type=range name=imgSaturate min=0 max=200 step=1 default=100>
+					</div>
+					<div>
+						<span class=input-title>Contrast:</span>
+						<button class=reset-button></button>
+						<input type=range name=imgContrast min=0 max=200 step=1 default=100>
+					</div>
+					<div>
+						<span class=input-title>Brightness:</span>
+						<button class=reset-button></button>
+						<input type=range name=imgBrightness min=0 max=200 step=1 default=100>
+					</div>
 				</div>
 			</div>
 
 		</div>
 		
-		<div class=save-buttons style=position:absolute;right:30px;bottom:10px;>
-			<button class=soulsy-box onclick=macroGen.redrawMacro()>Render changes</button>
-			<button style=margin-left:20px class=soulsy-box onclick=macroGen.saveImage()>Save image</button>
-		</div>
 	</div>
 </div>
 
