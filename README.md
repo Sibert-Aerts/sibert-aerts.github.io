@@ -3,7 +3,7 @@ my webzone
 
 ## Finished pages:
 * [FromSoftware area name generator](/new-area)
-* [FromSoftware image macro generator](/new-area/macro-generator.html)
+* [FromSoftware image macro generator](/new-area/image-creator)
 * [Evangelion title card generator](/evangelion)
 * [Affine fractal generator](/fractal)
 
