@@ -729,6 +729,7 @@ function applyFontSliders(ctx, canvas, gen, s) {
 
     let caption = gen.captionInput.value
 
+    // TODO: the chrome version doesn't scale with font size while the other one does!
     if( charSpacing ) {
         if( !!window.chrome && true ) {
             //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
@@ -832,6 +833,9 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
     ctx.filter = `blur(${s/2}px)`
 
+    // For some reason Firefox ignores the blend mode when shadowBlur === 0.
+    ctx.shadowBlur = 1
+
     /// First: Just draw the text, no glow
     const [r, g, b] = gen.sliders.font.get('textColor')
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
@@ -843,9 +847,12 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.fillStyle = `#000`
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0
 
+    // Like mentioned above, glowSize === 0 on Firefox breaks the effect.
+    const glowSizeEps = Math.max(.0001, glowSize)
+
     for( let opacity=glowOpacity; opacity > 0; ) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
-        ctx.shadowBlur = glowSize * Math.max(opacity, 1)
+        ctx.shadowBlur = glowSizeEps * Math.max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
         ctx.fillText(caption, w/2, h/2/vScale)
         opacity--
@@ -903,6 +910,117 @@ function drawAreaName(ctx, canvas, gen) {
         ctx.fillText(caption, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 )/vScale)
         c -= 1.17
     }
+}
+
+/** @type {drawFun} Function which draws a Bloodborne-style Area Name. */
+function drawBloodborneAreaName(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate(xOffset * w, yOffset * h)
+    s *= s0
+
+    // (MOCK BACK-IMAGE)
+    const { opacity } = gen.sliders.backImage.getValues()
+
+    if( opacity > 0 ) {
+        ctx.save()
+
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity}`
+        ctx.filter = `blur(${20*s}px)`
+        const left = (.5-.25*s0)*w, rectWidth = .28*s0*w
+        const top = (.5-.08*s0)*h, rectHeight = .12*s0*h
+        ctx.fillRect(left, top, rectWidth, rectHeight)
+
+        ctx.restore()
+        ctx.save()
+
+        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity*.75}`
+        ctx.lineWidth = 2*s
+        ctx.filter = `blur(${Math.sqrt(2*s)}px)`
+        ctx.beginPath()
+
+        ctx.moveTo(.5*w + .01*s0*w, .5*h - .10*s0*h)
+        ctx.lineTo(.5*w + .01*s0*w, .5*h + .06*s0*h)
+
+        ctx.moveTo(.5*w - .30*s0*w, .5*h + .01*s0*h)
+        ctx.lineTo(.5*w + .05*s0*w, .5*h + .01*s0*h)
+
+        ctx.stroke()
+        ctx.restore()
+    }
+
+    // TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'right'
+    ctx.fillText(caption, w/2, h/2/vScale)
+}
+
+/** @type {drawFun} Function which draws an Elden Ring-style Area Name. */
+function drawEldenAreaName(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { opacity } = gen.sliders.backImage.getValues()
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    ctx.translate(x0, y0)
+    s *= s0
+
+    // BACK IMAGE
+    if( opacity > 0 ) {
+        ctx.save()
+
+        const rectWidth = .45*w*s0
+        const left = .5*w - rectWidth/2, right = .5*w + rectWidth/2
+        const top = (.5 - .09*s0)*h, rectHeight = .1*s0*h
+        const lineY = top + rectHeight + .002*h*s0
+
+        // The main rectangle
+        const grad = ctx.createLinearGradient(left, 0, right, 0)
+        grad.addColorStop(0,   `rgba(30, 30, 28, 0)`)
+        grad.addColorStop(0.2, `rgba(30, 30, 28, ${opacity})`)
+        grad.addColorStop(0.8, `rgba(30, 30, 28, ${opacity})`)
+        grad.addColorStop(1,   `rgba(30, 30, 28, 0)`)
+        ctx.fillStyle = grad
+        ctx.filter = `blur(${2*s}px)`
+        ctx.fillRect(left, top, rectWidth, rectHeight)
+
+        // The lighter underline
+        const grad2 = ctx.createLinearGradient(left, 0, right, 0)
+        grad2.addColorStop(0,   `rgba(194, 194, 168, 0)`)
+        grad2.addColorStop(0.3, `rgba(194, 194, 168, ${opacity*2})`) // Gradient is asymmetrical on purpose, because the actual one is, for some reason.
+        grad2.addColorStop(0.8, `rgba(194, 194, 168, ${opacity*2})`)
+        grad2.addColorStop(1,   `rgba(194, 194, 168, 0)`)
+        ctx.fillStyle = grad2
+        ctx.filter = `blur(${Math.sqrt(2*s)}px)`
+        ctx.fillRect(left, lineY, rectWidth, 1*s)
+        ctx.fillRect(left, lineY, rectWidth, 1*s)
+
+        ctx.restore()
+    }
+
+    // TEXT
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
+
+    ctx.shadowOffsetX = 2*s
+    ctx.shadowOffsetY = 1*s
+    ctx.shadowBlur = 8*s
+    ctx.shadowColor = `rgba(0, 0, 0, .7)`
+    // Twice to get the slightly darker shadow
+    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, w/2, h/2/vScale)
+
 }
 
 /** @type {drawFun} Function which draws an YOU DIED. */
@@ -1636,6 +1754,29 @@ layerTypes.push({
 
 layerTypes.push({
     type: MacroType.areaName,
+    game: Game.bb,
+    preset: 'Area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: { 
+            xOffset: 0.389, yOffset: 0.373, scale: 1 
+        },
+        font: {
+            fontFamily: 'Spectral', textColor: [202, 203, 202],
+            fontSize: 42, fontWeight: 300,
+            vScale: 1.058, charSpacing: 0,
+        },
+        backImage: {
+            opacity: .8
+        }
+    },
+    // TODO: this needs a back image ofc
+    draw: drawBloodborneAreaName
+})
+
+layerTypes.push({
+    type: MacroType.areaName,
     game: Game.se,
     preset: 'Area Name',
 
@@ -1655,6 +1796,28 @@ layerTypes.push({
     },
     // TODO: this needs a back image ofc
     draw: drawAreaName
+})
+
+layerTypes.push({
+    type: MacroType.areaName,
+    game: Game.er,
+    preset: 'Area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: { 
+            xOffset: -.001, yOffset: 0.023, scale: 1 
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
+            fontSize: 90, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        backImage: {
+            opacity: .4
+        }
+    },
+    draw: drawEldenAreaName
 })
 
 //////// Special

@@ -22,6 +22,11 @@
 		h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
 		})(document)
 	</script>
+
+	<!-- Google fonts: "Spectral" -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 	
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
@@ -289,6 +294,14 @@
 					</div>
 				</div>
 
+				<div name=backImage class=sliders-container hidden>
+					<div>
+						<span class=input-title>Back image opacity:</span>
+						<button class=reset-button></button>
+						<input name=opacity type=range min=0 max=1 step=.01>
+					</div>
+				</div>
+
 				<div name=shadow class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Shadow size:</span>
@@ -335,7 +348,7 @@
 				<div id=background-color class=sliders-container>
 					<div class=smol>
 						<span class=input-title>Color:</span>
-						<input type=color name=bgColor default=#888888>
+						<input type=color name=bgColor default=#cccccc>
 					</div>
 					<div class=smol>
 						<span class=input-title>Opacity:</span>
