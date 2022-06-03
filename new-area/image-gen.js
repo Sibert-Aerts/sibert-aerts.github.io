@@ -652,9 +652,9 @@ const MacroType = {
     nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied', special: 'special'
 }
 const macroTypeName = {
-    nounVerbed: '"NOUN VERBED"',
-    areaName: 'Area name',
-    youDied: 'Death screen',
+    nounVerbed: 'Noun Verbed',
+    areaName: 'Area Name',
+    youDied: 'Death',
     special: 'Non-FromSoft',
 }
 
@@ -979,7 +979,7 @@ function drawEldenAreaName(ctx, canvas, gen) {
     if( opacity > 0 ) {
         ctx.save()
 
-        const rectWidth = .45*w*s0
+        const rectWidth = .8*h*s0
         const left = .5*w - rectWidth/2, right = .5*w + rectWidth/2
         const top = (.5 - .09*s0)*h, rectHeight = .1*s0*h
         const lineY = top + rectHeight + .002*h*s0
@@ -1638,6 +1638,29 @@ layerTypes.push({
 
 layerTypes.push({
     type: MacroType.youDied,
+    game: Game.ds2,
+    preset: 'YOU DIED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.005, yOffset: .229, scale: 1
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [100, 16, 16],
+            fontSize: 148, fontWeight: 400,
+            vScale: 1.3, charSpacing: 0,
+        },
+        shadow: {
+            shadowSize: 1.26, shadowOpacity: .9,
+            shadowOffset: -.006, shadowSoftness: 1.16,
+        }
+    },
+    draw: drawYouDied
+})
+
+layerTypes.push({
+    type: MacroType.youDied,
     game: Game.ds3,
     preset: 'YOU DIED',
 
@@ -1704,6 +1727,30 @@ layerTypes.push({
         }
     },
     draw: drawSekiroYouDied
+})
+
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.er,
+    preset: 'YOU DIED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: .001, yOffset: .001, scale: 1
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [130, 16, 29],
+            fontSize: 85, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        shadow: {
+            shadowSize: .66, shadowOpacity: .67,
+            shadowOffset: -0.006, shadowSoftness: 1.16,
+        }
+    },
+
+    draw: drawYouDied
 })
 
 //////// New Area
