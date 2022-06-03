@@ -1660,17 +1660,17 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
             vScale: 1, charSpacing: 0,
             fontWeight: 300, textColor: [220, 135, 56]
         },
         zoomBlur: {
-                            blurTint: [237, 140, 29],
+            textOpacity: 1, blurTint: [237, 140, 29],
             blurSize: 1.11, blurOpacity: 0.18,
         },
         shadow: {
-            shadowSize: .66, shadowOpacity: .67,
-            shadowOffset: -0.006, shadowSoftness: 1.16,
+            shadowSize: .7, shadowOpacity: .65,
+            shadowOffset: -0.006, shadowSoftness: 1.05,
         }
     },
     draw: drawEldenNounVerbed
@@ -1687,17 +1687,17 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
             vScale: 1, charSpacing: 0,
-            fontWeight: 300, textColor: [230, 185, 50]
+            fontWeight: 300, textColor: [220, 175, 45]
         },
         zoomBlur: {
-                            blurTint: [230, 185, 50],
+            textOpacity: 1, blurTint: [255, 208, 66],
             blurSize: 1.11, blurOpacity: 0.18,
         },
         shadow: {
-            shadowSize: .66, shadowOpacity: .67,
-            shadowOffset: -0.006, shadowSoftness: 1.16,
+            shadowSize: .7, shadowOpacity: .65,
+            shadowOffset: -0.006, shadowSoftness: 1.05,
         }
     },
     draw: drawEldenNounVerbed
@@ -1714,17 +1714,17 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
             vScale: 1, charSpacing: 0,
             fontWeight: 300, textColor: [230, 140, 65]
         },
         zoomBlur: {
-                            blurTint: [230, 140, 65],
+            textOpacity: 1, blurTint: [230, 140, 65],
             blurSize: 1.11, blurOpacity: 0.18,
         },
         shadow: {
-            shadowSize: .66, shadowOpacity: .67,
-            shadowOffset: -0.006, shadowSoftness: 1.16,
+            shadowSize: .7, shadowOpacity: .65,
+            shadowOffset: -0.006, shadowSoftness: 1.05,
         }
     },
     draw: drawEldenNounVerbed
@@ -1856,16 +1856,16 @@ layerTypes.push({
     preferCase: 'all caps',
     sliders: {
         position: {
-            xOffset: .001, yOffset: .001, scale: 1
+            xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [130, 16, 29],
-            fontSize: 85, fontWeight: 400,
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [130, 16, 29],
+            fontSize: 88, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
         shadow: {
-            shadowSize: .66, shadowOpacity: .67,
-            shadowOffset: -0.006, shadowSoftness: 1.16,
+            shadowSize: .7, shadowOpacity: .65,
+            shadowOffset: -0.006, shadowSoftness: 1.05,
         }
     },
 
