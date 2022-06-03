@@ -786,21 +786,20 @@ function drawNounVerbed(ctx, canvas, gen) {
     ctx.save()
 
     //// Emulate the zoom blur effect
-    const ZOOMSIZE = blurSize
-    const zoomSteps = Math.floor(20*ZOOMSIZE * Math.pow(s, 1/4))
-    // zoomFactor**zoomSteps = ZOOMSIZE
-    const zoomFactor = Math.pow(ZOOMSIZE, 1/zoomSteps)
+    const zoomSteps = Math.floor(20*blurSize * Math.pow(s, 1/4))
+    // zoomFactor**zoomSteps = blurSize
+    const zoomFactor = Math.pow(blurSize, 1/zoomSteps)
     // Zoom blur vertical distance
     const VOFFSET = 1
-    const voff = VOFFSET*s/(ZOOMSIZE-1)
+    const voff = VOFFSET*s/(blurSize-1)
     const blurColor = RGBMul(color, blurTint).map(byteClamp)
 
     for( let i=0; i<=zoomSteps; i++ ) {
         if( i ) ctx.scale(zoomFactor, zoomFactor)
-        // `product` ranges from 1 up to and including ZOOMSIZE
-        const product = Math.pow(ZOOMSIZE, i/zoomSteps)
+        // `product` ranges from 1 up to and including blurSize
+        const product = Math.pow(blurSize, i/zoomSteps)
         // `fatProduct` ranges from 1 up to and including ±2
-        const fatProduct = Math.pow(product, 1/Math.log2(ZOOMSIZE))
+        const fatProduct = Math.pow(product, 1/Math.log2(blurSize))
 
         ctx.filter = `blur(${Math.floor(s*product**4)}px)`
         ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
@@ -857,6 +856,46 @@ function drawGlowyText(ctx, canvas, gen) {
         ctx.fillText(caption, w/2, h/2/vScale)
         opacity--
     }
+}
+
+/** @type {drawFun} Function which draws an Elden Ring style NOUN VERBED.  */
+function drawEldenNounVerbed(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+    const textColor = gen.sliders.font.get('textColor')
+
+    const x0 = xOffset * w
+    const y0 = yOffset * h
+    s *= s0
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    //// SHADE
+    drawShadowBar(ctx, canvas, gen, s0)    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    //// TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    
+    // Regular text
+    // ctx.fillStyle = `rgba(${textColor.join()}, 0.8)`
+    ctx.fillText(caption, w/2, h/2/vScale )
+    
+    // Ghost effect goes on top
+    ctx.globalCompositeOperation = 'lighter' // blend mode: Add
+    ctx.shadowBlur = 1
+
+    const scaleX = blurSize, scaleY = 1+(blurSize-1)/2
+    ctx.scale(scaleX, scaleY)
+
+    ctx.fillStyle = `rgba(${blurTint.join()}, ${blurOpacity})`
+    ctx.fillText(caption, w/2/scaleX, h/2/scaleY/vScale)
 }
 
 /** @type {drawFun} Function which draws an Area Name. */
@@ -1609,6 +1648,89 @@ layerTypes.push({
         }
     },
     draw: drawGlowyText
+})
+
+//// ELDEN RING
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.er,
+    preset: 'LOST GRACE DISCOVERED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 0,
+            fontWeight: 300, textColor: [220, 135, 56]
+        },
+        zoomBlur: {
+                            blurTint: [237, 140, 29],
+            blurSize: 1.11, blurOpacity: 0.18,
+        },
+        shadow: {
+            shadowSize: .66, shadowOpacity: .67,
+            shadowOffset: -0.006, shadowSoftness: 1.16,
+        }
+    },
+    draw: drawEldenNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.er,
+    preset: 'ENEMY FELLED, et al.',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 0,
+            fontWeight: 300, textColor: [230, 185, 50]
+        },
+        zoomBlur: {
+                            blurTint: [230, 185, 50],
+            blurSize: 1.11, blurOpacity: 0.18,
+        },
+        shadow: {
+            shadowSize: .66, shadowOpacity: .67,
+            shadowOffset: -0.006, shadowSoftness: 1.16,
+        }
+    },
+    draw: drawEldenNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.er,
+    preset: 'HOST VANQUISHED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontSize: 86, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 0,
+            fontWeight: 300, textColor: [230, 140, 65]
+        },
+        zoomBlur: {
+                            blurTint: [230, 140, 65],
+            blurSize: 1.11, blurOpacity: 0.18,
+        },
+        shadow: {
+            shadowSize: .66, shadowOpacity: .67,
+            shadowOffset: -0.006, shadowSoftness: 1.16,
+        }
+    },
+    draw: drawEldenNounVerbed
 })
 
 //////// YOU DIED
