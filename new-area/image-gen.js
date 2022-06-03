@@ -755,7 +755,7 @@ function applyFontSliders(ctx, canvas, gen, s) {
 }
 
 
-/** @type {drawFun} Function which draws a NOUN VERBED.  */
+/** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
 function drawNounVerbed(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -763,21 +763,16 @@ function drawNounVerbed(ctx, canvas, gen) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { color, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+    const { textOpacity, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+    const textColor = gen.sliders.font.get('textColor')
 
-    const x0 = xOffset * w
-    const y0 = yOffset * h
+    const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
-
-    // Center to which things align and also scale
-    const VERTICALCENTER = .5
 
     // The shade only moves up or down
     ctx.translate(0, y0)
-
     //// SHADE
-    drawShadowBar(ctx, canvas, gen, s0)
-    
+    drawShadowBar(ctx, canvas, gen, s0)    
     // The text also moves left or right
     ctx.translate(x0, 0)
 
@@ -792,7 +787,7 @@ function drawNounVerbed(ctx, canvas, gen) {
     // Zoom blur vertical distance
     const VOFFSET = 1
     const voff = VOFFSET*s/(blurSize-1)
-    const blurColor = RGBMul(color, blurTint).map(byteClamp)
+    const blurColor = RGBMul(textColor, blurTint).map(byteClamp)
 
     for( let i=0; i<=zoomSteps; i++ ) {
         if( i ) ctx.scale(zoomFactor, zoomFactor)
@@ -803,12 +798,14 @@ function drawNounVerbed(ctx, canvas, gen) {
 
         ctx.filter = `blur(${Math.floor(s*product**4)}px)`
         ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
-        ctx.fillText(caption, w/2/product, ((h*VERTICALCENTER-voff)/product+voff)/vScale)
+        ctx.fillText(caption, w/2/product, ((h/2-voff)/product+voff)/vScale)
     }
     
     ctx.restore()
-    ctx.fillStyle = `rgba(${color.join()}, 0.9)`
-    ctx.fillText(caption, w/2, h*VERTICALCENTER/vScale )
+
+    // Draw the regular text on top
+    ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
+    ctx.fillText(caption, w/2, h/2/vScale )
 }
 
 /** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
@@ -866,7 +863,7 @@ function drawEldenNounVerbed(ctx, canvas, gen) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
+    const { textOpacity, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
     const textColor = gen.sliders.font.get('textColor')
 
     const x0 = xOffset * w
@@ -884,7 +881,7 @@ function drawEldenNounVerbed(ctx, canvas, gen) {
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
     
     // Regular text
-    // ctx.fillStyle = `rgba(${textColor.join()}, 0.8)`
+    ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
     ctx.fillText(caption, w/2, h/2/vScale )
     
     // Ghost effect goes on top
@@ -1179,10 +1176,10 @@ layerTypes.push({
         font: {
             fontSize: 92, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 8,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 255, 107]
         },
         zoomBlur: {
-            color: [255, 255, 107], blurTint: [255, 178, 153],
+            textOpacity: 0.9, blurTint: [255, 178, 153],
             blurSize: 1.1, blurOpacity: 0.08,
         },
         shadow: {
@@ -1206,10 +1203,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 0,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [129, 187, 153]
         },
         zoomBlur: {
-            color: [129, 187, 153], blurTint: [187, 201, 192],
+            textOpacity: 0.9, blurTint: [187, 201, 192],
             blurSize: 1.16, blurOpacity: 0.08,
         },
         shadow: {
@@ -1233,10 +1230,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 1,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 228, 92]
         },
         zoomBlur: {
-            color: [255, 228, 92], blurTint: [251, 149, 131],
+            textOpacity: 0.9, blurTint: [251, 149, 131],
             blurSize: 1.14, blurOpacity: 0.1,
         },
         shadow: {
@@ -1260,10 +1257,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 6,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [146, 215, 227]
         },
         zoomBlur: {
-            color: [146, 215, 227], blurTint: [154, 158, 167],
+            textOpacity: 0.9, blurTint: [154, 158, 167],
             blurSize: 1.14, blurOpacity: 0.1,
         },
         shadow: {
@@ -1287,10 +1284,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 5,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [250, 201, 91]
         },
         zoomBlur: {
-            color: [250, 201, 91], blurTint: [231, 133, 115],
+            textOpacity: 0.9, blurTint: [231, 133, 115],
             blurSize: 1.1, blurOpacity: 0.1,
         },
         shadow: {
@@ -1316,10 +1313,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 1,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 177, 68]
         },
         zoomBlur: {
-            color: [255, 177, 68], blurTint: [255, 198, 168],
+            textOpacity: 0.9, blurTint: [255, 198, 168],
             blurSize: 1.07, blurOpacity: 0.02,
         },
         shadow: {
@@ -1343,10 +1340,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 1,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [169, 254, 236]
         },
         zoomBlur: {
-            color: [169, 254, 236], blurTint: [102, 255, 166],
+            textOpacity: 0.9, blurTint: [102, 255, 166],
             blurSize: 1.07, blurOpacity: 0.05,
         },
         shadow: {
@@ -1370,10 +1367,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 5,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [169, 240, 254],
         },
         zoomBlur: {
-            color: [169, 240, 254], blurTint: [159, 213, 254],
+            textOpacity: 0.9, blurTint: [159, 213, 254],
             blurSize: 1.16, blurOpacity: 0.05,
         },
         shadow: {
@@ -1397,10 +1394,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 5,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 210, 87],
         },
         zoomBlur: {
-            color: [255, 210, 87], blurTint: [254, 132, 118],
+            textOpacity: 0.9, blurTint: [254, 132, 118],
             blurSize: 1.12, blurOpacity: 0.05,
         },
         shadow: {
@@ -1424,10 +1421,10 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 2,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 255, 98],
         },
         zoomBlur: {
-            color: [255, 255, 98], blurTint: [255, 176, 102],
+            textOpacity: 0.9, blurTint: [255, 176, 102],
             blurSize: 1.08, blurOpacity: 0.12,
         },
         shadow: {
@@ -1453,10 +1450,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.317, charSpacing: 1,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 255, 100],
         },
         zoomBlur: {
-            color: [255, 255, 100], blurTint: [240, 190, 254],
+            textOpacity: 0.9, blurTint: [240, 190, 254],
             blurSize: 1.18, blurOpacity: 0.08,
         },
         shadow: {
@@ -1480,10 +1477,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 3,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 75, 12],
         },
         zoomBlur: {
-            color: [255, 75, 12], blurTint: [206, 202, 211],
+            textOpacity: 0.9, blurTint: [206, 202, 211],
             blurSize: 1.19, blurOpacity: 0.08,
         },
         shadow: {
@@ -1507,10 +1504,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 3,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [251, 82, 19],
         },
         zoomBlur: {
-            color: [251, 82, 19], blurTint: [206, 202, 211],
+            textOpacity: 0.9, blurTint: [206, 202, 211],
             blurSize: 1.16, blurOpacity: 0.08,
         },
         shadow: {
@@ -1534,10 +1531,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 2,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 206, 86],
         },
         zoomBlur: {
-            color: [255, 206, 86], blurTint: [227, 166, 146],
+            textOpacity: 0.9, blurTint: [227, 166, 146],
             blurSize: 1.16, blurOpacity: 0.08,
         },
         shadow: {
@@ -1561,10 +1558,10 @@ layerTypes.push({
         font: {
             fontSize: 107, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 2,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [255, 187, 92],
         },
         zoomBlur: {
-            color: [255, 187, 92], blurTint: [255, 184, 184],
+            textOpacity: 0.9, blurTint: [255, 184, 184],
             blurSize: 1.20, blurOpacity: 0.08,
         },
         shadow: {
@@ -1588,10 +1585,10 @@ layerTypes.push({
         font: {
             fontSize: 102, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 3,
-            fontWeight: 400,
+            fontWeight: 400, textColor: [254, 252, 150],
         },
         zoomBlur: {
-            color: [254, 252, 150], blurTint: [254, 227, 190],
+            textOpacity: 0.9, blurTint: [254, 227, 190],
             blurSize: 1.16, blurOpacity: 0.08,
         },
         shadow: {
