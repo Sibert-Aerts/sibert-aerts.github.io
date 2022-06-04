@@ -498,5 +498,5 @@ function customGenerate() {
 }
 
 function tweetIntent() {
-    window.open(`https://twitter.com/intent/tweet?text=I%20just%20visited%20${location.hash.slice(1)}%0Ahttps://sibert-aerts.github.io/new-area/`)
+    window.open(`https://twitter.com/intent/tweet?text=I%20just%20visited%20${location.hash.slice(1)}%0Ahttps://rezuaq.be/new-area`)
 }
