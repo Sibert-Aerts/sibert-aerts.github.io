@@ -441,11 +441,27 @@ canvas.big {
     /* margin-bottom: 1em; */
     overflow: hidden; /* Layout trick */
 }
-    .sliders-container > h4 {
+    .sliders-pane h3 {
         width: 100%;
-        margin-bottom: 0;
+        margin: 0;
+        margin-bottom: .5em;
         font-size: 1.5em;
         text-align: center;
+    }
+    .sliders-pane h4 {
+        width: 100%;
+        margin: 0;
+        margin-top: .5em;
+        margin-bottom: .0em;
+        padding-top: .4em;
+        /* padding-left: 10%; */
+        padding-bottom: .4em;
+
+        /* color:rgb(179, 140, 115); */
+        font-size: 1.3em;
+        text-align: center;
+        /* border-bottom: 1px solid white; */
+        background-image: linear-gradient(#0003, #0000)
     }
 
     .sliders-container > div {

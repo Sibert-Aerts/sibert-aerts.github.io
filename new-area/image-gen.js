@@ -25,6 +25,11 @@ const laxRGBToHex = (r=0, g=0, b=0) => RGBToHex(...[r, g, b].map(byteClamp))
 const RGBMul = (c, d) => [c[0]*d[0]/255, c[1]*d[1]/255, c[2]*d[2]/255]
 
 
+const browserIs = {
+    chrome: !!window.chrome,
+    firefox: navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+}
+
 
 /** Handles incoming images. */
 class ImageHandler {
@@ -536,12 +541,12 @@ class MacroGenerator {
         // Clear out the ctx drawing state
         const ctx = this.ctx
         ctx.setTransform(1, 0, 0, 1, 0, 0)
-        ctx.fillStyle = null
-        ctx.shadowBlur = null
-        ctx.shadowColor = null
-        ctx.shadowOffsetX = null
-        ctx.shadowOffsetY = null
-        ctx.font = 'none'
+        ctx.fillStyle = '#000000'
+        ctx.shadowBlur = 0
+        ctx.shadowColor = 'rgba(0, 0, 0, 0)'
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
+        ctx.font = '10px sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'alphabetic'
         ctx.filter = 'none'
@@ -829,9 +834,6 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
     ctx.filter = `blur(${s/2}px)`
 
-    // For some reason Firefox ignores the blend mode when shadowBlur === 0.
-    ctx.shadowBlur = 1
-
     /// First: Just draw the text, no glow
     const [r, g, b] = gen.sliders.font.get('textColor')
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
@@ -840,10 +842,10 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.fillText(caption, w/2-s, h/2/vScale)
 
     /// Then: Draw the text black (invisible) multiple times to get more glow.
-    ctx.fillStyle = `#000`
+    ctx.fillStyle = `#000000`
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0
 
-    // Like mentioned above, glowSize === 0 on Firefox breaks the effect.
+    // glowSize === 0 normally hides the glow even though it's a totally cromulent amount of glow to want
     const glowSizeEps = Math.max(.0001, glowSize)
 
     for( let opacity=glowOpacity; opacity > 0; ) {
@@ -1082,8 +1084,8 @@ function drawYouDied(ctx, canvas, gen) {
     ctx.fillText(caption, w/2, h/2/vScale)
 }
 
-/** @type {drawFun} Function which draws Sekiro's iconic 死. */
-function drawSekiroYouDied(ctx, canvas, gen) {
+/** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
+function drawSekiroText(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
@@ -1094,20 +1096,27 @@ function drawSekiroYouDied(ctx, canvas, gen) {
     s *= s0
 
     //// TEXT
-    const { symbol, glowColor, glowSize, glowOpacity } = gen.sliders.sekiroDeath.getValues()
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const { symbol, symbolSize, symbolPos, symbolSpace } = gen.sliders.sekiro.getValues()
+    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.glowy.getValues()
+
+    // First: the characters
     const textColor = gen.sliders.font.get('textColor')
+    ctx.fillStyle = `rgb${textColor.join()}`
+    ctx.font = `800 ${symbolSize*s}px hot-gfkaishokk`
+    ctx.textBaseline = 'middle'
     ctx.filter = `blur(${s/2}px)`
 
-    const textFont = ctx.font
-    const symbolFont = `800 ${345*s}px hot-gfkaishokk`
-    ctx.font = symbolFont
-
     // Trick to make the font work good (for lack of a proper API)
-    byId('adobe-font-trick').innerText = symbol
-    
+    byId('adobe-font-trick').innerText = symbol    
 
-    /// First: Draw the text black (invisible) multiple times to get more glow.
+    function drawSymbols() {
+        const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
+        for(let i = 0; i < symbol.length; i++ ) {
+            ctx.fillText(symbol[i], w/2, baseY + i*(symbolSize+symbolSpace)*s)
+        }
+    }
+
+    /// First: Draw the symbol black (invisible) multiple times to get more glow.
     ctx.fillStyle = `#000`
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
@@ -1116,20 +1125,21 @@ function drawSekiroYouDied(ctx, canvas, gen) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
         ctx.shadowBlur = glowSize * Math.max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
-        ctx.fillText(symbol, w/2, h/2/vScale)
+        drawSymbols()
         opacity--
     }
+
     /// Turn off the shadow and blend mode
     ctx.shadowBlur = 0
     ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
 
     /// Then: Just draw the symbol
     ctx.fillStyle = `rgb(${textColor.join()})`
-    ctx.fillText(symbol, w/2, h/2/vScale)
+    drawSymbols()
 
     /// Finally: Just draw the caption    
-    ctx.fillStyle = `rgb(${textColor.join()}, 0.6)`
-    ctx.font = textFont
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.fillStyle = `rgb(${textColor.join()}, ${textOpacity})`
     ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
 
 }
@@ -1647,6 +1657,170 @@ layerTypes.push({
     draw: drawGlowyText
 })
 
+//// SEKIRO
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'SHINOBI EXECUTION',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: .001, yOffset: -.097, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 12,
+            fontWeight: 400, textColor: [255, 255, 255]
+        },
+        sekiro: {
+            symbol: '忍殺', symbolSize: 154,
+            symbolPos: 76, symbolSpace: 34,
+        },
+        glowy: {
+            textOpacity: .8, glowColor: [255, 255, 255],
+            glowSize: 30, glowOpacity: 0.4,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'IMMORTALITY SEVERED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: .001, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 13,
+            fontWeight: 400, textColor: [255, 255, 255]
+        },
+        sekiro: {
+            symbol: '不死斬り', symbolSize: 114,
+            symbolPos: 96, symbolSpace: 21,
+        },
+        glowy: {
+            textOpacity: .9, glowColor: [255, 255, 255],
+            glowSize: 23, glowOpacity: 0.5,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'SCULPTOR\'S IDOL FOUND',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: .016, scale: 1
+        },
+        font: {
+            fontSize: 35, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 13,
+            fontWeight: 400, textColor: [253, 237, 182]
+        },
+        sekiro: {
+            symbol: '鬼仏見出', symbolSize: 114,
+            symbolPos: 70, symbolSpace: 28,
+        },
+        glowy: {
+            textOpacity: .7, glowColor: [253, 237, 182],
+            glowSize: 31, glowOpacity: 0.8,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'UNSEEN AID',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: .001, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 13,
+            fontWeight: 400, textColor: [160, 200, 254]
+        },
+        sekiro: {
+            symbol: '冥助あり', symbolSize: 114,
+            symbolPos: 104, symbolSpace: 21,
+        },
+        glowy: {
+            textOpacity: .9, glowColor: [160, 200, 254],
+            glowSize: 23, glowOpacity: 0.5,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'DRAGONROT HEALED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: .001, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 13,
+            fontWeight: 400, textColor: [222, 186, 184]
+        },
+        sekiro: {
+            symbol: '竜咳快復', symbolSize: 114,
+            symbolPos: 88, symbolSpace: 21,
+        },
+        glowy: {
+            textOpacity: 1, glowColor: [222, 186, 184],
+            glowSize: 30, glowOpacity: 0.4,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'GRACIOUS GIFT OF TEARS',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: .002, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 13,
+            fontWeight: 400, textColor: [251, 220, 218]
+        },
+        sekiro: {
+            symbol: '拝涙', symbolSize: 152,
+            symbolPos: -18, symbolSpace: 34,
+        },
+        glowy: {
+            textOpacity: .9, glowColor: [251, 220, 218],
+            glowSize: 30, glowOpacity: 0.4,
+        }
+    },
+    draw: drawSekiroText
+})
+
 //// ELDEN RING
 
 layerTypes.push({
@@ -1838,14 +2012,18 @@ layerTypes.push({
         font: {
             fontSize: 37, fontFamily: 'adobe-garamond-pro',
             vScale: 1, charSpacing: 23,
-            fontWeight: 800, textColor: [183, 48, 44]
+            fontWeight: 400, textColor: [183, 48, 44]
         },
-        sekiroDeath: {
-            symbol: '死', glowColor: [168, 41, 41],
+        sekiro: {
+            symbol: '死', symbolSize: 345,
+            symbolPos: 0, symbolSpace: 0
+        },
+        glowy: {
+            textOpacity: .7, glowColor: [168, 41, 41],
             glowSize: 30, glowOpacity: 0.9,
         }
     },
-    draw: drawSekiroYouDied
+    draw: drawSekiroText
 })
 
 layerTypes.push({
@@ -1872,7 +2050,7 @@ layerTypes.push({
     draw: drawYouDied
 })
 
-//////// New Area
+//////// Area Name
 
 layerTypes.push({
     type: MacroType.areaName,
@@ -1972,11 +2150,11 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: -.001, yOffset: 0.023, scale: 1 
+            xOffset: 0, yOffset: 0.023, scale: 1 
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [255, 255, 255],
-            fontSize: 90, fontWeight: 400,
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
+            fontSize: 90, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
         backImage: {

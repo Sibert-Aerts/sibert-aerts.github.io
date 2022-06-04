@@ -57,6 +57,11 @@
 		window.addEventListener('load', function() {
 			// Create the global MacroGenerator
 			macroGen.redrawMacro()
+
+			if( browserIs.firefox ) {
+				for( const e of document.getElementsByClassName('firefox-warning'))
+					e.hidden = false
+			}
 		})
 		
 	</script>
@@ -83,7 +88,12 @@
 			<div class=help>
 				Select, link or paste an image to put convincing FromSoftware game overlays on it.
 				Work in progress, currently only implements a limited set of overlay types.
-			</div><br>
+			</div>
+			<div class='help firefox-warning' style=color:#ff8e8e hidden>
+				Warning: On Firefox certain HTML canvas effects and filters don't work as intended.
+				It is recommended to turn off hardware acceleration, or to open this page in a chromium browser instead.
+			</div>
+			<br>
 
 			<div class=canvas-wrapper>
 				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto"></canvas>
@@ -123,7 +133,7 @@
 			</div>
 
 			<div id=global-sliders class=sliders-container style="margin-bottom:1em">
-				<h4 style="margin-bottom: .5em"> Configuration </h4>
+				<h3> Configuration </h3>
 
 				<div>
 					<span class=input-title style=min-width:100px>Macro type:</span>
@@ -145,18 +155,19 @@
 			</div>
 
 			<div id=macro-sliders style=width:400px;margin-bottom:1em>
+				<h3> Overlay options </h3>
 
 				<div name=position class=sliders-container hidden>
-					<h4 style="margin-bottom: .5em"> Overlay options </h4>
+					<h4> Position </h4>
 					<div>
-						<span class=input-title>Horizontal offset:</span>
+						<span class=input-title>Horizontal:</span>
 						<button class=reset-button></button>
-						<input type=range name=xOffset min=-.60 max=.60 step=0.001 default=0>
+						<input type=range name=xOffset min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
-						<span class=input-title>Vertical offset:</span>
+						<span class=input-title>Vertical:</span>
 						<button class=reset-button></button>
-						<input type=range name=yOffset min=-.60 max=.60 step=0.001 default=0>
+						<input type=range name=yOffset min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
 						<span class=input-title>Scale:</span>
@@ -166,24 +177,24 @@
 				</div>
 
 				<div name=font class=sliders-container hidden>
-					<!-- <h4 style="margin-bottom:10px"> Font </h4> -->
+					<h4 > Text </h4>
 					<div class=smol>
 						<span class=input-title>Font family:</span>
 						<button class=reset-button></button>
 						<input type=text name=fontFamily>
 					</div>
 					<div class=smol>
-						<span class=input-title>Text color:</span>
+						<span class=input-title>Color:</span>
 						<button class=reset-button></button>
 						<input type=color name=textColor>
 					</div>
 					<div class=smol>
-						<span class=input-title>Font size:</span>
+						<span class=input-title>Size:</span>
 						<button class=reset-button></button>
 						<input type=range name=fontSize min=10 max=400 step=1>
 					</div>
 					<div class=smol>
-						<span class=input-title>Font weight:</span>
+						<span class=input-title>Weight:</span>
 						<button class=reset-button></button>
 						<input type=range name=fontWeight min=100 max=900 step=100>
 					</div>
@@ -193,7 +204,7 @@
 						<input type=range name=vScale min=-2 max=2 step=.02 as=log1.5>
 					</div>
 					<div class=smol>
-						<span class=input-title>Letter spacing:</span>
+						<span class=input-title>Spacing:</span>
 						<button class=reset-button></button>
 						<input type=range name=charSpacing min=-10 max=40 step=1>
 					</div>
@@ -213,6 +224,7 @@
 				</div>
 
 				<div name=zoomBlur class=sliders-container hidden>
+					<h4> Effect </h4>
 					<div class=smol>
 						<span class=input-title>Text opacity:</span>
 						<button class=reset-button></button>
@@ -235,7 +247,32 @@
 					</div>
 				</div>
 
+				<div name=sekiro class=sliders-container hidden>
+					<h4> Characters </h4>
+					<div class=smol>
+						<span class=input-title>Characters:</span>
+						<button class=reset-button></button>
+						<input type=text name=symbol value=死>
+					</div>
+					<div class=smol style="min-height:49px">
+						<span class=input-title>Size:</span>
+						<button class=reset-button></button>
+						<input type=range name=symbolSize min=50 max=500 step=2>
+					</div>
+					<div class=smol>
+						<span class=input-title>Position:</span>
+						<button class=reset-button></button>
+						<input type=range name=symbolPos min=-250 max=250 step=2>
+					</div>
+					<div class=smol>
+						<span class=input-title>Spacing:</span>
+						<button class=reset-button></button>
+						<input type=range name=symbolSpace min=-100 max=100 step=1>
+					</div>
+				</div>
+
 				<div name=glowy class=sliders-container hidden>
+					<h4> Effect </h4>
 					<div class=smol>
 						<span class=input-title>Text opacity:</span>
 						<button class=reset-button></button>
@@ -258,30 +295,8 @@
 					</div>
 				</div>
 
-				<div name=sekiroDeath class=sliders-container hidden>
-					<div class=smol>
-						<span class=input-title>Symbol:</span>
-						<button class=reset-button></button>
-						<input type=text name=symbol value=死>
-					</div>
-					<div class=smol>
-						<span class=input-title>Glow color:</span>
-						<button class=reset-button></button>
-						<input type=color name=glowColor as=rgb default=#ffffff>
-					</div>
-					<div class=smol>
-						<span class=input-title>Glow size:</span>
-						<button class=reset-button></button>
-						<input type=range name=glowSize min=0 max=100 step=1 default=40>
-					</div>
-					<div class=smol>
-						<span class=input-title>Glow opacity:</span>
-						<button class=reset-button></button>
-						<input type=range name=glowOpacity min=0 max=5 step=.1 default=1>
-					</div>
-				</div>
-
 				<div name=area class=sliders-container hidden>
+					<h4> Decoration </h4>
 					<div class=smol>
 						<span class=input-title>Underline:</span>
 						<button class=reset-button></button>
@@ -295,31 +310,33 @@
 				</div>
 
 				<div name=backImage class=sliders-container hidden>
+					<h4> Decoration </h4>
 					<div>
-						<span class=input-title>Back image opacity:</span>
+						<span class=input-title>Opacity:</span>
 						<button class=reset-button></button>
 						<input name=opacity type=range min=0 max=1 step=.01>
 					</div>
 				</div>
 
 				<div name=shadow class=sliders-container hidden>
+					<h4> Shadow </h4>
 					<div class=smol>
-						<span class=input-title>Shadow size:</span>
+						<span class=input-title>Size:</span>
 						<button class=reset-button></button>
 						<input name=shadowSize type=range min=0 max=8 step=.02>
 					</div>
 					<div class=smol>
-						<span class=input-title>Shadow opacity:</span>
+						<span class=input-title>Opacity:</span>
 						<button class=reset-button></button>
 						<input name=shadowOpacity type=range min=0 max=1 step=.01>
 					</div>
 					<div class=smol>
-						<span class=input-title>Shadow offset:</span>
+						<span class=input-title>Offset:</span>
 						<button class=reset-button></button>
-						<input name=shadowOffset type=range min=-.2 max=.2 step=.002>
+						<input name=shadowOffset type=range min=-0.2 max=0.2 step=.002>
 					</div>
 					<div class=smol>
-						<span class=input-title>Shadow softness:</span>
+						<span class=input-title>Softness:</span>
 						<button class=reset-button></button>
 						<input name=shadowSoftness type=range min=0 max=2 step=.01>
 					</div>
@@ -328,8 +345,9 @@
 			</div>
 
 			<div id=background-stuff>
+				<h3> Background </h3>
+
 				<div id=background-image class=sliders-container>
-					<h4 style="margin-bottom: .5em"> Background </h4>
 					<div>
 						<span class=input-title style=min-width:100px>Image URL:</span>
 						<input type=text name=image-URL style="min-width:280px">
@@ -405,7 +423,7 @@
 </div>
 
 <!-- Element used to trigger/trick the Adobe Fonts script into loading more parts of the font. -->
-<div id=adobe-font-trick style=font-family:hot-gfkaishokk hidden>死</div>
+<div id=adobe-font-trick style=font-family:hot-gfkaishokk hidden>死忍殺不死斬り鬼仏見出冥助あり竜咳快復拝涙</div>
 
 </body>
 
