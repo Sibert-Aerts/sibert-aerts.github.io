@@ -259,7 +259,7 @@ body {
     margin-left: 8px;
 }
 .background-item.selected {
-    color: #88BBDD;
+    color: orange;
 }
 .background-item:hover {
     text-decoration: underline;

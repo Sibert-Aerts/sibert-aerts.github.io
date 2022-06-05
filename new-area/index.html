@@ -34,6 +34,7 @@
 	</script>
 
 	<!-- My stylesheet and scripts -->
+	<!-- <link rel="stylesheet" href="normal.css"> -->
 	<link rel="stylesheet" href="soulsy-input.css">
 	<link rel="stylesheet" href="new-area.css">
 	<script type="text/javascript" src="areas.js"></script>
@@ -127,7 +128,7 @@
 
 
 		<div id=image-gen class="lesser content">
-			<h4>Image macro generator</h4>
+			<h4>Image macro creator</h4>
 			<button class="emoji-button minimise"></button>
 
 			<div class=body hidden>
@@ -291,7 +292,7 @@
 
 
 		<div id=custom-input class="lesser content hidden">
-			<h4>Custom area parts</h4> <button class="btn btn-success" style=float:right onclick=saveCustom()>Save</button>
+			<h4>Custom area parts</h4> <button class="soulsy-box" style=float:right;font-size:large onclick=saveCustom()>Save</button>
 			<br>
 
 			<div class=help style=width:700px;max-width:80vw>
@@ -336,15 +337,15 @@
 
 				<span class="help">Displays any name you put in.</span><br>
 				<input type="text" id="custom-text" size="40"></input>
-				<button id="custom-button" class="btn btn-primary" onclick=customGenerate()>Display</button>
+				<button id="custom-button" class="soulsy-box" onclick=customGenerate()>Display</button>
 
 				<br><br>
 
-				<button class="btn btn-success" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
+				<button class="soulsy-box" onClick="$('#fade-out-check').prop('checked', false); $('#name-underline-wrapper').removeClass('faded-out');">
 					Fade in
 				</button>
 
-				<button class="btn btn-danger" onClick="$('#name-underline-wrapper').addClass('faded-out');">
+				<button class="soulsy-box" onClick="$('#name-underline-wrapper').addClass('faded-out');">
 					Fade out
 				</button>
 
@@ -353,7 +354,7 @@
 				
 				<br>
 				
-				<button id=chromaButton style="margin-top:-15px; float:right" class="btn btn-primary" onClick=toggleChroma()>chroma</button>
+				<button id=chromaButton style="margin-top:-15px; float:right" class="soulsy-box" onClick=toggleChroma()>chroma</button>
 			</div>
 		</div>
 
