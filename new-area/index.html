@@ -235,16 +235,39 @@
 								</div>
 							</div>
 
+							<div name=outline class='sliders-container hidden' hidden>
+								<div class=smol>
+									<span class=input-title>Outline width:</span>
+									<button class=reset-button></button>
+									<input name=lineWidth type=range min=0 max=60>
+								</div>
+								<div class=smol>
+									<span class=input-title>Outline color:</span>
+									<button class=reset-button></button>
+									<input name=lineColor type=color>
+								</div>
+							</div>
+
 							<div name=area class=sliders-container hidden>
 								<div class=smol>
-									<span class=input-title>Underline:</span>
+									<span class=input-title>Line length:</span>
 									<button class=reset-button></button>
-									<input type=range name=underline min=0 max=.64 step=.01 default=.32>
+									<input name=ulLength type=range min=0 max=.64 step=.01>
+								</div>
+								<div class=smol>
+									<span class=input-title>Line width:</span>
+									<button class=reset-button></button>
+									<input name=ulWidth type=range min=0 max=20 step=.5>
+								</div>
+								<div class=smol>
+									<span class=input-title>Line position:</span>
+									<button class=reset-button></button>
+									<input name=ulPos type=range min=0 max=100 step=1>
 								</div>
 								<div class=smol>
 									<span class=input-title>Contrast:</span>
 									<button class=reset-button></button>
-									<input type=range name=contrast min=0 max=3 step=0.1 default=1>
+									<input name=contrast type=range min=0 max=3 step=0.1 default=1>
 								</div>
 							</div>
 

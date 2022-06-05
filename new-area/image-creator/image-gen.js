@@ -194,6 +194,8 @@ class Sliders {
     byName = {}
     /** @type {boolean} */
     usable = false
+    /** @type {boolean} */
+    visible = false
 
     /** @type {Callback} */
     onchange = null
@@ -252,9 +254,11 @@ class Sliders {
 
     hide() {
         if( this.usable ) this.element.hidden = true
+        this.visible = false
     }
     show() {
         if( this.usable ) this.element.hidden = false
+        this.visible = true
     }
 
     /** Get a specific slider's value. */
@@ -372,8 +376,8 @@ class MacroGenerator {
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
 
         this.sliders = {}
-        for( const child of this.macroSliders.children ) {
-            const sliders = new Sliders(child)
+        for( const elem of this.macroSliders.getElementsByClassName('sliders-container') ) {
+            const sliders = new Sliders(elem)
             this.sliders[sliders.name] = sliders
             sliders.onchange = autoRedraw
         }
@@ -905,11 +909,7 @@ function drawAreaName(ctx, canvas, gen) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { underline, contrast } = gen.sliders.area.getValues()
-
-    const x0 = xOffset * w
-    const y0 = yOffset * h
-    ctx.translate(x0, y0)
+    ctx.translate(xOffset * w, yOffset * h)
     s *= s0
     
     // Shadow style
@@ -918,25 +918,28 @@ function drawAreaName(ctx, canvas, gen) {
     ctx.shadowBlur = 8*s
 
     // UNDERLINE
-    if( underline > 0 ) {
-        const left = (.5-underline)*w, right = (.5+underline)*w
-        const length = 2*underline*w
+    const { ulLength, ulWidth, ulPos, contrast } = gen.sliders.area.getValues()
 
-        // The underline
+    if( ulLength > 0 ) {
+        const left = (.5-ulLength)*w, right = (.5+ulLength)*w
+
+        // The gradient
         const colorTuple = gen.sliders.font.get('textColor').join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
         grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
         grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
         grad.addColorStop(1,   `rgba(${colorTuple}, 0)`)
+
         ctx.fillStyle = grad
         ctx.shadowColor = `rgba(0, 0, 0, ${contrast/2})`
-        ctx.fillRect(left, .51*h, length, 5*s)
+        ctx.beginPath()
+        ctx.ellipse(w/2, h/2+ulPos*s, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
+        ctx.fill()
     }
 
     // TEXT
     ctx.shadowColor = `rgba(0, 0, 0, ${contrast})`
-
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
     ctx.textBaseline = 'alphabetic'
 
@@ -944,10 +947,58 @@ function drawAreaName(ctx, canvas, gen) {
     //      0.85 * 1.17 ~= 1
     for( let c = contrast; c >= 0; ) {
         ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
-        // The y-coordinate here is just magic numbers nonsense I found...
-        ctx.fillText(caption, w/2, h*(0.5 + (1-(s0-1)/3)*0.007 )/vScale)
+        ctx.fillText(caption, w/2, h/2/vScale)
         c -= 1.17
     }
+}
+
+/** @type {drawFun} Function which draws a DS2-style Area Name. */
+function drawDS2AreaName(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { ulLength, ulWidth, ulPos, contrast } = gen.sliders.area.getValues()
+    const { lineWidth, lineColor } = gen.sliders.outline.getValues()
+    ctx.translate(xOffset*w, yOffset*h)
+    s *= s0
+    
+    // UNDERLINE
+    if( ulLength > 0 ) {
+        const left = (.5-ulLength)*w, right = (.5+ulLength)*w
+
+        // The gradient
+        const colorTuple = gen.sliders.font.get('textColor').join()
+        const grad = ctx.createLinearGradient(left, 0, right, 0)
+        grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
+        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(1,   `rgba(${colorTuple}, 0)`)
+
+        ctx.fillStyle = `rgba(${lineColor}, ${contrast/3})`
+        const eps = lineWidth*s/2
+        const dy = ulPos*s
+        ctx.beginPath()
+        ctx.ellipse(w/2, h/2+dy, ulLength*w+eps, s*ulWidth/2+eps, 0, 0, 2*Math.PI)
+        ctx.fill()
+
+        ctx.fillStyle = grad
+        ctx.beginPath()
+        ctx.ellipse(w/2, h/2+dy, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
+        ctx.fill()
+    }
+
+    // TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
+
+    ctx.strokeStyle = `rgba(${lineColor}, ${contrast/3})`
+    ctx.lineWidth = lineWidth * s
+    ctx.miterLimit = 5
+    ctx.strokeText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, w/2, h/2/vScale)
 }
 
 /** @type {drawFun} Function which draws a Bloodborne-style Area Name. */
@@ -1159,7 +1210,7 @@ function drawOutlined(ctx, canvas, gen) {
     const { lineWidth, lineColor } = gen.sliders.outline.getValues()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
     if( lineWidth > 0 ) {
-        ctx.strokeStyle = lineColor
+        ctx.strokeStyle = `rgb(${lineColor})`
         ctx.lineWidth = lineWidth * s
         ctx.miterLimit = 5
         ctx.strokeText(caption, w/2, h/2/vScale)
@@ -2067,18 +2118,43 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: {
-            xOffset: .001, yOffset: -.004, scale: 1
+            xOffset: .001, yOffset: .006, scale: 1
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 98, fontWeight: 400,
-            vScale: 1, charSpacing: 0,
+            fontSize: 100, fontWeight: 400,
+            vScale: 1.041, charSpacing: -1,
         },
         area: {
-            underline: .3, contrast: 0
+            ulLength: .31, ulWidth: 4, ulPos: 4, contrast: 0
         }
     },
     draw: drawAreaName
+})
+
+layerTypes.push({
+    type: MacroType.areaName,
+    game: Game.ds2,
+    preset: 'Area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: -.007, scale: 1
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [200, 200, 200],
+            fontSize: 89, fontWeight: 400,
+            vScale: 1, charSpacing: 2,
+        },
+        outline: {
+            lineWidth: 4, lineColor: [0, 0, 0]
+        },
+        area: {
+            ulLength: .3, ulWidth: 4, ulPos: 19, contrast: 2
+        }
+    },
+    draw: drawDS2AreaName
 })
 
 layerTypes.push({
@@ -2089,7 +2165,7 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: 0.001, yOffset: 0.001, scale: 1 
+            xOffset: 0.001, yOffset: 0.008, scale: 1 
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [248, 248, 248],
@@ -2097,7 +2173,7 @@ layerTypes.push({
             vScale: 1, charSpacing: 0,
         },
         area: {
-            underline: .32, contrast: 1
+            ulLength: .33, ulWidth: 6, ulPos: 5, contrast: 1
         }
     },
     draw: drawAreaName
@@ -2134,7 +2210,7 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: 0.001, yOffset: -0.020, scale: 1 
+            xOffset: 0.001, yOffset: -0.013, scale: 1 
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [202, 204, 203],
@@ -2142,7 +2218,7 @@ layerTypes.push({
             vScale: 1, charSpacing: 0,
         },
         area: {
-            underline: 0, contrast: 1
+            ulLength: 0, ulWidth: 4, ulPos: 10,  contrast: 1
         }
     },
     // TODO: this needs a back image ofc
@@ -2212,7 +2288,7 @@ layerTypes.push({
             vScale: 1, charSpacing: 0,
         },
         outline: {
-            lineWidth: 20, lineColor: '#000'
+            lineWidth: 20, lineColor: [0, 0, 0]
         }
     },
     draw: drawOutlined
@@ -2239,8 +2315,8 @@ for( const layer of layerTypes ) {
 
 
 window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.nounVerbed,
-    game: Game.ds1,
+    macroType: MacroType.areaName,
+    game: Game.ds2,
 }
 
 window.EXPORT_SLIDERS = () => {
