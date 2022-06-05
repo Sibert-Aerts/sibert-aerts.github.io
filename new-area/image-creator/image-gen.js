@@ -1096,15 +1096,15 @@ function drawSekiroText(ctx, canvas, gen) {
     s *= s0
 
     //// TEXT
-    const { symbol, symbolSize, symbolPos, symbolSpace } = gen.sliders.sekiro.getValues()
+    const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = gen.sliders.sekiro.getValues()
     const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.glowy.getValues()
 
     // First: the characters
     const textColor = gen.sliders.font.get('textColor')
     ctx.fillStyle = `rgb${textColor.join()}`
-    ctx.font = `800 ${symbolSize*s}px hot-gfkaishokk`
+    ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
     ctx.textBaseline = 'middle'
-    ctx.filter = `blur(${s/2}px)`
+    ctx.filter = `blur(${Math.sqrt(s)/2}px)`
 
     // Trick to make the font work good (for lack of a proper API)
     byId('adobe-font-trick').innerText = symbol    
@@ -1115,9 +1115,9 @@ function drawSekiroText(ctx, canvas, gen) {
             ctx.fillText(symbol[i], w/2, baseY + i*(symbolSize+symbolSpace)*s)
         }
     }
-
+    
     /// First: Draw the symbol black (invisible) multiple times to get more glow.
-    ctx.fillStyle = `#000`
+    ctx.fillStyle = `#000000`
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
 
@@ -1675,6 +1675,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [255, 255, 255]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '忍殺', symbolSize: 154,
             symbolPos: 76, symbolSpace: 34,
         },
@@ -1702,6 +1703,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [255, 255, 255]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '不死斬り', symbolSize: 114,
             symbolPos: 96, symbolSpace: 21,
         },
@@ -1729,6 +1731,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [253, 237, 182]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '鬼仏見出', symbolSize: 114,
             symbolPos: 70, symbolSpace: 28,
         },
@@ -1756,6 +1759,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [160, 200, 254]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '冥助あり', symbolSize: 114,
             symbolPos: 104, symbolSpace: 21,
         },
@@ -1783,6 +1787,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [222, 186, 184]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '竜咳快復', symbolSize: 114,
             symbolPos: 88, symbolSpace: 21,
         },
@@ -1810,6 +1815,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [251, 220, 218]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '拝涙', symbolSize: 152,
             symbolPos: -18, symbolSpace: 34,
         },
@@ -2015,6 +2021,7 @@ layerTypes.push({
             fontWeight: 400, textColor: [183, 48, 44]
         },
         sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
             symbol: '死', symbolSize: 345,
             symbolPos: 0, symbolSpace: 0
         },

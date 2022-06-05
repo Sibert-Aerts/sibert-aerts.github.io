@@ -1,5 +1,5 @@
 /*
-    Script for the FromSoft Area Name Generator (https://sibert-aerts.github.io/new-area/)
+    Script for the FromSoft Area Name Generator (https://rezuaq.be/new-area/)
     Made by Sibert Aerts (Rezuaq), originally made ca. 2016, updated sporadically since then.
 */
 
