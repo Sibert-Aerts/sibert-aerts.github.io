@@ -514,6 +514,20 @@ input.bad-url {
     background-color: rgb(73, 0, 22)
 }
 
+.cookie-banner {
+    z-index: 100;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #111;
+    padding: .5em;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.cookie-banner > * { margin-left: 2em }
+
 
 /* 
  *   ADAPTIVE SCREEN SIZE STUFF - NEEDS TO BE AT THE BOTTOM SO IT TAKES PRECEDENCE!

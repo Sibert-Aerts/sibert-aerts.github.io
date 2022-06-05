@@ -7,8 +7,8 @@
 	<!-- Webpage meta -->
 	<title>FromSoft Image Macro Creator</title>
 	<meta name="description" content=
-		"Create convincing image macros and text overlays based on FromSoftware games like Dark Souls, Bloodborne and Elden Ring.
-		Includes 'VICTORY ACHIEVED', 'YOU DIED', 'NOUN VERBED', 'Area Name' etc.">
+		"Generate convincing image macros and text overlays based on games like Dark Souls, Bloodborne and Elden Ring.
+		Includes 'VICTORY ACHIEVED', 'YOU DIED', 'NOUN VERBED', area names, etc.">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href=../favicon.ico type="image/x-icon"/>
 
@@ -30,13 +30,10 @@
 	
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.endsWith('1') ?? false
-		window['ga-disable-G-HCGGJHJ3DR'] = disable
-		function gtag(){ dataLayer.push(arguments) }
-		gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
-	</script>
+	<!-- Script to make it easier to opt-in and opt-out -->
+	<script src="https://www.npmcdn.com/gtag-opt-in"></script>
+	<!-- My script to tie it all together -->
+	<script type="text/javascript" src="../cookies.js"></script>
 
 	<!-- My stylesheets and scripts -->
 	<link rel="stylesheet" href="../normal.css">
@@ -48,8 +45,6 @@
 	<script type="text/javascript">
 
 		document.addEventListener('DOMContentLoaded', function() {
-			// Recall whether that box is checked
-			document.querySelector('input[target=disable-ga]').checked = window['ga-disable-G-HCGGJHJ3DR']
 
 			// Instantiate the global MacroGenerator
 			macroGen = new MacroGenerator(document.getElementById('main-content'))
@@ -80,8 +75,8 @@
 <body style="background-image: url(https://i.imgur.com/Fcq8N5o.jpg)">
 <div id=background-layer class="background-layer faded"></div>
 
-<div id=main>
-	<div id=main-content class=content style="position: relative; margin-top: 1%; margin-bottom: 100px; margin-left: 2%; width: 96%; max-width: none; overflow: hidden">
+<div id=main style="margin-bottom: 100px">
+	<div id=main-content class=content style="position: relative; margin: 1% 2% 2%; width: 96%; max-width: none; overflow: hidden">
 		
 		<div class=canvas-pane>
 			<h1>FromSoftware image macro creator</h1>
@@ -412,6 +407,42 @@
 		</div>
 		
 	</div>
+
+	<div class="content" style="margin:1% auto; width: 800px">
+		<div style="font-size: 14px; font-family: Arial, Helvetica, sans-serif">
+			<h2 style="margin:0 .5em .5em">About font families</h2>
+			The app uses several typefaces to match or emulate those used in the different games.
+			<br><br>
+			For the Dark Souls games, the app uses <a href="https://fonts.adobe.com/fonts/adobe-garamond">Adobe Garamond</a>, 
+			which may be used on webpages for free through Adobe.
+			The actual font FromSoftware used for these games is unclear,
+			but Adobe Garamond matches it very closely, in particular for Dark Souls III.
+			<br><br>
+			Bloodborne uses the Japanese font <a href="https://en.morisawa.co.jp/fonts/specimen/2673">Reimin Y10</a>
+			for all of its UI, including the text pop-ups, even in English.
+			Sadly this font is not available under any free licenses, and for this app it is substituted by several
+			other fonts that are hopefully available on your devices.
+			<br><br>
+			For its decorative Japanese characters, including the iconic 死 pop-up, Sekiro uses 
+			<a href="https://j-font.com/font/detail.php?font_id=7745&pageno=1">白舟極太楷書</a>.
+			This font is not fully available under a free license, however Adobe offers a subset of it 
+			<a href="https://fonts.adobe.com/fonts/hot-gfkaishokk">HOT-GFKaishokk</a> free for web use,
+			which is why the app does not properly render every character in any of the in-game phrases.
+			<br><br>
+			Elden Ring for most of its UI seems to use <a href="https://www.linotype.com/6951/agmena.html">Agmena</a>,
+			a font for which I could find no free license.
+			This font very closely resembles the Dark Souls games' Garamond, except it has more square serifs,
+			some blockier details, and the capital Y is significantly different.
+			If, hypothetically, you have it installed on your computer, it's available as "Agmena Pro".
+		</div>
+	</div>
+</div>
+
+
+<div class=cookie-banner>
+	<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
+	<button class="soulsy-box" onclick=denyTracking()>Deny</button>
+	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>	
 </div>
 
 
@@ -420,10 +451,10 @@
 
 	<div id=credits>
 		<div class="credit left" style=line-height:1em>
-			<label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'ga-disable='+ +this.checked"></label>
+			<label>Enable Google Analytics: <input type=checkbox target=enable-ga></label>
 			<br>
 			<span style="opacity: 0.8; font-size: 16px">
-				Image composition happens in-app; No data is ever sent to a server, all images are 100% private.
+				Image composition happens in-app; No image data is ever sent to a server, all images are 100% private.
 			</span>
 		</div>
 
@@ -434,6 +465,11 @@
 			<span class=dash>-</span>
 			<a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
 		</div>
+	</div>
+
+	
+	<div class="cookie-banner phantom" style="position:initial">
+		<div>h</div>
 	</div>
 </div>
 

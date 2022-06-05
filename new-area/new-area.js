@@ -121,7 +121,6 @@ $(document).ready(function () {
     $("input[target=custom]").on("click", function(){ setHidden("#custom-input", !this.checked) })
     // Remember these checkboxes
     $("input[target=disable-anims]").attr('checked', localStorage.getItem('disable-anims') === 'true')
-    $("input[target=disable-ga]").attr('checked', window['ga-disable-G-HCGGJHJ3DR'])
 
     // Add a "minimise" button to each lesser content box
     $(".minimise").each( (i, m) => {

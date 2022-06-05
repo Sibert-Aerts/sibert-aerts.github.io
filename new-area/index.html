@@ -25,13 +25,10 @@
 	
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		disable = document.cookie?.split(';').find(c=>c.startsWith('ga-disable'))?.endsWith('1') ?? false
-		window['ga-disable-G-HCGGJHJ3DR'] = disable
-		function gtag(){ dataLayer.push(arguments) }
-		gtag('js', new Date()); gtag('config', 'G-HCGGJHJ3DR')
-	</script>
+	<!-- Script to make it easier to opt-in and opt-out -->
+	<script src="https://www.npmcdn.com/gtag-opt-in"></script>
+	<!-- My script to tie it all together -->
+	<script type="text/javascript" src="cookies.js"></script>
 
 	<!-- My stylesheet and scripts -->
 	<!-- <link rel="stylesheet" href="normal.css"> -->
@@ -361,6 +358,12 @@
 	</div>
 </div>
 
+<div class=cookie-banner>
+	<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
+	<button class="soulsy-box" onclick=denyTracking()>Deny</button>
+	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>	
+</div>
+
 <div id=footer>
 	<div id=bottom-fade></div>
 
@@ -368,7 +371,7 @@
 		<div class="credit left" style=line-height:1em>
 			<label style=font-weight:regular>Latest inclusion: Elden Ring (2022)</label><br>
 			<label>Disable Animations and Surprises: <input type=checkbox target=disable-anims onclick="localStorage.setItem('disable-anims', this.checked)"></label><br>
-			<label>Disable Google Analytics: <input type=checkbox target=disable-ga onclick="document.cookie = 'ga-disable='+ +this.checked"></label>
+			<label>Enable Google Analytics: <input type=checkbox target=enable-ga></label>
 		</div>
 
 		<div class="credit right">
@@ -377,6 +380,10 @@
 			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
 			<span class=dash>-</span>
 			<a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
+		</div>
+		
+		<div class="cookie-banner phantom" style="position:initial">
+			<div>h</div>
 		</div>
 	</div>
 </div>
