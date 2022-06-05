@@ -2315,8 +2315,8 @@ for( const layer of layerTypes ) {
 
 
 window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.areaName,
-    game: Game.ds2,
+    macroType: MacroType.nounVerbed,
+    game: Game.ds1,
 }
 
 window.EXPORT_SLIDERS = () => {
