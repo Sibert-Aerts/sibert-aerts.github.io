@@ -36,7 +36,7 @@ function playSound(a) {
 function toggleMute(){
     newAreaSound.pause();
     muted = !muted;
-    $("#muteButton").html(muted? "🔈&#xFE0F;" : "🔊&#xFE0F;");
+    $("#muteButton").html(muted? "🔈" : "🔊");
 }
 
 

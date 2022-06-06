@@ -293,6 +293,18 @@
 						<button class=reset-button></button>
 						<input type=range name=glowOpacity min=0 max=5 step=.1 default=1>
 					</div>
+					<div class=hidden>
+						<!-- Hidden -->
+						<span class=input-title>Blend mode:</span>
+						<button class=reset-button></button>
+						<input type=text name=blendMode default=lighter>
+					</div>
+					<div class=hidden>
+						<!-- Hidden -->
+						<span class=input-title>Secret factor:</span>
+						<button class=reset-button></button>
+						<input type=range name=secretFactor min=0 max=5 default=1>
+					</div>
 				</div>
 
 				<div name=area class=sliders-container hidden>
@@ -316,6 +328,25 @@
 						<span class=input-title>Contrast:</span>
 						<button class=reset-button></button>
 						<input name=contrast type=range min=0 max=3 step=0.1 default=1>
+					</div>
+				</div>
+
+				<div name=erFrame class=sliders-container hidden>
+					<h4> Frame </h4>
+					<div>
+						<span class=input-title>Opacity:</span>
+						<button class=reset-button></button>
+						<input name=opacity type=range min=0 max=1 step=.01>
+					</div>
+					<div class=smol>
+						<span class=input-title>Width:</span>
+						<button class=reset-button></button>
+						<input name=frameWidth type=range min=0 max=2 step=.01>
+					</div>
+					<div class=smol>
+						<span class=input-title>Height:</span>
+						<button class=reset-button></button>
+						<input name=frameHeight type=range min=0 max=.5 step=.005>
 					</div>
 				</div>
 

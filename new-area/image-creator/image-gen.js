@@ -230,19 +230,18 @@ class Sliders {
                 if( as.startsWith(conv) )
                     { slider.converter = new CONVERTERS[conv](as); break }
 
-            /// Assign its default
-            slider.value = slider.getAttribute('default')
+            /// Assign and remember its default
+            slider.value = slider.default = slider.trueDefault = slider.getAttribute('default')
 
             /// Hook up reset button
             /** @type {HTMLButtonElement} */
             const resetButton = div.getElementsByClassName('reset-button')[0]
             if (resetButton) {
                 slider.resetButton = resetButton
-                resetButton.value = slider.value
                 resetButton.disabled = true
 
                 resetButton.onclick = () => {
-                    slider.value = resetButton.value
+                    slider.value = slider.default
                     slider.onchange()
                     resetButton.disabled = true
                 }
@@ -292,15 +291,21 @@ class Sliders {
      *  @param  {{ [name: string]: any }} values
      */
     setDefaults(values) {
-        for( const name in values ) {
-            const slider = this.byName[name]
+        for( const slider of this.sliders ) {            
             if( slider.resetButton ) {
-                const val = slider.converter.toString(values[name])
-                slider.resetButton.value = val
+                let val
+                if( !(slider.name in values) ) val = slider.trueDefault
+                else val = slider.converter.toString(values[slider.name])
+
+                slider.default = val
                 if( slider.resetButton.disabled )
                     slider.value = val
             }
         }
+
+        for( const name in values )
+            if( !(name in this.byName) )
+                console.warn(`Bad slider name ${name} for sliders ${this.name}`)
     }
 }   
 
@@ -470,20 +475,18 @@ class MacroGenerator {
         }
 
         //// Hide/Show relevant selects (if any)
-        const usingNounVerbed = (macroType === MacroType.nounVerbed)
         const usingSpecial = (macroType === MacroType.special)
-
-        setPhantom(this.presetHolder.parentNode, !(usingNounVerbed || usingSpecial))
         setPhantom(this.gameSelect.parentNode, usingSpecial)
         
-        //// Show relevant Preset: selects
-        if( usingNounVerbed || usingSpecial ) {
-            for( const typeKey in MacroType ) for( const gameKey in Game ) {
-                if( this.presetSelects[typeKey][gameKey] ) {
-                    this.presetSelects[typeKey][gameKey].hidden = (typeKey !== macroType || gameKey !== game)
-                }
-            }
-        }
+        //// Show relevant Preset selects
+        for( const typeKey in MacroType ) for( const gameKey in Game )
+            if( this.presetSelects[typeKey][gameKey] && (typeKey !== macroType || gameKey !== game ))
+                this.presetSelects[typeKey][gameKey].hidden = true
+
+        this.presetSelects[macroType][game].hidden = false
+        const onlyOnePreset = this.presetSelects[macroType][game].length === 1
+        setPhantom(this.presetHolder.parentNode, onlyOnePreset)
+
         //// Enable/disable Games
         for( const gameKey in Game )
             this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
@@ -1057,20 +1060,19 @@ function drawEldenAreaName(ctx, canvas, gen) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { opacity } = gen.sliders.backImage.getValues()
-
-    const x0 = xOffset * w
-    const y0 = yOffset * h
-    ctx.translate(x0, y0)
+    ctx.translate(xOffset * w, yOffset * h)
     s *= s0
 
-    // BACK IMAGE
+    // FRAME
+    const { opacity, frameWidth, frameHeight } = gen.sliders.erFrame.getValues()
     if( opacity > 0 ) {
         ctx.save()
 
-        const rectWidth = .8*h*s0
+        const rectWidth = frameWidth*h*s0
+        const rectHeight = frameHeight*h*s0
+
         const left = .5*w - rectWidth/2, right = .5*w + rectWidth/2
-        const top = (.5 - .09*s0)*h, rectHeight = .1*s0*h
+        const top = (.5 + .01*s0)*h - rectHeight
         const lineY = top + rectHeight + .002*h*s0
 
         // The main rectangle
@@ -1147,18 +1149,17 @@ function drawSekiroText(ctx, canvas, gen) {
     s *= s0
 
     //// TEXT
+    const textColor = gen.sliders.font.get('textColor')
     const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = gen.sliders.sekiro.getValues()
-    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.glowy.getValues()
+    const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = gen.sliders.glowy.getValues()
+    
+    // Trick to make the japanese font work (for lack of an explicit API)
+    byId('adobe-font-trick').innerText = symbol    
 
     // First: the characters
-    const textColor = gen.sliders.font.get('textColor')
-    ctx.fillStyle = `rgb${textColor.join()}`
     ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
     ctx.textBaseline = 'middle'
     ctx.filter = `blur(${Math.sqrt(s)/2}px)`
-
-    // Trick to make the font work good (for lack of a proper API)
-    byId('adobe-font-trick').innerText = symbol    
 
     function drawSymbols() {
         const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
@@ -1167,29 +1168,37 @@ function drawSekiroText(ctx, canvas, gen) {
         }
     }
     
-    /// First: Draw the symbol black (invisible) multiple times to get more glow.
-    ctx.fillStyle = `#000000`
-    ctx.shadowOffsetX = ctx.shadowOffsetY = 0
-    ctx.globalCompositeOperation = 'lighter' // blend mode: Add
+    /// First: Draw the characters black (invisible) multiple times to get more glow.
+    ctx.globalCompositeOperation = blendMode
+    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
 
     for( let opacity=glowOpacity; opacity > 0; ) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
         ctx.shadowBlur = glowSize * Math.max(opacity, 1)
-        ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
+        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
         drawSymbols()
         opacity--
     }
-
-    /// Turn off the shadow and blend mode
-    ctx.shadowBlur = 0
+    /// Turn off the shadow and blend mode to draw the characters normal
     ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
-
-    /// Then: Just draw the symbol
+    ctx.shadowBlur = 0
     ctx.fillStyle = `rgb(${textColor.join()})`
     drawSymbols()
 
-    /// Finally: Just draw the caption    
+    /// Finally: Do the same with the caption    
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+
+    ctx.globalCompositeOperation = blendMode
+    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
+    ctx.shadowBlur = glowSize / 5
+    for( let opacity=glowOpacity*textOpacity*secretFactor; opacity > 0; ) {
+        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
+        ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
+        opacity--
+    }
+
+    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
+    ctx.shadowBlur = 0
     ctx.fillStyle = `rgb(${textColor.join()}, ${textOpacity})`
     ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
 
@@ -2059,12 +2068,12 @@ layerTypes.push({
 layerTypes.push({
     type: MacroType.youDied,
     game: Game.se,
-    preset: 'YOU DIED',
+    preset: 'DEATH',
 
     preferCase: 'all caps',
     sliders: {
         position: { 
-            xOffset: 0.001, yOffset: -.065, scale: 1
+            xOffset: 0.001, yOffset: -.065
         },
         font: {
             fontSize: 37, fontFamily: 'adobe-garamond-pro',
@@ -2077,8 +2086,37 @@ layerTypes.push({
             symbolPos: 0, symbolSpace: 0
         },
         glowy: {
-            textOpacity: .7, glowColor: [168, 41, 41],
+            textOpacity: .5, glowColor: [168, 41, 41],
+            glowSize: 30, glowOpacity: 1,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.se,
+    preset: 'DEATH (fake)',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0.001, yOffset: -.065
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 23,
+            fontWeight: 400, textColor: [109, 104, 101]
+        },
+        sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
+            symbol: '死', symbolSize: 345,
+            symbolPos: 0, symbolSpace: 0
+        },
+        glowy: {
+            textOpacity: .9, glowColor: [0, 0, 0],
             glowSize: 30, glowOpacity: 0.9,
+            blendMode: 'source-over', secretFactor: 3
         }
     },
     draw: drawSekiroText
@@ -2240,8 +2278,30 @@ layerTypes.push({
             fontSize: 90, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
-        backImage: {
-            opacity: .4
+        erFrame: {
+            opacity: .4, frameWidth: .8, frameHeight: .1
+        }
+    },
+    draw: drawEldenAreaName
+})
+
+layerTypes.push({
+    type: MacroType.areaName,
+    game: Game.er,
+    preset: 'Sub-area Name',
+
+    preferCase: 'title case',
+    sliders: {
+        position: { 
+            xOffset: -.002, yOffset: -.086, scale: 1 
+        },
+        font: {
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
+            fontSize: 51, fontWeight: 300,
+            vScale: 1, charSpacing: 0,
+        },
+        erFrame: {
+            opacity: .4, frameWidth: .55, frameHeight: .065
         }
     },
     draw: drawEldenAreaName
@@ -2315,8 +2375,8 @@ for( const layer of layerTypes ) {
 
 
 window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.nounVerbed,
-    game: Game.ds1,
+    macroType: MacroType.youDied,
+    game: Game.se,
 }
 
 window.EXPORT_SLIDERS = () => {
