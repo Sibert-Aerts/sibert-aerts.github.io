@@ -2375,8 +2375,8 @@ for( const layer of layerTypes ) {
 
 
 window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.youDied,
-    game: Game.se,
+    macroType: MacroType.nounVerbed,
+    game: Game.ds1,
 }
 
 window.EXPORT_SLIDERS = () => {
