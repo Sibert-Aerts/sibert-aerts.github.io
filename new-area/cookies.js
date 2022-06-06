@@ -31,11 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
     })    
 
     // Set up the cookies checkboxes
-    if( hideBanner ) hideCookieBanner()
+    if( hideBanner ) removeCookieBanner()
+    else showCookieBanner()
 
 })
 
-function hideCookieBanner() {
+function showCookieBanner() {
+    Array.from(document.getElementsByClassName('cookie-banner')).forEach(e => e.classList.remove('hidden'))
+}
+function removeCookieBanner() {
     Array.from(document.getElementsByClassName('cookie-banner')).forEach(e => e.remove())
 }
 
@@ -43,7 +47,7 @@ function consentToTracking() {
     document.cookie = 'hide-banner'
     document.cookie = 'ga-disable=0'
     GTagOptIn.optIn()
-    hideCookieBanner()
+    removeCookieBanner()
     document.querySelectorAll('input[target=enable-ga]').forEach(e => e.checked = true)
 }
 
@@ -51,6 +55,6 @@ function denyTracking() {
     document.cookie = 'hide-banner'
     document.cookie = 'ga-disable=1'
     GTagOptIn.optOut()
-    hideCookieBanner()
+    removeCookieBanner()
     document.querySelectorAll('input[target=enable-ga]').forEach(e => e.checked = false)
 }
