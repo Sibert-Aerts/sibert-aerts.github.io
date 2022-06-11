@@ -492,10 +492,10 @@ class MacroGenerator {
             this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
 
         //// Update generic caption
-        if( this.captionInput.value === 'ENTER CAPTION' && newType.preferCase === 'title case' )
-            this.captionInput.value = 'Enter Caption'
-        else if( this.captionInput.value === 'Enter Caption' && newType.preferCase === 'all caps' )
-            this.captionInput.value = 'ENTER CAPTION'
+        if( this.captionInput.value === 'CAPTION UNALTERED' && newType.preferCase === 'title case' )
+            this.captionInput.value = 'Caption Unaltered'
+        else if( this.captionInput.value === 'Caption Unaltered' && newType.preferCase === 'all caps' )
+            this.captionInput.value = 'CAPTION UNALTERED'
 
         //// Redraw (if desired)
         if (redraw) this.redrawMacro()
