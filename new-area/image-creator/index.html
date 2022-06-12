@@ -58,6 +58,24 @@
 				for( const e of document.getElementsByClassName('firefox-warning'))
 					e.hidden = false
 			}
+			
+			// The lil' info tabs
+			const tabs = document.getElementById('info-tabs')
+			const tabbedDivs = {}
+
+			if( tabs ) 
+			for( const tab of tabs.children ) {
+				const radio = tab.children[0]
+				tabbedDivs[radio.value] = document.getElementById(radio.value)
+				radio.onchange = function() {
+					for( const otherTab of tabs.children )
+						otherTab.classList.remove('checked')
+					tab.classList.add('checked')
+
+					for( const t in tabbedDivs )
+						tabbedDivs[t].hidden = (radio.value !== t)
+				}
+			}
 		})
 		
 	</script>
@@ -439,8 +457,51 @@
 		
 	</div>
 
-	<div class="content" style="margin:1% auto; width: 800px">
-		<div style="font-size: 14px; font-family: Arial, Helvetica, sans-serif">
+	<div class=content style="margin:1% auto; width:800px; font-size:14px; font-family:Arial, Helvetica, sans-serif">
+
+		<div id=info-tabs class=tabs>
+			<label class='tab checked'>
+				<input type=radio name=info-tabs value=call-info checked>
+				Help out
+			</label>
+			<label class='tab'>
+				<input type=radio name=info-tabs value=font-info>
+				Font families
+			</label>
+			<label class='tab'>
+				<input type=radio name=info-tabs value=legal-info>
+				Legal
+			</label>
+		</div>
+
+		<div id=call-info>
+			<h2 style="margin:0 .5em .5em">Public call to modders</h2>
+			If you're familiar with extracting assets from any/all games featured in this app,
+			and you would be willing to share extracted HUD/UI textures with me, contact me!
+
+			<br><br>
+			<h2 style="margin:0 .5em .5em">Am I missing something?</h2>
+			I tried to be exhaustive, but obviously few people would care to extensively document
+			all different instances of "NOUN VERBED" across all different games, and I've mainly had to google around a bit until it seemed like I got everything.
+			If you know of any particular variations I might have missed, and you have access to, or are willing to make high-resolution screenshots
+			that I can use as reference, contact me!<br>
+			In particular, I am currently looking for high quality screenshots of basically every applicable overlay from <b>Demon's Souls (2009)</b>.
+
+			<br><br>
+			<h2 style="margin:0 .5em .5em">Want to contribute?</h2>
+			If you're familiar with HTML canvas and interested in extending the set of available macros (possibly to include more games),
+			you are free to contribute through Github and to contact me if you need help or have any questions.<br>
+			Currently the app is pure javascript and HTML with no build systems or external dependencies.
+
+			<br><br>
+			<h2 style="margin:0 .5em .5em">Contact</h2>
+			Twitter: <a href=https://twitter.com/rezuaq target=_blank>@Rezuaq</a><br>
+			Discord: Rezuaq#0736<br>
+			Github: <a href=https://github.com/Sibert-Aerts/sibert-aerts.github.io/issues/new target=_blank>New Github issue</a><br>
+
+		</div>
+
+		<div id=font-info hidden>
 			<h2 style="margin:0 .5em .5em">About font families</h2>
 			The app uses several typefaces to match or emulate those used in the different games.
 			<br><br>
@@ -448,9 +509,11 @@
 			which may be used on webpages for free through Adobe.
 			The actual font FromSoftware used for these games is unclear,
 			but Adobe Garamond matches it very closely, in particular for Dark Souls III.
+			<br>
+			Starting with Dark Souls II, the "YOU DIED" text uses a notched/weathered variant of the font.
 			<br><br>
 			Bloodborne uses the Japanese font <a href="https://en.morisawa.co.jp/fonts/specimen/2673">Reimin Y10</a>
-			for all of its UI, including the text pop-ups, even in English.
+			for all of its UI, including the noun verbed overlays, even in English.
 			Sadly this font is not available under any free licenses, and for this app it is substituted by several
 			other fonts that are hopefully available on your devices.
 			<br><br>
@@ -466,13 +529,32 @@
 			some blockier details, and the capital Y is significantly different.
 			If, hypothetically, you have it installed on your computer, it's available as "Agmena Pro".
 		</div>
+
+		<div id=legal-info hidden>
+			<h2 style="margin:0 .5em .5em">Disclaimer</h2>
+			This web page is a fan creation, DEMON'S SOULS, DARK SOULS, BLOODBORNE, SEKIRO: SHADOWS DIE TWICE and ELDEN RING
+			belong to FromSoftware, Sony Interactive Entertainment, Bandai Namco Entertainment, Activision Publishing, and other respective owners.
+			<br><br>			
+			<h2 style="margin:0 .5em .5em">Use of generated graphics</h2>
+			As far as I am concerned all graphics produced by this tool are free to use without need for credit,
+			there are however two caveats:
+			<br>
+			• Most fonts used by this app are licensed through Adobe Fonts for web use (see: Font families),
+			and others may be implicitly licensed through your operating system.
+			<br>
+			• Any graphics created using extracted game textures are also obviously beyond my authority to yield the rights to.
+			<br><br>			
+			Graphics generated using either of these are obviously beyond my authority to yield the rights to.
+			It is not recommended to use these in commercial products such as games or merchandise without closely inspecting the legality of it first.
+		</div>
 	</div>
+
 </div>
 
 
 <div class='cookie-banner hidden'>
 	<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
-	<button class="soulsy-box" onclick=denyTracking()>Deny</button>
+	<button class="soulsy-box" onclick=denyTracking()>Deny cookies</button>
 	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>	
 </div>
 
@@ -492,7 +574,7 @@
 		<div class="credit right">
 			<a href="http://twitter.com/rezuaq" target=_blank>Created by Rezuaq</a>
 			<span class=dash>-</span>
-			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
+			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area/image-creator" target=_blank>On Github</a>
 			<span class=dash>-</span>
 			<a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
 		</div>

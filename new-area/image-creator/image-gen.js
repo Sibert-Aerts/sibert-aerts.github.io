@@ -392,15 +392,14 @@ class MacroGenerator {
 
         //// UHH THE LITTLE TAB RADIO BUTTONS ?
         const tabs = my('div', 'sliders-tabs')
-        const tabbedDivs = {
-            'global-sliders': my('div', 'global-sliders'),
-            'macro-sliders': my('div', 'macro-sliders'),
-            'background-stuff': my('div', 'background-stuff')
-        }
+        const tabbedDivs = {}
 
         if( tabs ) 
         for( const tab of tabs.children ) {
             const radio = tab.children[0]
+            if( radio.value !== 'all' )
+                tabbedDivs[radio.value] = my('div', radio.value)
+
             radio.onchange = function() {
                 for( const otherTab of tabs.children )
                     otherTab.classList.remove('checked')
@@ -1327,11 +1326,11 @@ layerTypes.push({
         font: {
             fontSize: 104, fontFamily: 'adobe-garamond-pro',
             vScale: 1.5, charSpacing: 6,
-            fontWeight: 400, textColor: [146, 215, 227]
+            fontWeight: 400, textColor: [161, 217, 226]
         },
         zoomBlur: {
             textOpacity: 0.9, blurTint: [154, 158, 167],
-            blurSize: 1.14, blurOpacity: 0.1,
+            blurSize: 1.16, blurOpacity: 0.1,
         },
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
