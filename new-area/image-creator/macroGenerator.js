@@ -1,0 +1,659 @@
+/*
+    Script for the image macro generator on (https://sibert-aerts.github.io/new-area/) and (https://sibert-aerts.github.io/new-area/macro-generator.html)
+*/
+'use strict';
+
+///// TINY UTILS
+const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
+
+///// TINY DOM UTILS
+const byId = id => document.getElementById(id)
+const makeElem = (tag, clss, text) => { const e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
+const makeOption = (value, text) => { const o = document.createElement('option'); o.textContent = text; o.value = value; o.setAttribute('name', value); return o }
+const setPhantom = (elem, val=true) => { if (val) elem.classList.add('phantom'); else elem.classList.remove('phantom') }
+
+///// TINY COLOR UTILS
+
+/** Must be used EXCLUSIVELY with strings of the form '#abcdef', such as input.color. */
+const hexToRGB = (h) => Array.from( h.matchAll(/[^#]{2}/g) ).map( x => parseInt(x[0], 16) )
+/** Must be used EXCLUSIVELY with integers [0, 255]. */
+const RGBToHex = (r, g, b) => '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0') ).join('')
+/** May be used with any numbers; floors and clamps them first. */
+const laxRGBToHex = (r=0, g=0, b=0) => RGBToHex(...[r, g, b].map(byteClamp))
+
+/** Multiply two lax RGB arrays into a lax RGB array. */
+const RGBMul = (c, d) => [c[0]*d[0]/255, c[1]*d[1]/255, c[2]*d[2]/255]
+
+
+const browserIs = {
+    chrome: !!window.chrome,
+    firefox: navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+}
+
+
+/** Handles incoming images. */
+class ImageHandler {
+    /** @type MacroGenerator */
+    macroGen
+
+    /** @type HTMLElement */
+    parent
+    /** @type HTMLInputElement */
+    URLinput
+    /** @type HTMLInputElement */
+    fileSelect
+
+    /** @type HTMLImageElement */
+    image = null
+    /** @type string */
+    imageType = null    
+
+    /**
+     * @param {MacroGenerator} macroGen 
+     * @param {HTMLElement} parent
+     */
+    constructor(macroGen, parent) {
+        this.macroGen = macroGen
+        this.parent = parent
+
+        /// URL event bindings
+        this.URLinput = parent.getElementsByTagName('input').namedItem('image-URL')
+        this.URLinput.onchange = this.handleImageURL.bind(this)
+        this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
+
+        /// File select event bindings
+        this.fileSelect = parent.getElementsByTagName('input').namedItem('image-upload')
+        this.fileSelect.onchange = this.handleFileSelect.bind(this)
+
+        /// Paste event bindings
+        // Currently binds to document because there's no other ImageHandler to need to contest with
+        document.addEventListener('paste', this.handlePaste.bind(this))
+    }
+
+    /** File Selector callback function. */
+    handleFileSelect() {
+        this.image = this.imageType = null
+
+        if( !this.fileSelect.files.length ) {
+            if( this.URLinput.value )
+                this.handleImageURL()
+            else
+                this.onerror()
+            return
+        }
+        const reader = new FileReader()
+        reader.onload = e => {
+            this.image = new Image()
+            this.image.onload = this.onload.bind(this)
+            this.image.src = e.target.result
+        }
+        reader.readAsDataURL(this.fileSelect.files[0])
+        this.imageType = this.fileSelect.files[0].type
+    }
+
+    /** Image URL callback function. */
+    handleImageURL() {
+        this.image = this.imageType = null
+        this.URLinput.classList.remove('bad-url')
+
+        if( !this.URLinput.value ) {
+            if( this.fileSelect.files.length )
+                this.handleFileSelect()
+            else
+                this.onerror()
+            return
+        }
+        this.image = new Image()
+        this.image.crossOrigin = 'anonymous'
+
+        this.image.onload = this.onload.bind(this)
+        this.image.onerror = e => {
+            console.error('Failed to load provided image URL:', this.URLinput.value, e)
+            this.URLinput.classList.add('bad-url')
+            this.onerror()
+        }
+        // Attempt to pull image type from URL
+        this.imageType = this.URLinput.value.match(/\.(\w+)$/)?.[1]
+        this.image.src = this.URLinput.value
+    }
+
+    /** Callback that checks if the user is pasting an image onto the page. */
+    handlePaste(e) {
+        /** @type DataTransferItemList */
+        const clipboardItems = e.clipboardData.items
+        const items = Array.from(clipboardItems).filter(item => item.type.startsWith('image'))
+        if ( !items.length ) return
+        const file = items[0].getAsFile()
+        
+        var reader = new FileReader()
+        reader.onload = e => {
+            this.image = new Image()
+            this.image.onload = this.onload.bind(this)
+            this.image.src = e.target.result
+        }
+        reader.readAsDataURL(file)
+        this.imageType = file.type
+    }
+
+    onload() {
+        this.macroGen.imageSliders.show()
+        this.macroGen.redrawMacro()
+    }
+    onerror() {
+        this.image = this.imageType = undefined
+        this.macroGen.clear()
+    }
+}
+
+/** 
+ * @typedef {Object} Converter<T>
+ * @prop { (string) => T }  parse 
+ * @prop { (T) => string | number }  toString 
+*/
+
+/** @type {{ [name: string]: { new(string) => Converter } }}  */
+const CONVERTERS = {
+    string: class {
+        parse = x => x
+        toString = x => x
+    },
+    float: class {
+        parse = parseFloat
+        toString = x => x.toString()
+    },
+    rgb: class {
+        parse = hexToRGB
+        toString([r, g, b]){ return RGBToHex(r, g, b) }
+    },
+    log: class {
+        constructor(string) {
+            this.base = parseFloat(string.slice(3))
+            this.logb = Math.log(this.base)
+        }   
+        parse(value) { return Math.pow(this.base, parseFloat(value)) }
+        toString(value) { return Math.log(parseFloat(value))/this.logb }
+    }
+}
+
+const DEFAULT_CONVERTERS = {
+    text: 'string',
+    range: 'float',
+    color: 'rgb'
+}
+
+
+class Sliders {
+    /** @type {string} */
+    name
+    /** @type {HTMLElement} */
+    element
+
+    /** @type {HTMLInputElement[]} */
+    sliders = []
+    /** @type {{[name: string]: HTMLInputElement}} */
+    byName = {}
+    /** @type {boolean} */
+    usable = false
+    /** @type {boolean} */
+    visible = false
+
+    /** @type {Callback} */
+    onchange = null
+
+    /**
+     * @param {string} name
+     * @param {HTMLElement} parent 
+     * @param {string[]} names 
+     */
+    constructor(element) {
+        this.element = element
+        if( !this.element ) return
+        this.name = this.element.getAttribute('name')
+
+        /// Find each slider
+        for( const div of this.element.children ) {
+            if( div.tagName !== 'DIV' ) continue
+
+            const slider = div.getElementsByTagName('input')[0]
+            if( !slider ) return
+
+            /// Add to our collections
+            this.sliders.push(slider)
+            this.byName[slider.name] = slider
+            slider.onchange = e => {
+                if( slider.resetButton ) slider.resetButton.disabled = false
+                this.onchange(e)
+            }
+            /// Assign its converter instance
+            let as = slider.getAttribute('as') || DEFAULT_CONVERTERS[slider.type] || 'string'
+            for( const conv in CONVERTERS )
+                if( as.startsWith(conv) )
+                    { slider.converter = new CONVERTERS[conv](as); break }
+
+            /// Assign and remember its default
+            slider.value = slider.default = slider.trueDefault = slider.getAttribute('default')
+
+            /// Hook up reset button
+            /** @type {HTMLButtonElement} */
+            const resetButton = div.getElementsByClassName('reset-button')[0]
+            if (resetButton) {
+                slider.resetButton = resetButton
+                resetButton.disabled = true
+
+                resetButton.onclick = () => {
+                    slider.value = slider.default
+                    slider.onchange()
+                    resetButton.disabled = true
+                }
+            }
+        }
+        // If we make it through the whole thing without an early return, we're usable!
+        this.usable = true
+    }
+
+    hide() {
+        if( this.usable ) this.element.hidden = true
+        this.visible = false
+    }
+    show() {
+        if( this.usable ) this.element.hidden = false
+        this.visible = true
+    }
+
+    /** Get a specific slider's value. */
+    get(key) {
+        return this.byName[key].converter.parse(this.byName[key].value)
+    }
+
+    /**
+     *  Get all slider values bundled as an object.
+     *  @returns  {{ [name: string]: any }}
+     */
+    getValues() {
+        const values = {}
+        for( const slider of this.sliders ) {
+            values[slider.name] = slider.converter.parse(slider.value)
+        }
+        return values
+    }
+
+    /**
+     *  @param  {{ [name: string]: any }} values
+     */
+    setValues(values) {
+        for( const name in values ) {
+            const slider = this.byName[name]
+            slider.value = slider.converter.toString(values[name])
+        }
+    }
+
+    /**
+     *  @param  {{ [name: string]: any }} values
+     */
+    setDefaults(values) {
+        for( const slider of this.sliders ) {            
+            if( slider.resetButton ) {
+                let val
+                if( !(slider.name in values) ) val = slider.trueDefault
+                else val = slider.converter.toString(values[slider.name])
+
+                slider.default = val
+                if( slider.resetButton.disabled )
+                    slider.value = val
+            }
+        }
+
+        for( const name in values )
+            if( !(name in this.byName) )
+                console.warn(`Bad slider name ${name} for sliders ${this.name}`)
+    }
+}   
+
+/**
+ *  The class that puts it all to work.
+ */
+class MacroGenerator {
+    /** @type {readonly HTMLElement | Document} */
+    element
+    /** @type {readonly HTMLCanvasElement} */
+    canvas
+    /** @type {readonly CanvasRenderingContext2D}  */
+    ctx
+
+    /** @type {readonly HTMLAnchorElement}   */
+    saveLink = document.createElement('a')
+
+    /** @type {{ [name: string]: Sliders }} */
+    sliders
+    /** @type {ImageHandler} */
+    imageHandler
+
+    /** @type {HTMLSelectElement} */
+    macroTypeSelect
+    /** @type {HTMLSelectElement} */
+    gameSelect
+    /** @type { {[type in keyof MacroType]: {[game in keyof Game]: HTMLSelectElement}} } */
+    presetSelects
+    /** @type {HTMLElement} */
+    presetHolder
+
+    /** @type {DrawableLayer} */
+    previousLayerType
+
+    /**
+     * @param {HTMLElement | Document} element
+     */
+    constructor(element=document) {
+        this.element = element
+
+        /** my(t, n) = my element `<t>` named `n` */
+        const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
+
+        const autoRedraw = () => this.autoRedraw()
+
+        //// CANVAS
+        this.canvas = my('canvas', 'canvas')
+        this.ctx = this.canvas.getContext('2d')
+
+        //// VIEW ELEMS
+        this.resView = { x: my('span', 'canv-res-x'), y: my('span', 'canv-res-y') }
+        this.resWarning = my('*', 'resolution-warning')
+
+        //// IMAGE HANDLER
+        this.imageHandler = new ImageHandler(this, my('div', 'background-image'))
+        this.bgColorSliders = new Sliders(my('div', 'background-color'))
+        this.bgColorSliders.onchange = autoRedraw
+
+        //// MACRO TYPE SELECTION
+        this.createMacroTypeSelects()
+
+        //// OTHER CONTROLS
+        this.captionInput = my('input', 'image-caption')
+        this.captionInput.oninput = autoRedraw
+        this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
+        if( window.MACROGEN_DEFAULTS?.caption )
+            this.captionInput.value = window.MACROGEN_DEFAULTS.caption
+
+        this.resolutionCheckbox = my('input', 'limit-resolution')
+        this.resolutionCheckbox.onchange = () => this.redrawMacro()
+
+        //// SLIDERS
+        this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
+
+        this.sliders = {}
+        for( const elem of this.macroSliders.getElementsByClassName('sliders-container') ) {
+            const sliders = new Sliders(elem)
+            this.sliders[sliders.name] = sliders
+            sliders.onchange = autoRedraw
+        }
+        
+        this.imageSliders = new Sliders(my('div', 'image'))
+        this.imageSliders.onchange = autoRedraw
+
+        //// UHH THE LITTLE TAB RADIO BUTTONS ?
+        const tabs = my('div', 'sliders-tabs')
+        const tabbedDivs = {}
+
+        if( tabs ) 
+        for( const tab of tabs.children ) {
+            const radio = tab.children[0]
+            if( radio.value !== 'all' )
+                tabbedDivs[radio.value] = my('div', radio.value)
+
+            radio.onchange = function() {
+                for( const otherTab of tabs.children )
+                    otherTab.classList.remove('checked')
+                tab.classList.add('checked')
+
+                for( const t in tabbedDivs )
+                    tabbedDivs[t].hidden = (radio.value !== 'all') && (radio.value !== t)
+            }
+        }
+
+
+        this.onMacroTypeChange(null, false)
+    }
+
+    createMacroTypeSelects() {
+        const onchange = e => this.onMacroTypeChange(e)
+
+        //// Macro Type
+        this.macroTypeSelect = this.my('select', 'macro-type')
+        this.macroTypeSelect.onchange = onchange
+
+        for( const key in MacroType )
+            this.macroTypeSelect.appendChild(makeOption(key, macroTypeName[key]))
+
+        this.macroTypeSelect.value = window.MACROGEN_DEFAULTS.macroType
+
+        //// Game
+        this.gameSelect = this.my('select', 'macro-type-game')
+        this.gameSelect.onchange = onchange
+
+        for( const key in Game )
+            this.gameSelect.appendChild(makeOption(key, gameName[key]))
+
+        this.gameSelect.value = window.MACROGEN_DEFAULTS.game
+
+        //// Preset (depends on combination of type+game)
+        this.presetSelects = {}
+        this.presetHolder = this.my('div', 'macro-type-preset-holder')
+
+        for( const type in MacroType ) {
+            this.presetSelects[type] = {}
+
+            for( const game in Game ) {
+                if( !layerTypesMap[type][game] ) continue
+
+                const select = makeElem('select')
+                for( const preset in layerTypesMap[type][game] )
+                    select.appendChild(makeOption(preset, preset))
+
+                this.presetHolder.appendChild(select)
+                this.presetSelects[type][game] = select
+                select.onchange = onchange
+            }
+        }
+    }
+
+    /** Callback from the macro type select */
+    onMacroTypeChange(e, redraw=true) {
+        const oldType = this.previousLayerType
+        const newType = this.getLayerType()
+        this.previousLayerType = newType
+
+        const [macroType, game] = this.getLayerTypeKeys()
+
+        //// Hide/Show necessary sliders
+        for( let n in oldType?.sliders )
+            this.sliders[n].hide()
+
+        for( let n in newType.sliders ) {
+            this.sliders[n].setDefaults(newType.sliders[n])
+            this.sliders[n].show()
+        }
+
+        //// Hide/Show relevant selects (if any)
+        const usingSpecial = (macroType === MacroType.special)
+        setPhantom(this.gameSelect.parentNode, usingSpecial)
+        
+        //// Show relevant Preset selects
+        for( const typeKey in MacroType ) for( const gameKey in Game )
+            if( this.presetSelects[typeKey][gameKey] && (typeKey !== macroType || gameKey !== game ))
+                this.presetSelects[typeKey][gameKey].hidden = true
+
+        this.presetSelects[macroType][game].hidden = false
+        const onlyOnePreset = this.presetSelects[macroType][game].length === 1
+        setPhantom(this.presetHolder.parentNode, onlyOnePreset)
+
+        //// Enable/disable Games
+        for( const gameKey in Game )
+            this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
+
+        //// Update generic caption
+        if( this.captionInput.value === 'CAPTION UNALTERED' && newType.preferCase === 'title case' )
+            this.captionInput.value = 'Caption Unaltered'
+        else if( this.captionInput.value === 'Caption Unaltered' && newType.preferCase === 'all caps' )
+            this.captionInput.value = 'CAPTION UNALTERED'
+
+        //// Redraw (if desired)
+        if (redraw) this.redrawMacro()
+    }
+
+    /** @returns {[ keyof MacroType, keyof Game, string ]} */
+    getLayerTypeKeys() {
+        const macroType = this.macroTypeSelect.value
+        let game = this.gameSelect.value
+        if( !this.presetSelects[macroType][game] ) {
+            for( const newGame in Game ) {
+                if( this.presetSelects[macroType][newGame] ) {
+                    game = this.gameSelect.value = newGame; break
+                }
+            }
+        }
+        const preset = this.presetSelects[macroType][game].value
+
+        return [macroType, game, preset]
+    }
+
+    /** @returns {DrawableLayer} */
+    getLayerType() {
+        const [macroType, game, preset] = this.getLayerTypeKeys()
+        return layerTypesMap[macroType][game]?.[preset]
+    }
+
+    /** Check whether the current canvas is too big to allow auto-rerendering. */
+    tooBig() {
+        // Value chosen so that 1080 * 1920 is approximately the threshold
+        return (this.canvas.width*this.canvas.height >= 2100000)
+    }
+    
+    /** Resize the canvas only if necessary. */
+    resizeCanvas(width, height) {
+        if( this.canvas.width !== width || this.canvas.height !== height ) {
+            this.canvas.width = width; this.canvas.height = height
+        }
+    }
+    
+    /** Called when there is no longer an image to draw. */
+    clear() {
+        this.canvas.width = 1920; this.canvas.height = 1080
+        this.imageSliders.hide()
+        this.redrawMacro()
+    }
+
+    /** Wipes all `ctx` and `canvas` properties that may affect how things are drawn to the canvas. */
+    resetDrawingState() {
+        // Clear out the ctx drawing state
+        const ctx = this.ctx
+        ctx.setTransform(1, 0, 0, 1, 0, 0)
+        ctx.fillStyle = '#000000'
+        ctx.shadowBlur = 0
+        ctx.shadowColor = 'rgba(0, 0, 0, 0)'
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
+        ctx.font = '10px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'alphabetic'
+        ctx.filter = 'none'
+        ctx.globalCompositeOperation = 'source-over'
+    
+        // On Chrome the canvas styling may affect drawing
+        if( !!window.chrome ) {
+            this.canvas.style.letterSpacing = null
+        }
+    }
+
+    /** 
+     * Call after minor input changes;
+     * Calls redrawMacro() only if the underlying canvas isn't too huge for this feature to be laggy.
+     */
+    autoRedraw() {
+        if( !this.tooBig() ) this.redrawMacro()
+    }
+
+    drawFlatColor() {
+        if( this.bgColorSliders.usable ) {
+            const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
+            if( bgColorOpacity === 0 ) return
+            this.ctx.fillStyle = `rgba(${bgColor.join()}, ${bgColorOpacity}`
+            this.ctx.fillRect(0, 0, canvas.width, canvas.height)
+        }
+    }
+
+    /** Redraw the underlying image, if any. */
+    drawImage() {
+        if( !this.imageHandler.image ) return
+
+        const image = this.imageHandler.image
+        const ctx = this.ctx
+
+        if( this.resolutionCheckbox.checked ) {
+            // Constrain image to be no larger than 1920x1080
+            const scale = Math.min(1920/image.width, 1080/image.height, 1)
+            this.resizeCanvas(image.width*scale, image.height*scale)
+            ctx.scale(scale, scale)
+
+        } else {
+            this.resizeCanvas(image.width, image.height)
+        }
+
+        this.drawFlatColor()
+        
+        if( this.imageSliders.usable ) {
+            const {imgSaturate, imgContrast, imgBrightness} = this.imageSliders.getValues()
+            ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
+        }
+
+        ctx.drawImage(image, 0, 0)
+        ctx.filter = 'none'
+    }
+
+    /** 
+     * Call after major changes;
+     * Blanks the canvas, redraws the selected image if any, and draws the text on top.
+     */
+    redrawMacro() {
+        const ctx = this.ctx
+        this.resetDrawingState()
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        this.drawFlatColor()
+    
+        // May alter the resolution
+        this.drawImage()
+
+        // UI changes
+        this.resWarning.hidden = !this.tooBig()
+        this.resView.x.textContent = canvas.width
+        this.resView.y.textContent = canvas.height        
+    
+        this.resetDrawingState()
+        const layerType = this.getLayerType()
+        layerType.draw(ctx, this.canvas, this)
+    }
+
+    /** Save the current contents of the canvas to the user's computer. */
+    saveImage() {
+        // Turn "image/xyz" to "xyz"
+        let imageType = this.imageHandler.imageType?.replace(/(.*)\//g, '')
+
+        // Normalise to either "jpeg" or "png"
+        if( imageType === 'jpg' ) imageType = 'jpeg'
+        else if( imageType !== 'jpeg' ) imageType = 'png'
+
+        // Set the file name and put the image data
+        const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z0-9 ]/g, '') || 'macro'
+        this.saveLink.setAttribute('download', fileName + '.' + imageType)
+        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType))        
+        this.saveLink.click()
+    }
+}
+
+// Console function used when tweaking presets
+window.EXPORT_SLIDERS = () => {
+    const obj = {}
+    for( const slidersName in macroGen.sliders )
+        if( !macroGen.sliders[slidersName].element.hidden )
+            obj[slidersName] = macroGen.sliders[slidersName].getValues()
+    console.log(obj)
+}
