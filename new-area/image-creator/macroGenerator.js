@@ -321,7 +321,9 @@ class MacroGenerator {
     ctx
 
     /** @type {readonly HTMLAnchorElement}   */
-    saveLink = document.createElement('a')
+    saveLink = makeElem('a')
+    /** @type {readonly HTMLCanvasElement}   */
+    tempCanvas = makeElem('canvas')
 
     /** @type {{ [name: string]: Sliders }} */
     sliders
@@ -587,10 +589,12 @@ class MacroGenerator {
 
         const image = this.imageHandler.image
         const ctx = this.ctx
+        const canvas = this.canvas
+        let scale = 1
 
         if( this.resolutionCheckbox.checked ) {
             // Constrain image to be no larger than 1920x1080
-            const scale = Math.min(1920/image.width, 1080/image.height, 1)
+            scale = Math.min(1920/image.width, 1080/image.height, 1)
             this.resizeCanvas(image.width*scale, image.height*scale)
             ctx.scale(scale, scale)
 
@@ -601,12 +605,63 @@ class MacroGenerator {
         this.drawFlatColor()
         
         if( this.imageSliders.usable ) {
-            const {imgSaturate, imgContrast, imgBrightness} = this.imageSliders.getValues()
-            ctx.filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
-        }
+            const {imgSaturate, imgContrast, imgBrightness, imgChromatic} = this.imageSliders.getValues()
+            let filter
 
-        ctx.drawImage(image, 0, 0)
-        ctx.filter = 'none'
+            // The way these filters work is a little weird, I like it better when the order varies like this
+            if( (imgContrast-100)*(imgBrightness-100) < 0 )
+                filter = `saturate(${imgSaturate}%) brightness(${imgBrightness}%) contrast(${imgContrast}%)`
+            else
+                filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
+
+            if( imgChromatic > 0 ) {
+                this.tempCanvas.width = canvas.width
+                this.tempCanvas.height = canvas.height
+                const tempCtx = this.tempCanvas.getContext('2d')
+                tempCtx.scale(scale, scale)
+
+                // Draw image to tempCanvas
+                tempCtx.globalCompositeOperation = 'source-over'
+                tempCtx.filter = filter
+                tempCtx.drawImage(image, 0, 0)
+                // Multiply by orangeish
+                tempCtx.globalCompositeOperation = 'multiply'
+                tempCtx.fillStyle = '#ff8000'
+                tempCtx.filter = 'none'
+                tempCtx.fillRect(0, 0, image.width, image.height)
+                
+                // Draw to actual canvas
+                ctx.resetTransform()
+                ctx.drawImage(this.tempCanvas, 0, 0)
+
+                // Draw image to tempCanvas
+                tempCtx.globalCompositeOperation = 'source-over'
+                tempCtx.filter = filter
+                tempCtx.drawImage(image, 0, 0)
+                // Multiply by blueish
+                tempCtx.globalCompositeOperation = 'multiply'
+                tempCtx.fillStyle = '#007fff'
+                tempCtx.filter = 'none'
+                tempCtx.fillRect(0, 0, image.width, image.height)
+
+                // Add to actual canvas, slightly aberrated
+                ctx.globalCompositeOperation = 'lighter'
+                ctx.resetTransform()
+                ctx.scale(1+imgChromatic, 1)
+                ctx.drawImage(this.tempCanvas, -canvas.width*imgChromatic/2, 0)
+                ctx.globalCompositeOperation = 'source-over'
+            }
+            else
+            {
+                ctx.filter = filter
+                ctx.drawImage(image, 0, 0)
+            }
+            ctx.filter = 'none'
+
+
+        } else {
+            ctx.drawImage(image, 0, 0)
+        }
     }
 
     /** 
