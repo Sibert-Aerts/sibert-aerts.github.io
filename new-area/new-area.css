@@ -347,6 +347,7 @@ canvas.big {
     padding: 16px;
 }
 .canvas-wrapper {
+    position: relative;
     width: 100%;
     min-height: 60vh;
     display: flex;
@@ -378,6 +379,33 @@ canvas.big {
         margin: 0;
     }
 }
+
+#canvas-overlay {
+    position: absolute;
+    overflow: hidden;
+    height: 100%;
+    pointer-events: none;
+}
+    #canvas-overlay > .grabby {
+        position: relative;
+        width: 20px; height: 20px;
+        border-radius: 10px;
+        background-color: white;
+        border: solid black 2px;
+        transform: translate(-10px, -10px);
+        pointer-events: all;
+        cursor: grab;
+        user-select: none;
+    }
+    #canvas-overlay > .grabby:hover {
+        border: solid black 1px;
+    }
+    #canvas-overlay > .grabby.grabbed {
+        background-color: red;
+        border: solid white 2px;
+        pointer-events: none;
+        cursor: grabbing;
+    }
 
 .tabs {
     position: relative;

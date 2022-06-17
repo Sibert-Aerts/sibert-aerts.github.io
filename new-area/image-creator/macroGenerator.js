@@ -284,6 +284,7 @@ class Sliders {
         for( const name in values ) {
             const slider = this.byName[name]
             slider.value = slider.converter.toString(values[name])
+            slider.resetButton.disabled = false
         }
     }
 
@@ -392,6 +393,10 @@ class MacroGenerator {
         this.imageSliders = new Sliders(my('div', 'image'))
         this.imageSliders.onchange = autoRedraw
 
+        //// CANVAS OVERLAY POSITION GRABBY (PROTOTYPE)
+        this.setupCanvasOverlay()
+
+
         //// UHH THE LITTLE TAB RADIO BUTTONS ?
         const tabs = my('div', 'sliders-tabs')
         const tabbedDivs = {}
@@ -414,6 +419,63 @@ class MacroGenerator {
 
 
         this.onMacroTypeChange(null, false)
+    }
+
+    setupCanvasOverlay() {
+        const canvasOverlay = this.my('div', 'canvas-overlay')
+
+        this.updateCanvasOverlay = () => {}
+
+        if( !canvasOverlay ) return
+
+        this.updateCanvasOverlay = () => {
+            canvasOverlay.style.left = this.canvas.offsetLeft + 'px'
+            canvasOverlay.style.width = this.canvas.clientWidth + 'px'
+            adjustGrabby()
+        }
+        window.addEventListener('resize', this.updateCanvasOverlay)
+
+        const grabby = this.grabby = canvasOverlay.children[0]
+        let grabState = {x: 0, y: 0, grabbed: false}
+
+        const adjustGrabby = () => {
+            grabby.style.left = (this.sliders.position.get('xOffset')+.5)*this.canvas.clientWidth + 'px'
+            grabby.style.top = (this.sliders.position.get('yOffset')+.5)*this.canvas.clientHeight + 'px'
+        }
+
+        const startGrab = e => {
+            grabState = { x: grabby.offsetLeft, y: grabby.offsetTop, grabbed: true }
+            grabby.classList.add('grabbed')
+        }
+        const completeGrab = e => {
+            if( !grabState.grabbed ) return
+
+            grabState.grabbed = false
+            grabby.classList.remove('grabbed')
+            this.sliders.position.setValues({
+                xOffset: grabby.offsetLeft/this.canvas.clientWidth-.5, yOffset: grabby.offsetTop/this.canvas.clientHeight-.5
+            })
+            this.sliders.position.onchange()
+        }
+        const moveGrab = e => {
+            if( !grabState.grabbed ) return
+
+            grabby.style.left = e.offsetX + 'px'
+            grabby.style.top = e.offsetY + 'px'
+        }
+
+        const ifMobile = f => (e => { if(screen.width < 1000) f(e) })
+        const ifNonMobile = f => (e => { if(screen.width >= 1000) f(e) })
+
+        grabby.addEventListener('pointerdown', ifNonMobile(startGrab))
+        grabby.addEventListener('click', ifMobile(startGrab))
+        document.addEventListener('pointerup', ifNonMobile(completeGrab))
+        this.canvas.addEventListener('pointermove', moveGrab)
+        this.canvas.addEventListener('click', e => { moveGrab(e); completeGrab(e)} )
+
+        const showGrabby = this.my('input', 'showGrabby')
+        showGrabby.onchange = e => { grabby.hidden = !showGrabby.checked }
+        showGrabby.onchange()
     }
 
     createMacroTypeSelects() {
@@ -497,6 +559,8 @@ class MacroGenerator {
             this.captionInput.value = 'Caption Unaltered'
         else if( this.captionInput.value === 'Caption Unaltered' && newType.preferCase === 'all caps' )
             this.captionInput.value = 'CAPTION UNALTERED'
+
+        this.updateCanvasOverlay()
 
         //// Redraw (if desired)
         if (redraw) this.redrawMacro()
@@ -686,11 +750,12 @@ class MacroGenerator {
         // UI changes
         this.resWarning.hidden = !this.tooBig()
         this.resView.x.textContent = canvas.width
-        this.resView.y.textContent = canvas.height        
+        this.resView.y.textContent = canvas.height
     
         this.resetDrawingState()
         const layerType = this.getLayerType()
         layerType.draw(ctx, this.canvas, this)
+        this.updateCanvasOverlay()
     }
 
     /** Save the current contents of the canvas to the user's computer. */

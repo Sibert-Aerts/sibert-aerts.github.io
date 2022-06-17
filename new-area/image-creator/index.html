@@ -111,7 +111,10 @@
 			<br>
 
 			<div class=canvas-wrapper>
-				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto"></canvas>
+				<div id=canvas-overlay>
+					<div class=grabby></div>
+				</div>
+				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto">
 			</div>
 			
 			<div style="text-align:center">
@@ -175,19 +178,24 @@
 				<div name=position class=sliders-container hidden>
 					<h4> Position </h4>
 					<div>
+						<label class=input-title>Show nub for manual positioning (experimental):
+							<input name=showGrabby type=checkbox>
+						</label>
+					</div>
+					<div>
 						<span class=input-title>Horizontal:</span>
 						<button class=reset-button></button>
-						<input type=range name=xOffset min=-0.60 max=.60 step=0.001 default=0>
+						<input name=xOffset type=range min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
 						<span class=input-title>Vertical:</span>
 						<button class=reset-button></button>
-						<input type=range name=yOffset min=-0.60 max=.60 step=0.001 default=0>
+						<input name=yOffset type=range min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
 						<span class=input-title>Scale:</span>
 						<button class=reset-button></button>
-						<input type=range name=scale min=-3 max=4 step=.01 default=0 as=log2>
+						<input name=scale type=range min=-3 max=4 step=.01 default=0 as=log2>
 					</div>
 				</div>
 
@@ -517,6 +525,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2022/06/17</b> • Added a prototype "nub" that can be dragged to change the overlay position <br>
 			<b>2022/06/17</b> • Added a few missing DS2/DS3 presets, slightly change mobile layout <br>
 			<b>2022/06/15</b> • Added "chromatic aberration" image filter <br>
 
