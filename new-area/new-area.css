@@ -59,7 +59,7 @@ body {
 .content {
     background-color: rgba(0, 8, 8, 0.7);
     background: url('noise.svg');
-    padding: 20px;
+    padding: calc(8px + .5%);
     border-radius: 8px;
     max-width: 90vw;
 }
@@ -321,6 +321,15 @@ body {
  *
  */
 
+#main-content {
+    position: relative;
+    display: inline-block;
+    width: 96%;
+    max-width: none;
+    margin: 1% 2% 2%;
+    padding: 0;
+}
+
 canvas.small {
     max-width: 720px;
     max-height: 480px;
@@ -334,7 +343,8 @@ canvas.big {
 
 .canvas-pane {
     float: left;
-    width: calc(100% - 420px);
+    width: calc(100% - 416px);
+    padding: 16px;
 }
 .canvas-wrapper {
     width: 100%;
@@ -344,9 +354,9 @@ canvas.big {
 }
 
 .sliders-pane {
-    float: right; width: 400px;
-    margin-left: 20px;
-    margin-bottom: 20px;
+    float: right;
+    width: 400px; max-width: 100%;
+    margin: 16px 16px 16px 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -354,25 +364,26 @@ canvas.big {
 
 @media screen and (max-width: 1320px) {  /** SMALL SCREEN LAYOUT */
     .canvas-pane {
-        float: left;
         width: 100%;
     }
     .canvas-wrapper {
         min-height: initial;
+        width: calc(100% + 32px);
+        margin: 0 -16px 0 -16px;
     }
     
     .sliders-pane {
         float: left;
-        width: calc(100% + 2em);
-        margin: 1em -1em 2em -1em;
+        width: 100%;
+        margin: 0;
     }
 }
 
 .tabs {
     position: relative;
     display: inline-block;
-    width: calc(100% + 20px);
-    margin: 0 -10px 1em -10px;
+    width: 100%;
+    margin: 0 0 1em 0;
     padding: 0;
     background: linear-gradient(#0000, #0004);
 }
@@ -496,6 +507,10 @@ canvas.big {
         margin: 2px 0 0 0;
         padding: 0;
         cursor: pointer;
+    }
+
+    .sliders-container select {
+        min-width: 200px;
     }
 
 .reset-button {

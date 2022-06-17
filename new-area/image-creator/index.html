@@ -96,7 +96,7 @@
 <div id=background-layer class="background-layer faded"></div>
 
 <div id=main style="margin-bottom: 100px">
-	<div id=main-content class=content style="position: relative; margin: 1% 2% 2%; width: 96%; max-width: none; overflow: hidden">
+	<div id=main-content class=content>
 		
 		<div class=canvas-pane>
 			<h1>FromSoftware image macro creator</h1>
@@ -126,7 +126,7 @@
 			</div>
 		</div>
 
-		<div id=sliders-pane class=sliders-pane>			
+		<div id=sliders-pane class=sliders-pane>
 
 			<div id=sliders-tabs class='tabs editor-tabs'>
 				<label class='tab checked'>
@@ -152,11 +152,11 @@
 
 				<div>
 					<span class=input-title style=min-width:100px>Macro type:</span>
-					<select name=macro-type style=min-width:200px></select>
+					<select name=macro-type></select>
 				</div>
 				<div>
 					<span class=input-title style=min-width:100px>Game:</span>
-					<select name=macro-type-game style=min-width:200px></select>
+					<select name=macro-type-game></select>
 				</div>
 				<div>
 					<span class=input-title style=min-width:100px>Preset:</span>
@@ -412,7 +412,7 @@
 				<div id=background-color class=sliders-container>
 					<div class=smol>
 						<span class=input-title>Color:</span>
-						<input type=color name=bgColor default=#cccccc>
+						<input type=color name=bgColor default=#404040>
 					</div>
 					<div class=smol>
 						<span class=input-title>Opacity:</span>
@@ -467,7 +467,7 @@
 		
 	</div>
 
-	<div class=content style="margin:1% auto; width:800px; font-size:14px; font-family:Arial, Helvetica, sans-serif">
+	<div class=content style="margin:1% auto; width:800px; min-height: 400px; font-size:14px; font-family:Arial, Helvetica, sans-serif">
 
 		<div id=info-tabs class=tabs>
 			<label class='tab checked'>
@@ -491,20 +491,19 @@
 		<div id=call-info>
 			<h2 style="margin:0 .5em .5em">Public call to modders</h2>
 			If you're familiar with extracting assets from any/all games featured in this app,
-			and you would be willing to share extracted HUD/UI textures with me, contact me!
+			and you would be willing to share extracted HUD/UI textures with me, <b>contact me!</b>
 
 			<br><br>
 			<h2 style="margin:0 .5em .5em">Am I missing something?</h2>
-			I tried to be exhaustive, but obviously few people would care to extensively document
-			all different instances of "NOUN VERBED" across all different games, and I've mainly had to google around a bit until it seemed like I got everything.
-			If you know of any particular variations I might have missed, and you have access to, or are willing to make high-resolution screenshots
-			that I can use as reference, contact me!<br>
-			In particular, I am currently looking for high quality screenshots of basically every applicable overlay from <b>Demon's Souls (2009)</b>.
+			I tried to be exhaustive, but as there is no comprehensive list of all the different "noun verbeds" online,
+			I had to go by all I could find from googling around. 
+			If you know of any particular variations I might have missed, shoot me a message!<br>
+			In particular, I am currently looking for high quality screenshots of basically every applicable overlay from the original <b>Demon's Souls</b>.
 
 			<br><br>
 			<h2 style="margin:0 .5em .5em">Want to contribute?</h2>
 			If you're familiar with HTML canvas and interested in extending the set of available macros (possibly to include more games),
-			you are free to contribute through Github and to contact me if you need help or have any questions.<br>
+			you are free to contribute through Github, and/or to contact me if you need help or have any questions.<br>
 			Currently the app is pure javascript and HTML with no build systems or external dependencies.
 
 			<br><br>
@@ -518,7 +517,8 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
-			<b>2022/06/15</b> • Added "chromatic aberration" image filter
+			<b>2022/06/17</b> • Added a few missing DS2/DS3 presets, slightly change mobile layout <br>
+			<b>2022/06/15</b> • Added "chromatic aberration" image filter <br>
 
 		</div>
 

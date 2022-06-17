@@ -606,8 +606,10 @@ class MacroGenerator {
         
         if( this.imageSliders.usable ) {
             const {imgSaturate, imgContrast, imgBrightness, imgChromatic} = this.imageSliders.getValues()
-            let filter
+            const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
+            const bgColorStr = `rgba(${bgColor.join()}, ${bgColorOpacity}`
 
+            let filter
             // The way these filters work is a little weird, I like it better when the order varies like this
             if( (imgContrast-100)*(imgBrightness-100) < 0 )
                 filter = `saturate(${imgSaturate}%) brightness(${imgBrightness}%) contrast(${imgContrast}%)`
@@ -622,6 +624,8 @@ class MacroGenerator {
 
                 // Draw image to tempCanvas
                 tempCtx.globalCompositeOperation = 'source-over'
+                tempCtx.fillStyle = bgColorStr
+                tempCtx.fillRect(0, 0, canvas.width, canvas.height)
                 tempCtx.filter = filter
                 tempCtx.drawImage(image, 0, 0)
                 // Multiply by orangeish
@@ -636,6 +640,8 @@ class MacroGenerator {
 
                 // Draw image to tempCanvas
                 tempCtx.globalCompositeOperation = 'source-over'
+                tempCtx.fillStyle = bgColorStr
+                tempCtx.fillRect(0, 0, canvas.width, canvas.height)
                 tempCtx.filter = filter
                 tempCtx.drawImage(image, 0, 0)
                 // Multiply by blueish

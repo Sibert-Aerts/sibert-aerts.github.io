@@ -188,6 +188,33 @@ layerTypes.push({
 layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.ds2,
+    preset: 'GREAT SOUL EMBRACED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.007, yOffset: 0.216, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 0,
+            fontWeight: 400, textColor: [255, 248, 85],
+        },
+        zoomBlur: {
+            textOpacity: 0.9, blurTint: [255, 163, 77],
+            blurSize: 1.05, blurOpacity: 0.06,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
     preset: 'BONFIRE LIT',
 
     preferCase: 'all caps',
@@ -203,6 +230,33 @@ layerTypes.push({
         zoomBlur: {
             textOpacity: 0.9, blurTint: [255, 198, 168],
             blurSize: 1.07, blurOpacity: 0.02,
+        },
+        shadow: {
+            shadowSize: 1.4, shadowOpacity: .9,
+            shadowOffset: -.004, shadowSoftness: 1.2,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds2,
+    preset: 'PRIMAL BONFIRE LIT',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: -0.005, yOffset: 0.219, scale: 1
+        },
+        font: {
+            fontSize: 104, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 2,
+            fontWeight: 400, textColor: [255, 214, 67]
+        },
+        zoomBlur: {
+            textOpacity: 0.9, blurTint: [255, 172, 128],
+            blurSize: 1.05, blurOpacity: 0.07,
         },
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
@@ -394,6 +448,33 @@ layerTypes.push({
         zoomBlur: {
             textOpacity: 0.9, blurTint: [206, 202, 211],
             blurSize: 1.16, blurOpacity: 0.08,
+        },
+        shadow: {
+            shadowSize: 0.8, shadowOpacity: .66,
+            shadowOffset: -.008, shadowSoftness: 1.24,
+        }
+    },
+    draw: drawNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.ds3,
+    preset: 'HOLLOWING REVERSED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -0.001, yOffset: 0.012, scale: 1
+        },
+        font: {
+            fontSize: 102, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.5, charSpacing: 7,
+            fontWeight: 600, textColor: [207, 254, 255],
+        },
+        zoomBlur: {
+            textOpacity: 0.9, blurTint: [176, 203, 216],
+            blurSize: 1.2, blurOpacity: 0.08,
         },
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
@@ -707,6 +788,33 @@ layerTypes.push({
 layerTypes.push({
     type: MacroType.nounVerbed,
     game: Game.er,
+    preset: 'Default',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
+            vScale: 1, charSpacing: 0,
+            fontWeight: 300, textColor: [220, 175, 45]
+        },
+        zoomBlur: {
+            textOpacity: 1, blurTint: [255, 208, 66],
+            blurSize: 1.11, blurOpacity: 0.18,
+        },
+        shadow: {
+            shadowSize: .7, shadowOpacity: .65,
+            shadowOffset: -0.006, shadowSoftness: 1.05,
+        }
+    },
+    draw: drawEldenNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.er,
     preset: 'LOST GRACE DISCOVERED',
 
     preferCase: 'all caps',
@@ -721,33 +829,6 @@ layerTypes.push({
         },
         zoomBlur: {
             textOpacity: 1, blurTint: [237, 140, 29],
-            blurSize: 1.11, blurOpacity: 0.18,
-        },
-        shadow: {
-            shadowSize: .7, shadowOpacity: .65,
-            shadowOffset: -0.006, shadowSoftness: 1.05,
-        }
-    },
-    draw: drawEldenNounVerbed
-})
-
-layerTypes.push({
-    type: MacroType.nounVerbed,
-    game: Game.er,
-    preset: 'ENEMY FELLED, et al.',
-
-    preferCase: 'all caps',
-    sliders: {
-        position: {
-            xOffset: 0, yOffset: 0, scale: 1
-        },
-        font: {
-            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
-            vScale: 1, charSpacing: 0,
-            fontWeight: 300, textColor: [220, 175, 45]
-        },
-        zoomBlur: {
-            textOpacity: 1, blurTint: [255, 208, 66],
             blurSize: 1.11, blurOpacity: 0.18,
         },
         shadow: {
