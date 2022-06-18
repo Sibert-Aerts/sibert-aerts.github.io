@@ -124,6 +124,65 @@ function drawNounVerbed(ctx, canvas, gen) {
     ctx.fillText(caption, w/2, h/2/vScale )
 }
 
+/** @type {drawFun} Function which draws a Demon's Souls-style NOUN VERBED.  */
+function drawDeSNounVerbed(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const x0 = xOffset*w, y0 = yOffset*h
+    s *= s0
+
+    // The shade only moves up or down
+    ctx.translate(0, y0)
+    //// SHADE
+    drawShadowBar(ctx, canvas, gen, s0)    
+    // The text also moves left or right
+    ctx.translate(x0, 0)
+
+    // buhh
+    ctx.translate(w/2, h/2)
+
+    //// DECOR LINE THINGIES
+    const lineWidth = 1.53*h*s0
+    const left = -lineWidth/2
+
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(left, -80*s, lineWidth, 5*s)
+    ctx.fillRect(left, 50*s, lineWidth, 5*s)
+    ctx.fillStyle = '#303030'
+    ctx.fillRect(left, -80*s, lineWidth, 3*s)
+    ctx.fillRect(left, 50*s, lineWidth, 3*s)
+    ctx.fillStyle = '#606060'
+    ctx.fillRect(left, -80*s, lineWidth, 2*s)
+    ctx.fillRect(left, 50*s, lineWidth, 2*s)
+
+    //// CAPTION
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.fillText(caption, 0, 0)    
+    
+    //// SUBCAPTION
+    const fontFamily = gen.sliders.font.get('fontFamily')
+    const { subCaption } = gen.sliders.subCaption.getValues()
+
+    ctx.resetTransform()
+    ctx.translate(x0 + w/2, y0 + h/2)
+    ctx.scale(1.1, 1)
+
+    canvas.style.letterSpacing = `${s}px`
+    ctx.globalAlpha = .9
+    ctx.font = `400 ${23*s}px ${fontFamily}`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'alphabetic'
+
+    const lines = subCaption.split('\n')
+    for(let i=0; i<lines.length; i++) {
+        ctx.fillText(lines[i], 0, 86*s + i*32*s)
+    }
+}
+
 /** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
 function drawGlowyText(ctx, canvas, gen) {
     // CONSTANTS

@@ -46,6 +46,60 @@ const layerTypes = []
 
 //////// NOUN VERBED
 
+//// DEMON'S SOULS
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.des,
+    preset: 'THE DEMON WAS DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 93, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.45, charSpacing: 8,
+            fontWeight: 400, textColor: [210, 181, 86]
+        },
+        subCaption: {
+            subCaption: 'You shall obtain the Demon Soul... and a power\nthat is beyond human imagination.'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: .7,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.des,
+    preset: 'TARGET WAS DESTROYED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 109, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.45, charSpacing: 8,
+            fontWeight: 400, textColor: [252, 140, 66]
+        },
+        subCaption: {
+            subCaption: 'You\'ve taken a human\'s Soul.\nWhat a superb demon!'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: .7,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
+
 //// DARK SOULS 1
 
 layerTypes.push({
@@ -867,6 +921,58 @@ layerTypes.push({
 })
 
 //////// YOU DIED
+
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.des,
+    preset: 'YOU DIED (human form)',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 109, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.45, charSpacing: 8,
+            fontWeight: 400, textColor: [123, 20, 20]
+        },
+        subCaption: {
+            subCaption: 'However, the Nexus traps you. You shall remain\nin this world as a Soul, forever.'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: 1,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
+
+layerTypes.push({
+    type: MacroType.youDied,
+    game: Game.des,
+    preset: 'YOU DIED (phantom form)',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 109, fontFamily: 'adobe-garamond-pro',
+            vScale: 1.45, charSpacing: 8,
+            fontWeight: 400, textColor: [123, 20, 20]
+        },
+        subCaption: {
+            subCaption: 'Phantom, you were not able to achieve your goal.\nYou must leave this world.'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: 1,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
 
 layerTypes.push({
     type: MacroType.youDied,

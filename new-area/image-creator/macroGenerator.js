@@ -214,7 +214,8 @@ class Sliders {
         for( const div of this.element.children ) {
             if( div.tagName !== 'DIV' ) continue
 
-            const slider = div.getElementsByTagName('input')[0]
+            const slider = 
+                div.getElementsByTagName('input')[0] || div.getElementsByTagName('textarea')[0]  || div.getElementsByTagName('select')[0]
             if( !slider ) return
 
             /// Add to our collections
@@ -623,6 +624,7 @@ class MacroGenerator {
         ctx.textBaseline = 'alphabetic'
         ctx.filter = 'none'
         ctx.globalCompositeOperation = 'source-over'
+        ctx.globalAlpha = 1
     
         // On Chrome the canvas styling may affect drawing
         if( !!window.chrome ) {

@@ -178,7 +178,7 @@
 				<div name=position class=sliders-container hidden>
 					<h4> Position </h4>
 					<div>
-						<label class=input-title>Show nub for manual positioning (experimental):
+						<label class=input-title>Show nub for manual positioning (prototype):
 							<input name=showGrabby type=checkbox>
 						</label>
 					</div>
@@ -230,6 +230,14 @@
 						<span class=input-title>Spacing:</span>
 						<button class=reset-button></button>
 						<input type=range name=charSpacing min=-10 max=40 step=1>
+					</div>
+				</div>
+
+				<div name=subCaption class=sliders-container hidden>
+					<div>
+						<span class=input-title>Sub-caption:</span>
+						<button class=reset-button></button>
+						<textarea name=subCaption rows=3 style=width:100%></textarea>
 					</div>
 				</div>
 
@@ -505,8 +513,7 @@
 			<h2 style="margin:0 .5em .5em">Am I missing something?</h2>
 			I tried to be exhaustive, but as there is no comprehensive list of all the different "noun verbeds" online,
 			I had to go by all I could find from googling around. 
-			If you know of any particular variations I might have missed, shoot me a message!<br>
-			In particular, I am currently looking for high quality screenshots of basically every applicable overlay from the original <b>Demon's Souls</b>.
+			If you know of any particular variations I might have missed, shoot me a message, ideally with a screenshot!<br>
 
 			<br><br>
 			<h2 style="margin:0 .5em .5em">Want to contribute?</h2>
@@ -525,6 +532,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2022/06/18</b> • (Finally) added some Demon's Souls macros: two "noun verbeds" and two deaths <br>
 			<b>2022/06/17</b> • Added a prototype "nub" that can be dragged to change the overlay position <br>
 			<b>2022/06/17</b> • Added a few missing DS2/DS3 presets, slightly change mobile layout <br>
 			<b>2022/06/15</b> • Added "chromatic aberration" image filter <br>
@@ -617,7 +625,9 @@
 </div>
 
 <!-- Element used to trigger/trick the Adobe Fonts script into loading more parts of the font. -->
-<div id=adobe-font-trick style=font-family:hot-gfkaishokk hidden>死忍殺不死斬り鬼仏見出冥助あり竜咳快復拝涙</div>
+<div id=adobe-font-trick style=font-family:hot-gfkaishokk hidden>
+	死忍殺不死斬り鬼仏見出冥助あり竜咳快復拝涙
+</div>
 
 </body>
 
