@@ -10,6 +10,7 @@ button.soulsy {
     font-family: adobe-garamond-pro;
     color: #ffe;
     border: none;
+    border-radius: 0;
 
     background: radial-gradient( ellipse farthest-side at 50% 100%, rgba(226, 136, 62, .3) 0%, rgba(204, 80, 8, .15) 50%, transparent );
 }
@@ -42,6 +43,7 @@ button.soulsy-box {
     color: #ddc;
     font-family: adobe-garamond-pro;
     border: double 6px #dfa02d2e;
+    border-radius: 0;
     background: rgba(26, 23, 25, 70%)
 }
 button.soulsy-box:hover {
@@ -147,6 +149,7 @@ input[type=file]::file-selector-button {
     color: #ffe;
     font-family: adobe-garamond-pro;
     border: double 3px #ecb64144;
+    border-radius: 0;
     background: rgb(36, 29, 26);
 }
 input[type=file]::file-selector-button:hover {
@@ -203,6 +206,6 @@ input[type=checkbox]::before {
     visibility: hidden;
   }
   
-input[type="checkbox"]:checked::before {
+input[type=checkbox]:checked::before {
     visibility: visible;
   }
