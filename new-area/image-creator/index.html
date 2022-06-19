@@ -46,20 +46,25 @@
 	<!-- Specific page-setup script -->
 	<script type="text/javascript">
 
-		document.addEventListener('DOMContentLoaded', function() {
+		var macroGen
 
+		let instantiateMacroGen = function() {
+			if( macroGen ) return
 			// Instantiate the global MacroGenerator
 			macroGen = new MacroGenerator(document.getElementById('main-content'))
-		})
+		}
+
+		document.addEventListener('DOMContentLoaded', instantiateMacroGen)
 
 		window.addEventListener('load', function() {
-			// Create the global MacroGenerator
+			
+			instantiateMacroGen()
 			macroGen.redrawMacro()
 
-			if( browserIs.firefox ) {
+			if( browserIs.firefox )
 				for( const e of document.getElementsByClassName('firefox-warning'))
 					e.hidden = false
-			}
+
 			
 			// The lil' info tabs
 			const tabs = document.getElementById('info-tabs')
@@ -112,7 +117,7 @@
 
 			<div class=canvas-wrapper>
 				<div id=canvas-overlay>
-					<div class=grabby></div>
+					<div class=grabby hidden></div>
 				</div>
 				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto">
 			</div>
