@@ -387,8 +387,8 @@ canvas.big {
     pointer-events: none;
 }
     #canvas-overlay > .grabby {
-        position: relative;
-        width: 40px; height: 40px;
+        position: absolute;
+        width: 48px; height: 48px;
         transform: translate(-50%, -50%);
         pointer-events: all;
         cursor: grab;
@@ -396,11 +396,20 @@ canvas.big {
         background-image: url(graphics/grabby.png);
         background-size: 400% 300%;
     }
+    #canvas-overlay > .grabby.position-grabby {
+        background-position-x: 0;
+    }
+    #canvas-overlay > .grabby.scale-grabby {
+        background-position-x: -100%;
+    }
     #canvas-overlay > .grabby:hover {
         background-position-y: -100%;
     }
     #canvas-overlay > .grabby.grabbed {
         background-position-y: -200%;
+        cursor: initial;
+    }
+    #canvas-overlay.grabbed > .grabby {
         pointer-events: none;
     }
 

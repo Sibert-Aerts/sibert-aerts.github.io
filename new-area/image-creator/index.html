@@ -117,7 +117,8 @@
 
 			<div class=canvas-wrapper>
 				<div id=canvas-overlay>
-					<div class=grabby hidden></div>
+					<div class='grabby position-grabby' hidden></div>
+					<div class='grabby scale-grabby' hidden></div>
 				</div>
 				<canvas id=canvas class=big width=1920px height=1080px style="margin: auto">
 			</div>
@@ -173,7 +174,8 @@
 
 				<div>
 					<span class=input-title style=min-width:100px>Caption:</span>
-					<input type=text id=image-caption value="Caption Unaltered" style="min-width:280px">
+					<textarea id=image-caption rows=1 style="min-height: 1em; min-width:280px; max-width:280px; margin-bottom:-8px"
+					>Caption Unaltered</textarea>
 				</div>
 			</div>
 
@@ -184,7 +186,7 @@
 					<h4> Position </h4>
 					<div>
 						<label class=input-title style=margin-bottom:0>
-							Enable manual positioning:
+							Show manual controls:
 							<input name=showGrabby type=checkbox>
 						</label>
 					</div>
@@ -538,6 +540,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2022/06/20</b> • Updated icons, progressed manual positioning feature <br>
 			<b>2022/06/18</b> • (Finally) added some Demon's Souls macros: two "noun verbeds" and two deaths <br>
 			<b>2022/06/17</b> • Added a prototype "nub" that can be dragged to change the overlay position <br>
 			<b>2022/06/17</b> • Added a few missing DS2/DS3 presets, slightly change mobile layout <br>

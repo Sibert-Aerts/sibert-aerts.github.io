@@ -372,7 +372,7 @@ class MacroGenerator {
         this.createMacroTypeSelects()
 
         //// OTHER CONTROLS
-        this.captionInput = my('input', 'image-caption')
+        this.captionInput = my('*', 'image-caption')
         this.captionInput.oninput = autoRedraw
         this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
         if( window.MACROGEN_DEFAULTS?.caption )
@@ -431,51 +431,105 @@ class MacroGenerator {
 
         this.updateCanvasOverlay = () => {
             canvasOverlay.style.left = this.canvas.offsetLeft + 'px'
-            canvasOverlay.style.width = this.canvas.clientWidth + 'px'
-            adjustGrabby()
+            canvasOverlay.style.width = this.canvas.clientWidth + 'px'            
+            updateGrabbies()
         }
         window.addEventListener('resize', this.updateCanvasOverlay)
 
-        const grabby = this.grabby = canvasOverlay.children[0]
-        let grabState = {x: 0, y: 0, grabbed: false}
+        const posGrabby = this.posGrabby = canvasOverlay.children[0]
+        const scaleGrabby = this.scaleGrabby = canvasOverlay.children[1]
+        const GrabType = {
+            none: 0, position: 1, scale: 2
+        }
+        let grabState = {type: 0, xOffset: 0, yOffset: 0, scale: 1}
+        const grabMap = [null, posGrabby, scaleGrabby]
 
-        const adjustGrabby = () => {
-            grabby.style.left = (this.sliders.position.get('xOffset')+.5)*this.canvas.clientWidth + 'px'
-            grabby.style.top = (this.sliders.position.get('yOffset')+.5)*this.canvas.clientHeight + 'px'
+        const SCALEGRABDIST = 40
+        const getScale = e => 
+            Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
+
+
+        /** Adjust the grabbies' position based on the Slider values. */
+        const updateGrabbies = () => {
+            const { xOffset, yOffset, scale } = this.sliders.position.getValues()
+            const left = (xOffset+.5)*this.canvas.clientWidth
+            const top =  (yOffset+.5)*this.canvas.clientHeight
+            updatePosGrabby(left, top)
+            updateScaleGrabby(left, top, scale)
+        }
+        const updatePosGrabby = (left, top) => {
+            posGrabby.style.left = left + 'px'
+            posGrabby.style.top = top + 'px'
+        }
+        const updateScaleGrabby = (left, top, scale) => {
+            scaleGrabby.style.left = left + scale*SCALEGRABDIST + 'px'
+            scaleGrabby.style.top = top - scale*SCALEGRABDIST + 'px'
         }
 
-        const startGrab = e => {
-            grabState = { x: grabby.offsetLeft, y: grabby.offsetTop, grabbed: true }
-            grabby.classList.add('grabbed')
+        //// Callbacks
+        const startPosGrab = e => {
+            grabState = { type: GrabType.position }
+            posGrabby.classList.add('grabbed')
+            canvasOverlay.classList.add('grabbed')
         }
-        const completeGrab = e => {
-            if( !grabState.grabbed ) return
-
-            grabState.grabbed = false
-            grabby.classList.remove('grabbed')
-            this.sliders.position.setValues({
-                xOffset: grabby.offsetLeft/this.canvas.clientWidth-.5, yOffset: grabby.offsetTop/this.canvas.clientHeight-.5
-            })
-            this.sliders.position.onchange()
+        const startScaleGrab = e => {
+            grabState = { type: GrabType.scale }
+            scaleGrabby.classList.add('grabbed')
+            canvasOverlay.classList.add('grabbed')
         }
         const moveGrab = e => {
-            if( !grabState.grabbed ) return
+            if( !grabState.type ) return
 
-            grabby.style.left = e.offsetX + 'px'
-            grabby.style.top = e.offsetY + 'px'
+            if( grabState.type === GrabType.position )
+            {
+                updatePosGrabby(e.offsetX, e.offsetY)
+                updateScaleGrabby(e.offsetX, e.offsetY, this.sliders.position.get('scale'))
+            }
+            else if ( grabState.type === GrabType.scale )
+            {
+                updateScaleGrabby(posGrabby.offsetLeft, posGrabby.offsetTop, getScale(e))
+            }
+        }
+        const completeGrab = e => {
+            if( !grabState.type ) return
+
+            if( grabState.type === GrabType.position )
+            {
+                this.sliders.position.setValues({
+                    xOffset: posGrabby.offsetLeft/this.canvas.clientWidth-.5, yOffset: posGrabby.offsetTop/this.canvas.clientHeight-.5
+                })
+            }
+            else if ( grabState.type === GrabType.scale )
+            {
+                this.sliders.position.setValues({ scale: getScale(e) })
+            }
+            this.sliders.position.onchange()
+
+            // Clear grab state
+            grabMap[grabState.type].classList.remove('grabbed')
+            canvasOverlay.classList.remove('grabbed')
+            grabState.type = 0
         }
 
+        // Listener binding helpers
         const ifMobile = f => (e => { if(screen.width < 1000) f(e) })
         const ifNonMobile = f => (e => { if(screen.width >= 1000) f(e) })
 
-        grabby.addEventListener('pointerdown', ifNonMobile(startGrab))
-        grabby.addEventListener('click', ifMobile(startGrab))
+        //// Bind those listeners
+        posGrabby.addEventListener('pointerdown', ifNonMobile(startPosGrab))
+        posGrabby.addEventListener('click', ifMobile(startPosGrab))
+
+        scaleGrabby.addEventListener('pointerdown', ifNonMobile(startScaleGrab))
+        scaleGrabby.addEventListener('click', ifMobile(startScaleGrab))
+
         document.addEventListener('pointerup', ifNonMobile(completeGrab))
         this.canvas.addEventListener('pointermove', moveGrab)
         this.canvas.addEventListener('click', e => { moveGrab(e); completeGrab(e)} )
 
+
+        //// Hook up checkbox to enable/disable
         const showGrabby = this.my('input', 'showGrabby')
-        showGrabby.onchange = e => { grabby.hidden = !showGrabby.checked }
+        showGrabby.onchange = e => { posGrabby.hidden = scaleGrabby.hidden = !showGrabby.checked }
         showGrabby.onchange()
     }
 
