@@ -58,7 +58,7 @@ body {
 
 .content {
     background-color: rgba(0, 8, 8, 0.7);
-    background: url('noise.svg');
+    background: url(graphics/noise.svg);
     padding: calc(8px + .5%);
     border-radius: 8px;
     max-width: 90vw;
@@ -368,7 +368,7 @@ canvas.big {
         width: 100%;
     }
     .canvas-wrapper {
-        min-height: initial;
+        min-height: 0;
         width: calc(100% + 32px);
         margin: 0 -16px 0 -16px;
     }
@@ -476,18 +476,19 @@ canvas.big {
     width: 32px; height: 32px;
     margin: auto;
     margin-top: 0;
-    background-image: url(soulsy-icons.png);
-    background-size: 256px;
+    background-image: url(graphics/tab-icons.png);
+    background-size: 800% 300%;
 }
 
-.tabs .tab > .icon          { background-position-y: -64px; }
+.tabs .tab > .icon          { background-position-y: -200%; }
 .tabs .tab:hover > .icon    { background-position-y: 0; }
-.tabs .tab.checked > .icon  { background-position-y: -32px; }
+.tabs .tab.checked > .icon  { background-position-y: -100%; }
 
-.tabs .tab > .icon.icon-all         { background-position-x: -128px; }
-.tabs .tab > .icon.icon-selects     { background-position-x: -160px; }
-.tabs .tab > .icon.icon-sliders     { background-position-x: -192px; }
-.tabs .tab > .icon.icon-background  { background-position-x: -224px; }
+.tabs .tab > .icon.icon-all         { background-position-x: 0; }
+.tabs .tab > .icon.icon-selects     { background-position-x: -100%; }
+.tabs .tab > .icon.icon-sliders     { background-position-x: -200%; }
+.tabs .tab > .icon.icon-background  { background-position-x: -300%; }
+.tabs .tab > .icon.icon-options     { background-position-x: -400%; }
 
 
 .sliders-container {
@@ -549,16 +550,16 @@ canvas.big {
 
     width: 16px; height: 16px;
     background: none;
-    background-image: url(soulsy-icons.png);
-    background-size: 128px;             /* 256 / 2 */
-    background-position: -32px -16px;   /* Orange 🔄 */
+    background-image: url(graphics/soulsy-icons.png);
+    background-size: 800% 800%;
+    background-position: -200% -100%;   /* Orange 🔄 */
 }
 .reset-button:hover {
-    background-position: -32px 0px;     /* White 🔄 */
+    background-position: -200% 0;       /* White 🔄 */
 }
 .reset-button:disabled {
     cursor: initial;
-    background-position: -32px -32px;   /* Greyish 🔄 */
+    background-position: -200% -200%;   /* Greyish 🔄 */
 }
 
 
