@@ -1,8 +1,4 @@
-/* 
- *
- *  I NABBED THESE FROM BOOTSTRAP ETC.
- *
-**/
+
 * {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -55,5 +51,5 @@ label {
     display: inline-block;
     max-width: 100%;
     margin-bottom: 5px;
-    font-weight: 700;
+    font-weight: normal;
 }
