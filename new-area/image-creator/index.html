@@ -154,6 +154,10 @@
 					<input type=radio name=tabs value=background-stuff>
 					<div class="icon icon-background"></div>
 				</label>
+				<label class='tab hidden'> 
+					<input type=radio name=tabs value=settings>
+					<div class="icon icon-settings"></div>
+				</label>
 			</div>
 
 			<div id=global-sliders class=sliders-container style="margin-bottom:1em">
@@ -487,6 +491,12 @@
 				</div>
 			</div>
 
+			<div id=settings class=sliders-container hidden>
+				<h3> Settings </h3>
+				Nothing yet sorry
+				
+			</div>
+
 		</div>
 		
 	</div>
@@ -521,7 +531,7 @@
 			<h2 style="margin:0 .5em .5em">Am I missing something?</h2>
 			I tried to be exhaustive, but as there is no comprehensive list of all the different "noun verbeds" online,
 			I had to go by all I could find from googling around. 
-			If you know of any particular variations I might have missed, shoot me a message, ideally with a screenshot!<br>
+			If you know of any particular variations I might have missed, shoot me a message, ideally with a screenshot!
 
 			<br><br>
 			<h2 style="margin:0 .5em .5em">Want to contribute?</h2>
@@ -540,7 +550,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
-			<b>2022/06/20</b> • Updated icons, progressed manual positioning feature <br>
+			<b>2022/06/20</b> • Drew much cuter tab icons, improved the manual positioning feature <br>
 			<b>2022/06/18</b> • (Finally) added some Demon's Souls macros: two "noun verbeds" and two deaths <br>
 			<b>2022/06/17</b> • Added a prototype "nub" that can be dragged to change the overlay position <br>
 			<b>2022/06/17</b> • Added a few missing DS2/DS3 presets, slightly change mobile layout <br>
@@ -552,28 +562,33 @@
 			<h2 style="margin:0 .5em .5em">About font families</h2>
 			The app uses several typefaces to match or emulate those used in the different games.
 			<br><br>
-			For the Dark Souls games, the app uses <a href="https://fonts.adobe.com/fonts/adobe-garamond">Adobe Garamond</a>, 
+			For the <b>Dark Souls</b> games, the app uses <a href="https://fonts.adobe.com/fonts/adobe-garamond">Adobe Garamond</a>, 
 			which may be used on webpages for free through Adobe.
 			The actual font FromSoftware used for these games is unclear,
 			but Adobe Garamond matches it very closely, in particular for Dark Souls III.
 			<br>
-			Starting with Dark Souls II, the "YOU DIED" text uses a notched/weathered variant of the font.
+			Starting with <b>Dark Souls II</b>, the "YOU DIED" text uses a notched/weathered variant of the font,
+			presumably custom made for those specific graphics, not recreated by this app.
 			<br><br>
-			Bloodborne uses the Japanese font <a href="https://en.morisawa.co.jp/fonts/specimen/2673">Reimin Y10</a>
+			For <b>Demon's Souls</b>, the font is closer to <i>Pinnacle JY</i> or <i>ITC Galliard</i>, neither of which I could find a
+			free-to-use equivalent of, instead just using Adobe Garamond again.
+			The main differences are that the true Demon's Souls font has much pointier serifs, and the capital "W" is styled differently. 
+			<br><br>
+			<b>Bloodborne</b> uses the Japanese font <a href="https://en.morisawa.co.jp/fonts/specimen/2673">Reimin Y10</a>
 			for all of its UI, including the noun verbed overlays, even in English.
 			Sadly this font is not available under any free licenses, and for this app it is substituted by several
 			other fonts that are hopefully available on your devices.
 			<br><br>
-			For its decorative Japanese characters, including the iconic 死 pop-up, Sekiro uses 
+			For its decorative Japanese characters, including the iconic 死 pop-up, <b>Sekiro</b> uses 
 			<a href="https://j-font.com/font/detail.php?font_id=7745&pageno=1">白舟極太楷書</a>.
 			This font is not fully available under a free license, however Adobe offers a subset of it 
 			<a href="https://fonts.adobe.com/fonts/hot-gfkaishokk">HOT-GFKaishokk</a> free for web use,
 			which is why the app does not properly render every character in any of the in-game phrases.
 			<br><br>
-			Elden Ring for most of its UI seems to use <a href="https://www.linotype.com/6951/agmena.html">Agmena</a>,
+			<b>Elden Ring</b> for most of its UI seems to use <a href="https://www.linotype.com/6951/agmena.html">Agmena</a>,
 			a font for which I could find no free license.
 			This font very closely resembles the Dark Souls games' Garamond, except it has more square serifs,
-			some blockier details, and the capital Y is significantly different.
+			some blockier details, and the capital "Y" is significantly different.
 			If, hypothetically, you have it installed on your computer, it's available as "Agmena Pro".
 		</div>
 

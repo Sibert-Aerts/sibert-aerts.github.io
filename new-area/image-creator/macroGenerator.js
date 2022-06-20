@@ -413,11 +413,12 @@ class MacroGenerator {
                     otherTab.classList.remove('checked')
                 tab.classList.add('checked')
 
-                for( const t in tabbedDivs )
-                    tabbedDivs[t].hidden = (radio.value !== 'all') && (radio.value !== t)
+                for( const t in tabbedDivs ) {
+                    let show = (radio.value === 'all' && t !== 'settings') || (radio.value === t)
+                    tabbedDivs[t].hidden = !show
+                }
             }
         }
-
 
         this.onMacroTypeChange(null, false)
     }

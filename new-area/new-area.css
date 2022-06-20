@@ -400,6 +400,7 @@ canvas.big {
         background-position-x: 0;
     }
     #canvas-overlay > .grabby.scale-grabby {
+        width: 32px; height: 32px;
         background-position-x: -100%;
     }
     #canvas-overlay > .grabby:hover {
@@ -494,7 +495,7 @@ canvas.big {
 .tabs .tab > .icon.icon-selects     { background-position-x: -100%; }
 .tabs .tab > .icon.icon-sliders     { background-position-x: -200%; }
 .tabs .tab > .icon.icon-background  { background-position-x: -300%; }
-.tabs .tab > .icon.icon-options     { background-position-x: -400%; }
+.tabs .tab > .icon.icon-settings    { background-position-x: -400%; }
 
 
 .sliders-container {
