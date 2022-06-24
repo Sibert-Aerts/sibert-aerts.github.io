@@ -1314,6 +1314,26 @@ layerTypes.push({
 layerTypes.push({
     type: MacroType.special,
     game: Game.ds1,
+    preset: 'Super Smash Bros. Melee',
+
+    preferCase: 'title case',
+    sliders: {
+        position: { },
+        font: {
+            fontFamily: 'Arial Black', textColor: [100, 60, 230],
+            fontSize: 120, fontWeight: 900,
+            vScale: 1.2, charSpacing: 0,
+        },
+        melee: {
+            lineWidth: 10, shadowOpacity: .5
+        }
+    },
+    draw: drawMelee
+})
+
+layerTypes.push({
+    type: MacroType.special,
+    game: Game.ds1,
     preset: 'Snapchat',
 
     preferCase: 'title case',

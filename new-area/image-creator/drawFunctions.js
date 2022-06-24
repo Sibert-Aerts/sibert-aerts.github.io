@@ -46,18 +46,16 @@ function applyFontSliders(ctx, canvas, gen, s) {
     let caption = gen.captionInput.value
 
     // TODO: the chrome version doesn't scale with font size while the other one does!
-    if( charSpacing ) {
-        if( !!window.chrome && true ) {
-            //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
-            canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
-            ctx.translate(charSpacing*s/2, 0)
-            // TODO: this throws off the glow-blur centering
+    if( !!window.chrome && true ) {
+        //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
+        canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
+        ctx.translate(charSpacing*s/2, 0)
+        // TODO: this throws off the glow-blur centering
 
-        } else if( charSpacing > 0 ) {
-            //// Otherwise: simply inject little hair spaces in between each character
-            const space = ' '.repeat(Math.floor(charSpacing/5))
-            caption = caption.split('').join(space)
-        }
+    } else if( charSpacing > 0 ) {
+        //// Otherwise: simply inject little hair spaces in between each character
+        const space = ' '.repeat(Math.floor(charSpacing/5))
+        caption = caption.split('').join(space)
     }
 
     ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
@@ -588,4 +586,59 @@ function drawOutlined(ctx, canvas, gen) {
         ctx.strokeText(caption, w/2, h/2/vScale)
     }
     ctx.fillText(caption, w/2, h/2/vScale)
+}
+
+/** @type {drawFun} Function which draws SSBM styled text. */
+function drawMelee(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5)*w, (yOffset+.5)*h)
+    s *= s0
+
+    // TEXT
+    const { textColor, fontSize } = gen.sliders.font.getValues()
+    const { lineWidth, shadowOpacity } = gen.sliders.melee.getValues()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
+
+    if( lineWidth > 0 ) {
+        ctx.miterLimit = 3
+        
+        ctx.shadowBlur = 0
+        ctx.shadowColor = `rgba(0, 0, 0, ${shadowOpacity})`
+        ctx.shadowOffsetX = ctx.shadowOffsetY = 15*s
+
+        ctx.strokeStyle = `#000000`
+        ctx.lineWidth = 3.2 * lineWidth * s
+        ctx.strokeText(caption, 0, 0)
+
+        
+        ctx.shadowOffsetX = ctx.shadowOffsetY = 0
+
+        ctx.strokeStyle = `#ffffff`
+        ctx.lineWidth = lineWidth * s
+        ctx.strokeText(caption, 0, 0)
+    }
+    const temp = gen.tempCanvas
+    temp.width = canvas.width; temp.height = canvas.height;
+    const tctx = temp.getContext('2d')
+
+    applyFontSliders(tctx, temp, gen, s)
+    tctx.textBaseline = 'alphabetic'
+    tctx.setTransform( ctx.getTransform() )
+    tctx.fillText(caption, 0, 0)
+
+    tctx.globalCompositeOperation = 'source-atop' // "MASK ONTO EXISTING"
+    const grad = tctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
+    grad.addColorStop(0, '#000000')
+    grad.addColorStop(1, RGBToHex(...textColor))
+    tctx.fillStyle = grad
+    tctx.fillRect(-1000*s, -fontSize*s, 2000*s, 2*fontSize*s)
+
+    ctx.resetTransform()
+    ctx.drawImage(temp, 0, 0)
 }

@@ -325,7 +325,7 @@ class MacroGenerator {
     /** @type {readonly HTMLAnchorElement}   */
     saveLink = makeElem('a')
     /** @type {readonly HTMLCanvasElement}   */
-    tempCanvas = makeElem('canvas')
+    tempCanvas
 
     /** @type {{ [name: string]: Sliders }} */
     sliders
@@ -358,6 +358,12 @@ class MacroGenerator {
         //// CANVAS
         this.canvas = my('canvas', 'canvas')
         this.ctx = this.canvas.getContext('2d')
+
+        //// TEMP CANVAS
+        this.tempCanvas = makeElem('canvas')
+        // Needed to make certain effects work on Chrome
+        this.tempCanvas.style.width = this.tempCanvas.style.height = '0px'
+        document.body.appendChild(this.tempCanvas)
 
         //// VIEW ELEMS
         this.resView = { x: my('span', 'canv-res-x'), y: my('span', 'canv-res-y') }
