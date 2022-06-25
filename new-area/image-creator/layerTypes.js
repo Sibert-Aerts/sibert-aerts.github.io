@@ -1162,8 +1162,8 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 100, fontWeight: 400,
-            vScale: 1.041, charSpacing: -1,
+            fontSize: 105, fontWeight: 400,
+            vScale: 1, charSpacing: -3,
         },
         area: {
             ulLength: .31, ulWidth: 4, ulPos: 4, contrast: 0

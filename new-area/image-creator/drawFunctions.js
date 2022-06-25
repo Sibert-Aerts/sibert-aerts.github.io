@@ -623,22 +623,30 @@ function drawMelee(ctx, canvas, gen) {
         ctx.lineWidth = lineWidth * s
         ctx.strokeText(caption, 0, 0)
     }
-    const temp = gen.tempCanvas
-    temp.width = canvas.width; temp.height = canvas.height;
-    const tctx = temp.getContext('2d')
-
-    applyFontSliders(tctx, temp, gen, s)
-    tctx.textBaseline = 'alphabetic'
-    tctx.setTransform( ctx.getTransform() )
-    tctx.fillText(caption, 0, 0)
-
-    tctx.globalCompositeOperation = 'source-atop' // "MASK ONTO EXISTING"
-    const grad = tctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
+    
+    const grad = ctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
     grad.addColorStop(0, '#000000')
     grad.addColorStop(1, RGBToHex(...textColor))
-    tctx.fillStyle = grad
-    tctx.fillRect(-1000*s, -fontSize*s, 2000*s, 2*fontSize*s)
+    ctx.fillStyle = grad
+    ctx.fillText(caption, 0, 0)
 
-    ctx.resetTransform()
-    ctx.drawImage(temp, 0, 0)
+
+    // const temp = gen.tempCanvas
+    // temp.width = canvas.width; temp.height = canvas.height;
+    // const tctx = temp.getContext('2d')
+
+    // applyFontSliders(tctx, temp, gen, s)
+    // tctx.textBaseline = 'alphabetic'
+    // tctx.setTransform( ctx.getTransform() )
+    // tctx.fillText(caption, 0, 0)
+
+    // tctx.globalCompositeOperation = 'source-atop' // "MASK ONTO EXISTING"
+    // const grad = tctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
+    // grad.addColorStop(0, '#000000')
+    // grad.addColorStop(1, RGBToHex(...textColor))
+    // tctx.fillStyle = grad
+    // tctx.fillRect(-1000*s, -fontSize*s, 2000*s, 2*fontSize*s)
+
+    // ctx.resetTransform()
+    // ctx.drawImage(temp, 0, 0)
 }
