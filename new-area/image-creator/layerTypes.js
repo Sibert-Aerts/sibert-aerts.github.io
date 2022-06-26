@@ -837,6 +837,62 @@ layerTypes.push({
     draw: drawSekiroText
 })
 
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'SINISTER BURDEN',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 12,
+            fontWeight: 400, textColor: [109, 0, 31]
+        },
+        sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
+            symbol: '厄憑', symbolSize: 154,
+            symbolPos: -14, symbolSpace: 34,
+        },
+        glowy: {
+            textOpacity: .9, glowColor: [109, 0, 31],
+            glowSize: 30, glowOpacity: 0.4,
+        }
+    },
+    draw: drawSekiroText
+})
+
+layerTypes.push({
+    type: MacroType.nounVerbed,
+    game: Game.se,
+    preset: 'BURDEN DISPELLED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: -.006, scale: 1
+        },
+        font: {
+            fontSize: 37, fontFamily: 'adobe-garamond-pro',
+            vScale: 1, charSpacing: 12,
+            fontWeight: 400, textColor: [255, 255, 255]
+        },
+        sekiro: {
+            symbolFont: 'hot-gfkaishokk, MS Gothic, Meiryo',
+            symbol: '厄払', symbolSize: 154,
+            symbolPos: -14, symbolSpace: 34,
+        },
+        glowy: {
+            textOpacity: .8, glowColor: [255, 255, 255],
+            glowSize: 30, glowOpacity: 0.4,
+        }
+    },
+    draw: drawSekiroText
+})
+
 //// ELDEN RING
 
 layerTypes.push({
