@@ -68,6 +68,31 @@ function applyFontSliders(ctx, canvas, gen, s) {
     return [caption, vScale]
 }
 
+/** @param {CanvasRenderingContext2D} ctx */
+function putNoise(ctx, x, y, w, h) {
+	const iData = ctx.createImageData(w, h)
+    const data = iData.data
+    const len = data.length
+	for(let i=0; i<len; i += 4) {
+		data[i  ] = Math.random() * 255
+		data[i+1] = Math.random() * 255
+		data[i+2] = Math.random() * 255
+        data[i+3] = 255
+    }
+    ctx.putImageData(iData, x, y)
+}
+
+/** Contains useful Images */
+const ASSETS = {
+    flame: './assets/flame.png'
+}
+
+for( const name in ASSETS ) {
+    const src = ASSETS[name]
+    ASSETS[name] = new Image()
+    ASSETS[name].src = src
+}
+
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
 function drawNounVerbed(ctx, canvas, gen) {
@@ -599,12 +624,12 @@ function drawMelee(ctx, canvas, gen) {
     ctx.translate((xOffset+.5)*w, (yOffset+.5)*h)
     s *= s0
 
-    // TEXT
     const { textColor, fontSize } = gen.sliders.font.getValues()
     const { lineWidth, shadowOpacity } = gen.sliders.melee.getValues()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
     ctx.textBaseline = 'alphabetic'
 
+    //// THE TWO OUTLINES
     if( lineWidth > 0 ) {
         ctx.miterLimit = 3
         
@@ -615,7 +640,6 @@ function drawMelee(ctx, canvas, gen) {
         ctx.strokeStyle = `#000000`
         ctx.lineWidth = 3.2 * lineWidth * s
         ctx.strokeText(caption, 0, 0)
-
         
         ctx.shadowOffsetX = ctx.shadowOffsetY = 0
 
@@ -624,29 +648,36 @@ function drawMelee(ctx, canvas, gen) {
         ctx.strokeText(caption, 0, 0)
     }
     
-    const grad = ctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
+    //// CREATE A TEMP CANVAS TO ACHIEVE OUR COOL EFFECTS (PAIN IN THE ASS)
+    const temp = gen.tempCanvas
+    temp.width = canvas.width; temp.height = canvas.height;
+    const tctx = temp.getContext('2d')
+
+    applyFontSliders(tctx, temp, gen, s)
+    tctx.textBaseline = 'alphabetic'
+    tctx.setTransform(ctx.getTransform())
+
+    const fxScale = fontSize/120*s
+
+    //// INNER GRADIENT TEXT
+    const grad = tctx.createLinearGradient(0, -48*fxScale, 0, 0)
     grad.addColorStop(0, '#000000')
     grad.addColorStop(1, RGBToHex(...textColor))
-    ctx.fillStyle = grad
-    ctx.fillText(caption, 0, 0)
+    tctx.fillStyle = grad
+    tctx.fillText(caption, 0, 0)
 
+    //// FLAME EFFECT
+    tctx.save()
+    tctx.globalCompositeOperation = 'lighter'
+    tctx.translate(0, -fontSize*.5*s)
+    tctx.transform(fxScale, 0, -.3*fxScale, .4*fxScale, 0, 0)
+    for( let i=0; i<10; i++ )
+        tctx.drawImage(ASSETS.flame, -1000 + i*229, 0)
+    tctx.restore()
+    /// MASK THE FLAME EFFECT!
+    tctx.globalCompositeOperation = 'destination-in'
+    tctx.fillText(caption, 0, 0)
 
-    // const temp = gen.tempCanvas
-    // temp.width = canvas.width; temp.height = canvas.height;
-    // const tctx = temp.getContext('2d')
-
-    // applyFontSliders(tctx, temp, gen, s)
-    // tctx.textBaseline = 'alphabetic'
-    // tctx.setTransform( ctx.getTransform() )
-    // tctx.fillText(caption, 0, 0)
-
-    // tctx.globalCompositeOperation = 'source-atop' // "MASK ONTO EXISTING"
-    // const grad = tctx.createLinearGradient(0, -fontSize*.4*s, 0, 0)
-    // grad.addColorStop(0, '#000000')
-    // grad.addColorStop(1, RGBToHex(...textColor))
-    // tctx.fillStyle = grad
-    // tctx.fillRect(-1000*s, -fontSize*s, 2000*s, 2*fontSize*s)
-
-    // ctx.resetTransform()
-    // ctx.drawImage(temp, 0, 0)
+    ctx.resetTransform()
+    ctx.drawImage(temp, 0, 0)
 }
