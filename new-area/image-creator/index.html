@@ -129,7 +129,7 @@
 				</div>
 				
 				<div class=save-buttons>
-					<button class=soulsy-box onclick=macroGen.redrawMacro()>Render changes</button>
+					<button class=soulsy-box onclick=macroGen.redrawMacro() hidden>Render changes</button>
 					<button style=margin-left:20px class=soulsy-box onclick=macroGen.saveImage()>Save image</button>
 				</div>
 			</div>
@@ -475,7 +475,9 @@
 					<div>
 						<label class=input-title>Constrain resolution: <input type=checkbox id=limit-resolution checked></label> 
 						<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
-						<div id=resolution-warning hidden>Warning: Selected image is too large, auto re-rendering is disabled.</div>
+						<div id=resolution-warning hidden>
+							Warning: Selected image is very large, automatic re-rendering will be delayed slightly to save on processing.
+						</div>
 					</div>
 				</div>
 				
@@ -623,10 +625,10 @@
 			• Most fonts used by this app are licensed through Adobe Fonts for web use (see: Font families),
 			and others may be implicitly licensed through your operating system.
 			<br>
-			• Any graphics created using extracted game textures are also obviously beyond my authority to yield the rights to.
+			• Some macros may employ extracted game textures.
 			<br><br>			
 			Graphics generated using either of these are obviously beyond my authority to yield the rights to.
-			It is not recommended to use these in commercial products such as games or merchandise without closely inspecting the legality of it first.
+			I therefore recommended against using these in commercial products such as games or merchandise.
 		</div>
 	</div>
 

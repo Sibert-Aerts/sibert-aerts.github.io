@@ -1449,7 +1449,16 @@ for( const layer of layerTypes ) {
 }
 
 // Hack: Put the desired "default macro type" somewhere...
+
+let randomDefault
+
+while( true ) {
+    randomDefault = layerTypes[ Math.floor(Math.random()*layerTypes.length) ]
+    if( randomDefault.preset !== 'Snapchat' && randomDefault.preset !== 'Image Macro' ) break
+}
+
 window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.nounVerbed,
-    game: Game.ds1,
+    macroType: randomDefault.type,
+    game: randomDefault.game,
+    preset: randomDefault.preset,
 }

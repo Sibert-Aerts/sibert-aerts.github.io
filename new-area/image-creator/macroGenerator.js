@@ -578,6 +578,9 @@ class MacroGenerator {
                 this.presetHolder.appendChild(select)
                 this.presetSelects[type][game] = select
                 select.onchange = onchange
+
+                if( game === window.MACROGEN_DEFAULTS.game )
+                    select.value = window.MACROGEN_DEFAULTS.preset
             }
         }
     }
@@ -699,6 +702,13 @@ class MacroGenerator {
      */
     autoRedraw() {
         if( !this.tooBig() ) this.redrawMacro()
+        else this.delayedRedraw()
+    }
+
+    /** Triggers a delayed and debounced redraw. */
+    delayedRedraw() {
+        clearTimeout(this.delayedRedrawTimeout)
+        this.delayedRedrawTimeout = setTimeout(_ => this.redrawMacro(), 2000)
     }
 
     drawFlatColor() {
