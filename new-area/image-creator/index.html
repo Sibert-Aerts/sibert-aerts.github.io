@@ -44,48 +44,7 @@
 	<script type="text/javascript" src="layerTypes.js"></script>
 	
 	<!-- Specific page-setup script -->
-	<script type="text/javascript">
-
-		var macroGen
-
-		let instantiateMacroGen = function() {
-			if( macroGen ) return
-			// Instantiate the global MacroGenerator
-			macroGen = new MacroGenerator(document.getElementById('main-content'))
-		}
-
-		document.addEventListener('DOMContentLoaded', instantiateMacroGen)
-
-		window.addEventListener('load', function() {
-			
-			instantiateMacroGen()
-			macroGen.redrawMacro()
-
-			if( browserIs.firefox )
-				for( const e of document.getElementsByClassName('firefox-warning'))
-					e.hidden = false
-
-			
-			// The lil' info tabs
-			const tabs = document.getElementById('info-tabs')
-			const tabbedDivs = {}
-
-			if( tabs ) 
-			for( const tab of tabs.children ) {
-				const radio = tab.children[0]
-				tabbedDivs[radio.value] = document.getElementById(radio.value)
-				radio.onchange = function() {
-					for( const otherTab of tabs.children )
-						otherTab.classList.remove('checked')
-					tab.classList.add('checked')
-
-					for( const t in tabbedDivs )
-						tabbedDivs[t].hidden = (radio.value !== t)
-				}
-			}
-		})
-		
-	</script>
+	<script type="text/javascript" src="bootstrapper.js"></script>
 
 	<!-- Twitter Card info -->
 	<meta name=twitter:card     content=summary_large_image>
@@ -665,13 +624,15 @@
 
 	
 	<div class="cookie-banner phantom hidden" style="position:initial">
-		<div>h</div>
+		<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
+		<button class="soulsy-box">Deny cookies</button>
+		<button class="soulsy-box">Accept cookies</button>	
 	</div>
 </div>
 
 <!-- Element used to trigger/trick the Adobe Fonts script into loading more parts of the font. -->
 <div id=adobe-font-trick style=font-family:hot-gfkaishokk hidden>
-	死忍殺不死斬り鬼仏見出冥助あり竜咳快復拝涙
+	死忍殺不死斬り鬼仏見出冥助あり竜咳快復拝涙厄憑
 </div>
 
 </body>

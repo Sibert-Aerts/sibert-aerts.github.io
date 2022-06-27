@@ -60,6 +60,7 @@ class ImageHandler {
         this.URLinput = parent.getElementsByTagName('input').namedItem('image-URL')
         this.URLinput.onchange = this.handleImageURL.bind(this)
         this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
+        if( this.URLinput.value ) this.handleImageURL()
 
         /// File select event bindings
         this.fileSelect = parent.getElementsByTagName('input').namedItem('image-upload')
@@ -104,7 +105,7 @@ class ImageHandler {
             return
         }
         this.image = new Image()
-        this.image.crossOrigin = 'anonymous'
+        this.image.crossOrigin = 'Anonymous'
 
         this.image.onload = this.onload.bind(this)
         this.image.onerror = e => {
@@ -543,6 +544,8 @@ class MacroGenerator {
     createMacroTypeSelects() {
         const onchange = e => this.onMacroTypeChange(e)
 
+        const {macroType: defaultType, game: defaultGame, preset: defaultPreset} = window.MACROGEN_DEFAULTS 
+
         //// Macro Type
         this.macroTypeSelect = this.my('select', 'macro-type')
         this.macroTypeSelect.onchange = onchange
@@ -550,7 +553,7 @@ class MacroGenerator {
         for( const key in MacroType )
             this.macroTypeSelect.appendChild(makeOption(key, macroTypeName[key]))
 
-        this.macroTypeSelect.value = window.MACROGEN_DEFAULTS.macroType
+        if( defaultType ) this.macroTypeSelect.value = defaultType
 
         //// Game
         this.gameSelect = this.my('select', 'macro-type-game')
@@ -559,7 +562,7 @@ class MacroGenerator {
         for( const key in Game )
             this.gameSelect.appendChild(makeOption(key, gameName[key]))
 
-        this.gameSelect.value = window.MACROGEN_DEFAULTS.game
+        if( defaultGame ) this.gameSelect.value = defaultGame
 
         //// Preset (depends on combination of type+game)
         this.presetSelects = {}
@@ -578,11 +581,10 @@ class MacroGenerator {
                 this.presetHolder.appendChild(select)
                 this.presetSelects[type][game] = select
                 select.onchange = onchange
-
-                if( game === window.MACROGEN_DEFAULTS.game )
-                    select.value = window.MACROGEN_DEFAULTS.preset
             }
         }
+
+        if( defaultPreset ) this.presetSelects[defaultType][defaultGame].value = defaultPreset
     }
 
     /** Callback from the macro type select */

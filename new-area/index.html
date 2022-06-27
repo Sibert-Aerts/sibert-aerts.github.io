@@ -51,7 +51,7 @@
 				parent.removeEventListener('click', callback)
 
 				window.MACROGEN_DEFAULTS = {
-					macroType: 'areaName', game: 'ds1',
+					macroType: 'areaName', game: 'ds1', preset: 'Area Name'
 				}
 				macroGen = new MacroGenerator()
 				macroGen.redrawMacro()
@@ -403,7 +403,9 @@
 		</div>
 		
 		<div class="cookie-banner phantom hidden" style="position:initial">
-			<div>h</div>
+			<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
+			<button class="soulsy-box">Deny cookies</button>
+			<button class="soulsy-box">Accept cookies</button>	
 		</div>
 	</div>
 </div>
