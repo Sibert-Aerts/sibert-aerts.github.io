@@ -15,8 +15,6 @@
 
     * Set "preferred resolution" for yourself instead of 1920x1080 by default
 
-    * Preferred macro type + image URL as url args
-
     * (hard) allow multiple layers:
         * UI required: List of layers
             * Clearly show which one is active layer

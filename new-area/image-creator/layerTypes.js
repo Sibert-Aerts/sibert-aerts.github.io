@@ -59,9 +59,9 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.007, scale: 1 
         },
         font: {
-            fontSize: 93, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.45, charSpacing: 8,
-            fontWeight: 400, textColor: [210, 181, 86]
+            fontSize: 100, fontFamily: 'Cormorant Garamond',
+            vScale: 1.38, charSpacing: 6,
+            fontWeight: 500, textColor: [210, 181, 86]
         },
         subCaption: {
             subCaption: 'You shall obtain the Demon Soul... and a power\nthat is beyond human imagination.'
@@ -85,9 +85,9 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.007, scale: 1 
         },
         font: {
-            fontSize: 109, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.45, charSpacing: 8,
-            fontWeight: 400, textColor: [252, 140, 66]
+            fontSize: 115, fontFamily: 'Cormorant Garamond',
+            vScale: 1.38, charSpacing: 6,
+            fontWeight: 500, textColor: [252, 140, 66]
         },
         subCaption: {
             subCaption: 'You\'ve taken a human\'s Soul.\nWhat a superb demon!'
@@ -989,9 +989,9 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.007, scale: 1 
         },
         font: {
-            fontSize: 109, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.45, charSpacing: 8,
-            fontWeight: 400, textColor: [123, 20, 20]
+            fontSize: 115, fontFamily: 'Cormorant Garamond',
+            vScale: 1.38, charSpacing: 8,
+            fontWeight: 600, textColor: [123, 20, 20]
         },
         subCaption: {
             subCaption: 'However, the Nexus traps you. You shall remain\nin this world as a Soul, forever.'
@@ -1015,9 +1015,9 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.007, scale: 1 
         },
         font: {
-            fontSize: 109, fontFamily: 'adobe-garamond-pro',
-            vScale: 1.45, charSpacing: 8,
-            fontWeight: 400, textColor: [123, 20, 20]
+            fontSize: 115, fontFamily: 'Cormorant Garamond',
+            vScale: 1.38, charSpacing: 8,
+            fontWeight: 600, textColor: [123, 20, 20]
         },
         subCaption: {
             subCaption: 'Phantom, you were not able to achieve your goal.\nYou must leave this world.'
@@ -1461,4 +1461,11 @@ window.MACROGEN_DEFAULTS = {
     macroType: randomDefault.type,
     game: randomDefault.game,
     preset: randomDefault.preset,
+}
+
+window.MACROGEN_DEFAULTS = {
+    macroType: MacroType.nounVerbed,
+    game: Game.des,
+    preset: 'THE DEMON WAS DESTROYED',
+    caption: 'THE DEMON WAS DESTROYED'
 }

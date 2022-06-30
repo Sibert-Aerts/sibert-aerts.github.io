@@ -184,7 +184,7 @@ function drawDeSNounVerbed(ctx, canvas, gen) {
 
     //// CAPTION
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
-    ctx.fillText(caption, 0, 0)    
+    ctx.fillText(caption, 0, -5*s/vScale)
     
     //// SUBCAPTION
     const fontFamily = gen.sliders.font.get('fontFamily')
@@ -195,8 +195,7 @@ function drawDeSNounVerbed(ctx, canvas, gen) {
     ctx.scale(1.1, 1)
 
     canvas.style.letterSpacing = `${s}px`
-    ctx.globalAlpha = .9
-    ctx.font = `400 ${23*s}px ${fontFamily}`
+    ctx.font = `600 ${24*s}px ${fontFamily}`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
 
