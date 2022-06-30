@@ -1463,9 +1463,9 @@ window.MACROGEN_DEFAULTS = {
     preset: randomDefault.preset,
 }
 
-window.MACROGEN_DEFAULTS = {
-    macroType: MacroType.nounVerbed,
-    game: Game.des,
-    preset: 'THE DEMON WAS DESTROYED',
-    caption: 'THE DEMON WAS DESTROYED'
-}
+// window.MACROGEN_DEFAULTS = {
+//     macroType: MacroType.nounVerbed,
+//     game: Game.des,
+//     preset: 'THE DEMON WAS DESTROYED',
+//     caption: 'THE DEMON WAS DESTROYED'
+// }
