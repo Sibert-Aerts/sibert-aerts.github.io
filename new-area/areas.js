@@ -203,7 +203,7 @@ Elden.areas = ["Limgrave", "Stormhill", "Weeping Peninsula", "Stormveil Castle",
     "Altus Plateau", "Mt. Gelmir", "Volcano Manor", "Redmane Castle", "Leyndell, Royal Capital", "Deeproot Depths", "Nokron, Eternal City",
     "Subterranean Shunning-Grounds", "Wailing Dunes",  "Moghwyn Palace", "Ruin-Strewn Precipice", "Capital Outskirts", "Forbidden Lands",
     "Mountaintops of the Giants", "Flame Peak", "Lake of Rot", "Moonlight Altar", "Consecrated Snowfield", "Miquella's Haligtree",
-    "Elphael, Brace of the Haligtree", "Crumbling Farum Azula", "Leyndell, Ashen Capital",
+    "Elphael, Brace of the Haligtree", "Crumbling Farum Azula", "Leyndell, Ashen Capital", "Stone Platform",
     // These ones are technically speaking small area name pop-ups, but they seem important anyway...
     "Noxtella, Eternal City", "Sellia, Town of Sorcery", "Ordina, Liturgical Town", "Dominula, Windmill Village"
 ]
@@ -216,7 +216,7 @@ Elden.properLocations = [
 Elden.primaryLocations =  [
     "Hill", "Peninsula", "Castle", "Hold", "River", "Academy", "Highway", "Barrow", "Dragonbarrow", "Swamp", "Chapel", "Plateau", "Volcano", "Manor", "Capital",
     "Depths", "City", "Shunning-Grounds", "Dunes", "Palace", "Precipice", "Outskirts", "Lands", "Mountaintops", "Peak", "Lake", "Altar", "Snowfield",
-    "Haligtree", "Brace", "Town",
+    "Haligtree", "Brace", "Town", "Platform",
     // This one's never technically a pop-up but c'mon
     "Erdtree",
     // I think this is appropriate to include
@@ -225,7 +225,7 @@ Elden.primaryLocations =  [
 Elden.secondaryLocations = [
     "Hill", "Castle", "Hold", "Highway", "Barrow", "Swamp", "Chapel", "Manor",
     "Depths", "Shunning-Grounds", "Palace", "Precipice", "Outskirts", "Peak", "Altar",
-    "Haligtree",
+    "Haligtree", "Platform",
     "Cave", "Catacombs", "Tunnel", "Tunnels", "Ruins", "Shack"
 ]
 
@@ -236,7 +236,7 @@ Elden.prefixes = ["Storm", "Dragon"]
 Elden.positionals = []
 Elden.adjectives = [
     "Weeping", "Royal", "Subterranean", "Wailing", "Ruin-Strewn", "Forbidden", "Flame", "Moonlight",
-    "Consecrated", "Crumbling", "Ashen", "Liturgical", "Eternal",
+    "Consecrated", "Crumbling", "Ashen", "Liturgical", "Eternal", "Stone"
 ]
 
 Elden.appendices = [ "of the Lakes", "of Anticipation", "of the Giants", "of Rot", "of the Haligtree", "of Sorcery" ]
