@@ -1,4 +1,4 @@
-My webzone
+Welcome to my webzone
 
 ## Finished pages
 * [FromSoftware area name generator](/new-area)
