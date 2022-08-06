@@ -1,17 +1,16 @@
-# Rezuaq.be
-my webzone
+My webzone
 
-## Finished pages:
+## Finished pages
 * [FromSoftware area name generator](/new-area)
 * [FromSoftware image macro generator](/new-area/image-creator)
 * [Evangelion title card generator](/evangelion)
 * [Affine fractal generator](/fractal)
 
-## Unfinished:
+## Unfinished
 * [Cat generator](/cat-generator)
 * [Art gallery demo](/gallery)
 
-## Experiments:
+## Experiments
 * [Lazy Maze generator](/lazy-maze)
 * [Small html toys](/toys)
 
