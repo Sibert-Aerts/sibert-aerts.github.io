@@ -27,3 +27,7 @@ Enjoy!
 
 ## 2018
 * [2018_SPOILERS.zip on MediaFire](https://www.mediafire.com/file/3p1c1zqqa1t73k7/2018_SPOILERS.zip/file)
+
+
+## Support me on Ko-fi
+If you'd like, you can support me on Ko-fi: https://ko-fi.com/rezuaq
