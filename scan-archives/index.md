@@ -12,17 +12,18 @@ and (the development of) my pantheon of original characters, occasionally even w
 Originally the 2018, 2019 and 2020 editions were for sale, but I've decided against that for now.  
 For archival sake I have not gone back and modified them in any way, or even gone back and read through them again;
 any cringe contained in these is perfectly preserved in its original form.
+(The older gallery apps have also not been modified to include features from newer editions.)
 
 Enjoy!
 
-## 2018
-* [2018_SPOILERS.zip on MediaFire](https://www.mediafire.com/file/3p1c1zqqa1t73k7/2018_SPOILERS.zip/file)
-
-## 2019
-* [2019_SPOILERS.zip on MediaFire](https://www.mediafire.com/file/n0e9sq4baqsh7wy/2019_SPOILERS.zip/file)
+## 2021 `new!`
+* [Rezuaq_2021_scan_archive.zip on MediaFire](https://www.mediafire.com/file/6amh821ak66m3y6/Rezuaq_2021_scan_archive.zip/file)
 
 ## 2020
 * [2020.zip on MediaFire](https://www.mediafire.com/file/381jm3tsrajfpcn/2020.zip/file)
 
-## 2021 `new!`
-* [Rezuaq_2021_scan_archive.zip on MediaFire](https://www.mediafire.com/file/6amh821ak66m3y6/Rezuaq_2021_scan_archive.zip/file)
+## 2019
+* [2019_SPOILERS.zip on MediaFire](https://www.mediafire.com/file/n0e9sq4baqsh7wy/2019_SPOILERS.zip/file)
+
+## 2018
+* [2018_SPOILERS.zip on MediaFire](https://www.mediafire.com/file/3p1c1zqqa1t73k7/2018_SPOILERS.zip/file)
