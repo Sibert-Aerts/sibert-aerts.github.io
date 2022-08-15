@@ -10,7 +10,7 @@ function setCookie(name, value='', exdays=365) {
     const id = 'G-HCGGJHJ3DR'
 
     // Read the tracking configuration cookies
-    let hideBanner = (document.cookie.indexOf('hide-banner') >= 0) || localStorage.get('hideBanner')
+    let hideBanner = (document.cookie.indexOf('hide-banner') >= 0) || localStorage.getItem('hideBanner')
     let disabled = (document.cookie.indexOf('ga-disable=1') >= 0)
 
     // Set up GTagOptIn to allow us to opt in or opt out later

@@ -14,10 +14,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if( search.get('macro') ) {
         split = search.get('macro').split(',')
-        if( layerTypesMap[split[0]][split[1]][split[2]] )
+        if( split.length === 1 ) {
+            const macro = layerIdMap[split[0]]
+            if( macro )
+            window.MACROGEN_DEFAULTS = {
+                macroType: macro.type, game: macro.game, preset: macro.preset
+            }
+        } else if( layerTypesMap[split[0]][split[1]][split[2]] ) {
             window.MACROGEN_DEFAULTS = {
                 macroType: split[0], game: split[1], preset: split[2],
             }
+        }
     }
     
     if( search.get('caption') ) {

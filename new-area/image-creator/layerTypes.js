@@ -27,6 +27,7 @@ const gameName = {
 /** 
  * @typedef {Object} DrawableLayer
  * 
+ * @prop {string} id
  * @prop {keyof MacroType} type
  * @prop {keyof Game} game
  * @prop {string} preset
@@ -49,6 +50,7 @@ const layerTypes = []
 //// DEMON'S SOULS
 
 layerTypes.push({
+    id: 'des:demon-destroyed',
     type: MacroType.nounVerbed,
     game: Game.des,
     preset: 'THE DEMON WAS DESTROYED',
@@ -75,6 +77,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'des:target-destroyed',
     type: MacroType.nounVerbed,
     game: Game.des,
     preset: 'TARGET WAS DESTROYED',
@@ -103,6 +106,7 @@ layerTypes.push({
 //// DARK SOULS 1
 
 layerTypes.push({
+    id: 'ds1:victory',
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'VICTORY ACHIEVED',
@@ -130,6 +134,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds1:humanity',
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'HUMANITY RESTORED',
@@ -157,6 +162,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds1:bonfire',
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'BONFIRE LIT',
@@ -184,6 +190,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds1:retrieval',
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'RETRIEVAL',
@@ -211,6 +218,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds1:target-destroyed',
     type: MacroType.nounVerbed,
     game: Game.ds1,
     preset: 'TARGET DESTROYED',
@@ -240,6 +248,7 @@ layerTypes.push({
 //// DARK SOULS 2
 
 layerTypes.push({
+    id: 'ds2:great-soul',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'GREAT SOUL EMBRACED',
@@ -267,6 +276,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:bonfire',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'BONFIRE LIT',
@@ -294,6 +304,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:primal-bonfire',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'PRIMAL BONFIRE LIT',
@@ -321,6 +332,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:humanity',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'HUMANITY RESTORED',
@@ -348,6 +360,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:retrieval',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'RETRIEVAL',
@@ -375,6 +388,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:target-destroyed',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'TARGET WAS DESTROYED',
@@ -402,6 +416,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:invader-banished',
     type: MacroType.nounVerbed,
     game: Game.ds2,
     preset: 'INVADER BANISHED',
@@ -431,6 +446,7 @@ layerTypes.push({
 //// DARK SOULS 3
 
 layerTypes.push({
+    id: 'ds3:heir-of-fire',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'HEIR OF FIRE DESTROYED',
@@ -458,6 +474,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:lord-of-cinder',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'LORD OF CINDER FALLEN',
@@ -485,6 +502,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:ember',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'EMBER RESTORED',
@@ -512,6 +530,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:hollowing',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'HOLLOWING REVERSED',
@@ -539,6 +558,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:bonfire',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'BONFIRE LIT',
@@ -566,6 +586,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:host-of-embers-destroyed',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'HOST OF EMBERS DESTROYED',
@@ -593,6 +614,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:dark-spirit-destroyed',
     type: MacroType.nounVerbed,
     game: Game.ds3,
     preset: 'DARK SPIRIT DESTROYED',
@@ -622,6 +644,7 @@ layerTypes.push({
 //// BLOODBORNE
 
 layerTypes.push({
+    id: 'bb:prey',
     type: MacroType.nounVerbed,
     game: Game.bb,
     preset: 'PREY SLAUGHTERED',
@@ -645,6 +668,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'bb:nightmare',
     type: MacroType.nounVerbed,
     game: Game.bb,
     preset: 'NIGHTMARE SLAIN',
@@ -670,6 +694,7 @@ layerTypes.push({
 //// SEKIRO
 
 layerTypes.push({
+    id: 'se:shinobi-execution',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'SHINOBI EXECUTION',
@@ -698,6 +723,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:immortality-severed',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'IMMORTALITY SEVERED',
@@ -726,6 +752,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:idol',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'SCULPTOR\'S IDOL FOUND',
@@ -754,6 +781,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:unseen-aid',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'UNSEEN AID',
@@ -782,6 +810,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:dragonrot-healed',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'DRAGONROT HEALED',
@@ -810,6 +839,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:gift-of-tears',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'GRACIOUS GIFT OF TEARS',
@@ -838,6 +868,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:sinister-burden',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'SINISTER BURDEN',
@@ -866,6 +897,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:burden-dispelled',
     type: MacroType.nounVerbed,
     game: Game.se,
     preset: 'BURDEN DISPELLED',
@@ -896,9 +928,10 @@ layerTypes.push({
 //// ELDEN RING
 
 layerTypes.push({
+    id: 'er:victory',
     type: MacroType.nounVerbed,
     game: Game.er,
-    preset: 'Default',
+    preset: 'Victory',
 
     preferCase: 'all caps',
     sliders: {
@@ -923,6 +956,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'er:lost-grace',
     type: MacroType.nounVerbed,
     game: Game.er,
     preset: 'LOST GRACE DISCOVERED',
@@ -950,6 +984,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'er:host-vanquished',
     type: MacroType.nounVerbed,
     game: Game.er,
     preset: 'HOST VANQUISHED',
@@ -979,6 +1014,7 @@ layerTypes.push({
 //////// YOU DIED
 
 layerTypes.push({
+    id: 'des:died-human',
     type: MacroType.youDied,
     game: Game.des,
     preset: 'YOU DIED (human form)',
@@ -1005,6 +1041,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'des:died-soul',
     type: MacroType.youDied,
     game: Game.des,
     preset: 'YOU DIED (phantom form)',
@@ -1031,6 +1068,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds1:died',
     type: MacroType.youDied,
     game: Game.ds1,
     preset: 'YOU DIED',
@@ -1054,6 +1092,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:died',
     type: MacroType.youDied,
     game: Game.ds2,
     preset: 'YOU DIED',
@@ -1077,6 +1116,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:died',
     type: MacroType.youDied,
     game: Game.ds3,
     preset: 'YOU DIED',
@@ -1101,6 +1141,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'bb:died',
     type: MacroType.youDied,
     game: Game.bb,
     preset: 'YOU DIED',
@@ -1124,6 +1165,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:death',
     type: MacroType.youDied,
     game: Game.se,
     preset: 'DEATH',
@@ -1152,6 +1194,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:death-fake',
     type: MacroType.youDied,
     game: Game.se,
     preset: 'DEATH (fake)',
@@ -1181,6 +1224,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'er:death',
     type: MacroType.youDied,
     game: Game.er,
     preset: 'YOU DIED',
@@ -1207,6 +1251,7 @@ layerTypes.push({
 //////// Area Name
 
 layerTypes.push({
+    id: 'ds1:area',
     type: MacroType.areaName,
     game: Game.ds1,
     preset: 'Area Name',
@@ -1229,6 +1274,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds2:area',
     type: MacroType.areaName,
     game: Game.ds2,
     preset: 'Area Name',
@@ -1254,6 +1300,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'ds3:area',
     type: MacroType.areaName,
     game: Game.ds3,
     preset: 'Area Name',
@@ -1276,6 +1323,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'bb:area',
     type: MacroType.areaName,
     game: Game.bb,
     preset: 'Area Name',
@@ -1299,6 +1347,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'se:area',
     type: MacroType.areaName,
     game: Game.se,
     preset: 'Area Name',
@@ -1322,6 +1371,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'er:area',
     type: MacroType.areaName,
     game: Game.er,
     preset: 'Area Name',
@@ -1344,6 +1394,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'er:sub-area',
     type: MacroType.areaName,
     game: Game.er,
     preset: 'Sub-area Name',
@@ -1368,6 +1419,7 @@ layerTypes.push({
 //////// Special
 
 layerTypes.push({
+    id: 'sp:ssbm',
     type: MacroType.special,
     game: Game.ds1,
     preset: 'Super Smash Bros. Melee',
@@ -1388,6 +1440,7 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'sp:snapchat',
     type: MacroType.special,
     game: Game.ds1,
     preset: 'Snapchat',
@@ -1411,9 +1464,10 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'sp:impact',
     type: MacroType.special,
     game: Game.ds1,
-    preset: 'Image macro',
+    preset: 'Impact macro',
 
     preferCase: 'all caps',
     sliders: {
@@ -1433,7 +1487,7 @@ layerTypes.push({
 })
 
 
-
+//// Populate objects storing the different layers.
 
 /** 
  * Object containing all types of drawable layers, indexed by type > game > preset
@@ -1441,12 +1495,21 @@ layerTypes.push({
  */
 const layerTypesMap = {}
 
+/** 
+ * Object containing all types of drawable layers, indexed by id
+ * @type { {[id: string] : DrawableLayer } 
+ */
+const layerIdMap = {}
+
 for( const type in MacroType ) for( const game in Game )
     layerTypesMap[type] = {[game]: null}
 for( const layer of layerTypes ) {
     layerTypesMap[layer.type][layer.game] ??= {}
     layerTypesMap[layer.type][layer.game][layer.preset] = layer
+    layerIdMap[layer.id] = layer
 }
+
+
 
 // Hack: Put the desired "default macro type" somewhere...
 
@@ -1454,7 +1517,7 @@ let randomDefault
 
 while( true ) {
     randomDefault = layerTypes[ Math.floor(Math.random()*layerTypes.length) ]
-    if( randomDefault.preset !== 'Snapchat' && randomDefault.preset !== 'Image macro' ) break
+    if( randomDefault.id !== 'sp:snapchat' && randomDefault.id !== 'sp:impact' ) break
 }
 
 window.MACROGEN_DEFAULTS = {
