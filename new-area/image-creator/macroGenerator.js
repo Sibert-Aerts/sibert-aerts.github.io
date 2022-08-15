@@ -454,14 +454,14 @@ class MacroGenerator {
 
         const SCALEGRABDIST = 40
         const getScale = e => 
-            Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
+            Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-this.canvas.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
 
 
         /** Adjust the grabbies' position based on the Slider values. */
         const updateGrabbies = () => {
             const { xOffset, yOffset, scale } = this.sliders.position.getValues()
             const left = (xOffset+.5)*this.canvas.clientWidth
-            const top =  (yOffset+.5)*this.canvas.clientHeight
+            const top =  (yOffset+.5)*this.canvas.clientHeight + this.canvas.offsetTop
             updatePosGrabby(left, top)
             updateScaleGrabby(left, top, scale)
         }
@@ -490,8 +490,8 @@ class MacroGenerator {
 
             if( grabState.type === GrabType.position )
             {
-                updatePosGrabby(e.offsetX, e.offsetY)
-                updateScaleGrabby(e.offsetX, e.offsetY, this.sliders.position.get('scale'))
+                updatePosGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop)
+                updateScaleGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop, this.sliders.position.get('scale'))
             }
             else if ( grabState.type === GrabType.scale )
             {
@@ -504,7 +504,8 @@ class MacroGenerator {
             if( grabState.type === GrabType.position )
             {
                 this.sliders.position.setValues({
-                    xOffset: posGrabby.offsetLeft/this.canvas.clientWidth-.5, yOffset: posGrabby.offsetTop/this.canvas.clientHeight-.5
+                    xOffset: posGrabby.offsetLeft/this.canvas.clientWidth-.5,
+                    yOffset: (posGrabby.offsetTop-this.canvas.offsetTop)/this.canvas.clientHeight-.5
                 })
             }
             else if ( grabState.type === GrabType.scale )

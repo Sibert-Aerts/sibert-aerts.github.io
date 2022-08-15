@@ -1454,7 +1454,7 @@ let randomDefault
 
 while( true ) {
     randomDefault = layerTypes[ Math.floor(Math.random()*layerTypes.length) ]
-    if( randomDefault.preset !== 'Snapchat' && randomDefault.preset !== 'Image Macro' ) break
+    if( randomDefault.preset !== 'Snapchat' && randomDefault.preset !== 'Image macro' ) break
 }
 
 window.MACROGEN_DEFAULTS = {

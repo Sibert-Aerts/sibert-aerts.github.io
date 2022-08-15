@@ -6,12 +6,11 @@ function setCookie(name, value='', exdays=365) {
 }
 
 {
-    // Important keys
+    // Important key
     const id = 'G-HCGGJHJ3DR'
-    const disableKey = 'ga-disable-' + id
 
     // Read the tracking configuration cookies
-    let hideBanner = (document.cookie.indexOf('hide-banner') >= 0) || localStorage.hideBanner
+    let hideBanner = (document.cookie.indexOf('hide-banner') >= 0) || localStorage.get('hideBanner')
     let disabled = (document.cookie.indexOf('ga-disable=1') >= 0)
 
     // Set up GTagOptIn to allow us to opt in or opt out later
