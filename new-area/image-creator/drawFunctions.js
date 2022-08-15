@@ -40,7 +40,7 @@ function drawShadowBar(ctx, canvas, gen, s0) {
 }
 
 /** PARTIAL: Sets the appropriate ctx properties. */
-function applyFontSliders(ctx, canvas, gen, s) {
+function applyFontSliders(ctx, canvas, gen, s=1) {
     const { fontSize, textColor, fontFamily, vScale, charSpacing, fontWeight } = gen.sliders.font.getValues()
 
     let caption = gen.captionInput.value
@@ -84,13 +84,15 @@ function putNoise(ctx, x, y, w, h) {
 
 /** Contains useful Images */
 const ASSETS = {
-    flame: './assets/flame.png'
+    custom: { flame: './assets/custom/flame.png' },
+    ds1: { bossHealth: './assets/ds1/boss health bar.png'},
 }
 
-for( const name in ASSETS ) {
-    const src = ASSETS[name]
-    ASSETS[name] = new Image()
-    ASSETS[name].src = src
+// Load all the assets
+for( const dir in ASSETS ) for( const name in ASSETS[dir] ) {
+    const src = ASSETS[dir][name]
+    ASSETS[dir][name] = new Image()
+    ASSETS[dir][name].src = src
 }
 
 
@@ -671,7 +673,7 @@ function drawMelee(ctx, canvas, gen) {
     tctx.translate(0, -fontSize*.5*s)
     tctx.transform(fxScale, 0, -.3*fxScale, .4*fxScale, 0, 0)
     for( let i=0; i<10; i++ )
-        tctx.drawImage(ASSETS.flame, -1000 + i*229, 0)
+        tctx.drawImage(ASSETS.custom.flame, -1000 + i*229, 0)
     tctx.restore()
     /// MASK THE FLAME EFFECT!
     tctx.globalCompositeOperation = 'destination-in'
@@ -679,4 +681,52 @@ function drawMelee(ctx, canvas, gen) {
 
     ctx.resetTransform()
     ctx.drawImage(temp, 0, 0)
+}
+
+
+/** @type {drawFun} Function which draws DS1 boss health bar + name. */
+function drawDS1Boss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+
+    // Transparent grey background    
+    ctx.fillStyle = 'rgba(20, 20, 20, .5)'
+    ctx.fillRect(-670, -6, 1335, 25)
+    
+    // Yellow health bar
+    const yellowGrad = ctx.createLinearGradient(0, -6, 0, 25)
+    yellowGrad.addColorStop(0, '#6b651e')
+    yellowGrad.addColorStop(.6, '#37330b')
+    yellowGrad.addColorStop(.9, '#4a4613')
+    ctx.fillStyle = yellowGrad
+    ctx.fillRect(-670, -6, 1335 * (health+ (1-health)*recentDamage), 25)
+
+    // Red health bar
+    const redGrad = ctx.createLinearGradient(0, -6, 0, 25)
+    redGrad.addColorStop(0, '#705252')
+    redGrad.addColorStop(.3, '#4a2224')
+    redGrad.addColorStop(.6, '#3c0d0e')
+    redGrad.addColorStop(.9, '#3a0000')
+    ctx.fillStyle = redGrad
+    ctx.fillRect(-670, -6, 1335 * health, 25)
+
+    // The main healthbar texture
+    ctx.drawImage(ASSETS.ds1.bossHealth, -750, -70)
+
+    // TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.fillText(caption, -655, -30/vScale)
+    
+    ctx.textAlign = 'right'
+    ctx.fillText(damageNumber, 655, -35/vScale)
 }

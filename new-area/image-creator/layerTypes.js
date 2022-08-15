@@ -2,12 +2,19 @@
 // Artisanal enum-type things
 
 const MacroType = {
-    nounVerbed: 'nounVerbed', areaName: 'areaName', youDied: 'youDied', special: 'special'
+    nounVerbed: 'nounVerbed',
+    areaName: 'areaName',
+    youDied: 'youDied',
+    boss: 'boss',
+
+    special: 'special'
 }
 const macroTypeName = {
     nounVerbed: 'Noun Verbed',
     areaName: 'Area Name',
     youDied: 'Death',
+    boss: 'Boss',
+
     special: 'Non-FromSoft',
 }
 
@@ -1415,6 +1422,52 @@ layerTypes.push({
     },
     draw: drawEldenAreaName
 })
+
+//////// Boss
+
+layerTypes.push({
+    id: 'ds1:boss-wide',
+    type: MacroType.boss,
+    game: Game.ds1,
+    preset: 'Wide',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: .320
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
+            fontSize: 45, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        boss: {}
+    },
+    draw: drawDS1Boss
+})
+
+
+layerTypes.push({
+    id: 'ds1:boss-faithful',
+    type: MacroType.boss,
+    game: Game.ds1,
+    preset: 'Faithful',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: .068, yOffset: .318, scale: .75
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
+            fontSize: 45, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        boss: {}
+    },
+    draw: drawDS1Boss
+})
+
 
 //////// Special
 

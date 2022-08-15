@@ -711,7 +711,7 @@ class MacroGenerator {
     /** Triggers a delayed and debounced redraw. */
     delayedRedraw() {
         clearTimeout(this.delayedRedrawTimeout)
-        this.delayedRedrawTimeout = setTimeout(_ => this.redrawMacro(), 2000)
+        this.delayedRedrawTimeout = setTimeout(_ => this.redrawMacro(), 1000)
     }
 
     drawFlatColor() {
