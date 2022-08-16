@@ -3,6 +3,7 @@ class Asset {
         this.path = path
     }
 
+    /** @returns {Promise<HTMLImageElement>} */
     get() {
         if( this.img )
             return new Promise(resolve => resolve(this.img))
@@ -20,6 +21,11 @@ class Asset {
 const ASSETS = {
     custom: { flame: new Asset('./assets/custom/flame.png') },
     ds1: { bossHealth: new Asset('./assets/ds1/boss health bar.png')},
+    ds3: {
+        bossHealthFrame: new Asset('./assets/ds3/boss health frame.png'),
+        bossHealthRed: new Asset('./assets/ds3/boss health red.png'),
+        bossHealthYellow: new Asset('./assets/ds3/boss health yellow.png'),
+    },
 }
 
 //========================================================================
@@ -718,14 +724,13 @@ async function drawDS1Boss(ctx, canvas, gen) {
     yellowGrad.addColorStop(.6, '#37330b')
     yellowGrad.addColorStop(.9, '#4a4613')
     ctx.fillStyle = yellowGrad
-    ctx.fillRect(-670, -6, 1335 * (health+ (1-health)*recentDamage), 25)
+    ctx.fillRect(-670, -6, 1335 * Math.min(1, health+recentDamage), 25)
 
     // Red health bar
     const redGrad = ctx.createLinearGradient(0, -6, 0, 25)
-    redGrad.addColorStop(0, '#705252')
-    redGrad.addColorStop(.3, '#4a2224')
-    redGrad.addColorStop(.6, '#3c0d0e')
-    redGrad.addColorStop(.9, '#3a0000')
+    redGrad.addColorStop(0, '#604540')
+    redGrad.addColorStop(.4, '#2e120e')
+    redGrad.addColorStop(.9, '#2d0000')
     ctx.fillStyle = redGrad
     ctx.fillRect(-670, -6, 1335 * health, 25)
 
@@ -740,4 +745,45 @@ async function drawDS1Boss(ctx, canvas, gen) {
     
     ctx.textAlign = 'right'
     ctx.fillText(damageNumber, 655, -35/vScale)
+}
+
+
+/** @type {drawFun} Function which draws DS3 boss health bar + name. */
+async function drawDS3Boss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+
+    // The main healthbar texture
+    let img = await ASSETS.ds3.bossHealthFrame.get()
+    ctx.drawImage(img, -508, -25)
+    
+    // Yellow health bar
+    let barWidth = 7 + 1002 * Math.min(1, health+recentDamage)
+    ctx.drawImage(await ASSETS.ds3.bossHealthYellow.get(), 0, 0, barWidth, 50, -508, -25, barWidth, 50)
+    
+    // Red health bar
+    barWidth = 7 + 1002 * health
+    ctx.drawImage(await ASSETS.ds3.bossHealthRed.get(), 0, 0, barWidth, 50, -508, -25, barWidth, 50)
+
+    // TEXT
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 1
+    ctx.shadowBlur = 4
+    ctx.shadowColor = 'rgba(0, 0, 0, 1)'
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.fillText(caption, -496, -17/vScale)
+    
+    ctx.textAlign = 'right'
+    ctx.fillText(damageNumber, 496, -18/vScale)
 }

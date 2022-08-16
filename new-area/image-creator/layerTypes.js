@@ -11,9 +11,9 @@ const MacroType = {
 }
 const macroTypeName = {
     nounVerbed: 'Noun Verbed',
-    areaName: 'Area Name',
+    areaName: 'Area name',
     youDied: 'Death',
-    boss: 'Boss',
+    boss: 'Boss health bar',
 
     special: 'Non-FromSoft',
 }
@@ -1446,7 +1446,6 @@ layerTypes.push({
     draw: drawDS1Boss
 })
 
-
 layerTypes.push({
     id: 'ds1:boss-faithful',
     type: MacroType.boss,
@@ -1466,6 +1465,44 @@ layerTypes.push({
         boss: {}
     },
     draw: drawDS1Boss
+})
+
+layerTypes.push({
+    id: 'ds3:boss-wide',
+    type: MacroType.boss,
+    game: Game.ds3,
+    preset: 'Wide',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: .343, scale: 1.5
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [194, 194, 192],
+            fontSize: 29, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        boss: {}
+    },
+    draw: drawDS3Boss
+})
+
+layerTypes.push({
+    id: 'ds3:boss-faithful',
+    type: MacroType.boss,
+    game: Game.ds3,
+    preset: 'Faithful',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0.052, yOffset: .343
+        },
+        font: layerTypes.at(-1).sliders.font,
+        boss: {}
+    },
+    draw: drawDS3Boss
 })
 
 
