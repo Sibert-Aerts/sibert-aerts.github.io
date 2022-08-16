@@ -330,6 +330,9 @@ body {
     padding: 0;
 }
 
+#canvas {
+    margin: auto;
+}
 canvas.small {
     max-width: 720px;
     max-height: 480px;

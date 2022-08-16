@@ -1437,8 +1437,8 @@ layerTypes.push({
             xOffset: 0, yOffset: .320
         },
         font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 45, fontWeight: 400,
+            fontFamily: 'Georgia', textColor: [227, 226, 224],
+            fontSize: 41, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
         boss: {}
@@ -1457,14 +1457,48 @@ layerTypes.push({
         position: {
             xOffset: .068, yOffset: .318, scale: .75
         },
-        font: {
-            fontFamily: 'adobe-garamond-pro', textColor: [227, 226, 224],
-            fontSize: 45, fontWeight: 400,
-            vScale: 1, charSpacing: 0,
-        },
+        font: layerTypes.at(-1).sliders.font,
         boss: {}
     },
     draw: drawDS1Boss
+})
+
+layerTypes.push({
+    id: 'ds2:boss-wide',
+    type: MacroType.boss,
+    game: Game.ds2,
+    preset: 'Wide',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: .358, scale: 2
+        },
+        font: {
+            fontFamily: 'Georgia', textColor: [185, 185, 185],
+            fontSize: 19, fontWeight: 400,
+            vScale: 1, charSpacing: 1,
+        },
+        boss: {}
+    },
+    draw: drawDS2Boss
+})
+
+layerTypes.push({
+    id: 'ds2:boss-faithful',
+    type: MacroType.boss,
+    game: Game.ds2,
+    preset: 'Faithful',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0.05, yOffset: .358, scale: 1.5
+        },
+        font: layerTypes.at(-1).sliders.font,
+        boss: {}
+    },
+    draw: drawDS2Boss
 })
 
 layerTypes.push({

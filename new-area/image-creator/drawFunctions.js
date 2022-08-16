@@ -21,6 +21,11 @@ class Asset {
 const ASSETS = {
     custom: { flame: new Asset('./assets/custom/flame.png') },
     ds1: { bossHealth: new Asset('./assets/ds1/boss health bar.png')},
+    ds2: {
+        bossHealthFrame: new Asset('./assets/ds2/boss health frame.png'),
+        bossHealthRed: new Asset('./assets/ds2/boss health red.png'),
+        bossHealthYellow: new Asset('./assets/ds2/boss health yellow.png'),
+    },
     ds3: {
         bossHealthFrame: new Asset('./assets/ds3/boss health frame.png'),
         bossHealthRed: new Asset('./assets/ds3/boss health red.png'),
@@ -744,7 +749,48 @@ async function drawDS1Boss(ctx, canvas, gen) {
     ctx.fillText(caption, -655, -30/vScale)
     
     ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
     ctx.fillText(damageNumber, 655, -35/vScale)
+}
+
+
+/** @type {drawFun} Function which draws DS2 boss health bar + name. */
+async function drawDS2Boss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+
+    // The main healthbar texture
+    ctx.drawImage(await ASSETS.ds2.bossHealthFrame.get(), -346, -14)    
+    // Yellow health bar
+    ctx.drawImage(await ASSETS.ds2.bossHealthYellow.get(), -346+14, -14+9, 664 * Math.min(1, health+recentDamage), 9)
+    // Red health bar
+    ctx.drawImage(await ASSETS.ds2.bossHealthRed.get(), -346+14, -14+9, 664 * health, 9)
+
+    // TEXT
+    ctx.strokeStyle = `rgba(0, 0, 0, .5)`
+    ctx.lineWidth = 2
+    ctx.miterLimit = 5
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.strokeText(caption, -345, -18/vScale)
+    ctx.fillText(caption, -345, -18/vScale)
+    
+    ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
+    ctx.strokeText(damageNumber, 345, -19/vScale)
+    ctx.fillText(damageNumber, 345, -19/vScale)
 }
 
 
@@ -762,8 +808,7 @@ async function drawDS3Boss(ctx, canvas, gen) {
     const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
 
     // The main healthbar texture
-    let img = await ASSETS.ds3.bossHealthFrame.get()
-    ctx.drawImage(img, -508, -25)
+    ctx.drawImage(await ASSETS.ds3.bossHealthFrame.get(), -508, -25)
     
     // Yellow health bar
     let barWidth = 7 + 1002 * Math.min(1, health+recentDamage)
@@ -776,8 +821,8 @@ async function drawDS3Boss(ctx, canvas, gen) {
     // TEXT
     ctx.shadowOffsetX = 2
     ctx.shadowOffsetY = 1
-    ctx.shadowBlur = 4
-    ctx.shadowColor = 'rgba(0, 0, 0, 1)'
+    ctx.shadowBlur = 4*s
+    ctx.shadowColor = '#000000'
 
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
     ctx.textBaseline = 'alphabetic'
@@ -785,5 +830,7 @@ async function drawDS3Boss(ctx, canvas, gen) {
     ctx.fillText(caption, -496, -17/vScale)
     
     ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
     ctx.fillText(damageNumber, 496, -18/vScale)
 }

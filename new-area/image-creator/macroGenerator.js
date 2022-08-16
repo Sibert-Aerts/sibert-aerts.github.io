@@ -677,7 +677,11 @@ class MacroGenerator {
     }
 
     /** Wipes all `ctx` and `canvas` properties that may affect how things are drawn to the canvas. */
-    resetDrawingState() {
+    resetDrawingState() {    
+        // On Chrome the canvas styling may affect drawing
+        this.canvas.style.letterSpacing = '0px'
+        this.canvas.style.fontVariantNumeric = 'normal'
+
         // Clear out the ctx drawing state
         const ctx = this.ctx
         ctx.setTransform(1, 0, 0, 1, 0, 0)
@@ -692,11 +696,6 @@ class MacroGenerator {
         ctx.filter = 'none'
         ctx.globalCompositeOperation = 'source-over'
         ctx.globalAlpha = 1
-    
-        // On Chrome the canvas styling may affect drawing
-        if( !!window.chrome ) {
-            this.canvas.style.letterSpacing = null
-        }
     }
 
     /** 
