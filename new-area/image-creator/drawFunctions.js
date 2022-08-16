@@ -1,4 +1,26 @@
+class Asset {
+    constructor(path) {
+        this.path = path
+    }
 
+    get() {
+        if( this.img )
+            return new Promise(resolve => resolve(this.img))
+        return new Promise( (resolve, reject) => {
+            const img = this.img = new Image()
+            img.src = this.path
+            this.loading = true
+            img.onload = () => resolve(img)
+            img.onerror = () => reject('Failed to load image.')
+        })
+    }
+}
+
+/** Contains useful Images */
+const ASSETS = {
+    custom: { flame: new Asset('./assets/custom/flame.png') },
+    ds1: { bossHealth: new Asset('./assets/ds1/boss health bar.png')},
+}
 
 //========================================================================
 //========================       DRAWABLES       =========================
@@ -82,18 +104,7 @@ function putNoise(ctx, x, y, w, h) {
     ctx.putImageData(iData, x, y)
 }
 
-/** Contains useful Images */
-const ASSETS = {
-    custom: { flame: './assets/custom/flame.png' },
-    ds1: { bossHealth: './assets/ds1/boss health bar.png'},
-}
 
-// Load all the assets
-for( const dir in ASSETS ) for( const name in ASSETS[dir] ) {
-    const src = ASSETS[dir][name]
-    ASSETS[dir][name] = new Image()
-    ASSETS[dir][name].src = src
-}
 
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
@@ -615,7 +626,7 @@ function drawOutlined(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws SSBM styled text. */
-function drawMelee(ctx, canvas, gen) {
+async function drawMelee(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
@@ -673,7 +684,7 @@ function drawMelee(ctx, canvas, gen) {
     tctx.translate(0, -fontSize*.5*s)
     tctx.transform(fxScale, 0, -.3*fxScale, .4*fxScale, 0, 0)
     for( let i=0; i<10; i++ )
-        tctx.drawImage(ASSETS.custom.flame, -1000 + i*229, 0)
+        tctx.drawImage(await ASSETS.custom.flame.get(), -1000 + i*229, 0)
     tctx.restore()
     /// MASK THE FLAME EFFECT!
     tctx.globalCompositeOperation = 'destination-in'
@@ -685,7 +696,7 @@ function drawMelee(ctx, canvas, gen) {
 
 
 /** @type {drawFun} Function which draws DS1 boss health bar + name. */
-function drawDS1Boss(ctx, canvas, gen) {
+async function drawDS1Boss(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
@@ -719,7 +730,7 @@ function drawDS1Boss(ctx, canvas, gen) {
     ctx.fillRect(-670, -6, 1335 * health, 25)
 
     // The main healthbar texture
-    ctx.drawImage(ASSETS.ds1.bossHealth, -750, -70)
+    ctx.drawImage(await ASSETS.ds1.bossHealth.get(), -750, -70)
 
     // TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen)

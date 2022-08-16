@@ -822,6 +822,7 @@ class MacroGenerator {
     
         // May alter the resolution
         this.drawImage()
+        this.updateCanvasOverlay()
 
         // UI changes
         this.resWarning.hidden = !this.tooBig()
@@ -831,7 +832,6 @@ class MacroGenerator {
         this.resetDrawingState()
         const layerType = this.getLayerType()
         layerType.draw(ctx, this.canvas, this)
-        this.updateCanvasOverlay()
     }
 
     /** Save the current contents of the canvas to the user's computer. */
