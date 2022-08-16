@@ -31,6 +31,10 @@ const ASSETS = {
         bossHealthRed: new Asset('./assets/ds3/boss health red.png'),
         bossHealthYellow: new Asset('./assets/ds3/boss health yellow.png'),
     },
+    sekiro: {
+        areaNameBG: new Asset('./assets/sekiro/area name bg.png'),
+        areaNameBGLarge: new Asset('./assets/sekiro/area name bg large.png'),
+    }
 }
 
 //========================================================================
@@ -459,6 +463,46 @@ function drawBloodborneAreaName(ctx, canvas, gen) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'right'
     ctx.fillText(caption, w/2, h/2/vScale)
+}
+
+/** @type {drawFun} Function which draws an Area Name. */
+async function drawSekiroAreaName(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    // Pixcture
+    ctx.save()
+    const { frameWidth, frameHeight, opacity } = gen.sliders.sekiroFrame.getValues()
+
+    // If needed, use a much larger resolution image for the backdrop
+    const useLargeImage = s*s0*Math.max(frameHeight, frameWidth) > 1.01
+    let img = await (useLargeImage? ASSETS.sekiro.areaNameBGLarge.get(): ASSETS.sekiro.areaNameBG.get())
+    const magicFactor = .5541
+    if( useLargeImage ) ctx.scale( magicFactor, magicFactor )
+
+    ctx.scale(frameWidth, frameHeight)
+    ctx.globalAlpha = opacity
+    const offsetFactor = useLargeImage? 1: magicFactor
+    ctx.drawImage(img, -1254*offsetFactor, (-185 - 60/frameHeight)*offsetFactor)
+    ctx.restore()
+    
+    // Shadow style
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 1
+    ctx.shadowBlur = 8*s
+
+    // TEXT
+    ctx.shadowColor = `rgba(0, 0, 0, 1)`
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    ctx.textBaseline = 'alphabetic'
+
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws an Elden Ring-style Area Name. */

@@ -1369,12 +1369,9 @@ layerTypes.push({
             fontSize: 85, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
-        area: {
-            ulLength: 0, ulWidth: 4, ulPos: 10,  contrast: 1
-        }
+        sekiroFrame: {}
     },
-    // TODO: this needs a back image ofc
-    draw: drawAreaName
+    draw: drawSekiroAreaName
 })
 
 layerTypes.push({
