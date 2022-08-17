@@ -1536,6 +1536,44 @@ layerTypes.push({
     draw: drawDS3Boss
 })
 
+layerTypes.push({
+    id: 'se:boss-big',
+    type: MacroType.boss,
+    game: Game.se,
+    preset: 'Big',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: -.45, yOffset: -.4, scale: 1.5
+        },
+        font: {
+            fontFamily: 'Georgia', textColor: [194, 194, 192],
+            fontSize: 28, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        sekiroBoss: {}
+    },
+    draw: drawSekiroBoss
+})
+
+layerTypes.push({
+    id: 'se:boss-faithful',
+    type: MacroType.boss,
+    game: Game.se,
+    preset: 'Faithful',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: -.45, yOffset: -.426
+        },
+        font: layerTypes.at(-1).sliders.font,
+        sekiroBoss: {}
+    },
+    draw: drawSekiroBoss
+})
+
 
 //////// Special
 

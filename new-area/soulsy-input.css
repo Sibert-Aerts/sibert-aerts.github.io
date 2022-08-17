@@ -126,7 +126,7 @@ input[type=range]:focus::-moz-range-track {
 /************************************** TEXT INPUT-LIKES **************************************/
 
 
-textarea, input[type=text], input[type=file], select {
+textarea, input[type=text], input[type=number], input[type=file], select {
     background-color: #1d1c1ccc;
     font-family: Dejavu Sans Mono, Courier New;
     color: white;
@@ -135,7 +135,7 @@ textarea, input[type=text], input[type=file], select {
     border-bottom-color: rgba(100, 95, 80, 0.4);
     border-right-color: rgba(100, 95, 80, 0.4);
 }
-textarea:focus, input[type=text]:focus, input[type=file]:focus, select:focus {
+textarea:focus, input[type=text]:focus, input[type=number]:focus, input[type=file]:focus, select:focus {
     background-color: #1a1417ff;
 }
 input[type=file] {

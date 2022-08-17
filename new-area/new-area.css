@@ -539,6 +539,9 @@ canvas.big {
     .sliders-container > div.smol {
         width: 50%; max-width: 200px;
     }
+    .sliders-container > div.tiny {
+        width: 33%; max-width: 133px;
+    }
 
     .sliders-container input[type=color] {
         width: 100%;

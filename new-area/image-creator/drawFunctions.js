@@ -3,7 +3,6 @@ const _assetPath = document.location.href.replace(/new-area\/.*$/, 'new-area/ima
 class Asset {
     constructor(path) {
         this.path = _assetPath + path
-        console.log(this.path)
     }
 
     /** @returns {Promise<HTMLImageElement>} */
@@ -37,6 +36,14 @@ const ASSETS = {
     sekiro: {
         areaNameBG: new Asset('sekiro/area name bg.png'),
         areaNameBGLarge: new Asset('sekiro/area name bg large.png'),
+
+        bossHealthBase: new Asset('sekiro/boss health base.png'),
+        bossHealthDamage: new Asset('sekiro/boss health damage.png'),
+        bossHealthRed: new Asset('sekiro/boss health red.png'),
+        bossHealthTip: new Asset('sekiro/boss health tip.png'),
+        bossLife: new Asset('sekiro/boss life.png'),
+        bossLostLife: new Asset('sekiro/boss lost life.png'),
+        bossNameBG: new Asset('sekiro/boss name bg.png'),
     }
 }
 
@@ -801,7 +808,6 @@ async function drawDS1Boss(ctx, canvas, gen) {
     ctx.fillText(damageNumber, 655, -35/vScale)
 }
 
-
 /** @type {drawFun} Function which draws DS2 boss health bar + name. */
 async function drawDS2Boss(ctx, canvas, gen) {
     // CONSTANTS
@@ -839,7 +845,6 @@ async function drawDS2Boss(ctx, canvas, gen) {
     ctx.strokeText(damageNumber, 345, -19/vScale)
     ctx.fillText(damageNumber, 345, -19/vScale)
 }
-
 
 /** @type {drawFun} Function which draws DS3 boss health bar + name. */
 async function drawDS3Boss(ctx, canvas, gen) {
@@ -880,4 +885,60 @@ async function drawDS3Boss(ctx, canvas, gen) {
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
     ctx.fillText(damageNumber, 496, -18/vScale)
+}
+
+/** @type {drawFun} Function which draws Sekiro boss health bar + name. */
+async function drawSekiroBoss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, livesLeft, livesSpent, frameOpacity} = gen.sliders.sekiroBoss.getValues()
+
+    ctx.save()
+    ctx.scale(.5538, .5538)
+    // The main healthbar texture
+    ctx.drawImage(await ASSETS.sekiro.bossHealthBase.get(), 0, 0)
+    
+    // Damage health bar
+    let barWidth = 32 + 740 * Math.min(1, health+recentDamage)
+    ctx.drawImage(await ASSETS.sekiro.bossHealthDamage.get(), 0, 0, barWidth, 71, 0, 0, barWidth, 71)
+    
+    // Red health bar
+    barWidth = 32 + 740 * health
+    ctx.drawImage(await ASSETS.sekiro.bossHealthRed.get(), 0, 0, barWidth, 71, 0, 0, barWidth, 71)
+    if( health > 0 ) ctx.drawImage(await ASSETS.sekiro.bossHealthTip.get(), barWidth - 10, 20)
+    ctx.restore()
+
+    // Lives
+    ctx.save()
+    ctx.scale(.45, .45)
+    for( let i=0; i<livesLeft+livesSpent; i++ ) {
+        const img = await (i<livesLeft? ASSETS.sekiro.bossLife.get(): ASSETS.sekiro.bossLostLife.get())
+        ctx.drawImage(img, 20 + 85*i, -80)
+    }
+    ctx.restore()
+
+    // Text background
+    ctx.save()
+    ctx.scale(.4815, .4815)
+    ctx.globalAlpha = frameOpacity
+    ctx.drawImage(await ASSETS.sekiro.bossNameBG.get(), 25, 75)
+    ctx.restore()
+
+    // TEXT
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 1
+    ctx.shadowBlur = 4*s
+    ctx.shadowColor = '#000000'
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.fillText(caption, 26, 64/vScale)
 }
