@@ -502,7 +502,7 @@ async function drawSekiroAreaName(ctx, canvas, gen) {
 
     // TEXT
     ctx.shadowColor = `rgba(0, 0, 0, 1)`
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
     ctx.textBaseline = 'alphabetic'
 
     ctx.fillText(caption, 0, 0)
