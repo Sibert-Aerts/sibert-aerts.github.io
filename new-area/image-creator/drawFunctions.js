@@ -28,6 +28,11 @@ const ASSETS = {
         bossHealthRed: new Asset('ds2/boss health red.png'),
         bossHealthYellow: new Asset('ds2/boss health yellow.png'),
     },
+    bloodborne: {
+        bossHealthBase: new Asset('bloodborne/boss health base.png'),
+        bossHealthRed: new Asset('bloodborne/boss health red.png'),
+        bossHealthCap: new Asset('bloodborne/boss health cap transp.png'),
+    },
     ds3: {
         bossHealthFrame: new Asset('ds3/boss health frame.png'),
         bossHealthRed: new Asset('ds3/boss health red.png'),
@@ -891,7 +896,7 @@ async function drawDS3Boss(ctx, canvas, gen) {
 async function drawSekiroBoss(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
-    let s = w/1920
+    let s = h/1080
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
@@ -941,4 +946,46 @@ async function drawSekiroBoss(ctx, canvas, gen) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, 26, 64/vScale)
+}
+
+/** @type {drawFun} Function which draws DS3 boss health bar + name. */
+async function drawBloodborneBoss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+
+    // The main healthbar texture
+    ctx.drawImage(await ASSETS.bloodborne.bossHealthBase.get(), -680, -40)
+    
+    // Red health bar
+    let barWidth = 54 + 1253 * health
+    ctx.drawImage(await ASSETS.bloodborne.bossHealthRed.get(), 0, 0, barWidth, 80, -680, -40, barWidth, 80)
+
+    // Caps
+    const img = await ASSETS.bloodborne.bossHealthCap.get()
+    ctx.drawImage(img, -680+54-6, -16)
+    ctx.drawImage(img, -680+barWidth-6, -16)
+
+    // TEXT
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 2
+    ctx.shadowBlur = 4*s
+    ctx.shadowColor = '#000000'
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.fillText(caption, -640, -23/vScale)
+    
+    ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
+    ctx.fillText(damageNumber, 630, -23/vScale)
 }

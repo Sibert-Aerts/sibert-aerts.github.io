@@ -1490,7 +1490,7 @@ layerTypes.push({
     preferCase: 'title case',
     sliders: {
         position: {
-            xOffset: 0.05, yOffset: .358, scale: 1.5
+            xOffset: 0.049, yOffset: .358, scale: 1.5
         },
         font: layerTypes.at(-1).sliders.font,
         boss: {}
@@ -1548,7 +1548,7 @@ layerTypes.push({
             xOffset: -.45, yOffset: -.4, scale: 1.5
         },
         font: {
-            fontFamily: 'Georgia', textColor: [194, 194, 192],
+            fontFamily: 'Georgia', textColor: [190, 190, 197],
             fontSize: 28, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
@@ -1572,6 +1572,27 @@ layerTypes.push({
         sekiroBoss: {}
     },
     draw: drawSekiroBoss
+})
+
+layerTypes.push({
+    id: 'bb:boss',
+    type: MacroType.boss,
+    game: Game.bb,
+    preset: 'Boss',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: .001, yOffset: .363
+        },
+        font: {
+            fontFamily: 'Spectral', textColor: [192, 192, 189],
+            fontSize: 28, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        boss: {}
+    },
+    draw: drawBloodborneBoss
 })
 
 
