@@ -1,6 +1,9 @@
+const _assetPath = document.location.href.replace(/new-area\/.*$/, 'new-area/image-creator/assets/')
+
 class Asset {
     constructor(path) {
-        this.path = path
+        this.path = _assetPath + path
+        console.log(this.path)
     }
 
     /** @returns {Promise<HTMLImageElement>} */
@@ -19,21 +22,21 @@ class Asset {
 
 /** Contains useful Images */
 const ASSETS = {
-    custom: { flame: new Asset('./assets/custom/flame.png') },
-    ds1: { bossHealth: new Asset('./assets/ds1/boss health bar.png')},
+    custom: { flame: new Asset('custom/flame.png') },
+    ds1: { bossHealth: new Asset('ds1/boss health bar.png')},
     ds2: {
-        bossHealthFrame: new Asset('./assets/ds2/boss health frame.png'),
-        bossHealthRed: new Asset('./assets/ds2/boss health red.png'),
-        bossHealthYellow: new Asset('./assets/ds2/boss health yellow.png'),
+        bossHealthFrame: new Asset('ds2/boss health frame.png'),
+        bossHealthRed: new Asset('ds2/boss health red.png'),
+        bossHealthYellow: new Asset('ds2/boss health yellow.png'),
     },
     ds3: {
-        bossHealthFrame: new Asset('./assets/ds3/boss health frame.png'),
-        bossHealthRed: new Asset('./assets/ds3/boss health red.png'),
-        bossHealthYellow: new Asset('./assets/ds3/boss health yellow.png'),
+        bossHealthFrame: new Asset('ds3/boss health frame.png'),
+        bossHealthRed: new Asset('ds3/boss health red.png'),
+        bossHealthYellow: new Asset('ds3/boss health yellow.png'),
     },
     sekiro: {
-        areaNameBG: new Asset('./assets/sekiro/area name bg.png'),
-        areaNameBGLarge: new Asset('./assets/sekiro/area name bg large.png'),
+        areaNameBG: new Asset('sekiro/area name bg.png'),
+        areaNameBGLarge: new Asset('sekiro/area name bg large.png'),
     }
 }
 
