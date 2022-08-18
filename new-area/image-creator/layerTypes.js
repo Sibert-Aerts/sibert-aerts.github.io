@@ -1330,26 +1330,42 @@ layerTypes.push({
 })
 
 layerTypes.push({
-    id: 'bb:area',
+    id: 'bb:area-safe',
     type: MacroType.areaName,
     game: Game.bb,
-    preset: 'Area Name',
+    preset: 'Safe',
 
     preferCase: 'title case',
     sliders: {
         position: { 
-            xOffset: 0.389, yOffset: 0.373, scale: 1 
+            xOffset: 0.398, yOffset: 0.386, scale: 1 
         },
         font: {
             fontFamily: 'Spectral', textColor: [202, 203, 202],
             fontSize: 42, fontWeight: 300,
             vScale: 1.058, charSpacing: 0,
         },
-        backImage: {
-            opacity: .8
+        bbArea: {
+            blotOpacity: 1, mode: 'transparency'
         }
     },
-    // TODO: this needs a back image ofc
+    draw: drawBloodborneAreaName
+})
+
+layerTypes.push({
+    id: 'bb:area-faithful',
+    type: MacroType.areaName,
+    game: Game.bb,
+    preset: 'Faithful (use with background)',
+
+    preferCase: 'title case',
+    sliders: {
+        position: layerTypes.at(-1).sliders.position,
+        font: layerTypes.at(-1).sliders.font,
+        bbArea: {
+            blotOpacity: .3, mode: 'blend'
+        }
+    },
     draw: drawBloodborneAreaName
 })
 

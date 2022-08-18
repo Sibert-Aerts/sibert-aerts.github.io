@@ -1,3 +1,6 @@
+const {floor} = Math
+
+
 const _assetPath = document.location.href.replace(/new-area\/.*$/, 'new-area/image-creator/assets/')
 
 class Asset {
@@ -29,6 +32,11 @@ const ASSETS = {
         bossHealthYellow: new Asset('ds2/boss health yellow.png'),
     },
     bloodborne: {
+        areaLines: new Asset('bloodborne/area lines.png'),
+        areaLinesTransp: new Asset('bloodborne/area lines transp.png'),
+        areaBlot: new Asset('bloodborne/area blot.png'),
+        areaBlotTransp: new Asset('bloodborne/area blot transp.png'),
+
         bossHealthBase: new Asset('bloodborne/boss health base.png'),
         bossHealthRed: new Asset('bloodborne/boss health red.png'),
         bossHealthCap: new Asset('bloodborne/boss health cap transp.png'),
@@ -433,51 +441,59 @@ function drawDS2AreaName(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws a Bloodborne-style Area Name. */
-function drawBloodborneAreaName(ctx, canvas, gen) {
+async function drawBloodborneAreaName(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    ctx.translate(xOffset * w, yOffset * h)
-    s *= s0
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+    // had to make the Origin align with the cross of the lines because it's cuter
+    ctx.translate(-16, -14)
 
     // (MOCK BACK-IMAGE)
-    const { opacity } = gen.sliders.backImage.getValues()
+    const { blotOpacity, mode } = gen.sliders.bbArea.getValues()
 
-    if( opacity > 0 ) {
-        ctx.save()
+    ctx.save()
 
-        ctx.fillStyle = `rgba(0, 0, 0, ${opacity}`
-        ctx.filter = `blur(${20*s}px)`
-        const left = (.5-.25*s0)*w, rectWidth = .28*s0*w
-        const top = (.5-.08*s0)*h, rectHeight = .12*s0*h
-        ctx.fillRect(left, top, rectWidth, rectHeight)
+    if( mode === 'transparency' ) {
+        ctx.globalAlpha = blotOpacity
+        ctx.drawImage(await ASSETS.bloodborne.areaBlotTransp.get(), -535, -112)
+        ctx.globalAlpha = 1
+        ctx.drawImage(await ASSETS.bloodborne.areaLinesTransp.get(), -632, -105)
+    } else {
+        const invert = () => {
+            ctx.save()
+            ctx.fillStyle = '#ffffff'
+            ctx.globalCompositeOperation = 'difference'
+            ctx.globalAlpha = 1
+            const t = ctx.getTransform()
+            ctx.resetTransform()
+            ctx.fillRect(floor(-535*t.a+t.e), floor(-112*t.d+t.f), floor(655*t.a), floor(209*t.d))
+            ctx.restore()
+        }
 
-        ctx.restore()
-        ctx.save()
+        if( blotOpacity > 0 ) {
+            invert()
+            ctx.globalAlpha = blotOpacity
+            ctx.globalCompositeOperation = 'lighter'
+            ctx.drawImage(await ASSETS.bloodborne.areaBlot.get(), -535, -112)
+            invert()
+        }
 
-        ctx.strokeStyle = `rgba(255, 255, 255, ${opacity*.75}`
-        ctx.lineWidth = 2*s
-        ctx.filter = `blur(${Math.sqrt(2*s)}px)`
-        ctx.beginPath()
-
-        ctx.moveTo(.5*w + .01*s0*w, .5*h - .10*s0*h)
-        ctx.lineTo(.5*w + .01*s0*w, .5*h + .06*s0*h)
-
-        ctx.moveTo(.5*w - .30*s0*w, .5*h + .01*s0*h)
-        ctx.lineTo(.5*w + .05*s0*w, .5*h + .01*s0*h)
-
-        ctx.stroke()
-        ctx.restore()
+        ctx.globalAlpha = 1
+        ctx.globalCompositeOperation = 'lighter'
+        ctx.drawImage(await ASSETS.bloodborne.areaLines.get(), -632, -105)
     }
+    ctx.restore()
 
     // TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'right'
-    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws an Area Name. */

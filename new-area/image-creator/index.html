@@ -438,12 +438,21 @@
 					</div>
 				</div>
 
-				<div name=backImage class=sliders-container hidden>
+				<div name=bbArea class=sliders-container hidden>
 					<h4> Decoration </h4>
 					<div>
-						<span class=input-title>Opacity:</span>
+						<span class=input-title>Blot opacity:</span>
 						<button class=reset-button></button>
-						<input name=opacity type=range min=0 max=1 step=.01>
+						<input name=blotOpacity type=range min=0 max=1 step=.01>
+					</div>
+					<div class=hidden>
+						<!-- Hidden -->
+						<span class=input-title>Effect:</span>
+						<button class=reset-button></button>
+						<select name=mode default="transparency">
+							<option value="transparency">Safe</option>
+							<option value="blend">Authentic</option>
+						</select>
 					</div>
 				</div>
 
@@ -596,7 +605,8 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
-			<b>2022/08/17</b> • Added Bloodborne style boss health bar preset <br>
+			<b>2022/08/18</b> • Upgraded Bloodborne style area names to use actual graphics <br> 
+			<b>2022/08/17</b> • Added Bloodborne style boss health bar preset <br> 
 			<b>2022/08/17</b> • Added Sekiro style boss health bar presets, complete Sekiro area name preset <br>
 			<b>2022/08/16</b> • Added the brush effect to Sekiro area names <br>
 			<b>2022/08/16</b> • Added Dark Souls 2 and 3 style boss health bar presets <br>

@@ -271,11 +271,21 @@
 								</div>
 							</div>
 
-							<div name=backImage class=sliders-container hidden>
+							<div name=bbArea class=sliders-container hidden>
+								<h4> Decoration </h4>
 								<div>
-									<span class=input-title>Back image opacity:</span>
+									<span class=input-title>Blot opacity:</span>
 									<button class=reset-button></button>
-									<input name=opacity type=range min=0 max=1 step=.01>
+									<input name=blotOpacity type=range min=0 max=1 step=.01>
+								</div>
+								<div class=hidden>
+									<!-- Hidden -->
+									<span class=input-title>Effect:</span>
+									<button class=reset-button></button>
+									<select name=mode default="transparency">
+										<option value="transparency">Safe</option>
+										<option value="blend">Authentic</option>
+									</select>
 								</div>
 							</div>
 
