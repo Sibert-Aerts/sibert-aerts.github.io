@@ -57,6 +57,13 @@ const ASSETS = {
         bossLife: new Asset('sekiro/boss life.png'),
         bossLostLife: new Asset('sekiro/boss lost life.png'),
         bossNameBG: new Asset('sekiro/boss name bg.png'),
+    },    
+    eldenRing: {
+        bossHealthBase: new Asset('eldenRing/boss health base.png'),
+        bossHealthYellow: new Asset('eldenRing/boss health yellow.png'),
+        bossHealthRed: new Asset('eldenRing/boss health red.png'),
+        bossHealthFrame: new Asset('eldenRing/boss health frame.png'),
+        bossHealthTip: new Asset('eldenRing/boss health tip.png'),
     }
 }
 
@@ -964,7 +971,7 @@ async function drawSekiroBoss(ctx, canvas, gen) {
     ctx.fillText(caption, 26, 64/vScale)
 }
 
-/** @type {drawFun} Function which draws DS3 boss health bar + name. */
+/** @type {drawFun} Function which draws Bloodborne boss health bar + name. */
 async function drawBloodborneBoss(ctx, canvas, gen) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -1004,4 +1011,59 @@ async function drawBloodborneBoss(ctx, canvas, gen) {
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
     ctx.fillText(damageNumber, 630, -23/vScale)
+}
+
+
+/** @type {drawFun} Function which draws Elden Ring boss health bar + name. */
+async function drawEldenRingBoss(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+
+    ctx.save()
+    ctx.scale(.5, .5) // Elden Ring uses 4K textures
+
+    // Backing shadow
+    ctx.drawImage(await ASSETS.eldenRing.bossHealthBase.get(), -1049, -50)
+    
+    // Yellow health bar
+    let barWidth = 50 + 1998 * Math.min(1, health+recentDamage)
+    ctx.drawImage(await ASSETS.eldenRing.bossHealthYellow.get(), 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
+    
+    // Red health bar
+    barWidth = 50 + 1998 * health
+    ctx.drawImage(await ASSETS.eldenRing.bossHealthRed.get(), 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
+
+    // The tip
+    const img = await ASSETS.eldenRing.bossHealthTip.get()
+    ctx.drawImage(img, -1049+barWidth-53, -50)
+    
+    // The frame
+    ctx.drawImage(await ASSETS.eldenRing.bossHealthFrame.get(), -1049, -50)
+
+    ctx.restore()
+
+    // TEXT
+    ctx.shadowOffsetX = 2
+    ctx.shadowOffsetY = 2
+    ctx.shadowBlur = 4*s
+    ctx.shadowColor = '#000000'
+
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    ctx.fillText(caption, -500, -15/vScale)
+    
+    ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
+    ctx.scale(.9, .9) // Numbers are just slightly slightly smaller
+    ctx.fillText(damageNumber, 500/.9, -15/vScale/.9)
 }

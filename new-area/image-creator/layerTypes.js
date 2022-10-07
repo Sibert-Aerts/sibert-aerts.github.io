@@ -1611,6 +1611,44 @@ layerTypes.push({
     draw: drawBloodborneBoss
 })
 
+layerTypes.push({
+    id: 'er:boss-wide',
+    type: MacroType.boss,
+    game: Game.er,
+    preset: 'Wide',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: .308, scale: 1.4
+        },
+        font: {
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [185, 190, 185],
+            fontSize: 24, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        boss: {}
+    },
+    draw: drawEldenRingBoss
+})
+
+layerTypes.push({
+    id: 'er:boss-faithful',
+    type: MacroType.boss,
+    game: Game.er,
+    preset: 'Faithful',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0.002, yOffset: .308
+        },
+        font: layerTypes.at(-1).sliders.font,
+        boss: {}
+    },
+    draw: drawEldenRingBoss
+})
+
 
 //////// Special
 
