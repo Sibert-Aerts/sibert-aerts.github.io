@@ -25,7 +25,12 @@ class Asset {
 /** Contains useful Images */
 const ASSETS = {
     custom: { flame: new Asset('custom/flame.png') },
-    ds1: { bossHealth: new Asset('ds1/boss health bar.png')},
+    ds1: {
+        bossHealth: new Asset('ds1/boss health bar.png'),
+        poisonIcons: new Asset('ds1/poison icons.png'),
+        poisonBarFrame: new Asset('ds1/poison bar frame.png'),
+        poisonBarFrameEnd: new Asset('ds1/poison bar frame end.png'),
+    },
     ds2: {
         bossHealthFrame: new Asset('ds2/boss health frame.png'),
         bossHealthRed: new Asset('ds2/boss health red.png'),
@@ -787,6 +792,7 @@ async function drawMelee(ctx, canvas, gen) {
     ctx.drawImage(temp, 0, 0)
 }
 
+// ================================================ BOSS HEALTH BARS ================================================
 
 /** @type {drawFun} Function which draws DS1 boss health bar + name. */
 async function drawDS1Boss(ctx, canvas, gen) {
@@ -1066,4 +1072,65 @@ async function drawEldenRingBoss(ctx, canvas, gen) {
     ctx.font = ctx.font // Force the number thing to apply
     ctx.scale(.9, .9) // Numbers are just slightly slightly smaller
     ctx.fillText(damageNumber, 500/.9, -15/vScale/.9)
+}
+
+
+// ================================================ POISON BARS ================================================
+
+/** @type {drawFun} Function which draws DS1 poison status bar. */
+async function drawDS1Poison(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.poison.getValues()
+
+    ctx.save()
+    ctx.scale(.75, .75)
+
+    // Calculate important things
+    const frameLeft = 80, frameTop = 36, frameHeight = 30
+    const frameWidth = maxPoison
+    const barWidth = Math.min(maxPoison, poison)
+
+    // Solid grey background    
+    ctx.fillStyle = 'rgb(71, 71, 71)'
+    ctx.fillRect(0, -frameHeight/2, frameWidth, frameHeight)
+    
+    // Bar (gradient)
+    const colours = active==='active'? ['#70641f', '#3a3310', '#574e19']: ['#3c006b', '#20003a', '#32005a']
+    const gradient = ctx.createLinearGradient(0, -frameHeight/2, 0, frameHeight/2)
+    gradient.addColorStop(0, colours[0])
+    gradient.addColorStop(.6, colours[1])
+    gradient.addColorStop(.9, colours[2])
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, -frameHeight/2, barWidth, frameHeight)
+
+    // The frame
+    const frame = await ASSETS.ds1.poisonBarFrame.get()
+    ctx.drawImage(frame, 0, 0, frameLeft + frameWidth, 100, -frameLeft, -frameTop-frameHeight/2, frameLeft + frameWidth, 100)
+    const end = await ASSETS.ds1.poisonBarFrameEnd.get()
+    ctx.drawImage(end, frameWidth-8, -frameTop-frameHeight/2)
+
+    // The icon
+    ctx.restore()
+    ctx.save()
+    ctx.scale(.5, .5)
+    const icons = await ASSETS.ds1.poisonIcons.get()
+    ctx.drawImage(icons, 0, type*86, 86, 86, -110, -86/2, 86, 86)
+    ctx.restore()
+
+    // TEXT
+    if( showText === 'show' ) {
+        const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+        ctx.textBaseline = 'alphabetic'
+        ctx.textAlign = 'center'
+        ctx.globalAlpha = 0.8
+        ctx.fillText(caption, 105, -textOffset/vScale)
+    }
 }

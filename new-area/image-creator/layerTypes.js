@@ -6,6 +6,7 @@ const MacroType = {
     areaName: 'areaName',
     youDied: 'youDied',
     boss: 'boss',
+    poison: 'poison',
 
     special: 'special'
 }
@@ -14,6 +15,7 @@ const macroTypeName = {
     areaName: 'Area name',
     youDied: 'Death',
     boss: 'Boss health bar',
+    poison: 'Poison bar',
 
     special: 'Non-FromSoft',
 }
@@ -1649,6 +1651,45 @@ layerTypes.push({
     draw: drawEldenRingBoss
 })
 
+//////// Poison
+
+layerTypes.push({
+    id: 'ds1:poison-big',
+    type: MacroType.poison,
+    game: Game.ds1,
+    preset: 'Big',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.082, yOffset: .237, scale: 1.5
+        },
+        font: {
+            fontFamily: 'Georgia', textColor: [255, 0, 0],
+            fontSize: 40, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        poison: {}
+    },
+    draw: drawDS1Poison
+})
+
+layerTypes.push({
+    id: 'ds1:poison-faithful',
+    type: MacroType.poison,
+    game: Game.ds1,
+    preset: 'Faithful',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.053, yOffset: .142
+        },
+        font: layerTypes.at(-1).sliders.font,
+        poison: {}
+    },
+    draw: drawDS1Poison
+})
 
 //////// Special
 

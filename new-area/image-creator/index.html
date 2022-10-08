@@ -352,6 +352,51 @@
 					</div>
 				</div>
 
+				<div name=poison class=sliders-container hidden>
+					<h4> Status buildup </h4>
+					<div class=smol>
+						<span class=input-title>Resistance:</span>
+						<button class=reset-button></button>
+						<input name=maxPoison type=range min=0 max=1400 step=1 default=400>
+					</div>
+					<div class=smol>
+						<span class=input-title>Buildup:</span>
+						<button class=reset-button></button>
+						<input name=poison type=range min=0 max=1400 step=1 default=300>
+					</div>
+					<div class=smol>
+						<span class=input-title>Type:</span>
+						<button class=reset-button></button>
+						<select name=type as=float default=1>
+							<option value=0>Bleed</option>
+							<option value=1>Poison</option>
+							<option value=2>Toxic</option>
+							<option value=3>Curse</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>State:</span>
+						<button class=reset-button></button>
+						<select name=active default=inactive>
+							<option value=inactive>Inactive</option>
+							<option value=active>Active</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Text:</span>
+						<button class=reset-button></button>
+						<select name=showText default=show>
+							<option value=show>Show</option>
+							<option value=hide>Hide</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Text offset:</span>
+						<button class=reset-button></button>
+						<input name=textOffset type=range min=-500 max=500 step=1 default=350>
+					</div>
+				</div>
+
 				<div name=boss class=sliders-container hidden>
 					<h4> Boss </h4>
 					<div>
@@ -600,7 +645,8 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
-			<b>2022/10/07</b> • Added Elden Ring style boss health bar presets <br> 
+			<b>2022/10/07</b> • Added Dark Souls style poison bar presets <br>
+			<b>2022/10/07</b> • Added Elden Ring style boss health bar presets <br>
 			<b>2022/08/18</b> • Upgraded Bloodborne style area names to use actual graphics <br> 
 			<b>2022/08/17</b> • Added Bloodborne style boss health bar preset <br> 
 			<b>2022/08/17</b> • Added Sekiro style boss health bar presets, complete Sekiro area name preset <br>

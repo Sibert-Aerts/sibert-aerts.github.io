@@ -234,6 +234,7 @@ class Sliders {
 
             /// Assign and remember its default
             slider.value = slider.default = slider.trueDefault = slider.getAttribute('default')
+            if( slider.type === 'checkbox' ) slider.checked = slider.value
 
             /// Hook up reset button
             /** @type {HTMLButtonElement} */
@@ -243,7 +244,10 @@ class Sliders {
                 resetButton.disabled = true
 
                 resetButton.onclick = () => {
-                    slider.value = slider.default
+                    if( slider.type === 'checkbox' )
+                        slider.checked = slider.default
+                    else
+                        slider.value = slider.default
                     slider.onchange()
                     resetButton.disabled = true
                 }
@@ -264,7 +268,10 @@ class Sliders {
 
     /** Get a specific slider's value. */
     get(key) {
-        return this.byName[key].converter.parse(this.byName[key].value)
+        const slider = this.byName[key]
+        if( slider.type === 'checkbox' )
+            return slider.checked
+        return slider.converter.parse(slider.value)
     }
 
     /**
@@ -274,7 +281,10 @@ class Sliders {
     getValues() {
         const values = {}
         for( const slider of this.sliders ) {
-            values[slider.name] = slider.converter.parse(slider.value)
+            if( slider.type === 'checkbox' )
+                values[slider.name] = slider.checked
+            else
+                values[slider.name] = slider.converter.parse(slider.value)
         }
         return values
     }
@@ -285,7 +295,10 @@ class Sliders {
     setValues(values) {
         for( const name in values ) {
             const slider = this.byName[name]
-            slider.value = slider.converter.toString(values[name])
+            if( slider.type === 'checkbox' )
+                slider.checked = values[name]
+            else
+                slider.value = slider.converter.toString(values[name])
             slider.resetButton.disabled = false
         }
     }
@@ -301,8 +314,12 @@ class Sliders {
                 else val = slider.converter.toString(values[slider.name])
 
                 slider.default = val
-                if( slider.resetButton.disabled )
-                    slider.value = val
+                if( slider.resetButton.disabled ) {
+                    if( slider.type === 'checkbox' )
+                        slider.checked = val
+                    else
+                        slider.value = val
+                }
             }
         }
 
