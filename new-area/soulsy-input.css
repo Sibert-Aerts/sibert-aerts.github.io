@@ -128,7 +128,7 @@ input[type=range]:focus::-moz-range-track {
 
 textarea, input[type=text], input[type=number], input[type=file], select {
     background-color: #1d1c1ccc;
-    font-family: Dejavu Sans Mono, Courier New;
+    font-family: Dejavu Sans Mono, monospace;
     color: white;
     padding: 1px 6px;
     border: solid 2px #0006;

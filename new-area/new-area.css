@@ -28,7 +28,7 @@ body {
     display: flex; 
     flex-direction: column; 
 
-    font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+    font-family: adobe-garamond-pro, Minion Pro, Georgia, serif;
     font-weight: 400;
     font-style: normal;
     color: white;
@@ -200,7 +200,7 @@ body {
 .example {
     display: inline-block;
     min-width: 300px;
-    font-family: Dejavu Sans Mono, Courier New;
+    font-family: Dejavu Sans Mono, monospace;
     font-size: 12px;
     opacity: 0.6;
     padding-left: 20px;
@@ -233,7 +233,7 @@ body {
     text-shadow: 1px 1px 1px black, 0px 0px 20px #111, 0px 0px 20px #111;
 }
     .credit.left {
-        font-family: adobe-garamond-pro, OptimusPrinceps, Minion Pro, Times New Roman, Arial;
+        font-family: adobe-garamond-pro, Minion Pro, Georgia, serif;
         font-size: 18px;
     }
     .credit > .dash {
