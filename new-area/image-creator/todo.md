@@ -14,6 +14,7 @@
     * Implement line breaks good
 
     * Set "preferred resolution" for yourself instead of 1920x1080 by default
+    * Cropping?
 
     * (hard) allow multiple layers:
         * UI required: List of layers

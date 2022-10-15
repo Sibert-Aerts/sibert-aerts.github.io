@@ -69,6 +69,12 @@ const ASSETS = {
         bossHealthRed: new Asset('eldenRing/boss health red.png'),
         bossHealthFrame: new Asset('eldenRing/boss health frame.png'),
         bossHealthTip: new Asset('eldenRing/boss health tip.png'),
+
+        poisonFrameCapLeft: new Asset('eldenRing/poison frame cap left.png'),
+        poisonFrameLength: new Asset('eldenRing/poison frame length.png'),
+        poisonBarRot: new Asset('eldenRing/poison bar rot.png'),
+        poisonBarCap: new Asset('eldenRing/poison bar cap.png'),
+        poisonIcons: new Asset('eldenRing/poison icons.png'),
     }
 }
 
@@ -1088,7 +1094,7 @@ async function drawDS1Poison(ctx, canvas, gen) {
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.poison.getValues()
+    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.ds1Poison.getValues()
 
     ctx.save()
     ctx.scale(.75, .75)
@@ -1132,5 +1138,57 @@ async function drawDS1Poison(ctx, canvas, gen) {
         ctx.textAlign = 'center'
         ctx.globalAlpha = 0.8
         ctx.fillText(caption, 105, -textOffset/vScale)
+    }
+}
+/** @type {drawFun} Function which draws ER poison status bar. */
+async function drawERPoison(ctx, canvas, gen) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.erPoison.getValues()
+
+    ctx.save()
+    ctx.scale(.5, .5)
+
+    // Calculate important things
+    const fillLeft = 38, fillTop = 36, fillHeight = 28
+    const frameWidth = maxPoison
+    const barWidth = Math.min(maxPoison, poison)
+
+    // Transparent black backdrop    
+    ctx.fillStyle = 'rgba(0, 0, 0, .5)'
+    ctx.fillRect(0, -fillHeight/2, frameWidth, fillHeight)
+    
+    // Bar
+    const bar = await ASSETS.eldenRing.poisonBarRot.get()
+    ctx.drawImage(bar, 0, 0, fillLeft + barWidth, 100, -fillLeft, -50, fillLeft + barWidth, 100)
+    const barCap = await ASSETS.eldenRing.poisonBarCap.get()
+    ctx.drawImage(barCap, -21.5 + barWidth, -50)
+
+    // The frame
+    const frame = await ASSETS.eldenRing.poisonFrameLength.get()
+    const cropWidth = frameWidth + 42
+    ctx.drawImage(frame, 1501-cropWidth, 0, cropWidth, 100, 0, -50, cropWidth, 100)
+    const end = await ASSETS.eldenRing.poisonFrameCapLeft.get()
+    ctx.drawImage(end, -fillLeft, -50)
+    
+    // The icon
+    ctx.scale(.88, .88)
+    const icons = await ASSETS.eldenRing.poisonIcons.get()
+    ctx.drawImage(icons, 0, type*106, 106, 106, -106, -106/2, 106, 106)
+    ctx.restore()
+
+    // TEXT
+    if( showText === 'show' ) {
+        const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+        ctx.textBaseline = 'alphabetic'
+        ctx.textAlign = 'center'
+        ctx.fillText(caption, 148, -textOffset/vScale)
     }
 }

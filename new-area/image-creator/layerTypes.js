@@ -1669,7 +1669,7 @@ layerTypes.push({
             fontSize: 40, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
-        poison: {}
+        ds1Poison: {}
     },
     draw: drawDS1Poison
 })
@@ -1686,9 +1686,47 @@ layerTypes.push({
             xOffset: -.053, yOffset: .142
         },
         font: layerTypes.at(-1).sliders.font,
-        poison: {}
+        ds1Poison: {}
     },
     draw: drawDS1Poison
+})
+
+layerTypes.push({
+    id: 'er:poison-big',
+    type: MacroType.poison,
+    game: Game.er,
+    preset: 'Big (WIP)',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.115, yOffset: .23, scale: 1.5
+        },
+        font: {
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [249, 233, 233],
+            fontSize: 40, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        erPoison: { textOffset: 350 }
+    },
+    draw: drawERPoison
+})
+
+layerTypes.push({
+    id: 'er:poison-faithful',
+    type: MacroType.poison,
+    game: Game.er,
+    preset: 'Faithful (WIP)',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: {
+            xOffset: -.077, yOffset: .164, scale: 1
+        },
+        font: layerTypes.at(-1).sliders.font,
+        erPoison: {}
+    },
+    draw: drawERPoison
 })
 
 //////// Special

@@ -67,7 +67,7 @@
 			<h1>FromSoftware image macro creator</h1>
 
 			<div class=help>
-				Select, link or paste an image to put convincing FromSoftware game overlays on it.
+				Select, link or paste an image to add convincing FromSoftware text effects and game overlays to it.
 			</div>
 			<div class='help firefox-warning' style=color:#ff8e8e hidden>
 				Warning: On Firefox certain HTML canvas effects and filters don't work as intended.
@@ -352,7 +352,7 @@
 					</div>
 				</div>
 
-				<div name=poison class=sliders-container hidden>
+				<div name=ds1Poison class=sliders-container hidden>
 					<h4> Status buildup </h4>
 					<div class=smol>
 						<span class=input-title>Resistance:</span>
@@ -394,6 +394,54 @@
 						<span class=input-title>Text offset:</span>
 						<button class=reset-button></button>
 						<input name=textOffset type=range min=-500 max=500 step=1 default=350>
+					</div>
+				</div>
+
+				<div name=erPoison class=sliders-container hidden>
+					<h4> Status buildup </h4>
+					<div class=smol>
+						<span class=input-title>Resistance:</span>
+						<button class=reset-button></button>
+						<input name=maxPoison type=range min=0 max=1425 step=1 default=500>
+					</div>
+					<div class=smol>
+						<span class=input-title>Buildup:</span>
+						<button class=reset-button></button>
+						<input name=poison type=range min=0 max=1425 step=1 default=350>
+					</div>
+					<div class=smol>
+						<span class=input-title>Type:</span>
+						<button class=reset-button></button>
+						<select name=type as=float default=1>
+							<option value=0>Poison</option>
+							<option value=1>Scarlet Rot</option>
+							<option value=2>Bleed</option>
+							<option value=3>Frostbite</option>
+							<option value=4>Sleep</option>
+							<option value=5>Madness</option>
+							<option value=6>Death</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>State:</span>
+						<button class=reset-button></button>
+						<select name=active default=inactive>
+							<option value=inactive>Inactive</option>
+							<option value=active>Active</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Text:</span>
+						<button class=reset-button></button>
+						<select name=showText default=show>
+							<option value=show>Show</option>
+							<option value=hide>Hide</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Text offset:</span>
+						<button class=reset-button></button>
+						<input name=textOffset type=range min=-250 max=750 step=1 default=470>
 					</div>
 				</div>
 
@@ -645,6 +693,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2022/10/15</b> • Added Elden Ring style poison bar presets (WIP)<br>
 			<b>2022/10/07</b> • Added Dark Souls style poison bar presets <br>
 			<b>2022/10/07</b> • Added Elden Ring style boss health bar presets <br>
 			<b>2022/08/18</b> • Upgraded Bloodborne style area names to use actual graphics <br> 
