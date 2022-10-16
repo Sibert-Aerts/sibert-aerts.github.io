@@ -583,11 +583,21 @@
 				<h3> Layers </h3>
 				
 				<div id=layers-controls>
-					<button class="soulsy-box" name="moveUp">↑</button>
-					<button class="soulsy-box" name="moveDown">↓</button>
-					<button class="soulsy-box" name="delete">🗑</button>
-					<button class="soulsy-box" name="duplicate">➕</button>
-					<button class="soulsy-box" name="hide">👁</button>
+					<button class="soulsy-box" name="moveUp" disabled>
+						<div class="icon icon-move-up"></div>
+					</button>
+					<button class="soulsy-box" name="moveDown" disabled>
+						<div class="icon icon-move-down"></div>
+					</button>
+					<button class="soulsy-box" name="duplicate">
+						<div class="icon icon-plus"></div>
+					</button>
+					<button class="soulsy-box" name="delete" disabled>
+						<div class="icon icon-bin"></div>
+					</button>
+					<button class="soulsy-box" name="hide">
+						<div class="icon icon-eye-open"></div>
+					</button>
 				</div>
 				<br>
 				<div id=layers-container>

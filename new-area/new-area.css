@@ -501,6 +501,30 @@ canvas.big {
 .tabs .tab > .icon.icon-settings    { background-position-x: -400%; }
 .tabs .tab > .icon.icon-layers      { background-position-x: -500%; }
 
+/* Little button icons */
+
+#layers-controls button {
+    padding: 2px;
+}
+
+#layers-controls .icon {
+    margin: 0; padding: 0;
+    width: 24px; height: 24px;
+    background-image: url(graphics/soulsy-icons.png);
+    background-size: 3200% 300%;
+}
+#layers-controls .icon.icon-up          { background-position-x: -800%; }
+#layers-controls .icon.icon-down        { background-position-x: -900%; }
+#layers-controls .icon.icon-bin         { background-position-x: -1000%; }
+#layers-controls .icon.icon-copy        { background-position-x: -1100%; }
+#layers-controls .icon.icon-eye-open    { background-position-x: -1200%; }
+#layers-controls .icon.icon-eye-closed  { background-position-x: -1300%; }
+#layers-controls .icon.icon-plus        { background-position-x: -1400%; }
+#layers-controls .icon.icon-move-up     { background-position-x: -1500%; }
+#layers-controls .icon.icon-move-down   { background-position-x: -1600%; }
+
+#layers-controls button[disabled] > .icon { background-position-y: -200%; }
+
 
 .sliders-container {
     width: 100%; max-width: 400px;
@@ -565,7 +589,7 @@ canvas.big {
     width: 16px; height: 16px;
     background: none;
     background-image: url(graphics/soulsy-icons.png);
-    background-size: 800% 800%;
+    background-size: 3200% 300%;
     background-position: -200% -100%;   /* Orange 🔄 */
 }
 .reset-button:hover {
@@ -578,6 +602,8 @@ canvas.big {
 
 #layers-container {
     width: 100%;
+    max-height: 80vh;
+    overflow: auto;
     background-image: radial-gradient(rgba(0, 0, 0, .2) 60% , rgba(0, 0, 0, 0.4));
     padding: 0;
 }
@@ -589,6 +615,9 @@ button.layer-box {
 }
     button.layer-box.active-layer {
         border-color:rgba(255, 187, 0, .4)
+    }
+    button.layer-box.hidden-layer {
+        color: #88f8;
     }
 
 

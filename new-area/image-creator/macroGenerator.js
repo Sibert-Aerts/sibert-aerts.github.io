@@ -246,7 +246,9 @@ class Sliders {
 
             /// Assign and remember its "true default" (=HTML-assigned default)
             const trueDefault = slider.getAttribute('default')
-            slider.value = slider.default = slider.trueDefault = this.trueDefaults[slider.name] = trueDefault
+            slider.value = slider.default = slider.trueDefault = trueDefault
+            if( trueDefault )
+                this.trueDefaults[slider.name] = slider.converter.parse(trueDefault)
 
             if( slider.type === 'checkbox' ) slider.checked = slider.value
             slider.reset = function() {
@@ -366,7 +368,7 @@ class Sliders {
         for( const slider of this.sliders ) {            
             if( slider.resetButton ) {
                 let val
-                if( !(slider.name in values) ) val = slider.trueDefault
+                if( !(slider.name in values) )val = slider.trueDefault
                 else val = slider.converter.toString(values[slider.name])
 
                 slider.default = val
@@ -691,20 +693,28 @@ class MacroGenerator {
 
         const layer = this.getLayerType()
         const sliders = this.getChangedSliderValues()
-        this.addLayer(layer, sliders)
+        this.addLayer({layer, sliders})
         
         if( !layerControls ) return
 
-        const onClick = (name, handler) => 
-            layerControls.children.namedItem(name).addEventListener('click', handler)
+        const getButton = name => layerControls.children.namedItem(name)
+        const duplicateButton = getButton('duplicate')
+        const deleteButton = getButton('delete')
+        const moveUpButton = getButton('moveUp')
+        const moveDownButton = getButton('moveDown')
+        const hideButton = getButton('hide')
 
-        onClick('duplicate', () => {
+        this.layerButtons = {duplicateButton, deleteButton, moveUpButton, moveDownButton, hideButton}
+
+        duplicateButton.addEventListener('click', () => {
             const layer = this.getLayerType()
             const sliders = this.getChangedSliderValues()
-            this.addLayer(layer, sliders)
+            const hidden = this.layers[this.activeLayer].hidden
+            this.addLayer({layer, sliders, hidden})
             this.redrawMacro()
+            deleteButton.disabled = false
         })
-        onClick('delete', () => {
+        deleteButton.addEventListener('click', () => {
             if( this.layers.length <= 1 ) return
 
             const oldData = this.layers[this.activeLayer]
@@ -715,8 +725,11 @@ class MacroGenerator {
                 this.activeLayer--
             this.layers[this.activeLayer].activate()
             this.redrawMacro()
+            
+            if( this.layers.length <= 1 )
+                deleteButton.disabled = true
         })
-        onClick('moveUp', () => {
+        moveUpButton.addEventListener('click', () => {
             if( this.activeLayer === 0 ) return
             const i = this.activeLayer
             
@@ -727,8 +740,9 @@ class MacroGenerator {
 
             this.activeLayer--
             this.redrawMacro()
+            this.updateLayerControlButtons()
         })
-        onClick('moveDown', () => {
+        moveDownButton.addEventListener('click', () => {
             if( this.activeLayer === this.layers.length-1 ) return
             const i = this.activeLayer
             
@@ -739,13 +753,30 @@ class MacroGenerator {
 
             this.activeLayer++
             this.redrawMacro()
+            this.updateLayerControlButtons()
+        })
+        hideButton.addEventListener('click', () => {
+            this.layers[this.activeLayer].hidden ^= true
+            this.layers[this.activeLayer].updateButton()
+            this.redrawMacro()
+            this.updateLayerControlButtons()
         })
     }
 
-    addLayer(layer, sliders) {
+    updateLayerControlButtons() {
+        if( !this.layerButtons ) return
+        const i = this.activeLayer
+        const data = this.layers[i]
+        
+        this.layerButtons.moveUpButton.disabled = (i === 0)
+        this.layerButtons.moveDownButton.disabled = (i === this.layers.length-1)
+        const hideIcon = this.layerButtons.hideButton.children[0]
+        hideIcon.className = data.hidden? "icon icon-eye-closed": "icon icon-eye-open"
+    }
+
+    addLayer(data) {
         const oldData = this.layers[this.activeLayer]
         // Insert before current
-        const data = {layer, sliders}
         this.layers.splice(this.activeLayer, 0, data)
         this.activeLayer++
 
@@ -764,6 +795,8 @@ class MacroGenerator {
             this.setChangedSliderValues(data.sliders)
             this.setLayerType(data.layer)
             data.updateButton()
+
+            this.updateLayerControlButtons()
         }
 
         const onClick = e => {
@@ -807,6 +840,11 @@ class MacroGenerator {
                 button.classList.add('active-layer')
             else
                 button.classList.remove('active-layer')
+
+            if( data.hidden )
+                button.classList.add('hidden-layer')
+            else
+                button.classList.remove('hidden-layer')
         }
 
         data.button = button
@@ -1097,11 +1135,11 @@ class MacroGenerator {
         this.resView.y.textContent = canvas.height
     
         for( let i=this.layers.length-1; i >= 0; i-- ) {
-            this.resetDrawingState()
             const layerData = this.layers[i]
+            if( layerData.hidden ) continue
+            this.resetDrawingState()
             const layer = layerData.layer
             const isActive = (i === this.activeLayer)
-
 
             const sliders = {}
             for( const slider in layer.sliders ) {
