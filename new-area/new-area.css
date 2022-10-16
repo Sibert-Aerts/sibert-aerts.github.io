@@ -499,6 +499,7 @@ canvas.big {
 .tabs .tab > .icon.icon-sliders     { background-position-x: -200%; }
 .tabs .tab > .icon.icon-background  { background-position-x: -300%; }
 .tabs .tab > .icon.icon-settings    { background-position-x: -400%; }
+.tabs .tab > .icon.icon-layers      { background-position-x: -500%; }
 
 
 .sliders-container {
@@ -574,6 +575,21 @@ canvas.big {
     cursor: initial;
     background-position: -200% -200%;   /* Greyish 🔄 */
 }
+
+#layers-container {
+    width: 100%;
+    background-image: radial-gradient(rgba(0, 0, 0, .2) 60% , rgba(0, 0, 0, 0.4));
+    padding: 0;
+}
+
+button.layer-box {
+    width: 100%;
+    min-height: 3em;
+    margin: 0;
+}
+    button.layer-box.active-layer {
+        border-color:rgba(255, 187, 0, .4)
+    }
 
 
 #resolution-warning {

@@ -207,6 +207,8 @@ class Sliders {
     usable = false
     /** @type {boolean} */
     visible = false
+    /** @type {{[name: string]: any}} */
+    trueDefaults = {}
 
     /** @type {Callback} */
     onchange = null
@@ -242,9 +244,19 @@ class Sliders {
                 if( as.startsWith(conv) )
                     { slider.converter = new CONVERTERS[conv](as); break }
 
-            /// Assign and remember its default
-            slider.value = slider.default = slider.trueDefault = slider.getAttribute('default')
+            /// Assign and remember its "true default" (=HTML-assigned default)
+            const trueDefault = slider.getAttribute('default')
+            slider.value = slider.default = slider.trueDefault = this.trueDefaults[slider.name] = trueDefault
+
             if( slider.type === 'checkbox' ) slider.checked = slider.value
+            slider.reset = function() {
+                if( this.type === 'checkbox' )
+                    this.checked = this.default
+                else
+                    this.value = this.default
+                if( this.resetButton )
+                    this.resetButton.disabled = true
+            }
 
             /// Hook up reset button
             /** @type {HTMLButtonElement} */
@@ -254,10 +266,7 @@ class Sliders {
                 resetButton.disabled = true
 
                 resetButton.onclick = () => {
-                    if( slider.type === 'checkbox' )
-                        slider.checked = slider.default
-                    else
-                        slider.value = slider.default
+                    slider.reset()
                     slider.onchange()
                     resetButton.disabled = true
                 }
@@ -309,7 +318,44 @@ class Sliders {
                 slider.checked = values[name]
             else
                 slider.value = slider.converter.toString(values[name])
-            slider.resetButton.disabled = false
+            if( slider.resetButton )
+                slider.resetButton.disabled = false
+        }
+    }    
+
+    /**
+     *  Get all values that aren't default.
+     *  @returns  {{ [name: string]: any }}
+     */
+     getChangedValues() {
+        const values = {}
+        for( const slider of this.sliders ) {
+            if( slider.resetButton?.disabled )
+                continue
+            if( slider.type === 'checkbox' )
+                values[slider.name] = slider.checked
+            else
+                values[slider.name] = slider.converter.parse(slider.value)
+        }
+        return values
+    }
+
+    /**
+     * Set values as given, otherwise default.
+     *  @param  {{ [name: string]: any }} values
+     */
+    setChangedValues(values) {
+        for( const slider of this.sliders ) {
+            if( slider.name in values ) {
+                if( slider.type === 'checkbox' )
+                    slider.checked = values[slider.name]
+                else
+                    slider.value = slider.converter.toString(values[slider.name])
+                if( slider.resetButton )
+                    slider.resetButton.disabled = false
+            } else {
+                slider.reset()
+            }
         }
     }
 
@@ -374,7 +420,7 @@ class MacroGenerator {
 
     /** @type {[DrawableLayer, any][]} */
     layers = []
-    currentLayer = 0
+    activeLayer = 0
 
     /**
      * @param {HTMLElement | Document} element
@@ -411,8 +457,17 @@ class MacroGenerator {
 
         //// OTHER CONTROLS
         this.captionInput = my('*', 'image-caption')
-        this.captionInput.oninput = autoRedraw
-        this.captionInput.onkeyup = e => { if (e.code==='Enter') this.redrawMacro() }
+        this.captionInput.oninput = () => {
+            this.updateActiveLayerButton()
+            this.autoRedraw()
+        }
+        this.captionInput.onchange = () => {
+            this.updateActiveLayerButton()
+            this.redrawMacro()
+        }
+        this.captionInput.onkeyup = e => {
+            if (e.code==='Enter') this.redrawMacro()
+        }
         if( window.MACROGEN_DEFAULTS?.caption )
             this.captionInput.value = window.MACROGEN_DEFAULTS.caption
 
@@ -434,6 +489,9 @@ class MacroGenerator {
 
         //// CANVAS OVERLAY POSITION GRABBY
         this.setupCanvasOverlay()
+        
+        // This needs to be here idk
+        this.onMacroTypeChange(null, false)
 
         //// LAYER CONTROL PANEL
         this.setUpLayers()
@@ -464,8 +522,6 @@ class MacroGenerator {
                 }
             }
         }
-
-        this.onMacroTypeChange(null, false)
     }
 
     setupCanvasOverlay() {
@@ -625,37 +681,168 @@ class MacroGenerator {
 
         if( defaultPreset ) this.presetSelects[defaultType][defaultGame].value = defaultPreset
     }
+    
+    /* ======================= MULTI-LAYERS ======================= */
 
     /** Create layer controls */
     setUpLayers() {
         const layerControls = this.my('div', 'layers-controls')
         const layerContainer = this.my('div', 'layers-container')
 
-        layerControls.namedItem('duplicate').addEventListener('click', function() {
-            // const [layer, sliders] = this.layers[this.currentLayer]
-            const layer = this.getLayerType()
-            const sliders = this.getValues()
-            this.layers.push([layer, {...sliders}])
-            // this dudnt do nuthin
-        })
+        const layer = this.getLayerType()
+        const sliders = this.getChangedSliderValues()
+        this.addLayer(layer, sliders)
+        
+        if( !layerControls ) return
 
-        const currentType = this.getLayerType()
-        const sliders = {caption: "Hehfhefhhefhe"}
-        const box = this.makeLayerBox(currentType, sliders)
-        layerContainer.append(...box)
+        const onClick = (name, handler) => 
+            layerControls.children.namedItem(name).addEventListener('click', handler)
+
+        onClick('duplicate', () => {
+            const layer = this.getLayerType()
+            const sliders = this.getChangedSliderValues()
+            this.addLayer(layer, sliders)
+            this.redrawMacro()
+        })
+        onClick('delete', () => {
+            if( this.layers.length <= 1 ) return
+
+            const oldData = this.layers[this.activeLayer]
+            layerContainer.removeChild(oldData.button)
+            
+            this.layers.splice(this.activeLayer, 1)
+            if( this.activeLayer === this.layers.length )
+                this.activeLayer--
+            this.layers[this.activeLayer].activate()
+            this.redrawMacro()
+        })
+        onClick('moveUp', () => {
+            if( this.activeLayer === 0 ) return
+            const i = this.activeLayer
+            
+            const data = this.layers[i]
+            const otherData = this.layers[i-1];
+            [this.layers[i], this.layers[i-1]] = [otherData, data]
+            this.my('div', 'layers-container').insertBefore(data.button, otherData.button)            
+
+            this.activeLayer--
+            this.redrawMacro()
+        })
+        onClick('moveDown', () => {
+            if( this.activeLayer === this.layers.length-1 ) return
+            const i = this.activeLayer
+            
+            const data = this.layers[i]
+            const otherData = this.layers[i+1];
+            [this.layers[i], this.layers[i+1]] = [otherData, data]
+            this.my('div', 'layers-container').insertBefore(otherData.button, data.button)            
+
+            this.activeLayer++
+            this.redrawMacro()
+        })
+    }
+
+    addLayer(layer, sliders) {
+        const oldData = this.layers[this.activeLayer]
+        // Insert before current
+        const data = {layer, sliders}
+        this.layers.splice(this.activeLayer, 0, data)
+        this.activeLayer++
+
+        // Create button
+        const layerContainer = this.my('div', 'layers-container')
+        const button = this.makeLayerButton(data)
+        if( oldData )
+            layerContainer.insertBefore(button, oldData.button)
+        else
+            layerContainer.append(button)
+
+        data.activate = () => {
+            // Pull in switched-to layer state
+            const index = this.layers.indexOf(data)
+            this.activeLayer = index
+            this.setChangedSliderValues(data.sliders)
+            this.setLayerType(data.layer)
+            data.updateButton()
+        }
+
+        const onClick = e => {
+            // Save switched-from layer state
+            const oldData = this.layers[this.activeLayer]
+            if( oldData ) {
+                oldData.layer = this.getLayerType()
+                oldData.sliders = this.getChangedSliderValues()
+            }
+
+            // Pull in switched-to layer state
+            data.activate()
+
+            oldData?.updateButton()
+        }
+        button.addEventListener('click', onClick)
+        onClick()
     }
 
     /** Makes an HTML layer box element
      * @param {DrawableLayer} layer
      * 
     */
-    makeLayerBox(layer, sliders) {
-        return htmlToDOM(`
-            <button class="soulsy-box">
-                <b>${layer.id}</b> - <i>${sliders.caption}</i>
-            </button>
-        `)
+    makeLayerButton(data) {
+        const button = makeElem('button', 'soulsy-box layer-box')
+        const idElem = makeElem('b')
+        const typeElem = makeElem('b')
+        const gameElem = makeElem('b')
+        const presetElem = makeElem('b')
+        const captionElem = makeElem('span')
+        button.append(typeElem, ' / ', gameElem, ' / ', presetElem, makeElem('br'), '“', captionElem, '”')
+
+        const updateButton = () => {
+            idElem.textContent = data.layer.id
+            typeElem.textContent = macroTypeName[data.layer.type]
+            gameElem.textContent = gameName[data.layer.game]
+            presetElem.textContent = data.layer.preset
+            captionElem.textContent = data.sliders.caption
+
+            if( this.layers[this.activeLayer] === data )
+                button.classList.add('active-layer')
+            else
+                button.classList.remove('active-layer')
+        }
+
+        data.button = button
+        data.updateButton = updateButton
+        updateButton()
+
+        return button
     }
+
+    updateActiveLayerButton() {
+        const data = this.layers[this.activeLayer]
+        if( !data ) return
+        data.layer = this.getLayerType()
+        data.sliders.caption = this.captionInput.value
+        data.updateButton()
+    }
+
+    /* ======================= SLIDER SAVING/LOADING ======================= */
+
+    getChangedSliderValues() {
+        const vals = {}
+        vals.caption = this.captionInput.value
+        for( const slider in this.sliders ) {
+            vals[slider] = this.sliders[slider].getChangedValues()
+        }
+        return vals
+    }
+    
+    setChangedSliderValues(vals) {
+        this.captionInput.value = vals.caption 
+        for( const slider in this.sliders ) {
+            this.sliders[slider].setChangedValues(vals[slider])
+        }
+    }   
+
+    /* ======================= LAYER (TYPE) SWITCHING ======================= */
 
     /** Callback from the macro type select */
     onMacroTypeChange(e, redraw=true) {
@@ -698,6 +885,7 @@ class MacroGenerator {
             this.captionInput.value = 'CAPTION UNALTERED'
 
         this.updateCanvasOverlay()
+        this.updateActiveLayerButton()
 
         //// Redraw (if desired)
         if (redraw) this.redrawMacro()
@@ -724,6 +912,17 @@ class MacroGenerator {
         const [macroType, game, preset] = this.getLayerTypeKeys()
         return layerTypesMap[macroType][game]?.[preset]
     }
+
+    /** @param {DrawableLayer} layer */
+    setLayerType(layer) {
+        this.macroTypeSelect.value = layer.type
+        this.gameSelect.value = layer.game
+        this.presetSelects[layer.type][layer.game].value = layer.preset
+
+        this.onMacroTypeChange(null, false)
+    }
+
+    /* ======================= DRAWING ======================= */
 
     /** Check whether the current canvas is too big to allow auto-rerendering. */
     tooBig() {
@@ -882,7 +1081,7 @@ class MacroGenerator {
      * Call after major changes;
      * Blanks the canvas, redraws the selected image if any, and draws the text on top.
      */
-    redrawMacro() {
+    async redrawMacro() {
         const ctx = this.ctx
         this.resetDrawingState()
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -897,9 +1096,28 @@ class MacroGenerator {
         this.resView.x.textContent = canvas.width
         this.resView.y.textContent = canvas.height
     
-        this.resetDrawingState()
-        const layerType = this.getLayerType()
-        layerType.draw(ctx, this.canvas, this)
+        for( let i=this.layers.length-1; i >= 0; i-- ) {
+            this.resetDrawingState()
+            const layerData = this.layers[i]
+            const layer = layerData.layer
+            const isActive = (i === this.activeLayer)
+
+
+            const sliders = {}
+            for( const slider in layer.sliders ) {
+                if( isActive )
+                    sliders[slider] = this.sliders[slider].getValues()
+                else
+                    sliders[slider] = { ...this.sliders[slider].trueDefaults, ...layer.sliders[slider], ...layerData.sliders[slider] }
+            }
+
+            if( i === this.activeLayer )
+                sliders.caption = this.captionInput.value
+            else
+                sliders.caption = layerData.sliders.caption
+            
+            await layerData.layer.draw(ctx, this.canvas, this, sliders)
+        }
     }
 
     /** Save the current contents of the canvas to the user's computer. */
