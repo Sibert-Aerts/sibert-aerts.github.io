@@ -54,6 +54,10 @@ button.soulsy-box:active {
     border-color: #dfa12d62;
     background: radial-gradient(ellipse 90% .95em, rgb(36, 29, 26) 0%, rgb(48, 30, 23) 35%, rgb(70, 35, 21) 70%, rgb(192, 48, 4) 100%);
 }
+button.soulsy-box[disabled] {
+    border-color: #dfa12d1c;
+    background: rgba(26, 23, 25, 70%)
+}
 
 
 /************************************** RANGE INPUT **************************************/

@@ -83,13 +83,13 @@ const ASSETS = {
 //========================================================================
 
 /** 
- * @typedef {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator) => void} drawFun
+ * @typedef {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator, sliders: any) => void} drawFun
  */
 
 /** PARTIAL: Draws a horizontal shadow bar at y=50%. */
-function drawShadowBar(ctx, canvas, gen, s0) {
+function drawShadowBar(ctx, canvas, gen, sliders, s0) {
     const w = canvas.width, h = canvas.height
-    const { shadowSize, shadowOpacity, shadowOffset, shadowSoftness } = gen.sliders.shadow.getValues()
+    const { shadowSize, shadowOpacity, shadowOffset, shadowSoftness } = sliders.shadow
 
     if( shadowSize === 0 ) return
 
@@ -118,10 +118,10 @@ function drawShadowBar(ctx, canvas, gen, s0) {
 }
 
 /** PARTIAL: Sets the appropriate ctx properties. */
-function applyFontSliders(ctx, canvas, gen, s=1) {
-    const { fontSize, textColor, fontFamily, vScale, charSpacing, fontWeight } = gen.sliders.font.getValues()
+function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
+    const { fontSize, textColor, fontFamily, vScale, charSpacing, fontWeight } = sliders.font
 
-    let caption = gen.captionInput.value
+    let caption = sliders.caption
 
     // TODO: the chrome version doesn't scale with font size while the other one does!
     if( !!window.chrome && true ) {
@@ -164,15 +164,15 @@ function putNoise(ctx, x, y, w, h) {
 
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
-function drawNounVerbed(ctx, canvas, gen) {
+function drawNounVerbed(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { textOpacity, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
-    const textColor = gen.sliders.font.get('textColor')
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const textColor = sliders.font.textColor
 
     const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
@@ -180,12 +180,12 @@ function drawNounVerbed(ctx, canvas, gen) {
     // The shade only moves up or down
     ctx.translate(0, y0)
     //// SHADE
-    drawShadowBar(ctx, canvas, gen, s0)    
+    drawShadowBar(ctx, canvas, gen, sliders, s0)    
     // The text also moves left or right
     ctx.translate(x0, 0)
 
     //// TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.save()
 
     //// Emulate the zoom blur effect
@@ -217,20 +217,20 @@ function drawNounVerbed(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws a Demon's Souls-style NOUN VERBED.  */
-function drawDeSNounVerbed(ctx, canvas, gen) {
+function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
 
     // The shade only moves up or down
     ctx.translate(0, y0)
     //// SHADE
-    drawShadowBar(ctx, canvas, gen, s0)    
+    drawShadowBar(ctx, canvas, gen, sliders, s0)    
     // The text also moves left or right
     ctx.translate(x0, 0)
 
@@ -252,12 +252,12 @@ function drawDeSNounVerbed(ctx, canvas, gen) {
     ctx.fillRect(left, 50*s, lineWidth, 2*s)
 
     //// CAPTION
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.fillText(caption, 0, -5*s/vScale)
     
     //// SUBCAPTION
-    const fontFamily = gen.sliders.font.get('fontFamily')
-    const { subCaption } = gen.sliders.subCaption.getValues()
+    const fontFamily = sliders.font.fontFamily
+    const { subCaption } = sliders.subCaption
 
     ctx.resetTransform()
     ctx.translate(x0 + w/2, y0 + h/2)
@@ -275,14 +275,14 @@ function drawDeSNounVerbed(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
-function drawGlowyText(ctx, canvas, gen) {
+function drawGlowyText(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { textOpacity, glowColor, glowSize, glowOpacity } = gen.sliders.glowy.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const { textOpacity, glowColor, glowSize, glowOpacity } = sliders.glowy
 
     const x0 = xOffset * w
     const y0 = yOffset * h
@@ -291,12 +291,12 @@ function drawGlowyText(ctx, canvas, gen) {
     ctx.translate(x0, y0)
 
     //// TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
     ctx.filter = `blur(${s/2}px)`
 
     /// First: Just draw the text, no glow
-    const [r, g, b] = gen.sliders.font.get('textColor')
+    const [r, g, b] = sliders.font.textColor
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
     ctx.fillText(caption, w/2, h/2/vScale)
     ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
@@ -319,15 +319,15 @@ function drawGlowyText(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws an Elden Ring style NOUN VERBED.  */
-function drawEldenNounVerbed(ctx, canvas, gen) {
+function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { textOpacity, blurTint, blurSize, blurOpacity } = gen.sliders.zoomBlur.getValues()
-    const textColor = gen.sliders.font.get('textColor')
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const textColor = sliders.font.textColor
 
     const x0 = xOffset * w
     const y0 = yOffset * h
@@ -336,12 +336,12 @@ function drawEldenNounVerbed(ctx, canvas, gen) {
     // The shade only moves up or down
     ctx.translate(0, y0)
     //// SHADE
-    drawShadowBar(ctx, canvas, gen, s0)    
+    drawShadowBar(ctx, canvas, gen, sliders, s0)   
     // The text also moves left or right
     ctx.translate(x0, 0)
 
     //// TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     
     // Regular text
     ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
@@ -359,13 +359,13 @@ function drawEldenNounVerbed(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws an Area Name. */
-function drawAreaName(ctx, canvas, gen) {
+function drawAreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate(xOffset * w, yOffset * h)
     s *= s0
     
@@ -375,13 +375,13 @@ function drawAreaName(ctx, canvas, gen) {
     ctx.shadowBlur = 8*s
 
     // UNDERLINE
-    const { ulLength, ulWidth, ulPos, contrast } = gen.sliders.area.getValues()
+    const { ulLength, ulWidth, ulPos, contrast } = sliders.area
 
     if( ulLength > 0 ) {
         const left = (.5-ulLength)*w, right = (.5+ulLength)*w
 
         // The gradient
-        const colorTuple = gen.sliders.font.get('textColor').join()
+        const colorTuple = sliders.font.textColor.join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
         grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
@@ -397,7 +397,7 @@ function drawAreaName(ctx, canvas, gen) {
 
     // TEXT
     ctx.shadowColor = `rgba(0, 0, 0, ${contrast})`
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.textBaseline = 'alphabetic'
 
     // Apply contrast by just redrawing the same text so the shadow overlaps
@@ -410,15 +410,15 @@ function drawAreaName(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws a DS2-style Area Name. */
-function drawDS2AreaName(ctx, canvas, gen) {
+function drawDS2AreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
-    const { ulLength, ulWidth, ulPos, contrast } = gen.sliders.area.getValues()
-    const { lineWidth, lineColor } = gen.sliders.outline.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const { ulLength, ulWidth, ulPos, contrast } = sliders.area
+    const { lineWidth, lineColor } = sliders.outline
     ctx.translate(xOffset*w, yOffset*h)
     s *= s0
     
@@ -427,7 +427,7 @@ function drawDS2AreaName(ctx, canvas, gen) {
         const left = (.5-ulLength)*w, right = (.5+ulLength)*w
 
         // The gradient
-        const colorTuple = gen.sliders.font.get('textColor').join()
+        const colorTuple = sliders.font.textColor.join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
         grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
@@ -448,7 +448,7 @@ function drawDS2AreaName(ctx, canvas, gen) {
     }
 
     // TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.textBaseline = 'alphabetic'
 
     ctx.strokeStyle = `rgba(${lineColor}, ${contrast/3})`
@@ -459,20 +459,20 @@ function drawDS2AreaName(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws a Bloodborne-style Area Name. */
-async function drawBloodborneAreaName(ctx, canvas, gen) {
+async function drawBloodborneAreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
     // had to make the Origin align with the cross of the lines because it's cuter
     ctx.translate(-16, -14)
 
     // (MOCK BACK-IMAGE)
-    const { blotOpacity, mode } = gen.sliders.bbArea.getValues()
+    const { blotOpacity, mode } = sliders.bbArea
 
     ctx.save()
 
@@ -508,26 +508,26 @@ async function drawBloodborneAreaName(ctx, canvas, gen) {
     ctx.restore()
 
     // TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'right'
     ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws an Area Name. */
-async function drawSekiroAreaName(ctx, canvas, gen) {
+async function drawSekiroAreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
     // Pixcture
     ctx.save()
-    const { frameWidth, frameHeight, opacity } = gen.sliders.sekiroFrame.getValues()
+    const { frameWidth, frameHeight, opacity } = sliders.sekiroFrame
 
     // If needed, use a much larger resolution image for the backdrop
     const useLargeImage = s*s0*Math.max(frameHeight, frameWidth) > 1.01
@@ -548,25 +548,25 @@ async function drawSekiroAreaName(ctx, canvas, gen) {
 
     // TEXT
     ctx.shadowColor = `rgba(0, 0, 0, 1)`
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
 
     ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws an Elden Ring-style Area Name. */
-function drawEldenAreaName(ctx, canvas, gen) {
+function drawEldenAreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate(xOffset * w, yOffset * h)
     s *= s0
 
     // FRAME
-    const { opacity, frameWidth, frameHeight } = gen.sliders.erFrame.getValues()
+    const { opacity, frameWidth, frameHeight } = sliders.erFrame
     if( opacity > 0 ) {
         ctx.save()
 
@@ -603,7 +603,7 @@ function drawEldenAreaName(ctx, canvas, gen) {
 
     // TEXT
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.textBaseline = 'alphabetic'
 
     ctx.shadowOffsetX = 2*s
@@ -617,43 +617,43 @@ function drawEldenAreaName(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws an YOU DIED. */
-function drawYouDied(ctx, canvas, gen) {
+function drawYouDied(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()    
+    const { xOffset, yOffset, scale: s0 } = sliders.position    
     const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
 
     // The shade only moves up or down
     ctx.translate(0, y0)
     // SHADE
-    drawShadowBar(ctx, canvas, gen, s0)
+    drawShadowBar(ctx, canvas, gen, sliders, s0)
     // The text also moves left or right
     ctx.translate(x0, 0)
 
     // TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)    
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)    
     ctx.fillText(caption, w/2, h/2/vScale)
 }
 
 /** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
-function drawSekiroText(ctx, canvas, gen) {
+function drawSekiroText(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate(xOffset * w, yOffset * h)
     s *= s0
 
     //// TEXT
-    const textColor = gen.sliders.font.get('textColor')
-    const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = gen.sliders.sekiro.getValues()
-    const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = gen.sliders.glowy.getValues()
+    const textColor = sliders.font.textColor
+    const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = sliders.sekiro
+    const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = sliders.glowy
     
     // Trick to make the japanese font work (for lack of an explicit API)
     byId('adobe-font-trick').innerText = symbol    
@@ -688,7 +688,7 @@ function drawSekiroText(ctx, canvas, gen) {
     drawSymbols()
 
     /// Finally: Do the same with the caption    
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
 
     ctx.globalCompositeOperation = blendMode
     ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
@@ -707,19 +707,19 @@ function drawSekiroText(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws simple outlined text. */
-function drawOutlined(ctx, canvas, gen) {
+function drawOutlined(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate(xOffset*w, yOffset*h)
     s *= s0
 
     // TEXT
-    const { lineWidth, lineColor } = gen.sliders.outline.getValues()
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const { lineWidth, lineColor } = sliders.outline
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     if( lineWidth > 0 ) {
         ctx.strokeStyle = `rgb(${lineColor})`
         ctx.lineWidth = lineWidth * s
@@ -730,19 +730,19 @@ function drawOutlined(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws SSBM styled text. */
-async function drawMelee(ctx, canvas, gen) {
+async function drawMelee(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5)*w, (yOffset+.5)*h)
     s *= s0
 
-    const { textColor, fontSize } = gen.sliders.font.getValues()
-    const { lineWidth, shadowOpacity } = gen.sliders.melee.getValues()
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, s)
+    const { textColor, fontSize } = sliders.font
+    const { lineWidth, shadowOpacity } = sliders.melee
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.textBaseline = 'alphabetic'
 
     //// THE TWO OUTLINES
@@ -769,7 +769,7 @@ async function drawMelee(ctx, canvas, gen) {
     temp.width = canvas.width; temp.height = canvas.height;
     const tctx = temp.getContext('2d')
 
-    applyFontSliders(tctx, temp, gen, s)
+    applyFontSliders(tctx, temp, gen, sliders, s)
     tctx.textBaseline = 'alphabetic'
     tctx.setTransform(ctx.getTransform())
 
@@ -801,17 +801,17 @@ async function drawMelee(ctx, canvas, gen) {
 // ================================================ BOSS HEALTH BARS ================================================
 
 /** @type {drawFun} Function which draws DS1 boss health bar + name. */
-async function drawDS1Boss(ctx, canvas, gen) {
+async function drawDS1Boss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+    const {health, recentDamage, damageNumber} = sliders.boss
 
     // Transparent grey background    
     ctx.fillStyle = 'rgba(20, 20, 20, .5)'
@@ -837,7 +837,7 @@ async function drawDS1Boss(ctx, canvas, gen) {
     ctx.drawImage(await ASSETS.ds1.bossHealth.get(), -750, -70)
 
     // TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -655, -30/vScale)
@@ -849,17 +849,17 @@ async function drawDS1Boss(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws DS2 boss health bar + name. */
-async function drawDS2Boss(ctx, canvas, gen) {
+async function drawDS2Boss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+    const {health, recentDamage, damageNumber} = sliders.boss
 
     // The main healthbar texture
     ctx.drawImage(await ASSETS.ds2.bossHealthFrame.get(), -346, -14)    
@@ -873,7 +873,7 @@ async function drawDS2Boss(ctx, canvas, gen) {
     ctx.lineWidth = 2
     ctx.miterLimit = 5
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.strokeText(caption, -345, -18/vScale)
@@ -887,17 +887,17 @@ async function drawDS2Boss(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws DS3 boss health bar + name. */
-async function drawDS3Boss(ctx, canvas, gen) {
+async function drawDS3Boss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+    const {health, recentDamage, damageNumber} = sliders.boss
 
     // The main healthbar texture
     ctx.drawImage(await ASSETS.ds3.bossHealthFrame.get(), -508, -25)
@@ -916,7 +916,7 @@ async function drawDS3Boss(ctx, canvas, gen) {
     ctx.shadowBlur = 4*s
     ctx.shadowColor = '#000000'
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -496, -17/vScale)
@@ -928,17 +928,17 @@ async function drawDS3Boss(ctx, canvas, gen) {
 }
 
 /** @type {drawFun} Function which draws Sekiro boss health bar + name. */
-async function drawSekiroBoss(ctx, canvas, gen) {
+async function drawSekiroBoss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, livesLeft, livesSpent, frameOpacity} = gen.sliders.sekiroBoss.getValues()
+    const {health, recentDamage, livesLeft, livesSpent, frameOpacity} = sliders.sekiroBoss
 
     ctx.save()
     ctx.scale(.5538, .5538)
@@ -977,24 +977,24 @@ async function drawSekiroBoss(ctx, canvas, gen) {
     ctx.shadowBlur = 4*s
     ctx.shadowColor = '#000000'
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, 26, 64/vScale)
 }
 
 /** @type {drawFun} Function which draws Bloodborne boss health bar + name. */
-async function drawBloodborneBoss(ctx, canvas, gen) {
+async function drawBloodborneBoss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+    const {health, recentDamage, damageNumber} = sliders.boss
 
     // The main healthbar texture
     ctx.drawImage(await ASSETS.bloodborne.bossHealthBase.get(), -680, -40)
@@ -1014,7 +1014,7 @@ async function drawBloodborneBoss(ctx, canvas, gen) {
     ctx.shadowBlur = 4*s
     ctx.shadowColor = '#000000'
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -640, -23/vScale)
@@ -1027,17 +1027,17 @@ async function drawBloodborneBoss(ctx, canvas, gen) {
 
 
 /** @type {drawFun} Function which draws Elden Ring boss health bar + name. */
-async function drawEldenRingBoss(ctx, canvas, gen) {
+async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {health, recentDamage, damageNumber} = gen.sliders.boss.getValues()
+    const {health, recentDamage, damageNumber} = sliders.boss
 
     ctx.save()
     ctx.scale(.5, .5) // Elden Ring uses 4K textures
@@ -1068,7 +1068,7 @@ async function drawEldenRingBoss(ctx, canvas, gen) {
     ctx.shadowBlur = 4*s
     ctx.shadowColor = '#000000'
 
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -500, -15/vScale)
@@ -1084,17 +1084,17 @@ async function drawEldenRingBoss(ctx, canvas, gen) {
 // ================================================ POISON BARS ================================================
 
 /** @type {drawFun} Function which draws DS1 poison status bar. */
-async function drawDS1Poison(ctx, canvas, gen) {
+async function drawDS1Poison(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.ds1Poison.getValues()
+    const {poison, maxPoison, type, active, showText, textOffset} = sliders.ds1Poison
 
     ctx.save()
     ctx.scale(.75, .75)
@@ -1133,7 +1133,7 @@ async function drawDS1Poison(ctx, canvas, gen) {
 
     // TEXT
     if( showText === 'show' ) {
-        const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+        const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
         ctx.textBaseline = 'alphabetic'
         ctx.textAlign = 'center'
         ctx.globalAlpha = 0.8
@@ -1141,17 +1141,17 @@ async function drawDS1Poison(ctx, canvas, gen) {
     }
 }
 /** @type {drawFun} Function which draws ER poison status bar. */
-async function drawERPoison(ctx, canvas, gen) {
+async function drawERPoison(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
     let s = w/1920
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = gen.sliders.position.getValues()
+    const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {poison, maxPoison, type, active, showText, textOffset} = gen.sliders.erPoison.getValues()
+    const {poison, maxPoison, type, active, showText, textOffset} = sliders.erPoison
 
     ctx.save()
     ctx.scale(.5, .5)
@@ -1186,7 +1186,7 @@ async function drawERPoison(ctx, canvas, gen) {
 
     // TEXT
     if( showText === 'show' ) {
-        const [caption, vScale] = applyFontSliders(ctx, canvas, gen)
+        const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
         ctx.textBaseline = 'alphabetic'
         ctx.textAlign = 'center'
         ctx.fillText(caption, 148, -textOffset/vScale)

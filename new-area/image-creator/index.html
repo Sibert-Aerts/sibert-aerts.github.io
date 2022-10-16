@@ -98,6 +98,10 @@
 		<div id=sliders-pane class=sliders-pane>
 
 			<div id=sliders-tabs class='tabs editor-tabs'>
+				<label class='tab'> 
+					<input type=radio name=tabs value=layers>
+					<div class="icon icon-layers"></div>
+				</label>
 				<label class='tab checked'>
 					<input type=radio name=tabs value=all checked>
 					<div class="icon icon-all"></div>
@@ -575,7 +579,33 @@
 
 			</div>
 
-			<div id=background-stuff>
+			<div id=layers class=sliders-container hidden>
+				<h3> Layers </h3>
+				
+				<div id=layers-controls>
+					<button class="soulsy-box" name="moveUp" disabled>
+						<div class="icon icon-move-up"></div>
+					</button>
+					<button class="soulsy-box" name="moveDown" disabled>
+						<div class="icon icon-move-down"></div>
+					</button>
+					<button class="soulsy-box" name="duplicate">
+						<div class="icon icon-plus"></div>
+					</button>
+					<button class="soulsy-box" name="delete" disabled>
+						<div class="icon icon-bin"></div>
+					</button>
+					<button class="soulsy-box" name="hide">
+						<div class="icon icon-eye-open"></div>
+					</button>
+				</div>
+				<br>
+				<div id=layers-container>
+
+				</div>
+			</div>
+
+			<div id=background-stuff hidden>
 				<h3> Background </h3>
 				<h4> Background color </h4>
 
@@ -635,6 +665,7 @@
 				</div>
 			</div>
 
+
 			<div id=settings class=sliders-container hidden>
 				<h3> Settings </h3>
 				Nothing yet sorry
@@ -693,6 +724,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2022/10/16</b> • Implemented layer system to allow combining macros easily. <br>
 			<b>2022/10/15</b> • Added Elden Ring style poison bar presets (WIP)<br>
 			<b>2022/10/07</b> • Added Dark Souls style poison bar presets <br>
 			<b>2022/10/07</b> • Added Elden Ring style boss health bar presets <br>

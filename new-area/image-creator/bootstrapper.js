@@ -68,3 +68,10 @@ window.addEventListener('load', function() {
         }
     }
 })
+
+window.addEventListener('beforeunload', function (e) {
+    const message = 'Beware, edited macros and layers are lost when leaving the page.'
+                + ' Make sure you have saved any images you wish to keep.';
+    (e || window.event).returnValue = message
+    return message
+})
