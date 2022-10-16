@@ -12,6 +12,16 @@ const makeElem = (tag, clss, text) => { const e = document.createElement(tag); i
 const makeOption = (value, text) => { const o = document.createElement('option'); o.textContent = text; o.value = value; o.setAttribute('name', value); return o }
 const setPhantom = (elem, val=true) => { if (val) elem.classList.add('phantom'); else elem.classList.remove('phantom') }
 
+/**
+ * @param {String} HTML representing any number of sibling elements
+ * @return {NodeList} 
+ */
+ function htmlToDOM(html) {
+    const t = document.createElement('template')
+    t.innerHTML = html
+    return t.content.childNodes
+}
+
 ///// TINY COLOR UTILS
 
 /** Must be used EXCLUSIVELY with strings of the form '#abcdef', such as input.color. */
@@ -362,6 +372,10 @@ class MacroGenerator {
     /** @type {DrawableLayer} */
     previousLayerType
 
+    /** @type {[DrawableLayer, any][]} */
+    layers = []
+    currentLayer = 0
+
     /**
      * @param {HTMLElement | Document} element
      */
@@ -418,8 +432,11 @@ class MacroGenerator {
         this.imageSliders = new Sliders(my('div', 'image'))
         this.imageSliders.onchange = autoRedraw
 
-        //// CANVAS OVERLAY POSITION GRABBY (PROTOTYPE)
+        //// CANVAS OVERLAY POSITION GRABBY
         this.setupCanvasOverlay()
+
+        //// LAYER CONTROL PANEL
+        this.setUpLayers()
 
 
         //// UHH THE LITTLE TAB RADIO BUTTONS ?
@@ -438,7 +455,11 @@ class MacroGenerator {
                 tab.classList.add('checked')
 
                 for( const t in tabbedDivs ) {
-                    let show = (radio.value === 'all' && t !== 'settings') || (radio.value === t)
+                    var show
+                    if( radio.value === 'all' )
+                        show = ['global-sliders', 'macro-sliders'].includes(t)
+                    else
+                        show = (radio.value === t)
                     tabbedDivs[t].hidden = !show
                 }
             }
@@ -603,6 +624,37 @@ class MacroGenerator {
         }
 
         if( defaultPreset ) this.presetSelects[defaultType][defaultGame].value = defaultPreset
+    }
+
+    /** Create layer controls */
+    setUpLayers() {
+        const layerControls = this.my('div', 'layers-controls')
+        const layerContainer = this.my('div', 'layers-container')
+
+        layerControls.namedItem('duplicate').addEventListener('click', function() {
+            // const [layer, sliders] = this.layers[this.currentLayer]
+            const layer = this.getLayerType()
+            const sliders = this.getValues()
+            this.layers.push([layer, {...sliders}])
+            // this dudnt do nuthin
+        })
+
+        const currentType = this.getLayerType()
+        const sliders = {caption: "Hehfhefhhefhe"}
+        const box = this.makeLayerBox(currentType, sliders)
+        layerContainer.append(...box)
+    }
+
+    /** Makes an HTML layer box element
+     * @param {DrawableLayer} layer
+     * 
+    */
+    makeLayerBox(layer, sliders) {
+        return htmlToDOM(`
+            <button class="soulsy-box">
+                <b>${layer.id}</b> - <i>${sliders.caption}</i>
+            </button>
+        `)
     }
 
     /** Callback from the macro type select */

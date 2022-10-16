@@ -110,6 +110,10 @@
 					<input type=radio name=tabs value=macro-sliders>
 					<div class="icon icon-sliders"></div>
 				</label>
+				<label class='tab'> 
+					<input type=radio name=tabs value=layers>
+					<div class="icon icon-settings"></div>
+				</label>
 				<label class=tab> 
 					<input type=radio name=tabs value=background-stuff>
 					<div class="icon icon-background"></div>
@@ -575,7 +579,23 @@
 
 			</div>
 
-			<div id=background-stuff>
+			<div id=layers class=sliders-container hidden>
+				<h3> Layers </h3>
+				
+				<div id=layers-controls>
+					<button class="soulsy-box" name="moveUp">↑</button>
+					<button class="soulsy-box" name="moveDown">↓</button>
+					<button class="soulsy-box" name="delete">🗑</button>
+					<button class="soulsy-box" name="duplicate">➕</button>
+					<button class="soulsy-box" name="hide">👁</button>
+				</div>
+				<br>
+				<div id=layers-container>
+
+				</div>
+			</div>
+
+			<div id=background-stuff hidden>
 				<h3> Background </h3>
 				<h4> Background color </h4>
 
@@ -634,6 +654,7 @@
 					</div>
 				</div>
 			</div>
+
 
 			<div id=settings class=sliders-container hidden>
 				<h3> Settings </h3>
