@@ -86,6 +86,60 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'des:regained',
+    type: MacroType.nounVerbed,
+    game: Game.des,
+    preset: 'YOU REGAINED LOST SOUL',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 110, fontFamily: 'Cormorant Garamond',
+            vScale: 1.40, charSpacing: 6,
+            fontWeight: 600, textColor: [61, 102, 118]
+        },
+        subCaption: {
+            subCaption: 'You\'ve touched the mark of death itself.\nBring more souls, slayer of demons.'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: .7,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
+
+layerTypes.push({
+    id: 'des:revived',
+    type: MacroType.nounVerbed,
+    game: Game.des,
+    preset: 'YOU REVIVED',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0.007, scale: 1 
+        },
+        font: {
+            fontSize: 117, fontFamily: 'Cormorant Garamond',
+            vScale: 1.40, charSpacing: 6,
+            fontWeight: 600, textColor: [61, 119, 81]
+        },
+        subCaption: {
+            subCaption: 'You have regained your body.\nBring more souls, slayer of demons.'
+        },
+        shadow: {
+            shadowSize: 1.14, shadowOpacity: .7,
+            shadowOffset: .028, shadowSoftness: .95,
+        }
+    },
+    draw: drawDeSNounVerbed
+})
+
+layerTypes.push({
     id: 'des:target-destroyed',
     type: MacroType.nounVerbed,
     game: Game.des,
