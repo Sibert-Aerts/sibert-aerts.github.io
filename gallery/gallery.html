@@ -1,115 +1,307 @@
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <link rel=stylesheet type=text/css href=html/style.css>
-    <title>Rezuaq's Image Gallery Demo</title>
-    <link rel=icon href=html/favicon.ico>
+	<!-- REZUAQ GALLERY APP v2021 © REZUAQ (SIBERT AERTS) -->
+	<meta charset=UTF-8>
+	<link rel=stylesheet type=text/css href=_html/style.css>
+	<title>Rezuaq's Image Gallery Demo</title>
+	<link rel=icon href=_html/favicon.ico>
 </head>
 
 <body>
-    <div id=spinner>
-        <div id=spindle>💀</div>
-    </div>
+	<div id=spinner>
+		<div id=spindle>💀</div>
+	</div>
 
-    <div id=month class=box>
-        <span class='big butt' id=month-prev style=float:left>⬅</span>
-        <span id=month-name></span>
-        <span class='big butt' id=month-next style=float:right>➡</span>
-    </div>
+	<div id=main>
+		<!-- MAIN VIEW -->
+		<div id=load-blur></div>
 
-    <div id=picture-frame>
-        <img id=picture>
-    </div>
+		<div id=main-left>
+			<div id=picture-wrap>
+				<div id=picture-frame>
+					<div id=picture-overlay></div>
+					<a id=picture-link>
+						<img id=picture>
+					</a>
+				</div>
+			</div>
+		</div>
 
-    <div id=navigator class=box>
-        <div class=title>
-            <span id=nav-random class=butt>🔀&#xFE0E;</span> <span class=butt id=nav-prev>⬅</span>NAVIGATOR<span class=butt id=nav-next>➡</span> <div id=help>?</div>
-        </div>
-        <div id=nav-container></div>
-    </div>
+		<div id=main-right>
+			<div id=month class='box center'>
+				<button class=big id=month-prev style=float:left>🠜</button>
+				<button class=big id=month-name></button>
+				<button class=big id=month-next style=float:right>🠞</button>
+			</div>
+	
+			<div id=month-list class=box hidden>
+				<div class=title>
+					MONTH <button id=month-list-close>×</button>
+				</div>
+				<div id=month-list-container></div>
+			</div>
 
-    <div id=commentary class=box>
-        <div class=title id=pic-name></div>
-        <div class=title style=font-size:18px>COMMENTARY</div>
-        <div class=body id=desc></div>
-    </div>
+			<div id=navigator class=box>
+				<div class=title style=display:flex;justify-content:space-between;align-items:center>
+					<button id=nav-random>🔀&#xFE0E;<div class=tooltip style=left:-25px;>Random</div></button>
+					<div class=center>
+						<button id=nav-prev>⯇</button>
+						PAGE
+						<button id=nav-next>⯈</button>
+					</div>
+					<div id=open-help>?<div class=tooltip style=left:-10px;>Help</div></div>
+				</div>
+				<div id=nav-container></div>
+			</div>
+	
+			<div id=description class=box>
+				<div class=title>
+					<span id=pic-name></span>
+					<span id=open-page-info style=float:right;width:.55em>i<div class=tooltip style=left:-14px;>Info</div></span>
+				</div>
+				<div id=comment-wrap>
+					<div class=body id=comment></div>
+				</div>
+			</div>
+	
+			<div id=dev-annotation-editor class='dev box' style=width:85% hidden>
+				<button onclick=makeAnnotation()>Make annotation</button> 
+				<button onclick="copyTextArea('dev-annotation-out')">copy</button>
+				<label><input type=checkbox id=dev-check-invisible checked> invisible</label>
+				<br>
+				<textarea id=dev-annotation-out style=width:100%></textarea>
+				<br>
+				Paste the resulting HTML tag into your page description to make an annotation box.
+			</div>
+			
+		</div>
 
 
-    <div id=help-box hidden>
-        <h2 style=margin-left:2%;margin-bottom:0px>Info</h2>
+	</div>
 
-        <div>
-            <div style=width:30%;float:left;>
-                <h3 style=margin-left:5%>Thumbnails</h3>
-                <div class='nav'></div> <span class=nav-help>Regular scan</span> <br>
-                <div class='nav special'></div> <span class=nav-help>Edited scan or collage</span> <br>
-                <div class='nav digital'></div> <span class=nav-help>Digital drawing</span> <br>
-                <div class='nav spoiler'></div> <span class=nav-help>Spoilers!</span> <br>
-                <div class='nav has-desc' style=background-image:none;background-color:#fff2></div> <span class=nav-help>Has commentary</span> <br>
-            </div>
+	<div id=credit>Rezuaq 2019–2022 <a href=https://twitter.com/rezuaq target=_blank style=padding-left:10px>@Rezuaq</a></div>
 
-            <div style=width:25%;float:left;>
-                <h3 style=margin-left:5%>Icons</h3>
-                <span class=emoji>🦑</span> Splatoon <br>
-                <span class=emoji>👧</span> Girls <br>
-                <span class=emoji>💬</span> Comic <br>
-                <span class=emoji>💉</span> Blood & Gore <br>
-            </div>
+	<div id=modals>
 
-            <div style=width:40%;float:left;>
-                <h3 style=margin-left:5%>Controls</h3>
-                <p><b>Left/right</b> on the <b>keyboard</b> for previous/next scan.</p>
-                <p><b>Up/down</b> on the <b>keyboard</b> for next/previous month.</p>
-                <p><b>Forward/backwards</b> in your <b>browser</b> to navigate forward/backwards through the scans you've visited.</p>
-                <p><b>Enter</b> on the <b>keyboard</b> to zoom in on the image.</p>
-                <p><b>Escape/Enter</b> on the <b>keyboard</b> to zoom back out.</p>
+		<div id=help class=modal hidden>
+			<h2 style=margin-left:2%;margin-bottom:0px>Help</h2>
 
-                <h3 style=margin-left:5%;margin-top:30px>Contact</h3>
-                If anything is weird or broken or you just want to chat, you can contact me on Twitter&nbsp;(<a href=https://twitter.com/rezuaq target=_blank>@Rezuaq</a>)
-                or by e-mail&nbsp;(<a href=mailto:rezuaq@gmail.com target=_blank>rezuaq@gmail.com</a>) or on Discord&nbsp;(<b>Rezuaq#0736</b>).
-            </div>
-        </div>
+			<div>
+				<div style=width:30%;float:left;>
+					<h3 style=margin-left:5%>Thumbnails</h3>
+					<div class='nav'></div> <span class=nav-help>Regular scan, drawn at home</span> <br>
+					<div class='nav remote'></div> <span class=nav-help>Drawn during remote lecture</span> <br>
+					<div class='nav school'></div> <span class=nav-help>Drawn during regular lecture</span> <br>
+					<div class='nav special'></div><span class=nav-help>Edited scan or collage</span> <br>
+					<div class='nav has-desc' style=background-image:none;background-color:#fff1></div> <span class=nav-help>Has commentary</span> <br>
+				</div>
 
-        <div style=opacity:.6;position:absolute;bottom:16px;left:5%>Click to close</div>
-    </div>
+				<div style=width:28%;float:left;>
+					<h3 style=margin-left:5%>Icons</h3>
+					<span class=emoji>💬</span> Comic <br>
+					<span class=emoji>👧</span> Original characters <br>
+					<span class=emoji>🩸</span> Blood or gore <br>
+					<span class=emoji>🔫</span> Guns and firearms <br>
+					<span class=emoji>🦠</span> Jeremy "Jerma985" <a href=https://youtube.com/channel/UCL7DDQWP6x7wy0O6L5ZIgxg>(YouTube)</a><br>
+				</div>
 
-    <div id=credit>
-        Made by Rezuaq 2019 <a href=https://twitter.com/rezuaq style=padding-left:10px>@Rezuaq</a>
-    </div>
+				<div style=width:40%;float:left;>
+					<h3 style=margin-left:5%>Keyboard controls</h3>
+					<p><b>Arrow keys</b> on the <b>keyboard</b> to browse images.</p>
+					<p><b>Ctrl + left/right</b> on the <b>keyboard</b> for previous/next month.</p>
+					<p><b>Forward/backwards</b> in your <b>browser</b> to navigate forward/backwards through the scans you've visited.</p>
+					<p><b>Enter</b> on the <b>keyboard</b> to open the zoom view.</p>
+					<p><b>+/-</b> on the <b>keyboard</b> to zoom in/out.</p>
+					<p><b>Escape/Enter</b> on the <b>keyboard</b> to close the zoom view.</p>
 
-    <div id=zoom-view hidden>
-        <img id=zoom-picture></img>
-    </div>
+					<h3 style=margin-left:5%;margin-top:30px>Contact</h3>
+					If anything is weird or broken or you just want to chat, you can contact me on Twitter&nbsp;(<a href=https://twitter.com/rezuaq target=_blank>@Rezuaq</a>),
+					by e-mail&nbsp;(<a href=mailto:rezuaq@gmail.com target=_blank>rezuaq@gmail.com</a>) or on Discord&nbsp;(<b>Rezuaq#0736</b>).
+				</div>
+			</div>
+
+			<div id=close-help class=close-modal>×</div>
+		</div>
+
+		<div id=page-info class=modal hidden>
+			<h2 style=margin-left:2%>Picture info</h2>
+
+			<table id=page-info-table>
+				<tr>
+					<td> <b>Name:</b> </td><td> <span name=name></span> </td>
+				</tr><tr>
+					<td> <b>File type:</b> </td><td> <span name=type></span> </td>
+				</tr><tr>
+					<td> <b>Source:</b> </td><td> <a name=link target=_blank></a> </td>
+				</tr><tr>
+					<td> <b>Dimensions:</b> </td><td> <span name=size></span> </td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+				<tr>
+					<td> <b>Tags:</b> </td><td> <span name=tags></span> </td>
+				</tr><tr>
+					<td> <b>Annotations:</b> </td><td> <span name=annots></span> </td>
+				</tr>
+			</table>
+
+			<div id=close-page-info class=close-modal>×</div>
+		</div>
+
+	</div>
+
+	<div id=zoom-wrap hidden>
+		<div id=zoom-backdrop></div>
+		<div id=zoom-view>
+			<img id=zoom-picture></img>
+		</div>
+		<div id=zoom-control-wrap>
+			<div id=zoom-control-box>
+				<div id=zoom-labels><span>10%</span><span style=padding-left:34px>50%</span><span style=text-align:right>100%</span></div>
+				<input type=range min=100 max=1000 value=500 id=zoom-control>
+			</div>
+		</div>
+		<div id=zoom-close>×</div>
+	</div>
 
 </body>
 
-<script src=html/script.js></script>
+<!----------------------------------- PAGE LAYOUT ENDS HERE ----------------------------------->
+
+
+
+
+
+<image-list hidden>
+	<!------------- DEFINE MONTHS AND PAGES HERE ------------->
+
+	<month name="Folder 1" path=folder_1>
+		
+		<page file=pic01.png tags="SPECIAL">
+			For a detailed explanation of how this gallery works, how to use it, and what the various symbols and icons mean, click the [?] icon top right.
+			<br><br>
+			This box is the commentary box, you can put any kind of html in here that you like.
+		</page>
+
+		<page file=pic02.png tags='JERMA'>
+			Pictures can have annotations of all kinds.
+			<p annot=1>
+				You can link annotations to bits of text that highlight them, like this one.
+			</p>
+			Annotations can be set to be invisible unless you hover over them, and can show in-line bits of commentary, like the "?" on the drawing there.
+
+			<annot name=1 x=.2545 y=.0386 w=.2 h=.2></annot>
+
+			<annot name=2 class=invis x=.7158 y=.6451 w=.0690 h=.0717>
+				<annot position=above><span style="font-size:40px">?</span></annot>
+			</annot>
+		</page>
+
+	</month>
+
+	<month name="Folder 2" path=folder_2>
+		
+		<page file=pic03.png tags="GIRLS">
+			You can have multiple "directories" or "folders" (I use them for months).
+		</page>
+
+		<page file=pic04.png tags='JERMA RIGHTSTUB'>
+		</page>
+
+		<page file=pic05.png tags='BLOOD LEFTSTUB'>
+			<annot name=1 class=invis x=.1074 y=.0932 w=.3264 h=.4589>
+				<annot>
+					"Bonjour, avez-vous déja mangé?"<br>
+					("Hello, have you already eaten?")
+				</annot>
+			</annot>
+		</page>
+
+	</month>
+
+</image-list>
+
+
+<script src=_html/script.js></script>
 
 <script>
 
-    // IMAGE FLAGS
-    let SPOILER = true;
-    let DIGITAL = true;
-    let SPECIAL = true;
-    let COMIC = true;
-    let BLOOD = true;
-    let SQUID = true;
-    let GIRLS = true;
+	//// UPDATE LOG FOR v2019:
+	// 28/10/19 - middle clicking picture opens the image in new tab
+	// 28/10/19 - month name is now a button that opens a menu that lets you select a month directly
+	// 02/12/19 - a button lets you close the month selector box
+	// 05/12/19 - instead of up/down, ctrl+left/ctrl+right now move between months
+	// xx/12/19 - inputting a secret code now triggers secret code
+	// 12/12/19 - scrollbar is always visible + customised scrollbar appearance to balance this out (webkit only)
+	// 13/01/20 - add little 'fade in' animations on loading the page
+	// 14/01/20 - tweak fade in, close zoom/help by clicking outside instead of inside,
+	//            drag zoom view to scroll, slight feedback on clicking navs, almost perfect scroll bars
+	// 27/01/20 - screw around with ALL alignment and spacing stylings to make sure everything looks good at all window sizes
+	// 29/01/20 - pull up tag code so you can just define them in gallery.html
+	// 30/01/20 - image is centered on zoom
+	// 06/02/20 - months and pages are no longer added using javascript directly but by HTML elements as seen above,
+	//            refactor stuff; create Page class, pull stuff up, refactor, refactor, refactor....
+	// 07/02/20 - refactoring refactoring yet more refactoring, fix a bunch of stuff that was triggering twice due to parseanchor shenanigans...
+	// 09/02/20 - scrolling over the zoom scroll bar zooms in/out
+	// 10/02/20 - refactor page link parsing, "@@handle" now turns into a link to @handle on twitter
+	// 16/02/20 - finishing aesthetic touches
+	// 02/03/20 - better keyboard controls: zoom view focuses properly, +/- to zoom in out, Enter can be used to just click things again
+	// 07/03/20 - truly final touches; release day
 
-    var jan = new Month('Month 1', '01');
+	//// UPDATE LOG FOR v2020:
+	// 23/01/21 - clicking on an image to open the zoom view will result in the clicked part of the image being centered in zoom view,
+	//            also refactored a lot, made a Gallery class and ripped the huge start_gallery function into 10 different methods of Gallery
+	// 24/01/21 - zoom view: zooming in or out happens around the center of the screen, double-clicking zooms in the double-clicked part
+	// 26/01/21 - prototype proportionately defined image overlay boxes that change color when hovering over parts of the description
+	// 27/01/21 - simple system for defining "annotations" on an image that are highlighted when hovering over a part of the description,
+	//            pressing UP and DOWN arrows now navigates up or down through the thumbnails
+	// 28/01/21 - tweak annotation types and behaviour, add dev-facing annotation editor
+	// 30/01/21 - add 'page info' window showing some page metadata
+	// 31/01/21 - implement 'child annotations' containing text (or any HTML) that show up next to an annotation when hovering over it
+	// 28/02/21 - minor finishing touches
+	// 28/02/21 - fix +/- buttons zooming by .5% instead of 5%
 
-    jan.add('Untitled.png', `This is the first picture in the gallery!<br><br> Press right on your keyboard, or right arrow on the navigator to go to the next image!`, {DIGITAL, COMIC});
-    jan.add('Capture.PNG', `This is the second picture in the gallery!<br><br> click this link to go back to the first image: [01/Untitled]`, {DIGITAL, COMIC});
+	//// UPDATE LOG FOR v2021
+	// 05/07/21 - 'Month' box and 'Month list' box now has a cute little animation morphing between the two of them
+	// 08/07/21 - Gallery is now actually split into a left panel (picture display) and right panel (controls);
+	//            Right panel elements center vertically and scroll independently, left panel is centered entirely
 
-    var feb = new Month('Month 2', '02');
-    feb.add('Untitled2.jpg', `This is the first picture of the second month!`, {DIGITAL, COMIC});
-    feb.add('Untitled3.png', `This picture is very large, click on it to see it at 100%!`, {DIGITAL, COMIC});
-    feb.add('Untitled4.jpg', `This picture uses <b>HTML</b> markup!<br><span class=bottom-text>bottom text</span>`, {DIGITAL, COMIC});
+	//// TODO:
+	// * BUG: dragging zoom view onto scroll bar closes zoom view
 
+	// IMAGE TAGS: { tag: effect }
+	// ABC: asClass('xyz') means any image tagged with "ABC" will have a thumbnail with class "xyz"
+	// DEF: asEmoji('🙂') means any image tagged with "DEF" will have a thumbnail containing the 🙂 emoji
+	const TAGDICT = {
+		// "DESC" should not be manually assigned, but is given to any picture with a non-empty description
+		DESC:       asClass('has-desc'),
+		SCHOOL:     asClass('school'),
+		REMOTE:     asClass('remote'),
+		SPECIAL:    asClass('special'),
+		SECRET:     asClass('secret'), // TEST: REMOVE THIS
+		REMOVED:    asClass('removed'), // TEST: REMOVE THIS
+		
+		GIRLS:      asEmoji('👧'),
+		COMIC:      asEmoji('💬'),
+		GUNS:       asEmoji('🔫'),
+		JERMA:      asEmoji('🦠'),
+		BLOOD:      asEmoji('🩸'),
+		GAME:       asEmoji('🎮'),
 
-    // THIS LINE IS VERY IMPORTANT!!!!!!!!!!!!!
-    months = [jan, feb];
+		LEFTNUB: nav => nav.appendChild(makeElem('div', 'nub left-nub')),
+		RIGHTNUB: nav => nav.appendChild(makeElem('div', 'nub right-nub')),
+		LEFTSTUB: nav => nav.appendChild(makeElem('div', 'nub left-stub')),
+		RIGHTSTUB: nav => nav.appendChild(makeElem('div', 'nub right-stub')),
+	}
 
-    // THIS ONE TOO!!!!!!!!!!!
-    start_gallery();
+	function SPINDLEMAP( tags ){
+		if( tags.has('BLOOD') ) return '🩸'
+		if( tags.has('GAME') )  return '🎮'
+		if( tags.has('GIRLS') ) return '👧'
+		return '💀'
+	}
+
+	var GALLERY = new Gallery()
 
 </script>
+</html>
