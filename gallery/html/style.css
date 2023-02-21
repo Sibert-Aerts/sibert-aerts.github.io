@@ -14,7 +14,7 @@ html, body {
     overflow-y: overlay;
     background-attachment: local;
     background-color: #282828;
-    background-image: url('../_html/background.png');
+    background-image: url('../html/background.png');
 }
 
 #main-left {
