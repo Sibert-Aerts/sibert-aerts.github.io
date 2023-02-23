@@ -11,13 +11,13 @@ const MacroType = {
     special: 'special'
 }
 const macroTypeName = {
-    nounVerbed: 'Noun Verbed',
-    areaName: 'Area name',
-    youDied: 'Death',
-    boss: 'Boss health bar',
-    poison: 'Poison bar',
+    nounVerbed: '🏆 Noun Verbed',
+    areaName: '📍 Area name',
+    youDied: '☠️ Death',
+    boss: '👹 Boss health bar',
+    poison: '🩸 Poison bar',
 
-    special: 'Non-FromSoft',
+    special: '✨ Non-FromSoft',
 }
 
 const Game = {
