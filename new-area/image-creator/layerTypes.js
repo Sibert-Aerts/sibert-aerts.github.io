@@ -13,7 +13,7 @@ const MacroType = {
 const macroTypeName = {
     nounVerbed: '🏆 Noun Verbed',
     areaName: '📍 Area name',
-    youDied: '☠️ Death',
+    youDied: '💀 Death',
     boss: '👹 Boss health bar',
     poison: '🩸 Poison bar',
 
