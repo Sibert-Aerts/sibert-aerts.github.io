@@ -5,6 +5,7 @@ const MacroType = {
     nounVerbed: 'nounVerbed',
     areaName: 'areaName',
     youDied: 'youDied',
+    interactBox: 'interactBox',
     boss: 'boss',
     poison: 'poison',
 
@@ -14,6 +15,7 @@ const macroTypeName = {
     nounVerbed: '🏆 Noun Verbed',
     areaName: '📍 Area name',
     youDied: '💀 Death',
+    interactBox: '📋 Interact Box',
     boss: '👹 Boss health bar',
     poison: '🩸 Poison bar',
 
@@ -41,7 +43,7 @@ const gameName = {
  * @prop {keyof Game} game
  * @prop {string} preset
  * 
- * @prop {'all caps' | 'title case'} preferCase
+ * @prop {'all caps' | 'title case' | undefined} preferCase
  * @prop {object} sliders
  * 
  * @prop {drawFun} draw()
@@ -1780,6 +1782,31 @@ layerTypes.push({
     },
     draw: drawERPoison
 })
+
+
+//////// Interact Box
+
+layerTypes.push({
+    id: 'ds1:interact',
+    type: MacroType.interactBox,
+    game: Game.ds1,
+    preset: 'YES/NO',
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.345
+        },
+        font: {
+            fontFamily: 'Georgia', textColor: [242, 242, 242],
+            fontSize: 39, fontWeight: 200,
+            vScale: 1, charSpacing: 2,
+        },
+        interactBox: {option1: 'YES', option2: 'NO'}
+    },
+    draw: drawDS1InteractBox
+})
+
 
 //////// Special
 

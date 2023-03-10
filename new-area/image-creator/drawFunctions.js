@@ -30,6 +30,8 @@ const ASSETS = {
         poisonIcons: new Asset('ds1/poison icons.png'),
         poisonBarFrame: new Asset('ds1/poison bar frame.png'),
         poisonBarFrameEnd: new Asset('ds1/poison bar frame end.png'),
+        interactBox: new Asset('ds1/interact box.png'),
+        interactBoxButton: new Asset('ds1/interact box button.png'),
     },
     ds2: {
         bossHealthFrame: new Asset('ds2/boss health frame.png'),
@@ -1174,4 +1176,53 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     const icons = await ASSETS.eldenRing.poisonIcons.get()
     ctx.drawImage(icons, 0, type*106, 106, 106, -106, -106/2, 106, 106)
     ctx.restore()
+}
+
+
+// ================================================ POP-UP BOXES ================================================
+
+/** @type {drawFun} Function which draws DS1 poison status bar. */
+async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+    ctx.scale(.75, .75)
+
+    const {option1, option2, selected} = sliders.interactBox
+
+    // The Box
+    const boxWidth = 1290, boxHeight = 260
+    const box = await ASSETS.ds1.interactBox.get()
+    ctx.drawImage(box, -boxWidth/2 - 4, -boxHeight/2)
+
+    // Text
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'center'
+    ctx.fillText(caption, 0, -10/vScale)
+
+    if (!option1 || !option2) {
+        const option = option1 || option2
+        if (selected) {
+            const button = await ASSETS.ds1.interactBoxButton.get()
+            ctx.save()
+            ctx.scale(1, .8)
+            ctx.drawImage(button, -boxWidth/2, -boxHeight/2 + 10)
+            ctx.restore()
+        }
+        ctx.fillText(option, 0, 55/vScale)
+    } else {
+        if (selected) {
+            const button = await ASSETS.ds1.interactBoxButton.get()
+            const xo = (selected=='first')? -280: 280
+            ctx.drawImage(button, xo-boxWidth/2, -boxHeight/2)
+        }
+        ctx.fillText(option1, -280, 52/vScale)
+        ctx.fillText(option2,  280, 52/vScale)
+    }
 }

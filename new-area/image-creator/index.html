@@ -551,6 +551,29 @@
 					</div>
 				</div>
 
+				<div name=interactBox class=sliders-container hidden>
+					<h4> Interact Box </h4>
+					<div class=smol>
+						<span class=input-title>First option:</span>
+						<button class=reset-button></button>
+						<input name=option1 type=text default=YES>
+					</div>
+					<div class=smol>
+						<span class=input-title>Second option:</span>
+						<button class=reset-button></button>
+						<input name=option2 type=text default=NO>
+					</div>
+					<div>
+						<span class=input-title>Selected:</span>
+						<button class=reset-button></button>
+						<select name=selected default=first>
+							<option value="">None</option>
+							<option value=first>First</option>
+							<option value=second>Second</option>
+						</select>
+					</div>
+				</div>
+
 			</div>
 
 			<div id=layers class=sliders-container hidden>
@@ -698,6 +721,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/03/10</b> • Add Dark Souls 1 interact box, add some Elden Ring poison colours <br>
 			<b>2023/01/14</b> • Add two more Demon's Souls Noun Verbeds <br>
 			<b>2022/10/16</b> • Implemented layer system to allow combining macros easily. <br>
 			<b>2022/10/15</b> • Added Elden Ring style poison bar presets (WIP)<br>
