@@ -1718,11 +1718,11 @@ layerTypes.push({
         position: {
             xOffset: -.082, yOffset: .237, scale: 1.5
         },
-        font: {
-            fontFamily: 'Georgia', textColor: [255, 0, 0],
-            fontSize: 40, fontWeight: 400,
-            vScale: 1, charSpacing: 0,
-        },
+        // font: {
+        //     fontFamily: 'Georgia', textColor: [255, 0, 0],
+        //     fontSize: 40, fontWeight: 400,
+        //     vScale: 1, charSpacing: 0,
+        // },
         ds1Poison: {}
     },
     draw: drawDS1Poison
@@ -1739,7 +1739,6 @@ layerTypes.push({
         position: {
             xOffset: -.053, yOffset: .142
         },
-        font: layerTypes.at(-1).sliders.font,
         ds1Poison: {}
     },
     draw: drawDS1Poison
@@ -1756,11 +1755,11 @@ layerTypes.push({
         position: {
             xOffset: -.115, yOffset: .23, scale: 1.5
         },
-        font: {
-            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [249, 233, 233],
-            fontSize: 40, fontWeight: 400,
-            vScale: 1, charSpacing: 0,
-        },
+        // font: {
+        //     fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [249, 233, 233],
+        //     fontSize: 40, fontWeight: 400,
+        //     vScale: 1, charSpacing: 0,
+        // },
         erPoison: { textOffset: 350 }
     },
     draw: drawERPoison
@@ -1777,7 +1776,6 @@ layerTypes.push({
         position: {
             xOffset: -.077, yOffset: .164, scale: 1
         },
-        font: layerTypes.at(-1).sliders.font,
         erPoison: {}
     },
     draw: drawERPoison

@@ -72,7 +72,7 @@ const ASSETS = {
 
         poisonFrameCapLeft: new Asset('eldenRing/poison frame cap left.png'),
         poisonFrameLength: new Asset('eldenRing/poison frame length.png'),
-        poisonBarRot: new Asset('eldenRing/poison bar rot.png'),
+        poisonBarFill: new Asset('eldenRing/poison bar fill.png'),
         poisonBarCap: new Asset('eldenRing/poison bar cap.png'),
         poisonIcons: new Asset('eldenRing/poison icons.png'),
     }
@@ -1025,7 +1025,6 @@ async function drawBloodborneBoss(ctx, canvas, gen, sliders) {
     ctx.fillText(damageNumber, 630, -23/vScale)
 }
 
-
 /** @type {drawFun} Function which draws Elden Ring boss health bar + name. */
 async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
     // CONSTANTS
@@ -1094,7 +1093,7 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {poison, maxPoison, type, active, showText, textOffset} = sliders.ds1Poison
+    const {poison, maxPoison, type, active} = sliders.ds1Poison
 
     ctx.save()
     ctx.scale(.75, .75)
@@ -1130,16 +1129,8 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
     const icons = await ASSETS.ds1.poisonIcons.get()
     ctx.drawImage(icons, 0, type*86, 86, 86, -110, -86/2, 86, 86)
     ctx.restore()
-
-    // TEXT
-    if( showText === 'show' ) {
-        const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
-        ctx.textBaseline = 'alphabetic'
-        ctx.textAlign = 'center'
-        ctx.globalAlpha = 0.8
-        ctx.fillText(caption, 105, -textOffset/vScale)
-    }
 }
+
 /** @type {drawFun} Function which draws ER poison status bar. */
 async function drawERPoison(ctx, canvas, gen, sliders) {
     // CONSTANTS
@@ -1151,7 +1142,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const {poison, maxPoison, type, active, showText, textOffset} = sliders.erPoison
+    const {poison, maxPoison, type, active} = sliders.erPoison
 
     ctx.save()
     ctx.scale(.5, .5)
@@ -1166,8 +1157,8 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     ctx.fillRect(0, -fillHeight/2, frameWidth, fillHeight)
     
     // Bar
-    const bar = await ASSETS.eldenRing.poisonBarRot.get()
-    ctx.drawImage(bar, 0, 0, fillLeft + barWidth, 100, -fillLeft, -50, fillLeft + barWidth, 100)
+    const bar = await ASSETS.eldenRing.poisonBarFill.get()
+    ctx.drawImage(bar, 0, type*100, fillLeft + barWidth, 100, -fillLeft, -50, fillLeft + barWidth, 100)
     const barCap = await ASSETS.eldenRing.poisonBarCap.get()
     ctx.drawImage(barCap, -21.5 + barWidth, -50)
 
@@ -1183,12 +1174,4 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     const icons = await ASSETS.eldenRing.poisonIcons.get()
     ctx.drawImage(icons, 0, type*106, 106, 106, -106, -106/2, 106, 106)
     ctx.restore()
-
-    // TEXT
-    if( showText === 'show' ) {
-        const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
-        ctx.textBaseline = 'alphabetic'
-        ctx.textAlign = 'center'
-        ctx.fillText(caption, 148, -textOffset/vScale)
-    }
 }
