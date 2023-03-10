@@ -142,8 +142,14 @@
 
 				<div>
 					<span class=input-title style=min-width:100px>Caption:</span>
+					<!-- NOTE: this textarea tag has to look stupid or else there's a bunch of newlines in there -->
 					<textarea id=image-caption rows=1 style="min-height: 1em; min-width:280px; max-width:280px; margin-bottom:-8px"
-					>Caption Unaltered</textarea>
+					>Caption unaltered</textarea>
+					<label>
+						<span style="min-width:100px; display:inline-block;"></span>
+						<input name=adjustCase type=checkbox checked>
+						Adjust capitalization
+					</label>
 				</div>
 			</div>
 

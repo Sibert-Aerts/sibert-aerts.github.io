@@ -6,6 +6,19 @@
 ///// TINY UTILS
 const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
 
+
+const TITLE_EXEMPT = /^(of|and|the|a|an|in|on|or|my)$/
+
+function titleCase(string) {
+    if (!string) return string
+    let first = true
+    return string.replace(/\S+/g, function(s) {
+        if (!first && s.match(TITLE_EXEMPT)) return s
+        first = false
+        return s[0].toUpperCase() + s.slice(1)
+    })
+}
+
 ///// TINY DOM UTILS
 const byId = id => document.getElementById(id)
 const makeElem = (tag, clss, text) => { const e = document.createElement(tag); if(clss) e.className = clss; if(text) e.textContent = text; return e }
@@ -180,7 +193,7 @@ const CONVERTERS = {
         constructor(string) {
             this.base = parseFloat(string.slice(3))
             this.logb = Math.log(this.base)
-        }   
+        }
         parse(value) { return Math.pow(this.base, parseFloat(value)) }
         toString(value) { return Math.log(parseFloat(value))/this.logb }
     }
@@ -189,7 +202,7 @@ const CONVERTERS = {
 const DEFAULT_CONVERTERS = {
     text: 'string',
     range: 'float',
-    color: 'rgb'
+    color: 'rgb',
 }
 
 
@@ -228,7 +241,7 @@ class Sliders {
             if( div.tagName !== 'DIV' ) continue
 
             const slider = 
-                div.getElementsByTagName('input')[0] || div.getElementsByTagName('textarea')[0]  || div.getElementsByTagName('select')[0]
+                div.getElementsByTagName('input')[0] || div.getElementsByTagName('textarea')[0] || div.getElementsByTagName('select')[0]
             if( !slider ) return
 
             /// Add to our collections
@@ -323,7 +336,7 @@ class Sliders {
             if( slider.resetButton )
                 slider.resetButton.disabled = false
         }
-    }    
+    }
 
     /**
      *  Get all values that aren't default.
@@ -433,6 +446,7 @@ class MacroGenerator {
         /** my(t, n) = my element `<t>` named `n` */
         const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
+        const redraw = () => this.redrawMacro()
         const autoRedraw = () => this.autoRedraw()
 
         //// CANVAS
@@ -473,8 +487,10 @@ class MacroGenerator {
         if( window.MACROGEN_DEFAULTS?.caption )
             this.captionInput.value = window.MACROGEN_DEFAULTS.caption
 
+        this.adjustCaseCheckbox = my('input', 'adjustCase')
+        this.adjustCaseCheckbox.onchange = redraw
         this.resolutionCheckbox = my('input', 'limit-resolution')
-        this.resolutionCheckbox.onchange = () => this.redrawMacro()
+        this.resolutionCheckbox.onchange = redraw
 
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
@@ -524,6 +540,18 @@ class MacroGenerator {
                 }
             }
         }
+    }
+
+    getCaption() {
+        const caption = this.captionInput.value
+        if (!this.adjustCaseCheckbox.checked)
+            return caption
+        const layer = this.getLayerType()
+        if (layer.preferCase === 'all caps')
+            return caption.toUpperCase()
+        if (layer.preferCase === 'title case')
+            return titleCase(caption)
+        return caption
     }
 
     setupCanvasOverlay() {
@@ -736,7 +764,7 @@ class MacroGenerator {
             const data = this.layers[i]
             const otherData = this.layers[i-1];
             [this.layers[i], this.layers[i-1]] = [otherData, data]
-            this.my('div', 'layers-container').insertBefore(data.button, otherData.button)            
+            layerContainer.insertBefore(data.button, otherData.button)            
 
             this.activeLayer--
             this.redrawMacro()
@@ -749,7 +777,7 @@ class MacroGenerator {
             const data = this.layers[i]
             const otherData = this.layers[i+1];
             [this.layers[i], this.layers[i+1]] = [otherData, data]
-            this.my('div', 'layers-container').insertBefore(otherData.button, data.button)            
+            layerContainer.insertBefore(otherData.button, data.button)            
 
             this.activeLayer++
             this.redrawMacro()
@@ -806,19 +834,19 @@ class MacroGenerator {
                 oldData.layer = this.getLayerType()
                 oldData.sliders = this.getChangedSliderValues()
             }
-
             // Pull in switched-to layer state
             data.activate()
-
             oldData?.updateButton()
         }
         button.addEventListener('click', onClick)
+        // Dumb workaround for the caption possibly being changed instantly here
+        const caption = this.captionInput.value
         onClick()
+        this.captionInput.value = caption
     }
 
     /** Makes an HTML layer box element
      * @param {DrawableLayer} layer
-     * 
     */
     makeLayerButton(data) {
         const button = makeElem('button', 'soulsy-box layer-box')
@@ -858,7 +886,7 @@ class MacroGenerator {
         const data = this.layers[this.activeLayer]
         if( !data ) return
         data.layer = this.getLayerType()
-        data.sliders.caption = this.captionInput.value
+        data.sliders.caption = this.getCaption()
         data.updateButton()
     }
 
@@ -866,7 +894,8 @@ class MacroGenerator {
 
     getChangedSliderValues() {
         const vals = {}
-        vals.caption = this.captionInput.value
+        vals.caption = this.getCaption()
+        vals.adjustCase = this.adjustCaseCheckbox.checked
         for( const slider in this.sliders ) {
             vals[slider] = this.sliders[slider].getChangedValues()
         }
@@ -875,6 +904,7 @@ class MacroGenerator {
     
     setChangedSliderValues(vals) {
         this.captionInput.value = vals.caption 
+        this.adjustCaseCheckbox.checked = vals.adjustCase
         for( const slider in this.sliders ) {
             this.sliders[slider].setChangedValues(vals[slider])
         }
@@ -915,12 +945,6 @@ class MacroGenerator {
         //// Enable/disable Games
         for( const gameKey in Game )
             this.gameSelect.namedItem(gameKey).disabled = !this.presetSelects[macroType][gameKey]
-
-        //// Update generic caption
-        if( this.captionInput.value === 'CAPTION UNALTERED' && newType.preferCase === 'title case' )
-            this.captionInput.value = 'Caption Unaltered'
-        else if( this.captionInput.value === 'Caption Unaltered' && newType.preferCase === 'all caps' )
-            this.captionInput.value = 'CAPTION UNALTERED'
 
         this.updateCanvasOverlay()
         this.updateActiveLayerButton()
@@ -1134,25 +1158,25 @@ class MacroGenerator {
         this.resView.x.textContent = canvas.width
         this.resView.y.textContent = canvas.height
     
-        for( let i=this.layers.length-1; i >= 0; i-- ) {
+        for (let i=this.layers.length-1; i >= 0; i--) {
             const layerData = this.layers[i]
-            if( layerData.hidden ) continue
+            if (layerData.hidden) continue
             this.resetDrawingState()
             const layer = layerData.layer
             const isActive = (i === this.activeLayer)
 
             const sliders = {}
-            for( const slider in layer.sliders ) {
-                if( isActive )
+            if (isActive) {
+                sliders.caption = this.getCaption()
+                for (const slider in layer.sliders) {
                     sliders[slider] = this.sliders[slider].getValues()
-                else
-                    sliders[slider] = { ...this.sliders[slider].trueDefaults, ...layer.sliders[slider], ...layerData.sliders[slider] }
-            }
-
-            if( i === this.activeLayer )
-                sliders.caption = this.captionInput.value
-            else
+                }
+            } else {
                 sliders.caption = layerData.sliders.caption
+                for (const slider in layer.sliders) {
+                    sliders[slider] = { ...this.sliders[slider].trueDefaults, ...layer.sliders[slider], ...layerData.sliders[slider] }
+                }
+            }
             
             await layerData.layer.draw(ctx, this.canvas, this, sliders)
         }

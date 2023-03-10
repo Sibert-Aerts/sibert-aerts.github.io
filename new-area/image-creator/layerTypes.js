@@ -1762,7 +1762,7 @@ layerTypes.push({
         //     fontSize: 40, fontWeight: 400,
         //     vScale: 1, charSpacing: 0,
         // },
-        erPoison: { textOffset: 350 }
+        erPoison: {}
     },
     draw: drawERPoison
 })
@@ -1792,7 +1792,6 @@ layerTypes.push({
     game: Game.ds1,
     preset: 'YES/NO',
 
-    preferCase: 'title case',
     sliders: {
         position: {
             xOffset: 0, yOffset: 0.345
@@ -1837,7 +1836,6 @@ layerTypes.push({
     game: Game.ds1,
     preset: 'Snapchat',
 
-    preferCase: 'title case',
     sliders: {
         position: { 
             xOffset: 0, yOffset: 0, scale: 1 
