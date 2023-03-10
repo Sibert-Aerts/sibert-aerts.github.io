@@ -128,25 +128,25 @@
 				<h3> Configuration </h3>
 
 				<div>
-					<span class=input-title style=min-width:100px>Macro type:</span>
+					<span class="input-title macro-select-title" style=>Macro type:</span>
 					<select name=macro-type></select>
 				</div>
 				<div>
-					<span class=input-title style=min-width:100px>Game:</span>
+					<span class="input-title macro-select-title">Game:</span>
 					<select name=macro-type-game></select>
 				</div>
 				<div>
-					<span class=input-title style=min-width:100px>Preset:</span>
+					<span class="input-title macro-select-title">Preset:</span>
 					<div name=macro-type-preset-holder style=display:inline-block></div>
 				</div>
 
-				<div>
-					<span class=input-title style=min-width:100px>Caption:</span>
+				<div style=margin-bottom:-4px>
+					<span class="input-title macro-select-title">Caption:</span>
 					<!-- NOTE: this textarea tag has to look stupid or else there's a bunch of newlines in there -->
-					<textarea id=image-caption rows=1 style="min-height: 1em; min-width:280px; max-width:280px; margin-bottom:-8px"
+					<textarea id=image-caption rows=1 style="min-height: 26px; min-width:280px; max-width:280px; margin-bottom:-8px"
 					>Caption unaltered</textarea>
-					<label>
-						<span style="min-width:100px; display:inline-block;"></span>
+					<label style="margin-top:4px">
+						<span class="input-title macro-select-title"></span>
 						<input name=adjustCase type=checkbox checked>
 						Adjust capitalization
 					</label>
@@ -159,9 +159,9 @@
 				<div name=position class=sliders-container hidden>
 					<h4> Position </h4>
 					<div>
-						<label class=input-title style=margin-bottom:0>
-							Show manual controls:
+						<label style=margin-bottom:0>
 							<input name=showGrabby type=checkbox>
+							Enable manual controls
 						</label>
 					</div>
 					<div>

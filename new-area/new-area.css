@@ -196,6 +196,11 @@ body {
     font-weight: normal;
     min-width: 60px;
 }
+.macro-select-title {
+    min-width: 100px;
+    padding-right: .5em;
+    text-align: right;
+}
 
 .example {
     display: inline-block;
@@ -419,7 +424,8 @@ canvas.big {
 
 .tabs {
     position: relative;
-    display: inline-block;
+    display: flex;
+    justify-content: space-evenly;
     width: 100%;
     margin: 0 0 1em 0;
     padding: 0;
@@ -440,14 +446,13 @@ canvas.big {
     float: left;
     nav-index: 1;
     height: 100%;
-    margin: 0 1em;
+    margin: 0 .5em;
     padding: 4px;
     border-radius: 8px 8px 0 0;
     text-align: center;
 }
     .tabs.editor-tabs > .tab {
         width: 50px;
-        margin: 0 2% 0;
     }
 
     /* Button-like styling */
@@ -469,7 +474,7 @@ canvas.big {
     .tabs > .tab.checked {
         color: rgb(255, 187, 0);
         background-image: none;
-        background-color: #222;
+        background-image: linear-gradient(#333, #303030, #222);
         box-shadow: 6px -4px 6px -2px #0004, -6px -4px 6px -2px #0004;
         cursor: default;
     }
