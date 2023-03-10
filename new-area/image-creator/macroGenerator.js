@@ -563,7 +563,9 @@ class MacroGenerator {
 
         this.updateCanvasOverlay = () => {
             canvasOverlay.style.left = this.canvas.offsetLeft + 'px'
-            canvasOverlay.style.width = this.canvas.clientWidth + 'px'            
+            canvasOverlay.style.width = this.canvas.clientWidth + 'px'
+            canvasOverlay.style.top = this.canvas.offsetTop + 'px'
+            canvasOverlay.style.height = this.canvas.clientHeight + 'px'
             updateGrabbies()
         }
         window.addEventListener('resize', this.updateCanvasOverlay)

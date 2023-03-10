@@ -20,4 +20,3 @@
         * Ability to save layers as preset or something, and export/import presets
 
 * BUGS:
-    * Manual controls don't align properly at too-small image
