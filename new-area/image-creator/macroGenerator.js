@@ -260,7 +260,7 @@ class Sliders {
             /// Assign and remember its "true default" (=HTML-assigned default)
             const trueDefault = slider.getAttribute('default')
             slider.value = slider.default = slider.trueDefault = trueDefault
-            if( trueDefault )
+            if( trueDefault !== null )
                 this.trueDefaults[slider.name] = slider.converter.parse(trueDefault)
 
             if( slider.type === 'checkbox' ) slider.checked = slider.value
@@ -491,6 +491,10 @@ class MacroGenerator {
         this.adjustCaseCheckbox.onchange = redraw
         this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = redraw
+
+        for (const randomMacroButton of element.getElementsByClassName('random-macro-button')) {
+            randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
+        }
 
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
@@ -978,12 +982,17 @@ class MacroGenerator {
     }
 
     /** @param {DrawableLayer} layer */
-    setLayerType(layer) {
+    setLayerType(layer, redraw=false) {
         this.macroTypeSelect.value = layer.type
         this.gameSelect.value = layer.game
         this.presetSelects[layer.type][layer.game].value = layer.preset
 
-        this.onMacroTypeChange(null, false)
+        this.onMacroTypeChange(null, redraw)
+    }
+
+    selectRandomLayerType() {
+        const layer = layerTypes[Math.floor(Math.random()*layerTypes.length)]
+        this.setLayerType(layer, true)
     }
 
     /* ======================= DRAWING ======================= */

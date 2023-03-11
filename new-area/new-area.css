@@ -595,14 +595,20 @@ canvas.big {
     background: none;
     background-image: url(graphics/soulsy-icons.png);
     background-size: 3200% 300%;
-    background-position: -200% -100%;   /* Orange 🔄 */
+    background-position-x: -200%;   /* 🔄 */
+    background-position-y: -100%;   /* Orange */
 }
-.reset-button:hover {
-    background-position: -200% 0;       /* White 🔄 */
-}
-.reset-button:disabled {
-    cursor: initial;
-    background-position: -200% -200%;   /* Greyish 🔄 */
+    .reset-button:hover {
+        background-position-y: 0;       /* White */
+    }
+    .reset-button:disabled {
+        cursor: initial;
+        background-position-y: -200%;   /* Greyish */
+    }
+
+.random-macro-button {
+    float: none;
+    background-position-x: -1700%;   /* Orange 🔀 */
 }
 
 #layers-container {

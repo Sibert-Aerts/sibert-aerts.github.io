@@ -69,7 +69,7 @@
 			<div class=help>
 				Select, link or paste an image to add convincing FromSoftware text effects and game overlays to it.
 			</div>
-			<div class='help firefox-warning' style=color:#ff8e8e hidden>
+			<div class="help firefox-warning" style=color:#ff8e8e hidden>
 				Warning: On Firefox certain HTML canvas effects and filters don't work as intended.
 				It is recommended to turn off hardware acceleration, or to open this page in a chromium browser instead.
 			</div>
@@ -77,8 +77,8 @@
 
 			<div class=canvas-wrapper>
 				<div id=canvas-overlay>
-					<div class='grabby position-grabby' hidden></div>
-					<div class='grabby scale-grabby' hidden></div>
+					<div class="grabby position-grabby" hidden></div>
+					<div class="grabby scale-grabby" hidden></div>
 				</div>
 				<canvas id=canvas class=big width=1920px height=1080px>
 			</div>
@@ -130,6 +130,7 @@
 				<div>
 					<span class="input-title macro-select-title" style=>Macro type:</span>
 					<select name=macro-type></select>
+					<button class="reset-button random-macro-button" name="random-macro" title="Switch to random"></button>
 				</div>
 				<div>
 					<span class="input-title macro-select-title">Game:</span>
@@ -409,7 +410,7 @@
 					<div class=smol>
 						<span class=input-title>Type:</span>
 						<button class=reset-button></button>
-						<select name=type as=float default=1>
+						<select name=type as=float default=0>
 							<option value=0>Poison</option>
 							<option value=1>Scarlet Rot</option>
 							<option value=2>Bleed</option>
@@ -586,25 +587,24 @@
 				<h3> Layers </h3>
 				
 				<div id=layers-controls>
-					<button class="soulsy-box" name="moveUp" disabled>
+					<button class="soulsy-box" name="moveUp" title="Move layer up" disabled>
 						<div class="icon icon-move-up"></div>
 					</button>
-					<button class="soulsy-box" name="moveDown" disabled>
+					<button class="soulsy-box" name="moveDown" title="Move layer down" disabled>
 						<div class="icon icon-move-down"></div>
 					</button>
-					<button class="soulsy-box" name="duplicate">
+					<button class="soulsy-box" name="duplicate" title="Duplicate layer">
 						<div class="icon icon-plus"></div>
 					</button>
-					<button class="soulsy-box" name="delete" disabled>
+					<button class="soulsy-box" name="delete" title="Delete layer" disabled>
 						<div class="icon icon-bin"></div>
 					</button>
-					<button class="soulsy-box" name="hide">
+					<button class="soulsy-box" name="hide" title="Hide/unhide layer">
 						<div class="icon icon-eye-open"></div>
 					</button>
 				</div>
-				<br>
 				<div id=layers-container>
-
+					<!-- Elements representing layers go here -->
 				</div>
 			</div>
 
