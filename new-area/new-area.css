@@ -411,10 +411,19 @@ canvas.big {
         width: 32px; height: 32px;
         background-position-x: -100%;
     }
+    #canvas-overlay > .grabby.layering-grabby {
+        width: 24px; height: 24px;
+        background-position-x: -200%;
+        cursor: pointer;
+    }
+    #canvas-overlay > .grabby.layering-grabby.layering-down-grabby {
+        transform-origin: 25% 25%;
+        transform: rotate(180deg);
+    }
     #canvas-overlay > .grabby:hover {
         background-position-y: -100%;
     }
-    #canvas-overlay > .grabby.grabbed {
+    #canvas-overlay > .grabby.grabbed, #canvas-overlay > .grabby:active {
         background-position-y: -200%;
         cursor: initial;
     }
@@ -444,7 +453,7 @@ canvas.big {
 
 .tabs > .tab {
     float: left;
-    nav-index: 1;
+    flex-grow: 1;
     height: 100%;
     margin: 0 .5em;
     padding: 4px;
@@ -452,7 +461,7 @@ canvas.big {
     text-align: center;
 }
     .tabs.editor-tabs > .tab {
-        width: 50px;
+        min-width: 50px;
     }
 
     /* Button-like styling */

@@ -444,6 +444,7 @@ class MacroGenerator {
         this.element = element
 
         /** my(t, n) = my element `<t>` named `n` */
+        /** @returns {HTMLElement} */
         const my = this.my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
         const redraw = () => this.redrawMacro()
@@ -574,8 +575,11 @@ class MacroGenerator {
         }
         window.addEventListener('resize', this.updateCanvasOverlay)
 
-        const posGrabby = this.posGrabby = canvasOverlay.children[0]
-        const scaleGrabby = this.scaleGrabby = canvasOverlay.children[1]
+        const grabbies = canvasOverlay.getElementsByClassName('grabby')
+        const posGrabby = this.posGrabby = grabbies.namedItem('position')
+        const scaleGrabby = this.scaleGrabby = grabbies.namedItem('scale')
+        const layeringUpGrabby = this.layeringUpGrabby = grabbies.namedItem('layering-up')
+        const layeringDownGrabby = this.layeringDownGrabby = grabbies.namedItem('layering-down')
         const GrabType = {
             none: 0, position: 1, scale: 2
         }
@@ -586,7 +590,6 @@ class MacroGenerator {
         const getScale = e => 
             Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-this.canvas.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
 
-
         /** Adjust the grabbies' position based on the Slider values. */
         const updateGrabbies = () => {
             const { xOffset, yOffset, scale } = this.sliders.position.getValues()
@@ -594,6 +597,7 @@ class MacroGenerator {
             const top =  (yOffset+.5)*this.canvas.clientHeight + this.canvas.offsetTop
             updatePosGrabby(left, top)
             updateScaleGrabby(left, top, scale)
+            updateLayeringGrabbies(left, top)
         }
         const updatePosGrabby = (left, top) => {
             posGrabby.style.left = left + 'px'
@@ -602,6 +606,12 @@ class MacroGenerator {
         const updateScaleGrabby = (left, top, scale) => {
             scaleGrabby.style.left = left + scale*SCALEGRABDIST + 'px'
             scaleGrabby.style.top = top - scale*SCALEGRABDIST + 'px'
+        }
+        const updateLayeringGrabbies = (left, top) => {
+            layeringUpGrabby.style.left = left + 50 + 'px'
+            layeringUpGrabby.style.top  = top  - 10 + 'px'
+            layeringDownGrabby.style.left = left + 50 + 'px'
+            layeringDownGrabby.style.top  = top  + 10 + 'px'
         }
 
         //// Callbacks
@@ -622,6 +632,7 @@ class MacroGenerator {
             {
                 updatePosGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop)
                 updateScaleGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop, this.sliders.position.get('scale'))
+                updateLayeringGrabbies(e.offsetX, e.offsetY + this.canvas.offsetTop)
             }
             else if ( grabState.type === GrabType.scale )
             {
@@ -661,6 +672,13 @@ class MacroGenerator {
         scaleGrabby.addEventListener('pointerdown', ifNonMobile(startScaleGrab))
         scaleGrabby.addEventListener('click', ifMobile(startScaleGrab))
 
+        // Hackish, just bind these clicks to the layer control buttons
+        const layerControls = this.my('div', 'layers-controls')
+        const moveUpButton = layerControls.children.namedItem('moveUp')
+        const moveDownButton = layerControls.children.namedItem('moveDown')
+        layeringUpGrabby.addEventListener('click', () => moveUpButton.click())
+        layeringDownGrabby.addEventListener('click', () => moveDownButton.click())
+
         document.addEventListener('pointerup', ifNonMobile(completeGrab))
         this.canvas.addEventListener('pointermove', moveGrab)
         this.canvas.addEventListener('click', e => { moveGrab(e); completeGrab(e)} )
@@ -668,7 +686,7 @@ class MacroGenerator {
 
         //// Hook up checkbox to enable/disable
         const showGrabby = this.my('input', 'showGrabby')
-        showGrabby.onchange = e => { posGrabby.hidden = scaleGrabby.hidden = !showGrabby.checked }
+        showGrabby.onchange = e => { posGrabby.hidden = scaleGrabby.hidden = layeringDownGrabby.hidden = layeringUpGrabby.hidden = !showGrabby.checked }
         showGrabby.onchange()
     }
 
