@@ -36,6 +36,9 @@ const ASSETS = {
         bossHealthFrame: new Asset('ds2/boss health frame.png'),
         bossHealthRed: new Asset('ds2/boss health red.png'),
         bossHealthYellow: new Asset('ds2/boss health yellow.png'),
+        buttonBlue: new Asset('ds2/button blue.png'),
+        buttonOrange: new Asset('ds2/button orange.png'),
+        interactBox: new Asset('ds2/interact box yes no.png'),
     },
     bloodborne: {
         areaLines: new Asset('bloodborne/area lines.png'),
@@ -125,7 +128,7 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     let caption = sliders.caption
 
     // TODO: the chrome version doesn't scale with font size while the other one does!
-    if( !!window.chrome && true ) {
+    if( window.chrome ) {
         //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
         canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
         ctx.translate(charSpacing*s/2, 0)
@@ -1210,7 +1213,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
 
 // ================================================ POP-UP BOXES ================================================
 
-/** @type {drawFun} Function which draws DS1 poison status bar. */
+/** @type {drawFun} Function which draws a DS1 interact box. */
 async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -1255,5 +1258,78 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
         applyFontSliders(ctx, canvas, gen, sliders)
         ctx.fillText(option1, -280, 42/vScale)
         ctx.fillText(option2,  280, 42/vScale)
+    }
+}
+
+/** @type {drawFun} Function which draws a DS2 interact box. */
+async function drawDS2InteractBox(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const {option1, option2, selected} = sliders.interactBox
+
+    // Start loading assets
+    const boxPromise = ASSETS.ds2.interactBox.get()
+    const buttonBluePromise = ASSETS.ds2.buttonBlue.get()
+    const buttonOrangePromise = ASSETS.ds2.buttonOrange.get()
+
+    const boxWidth = 1000, boxHeight = 350
+    const buttonWidth = 220, buttonHeight = 50
+    // The Box
+    ctx.drawImage(await boxPromise, -boxWidth/2, -boxHeight/2)
+
+    // Text
+    ctx.strokeStyle = `rgba(0, 0, 0, .75)`
+    ctx.lineWidth = 3
+    ctx.miterLimit = 5
+    ctx.save()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+
+    // Multi-line block of text
+    const lines = caption.split('\n')
+    const LINEHEIGHT = sliders.font.fontSize * 1.25
+    for (let i=0; i<lines.length; i++) {
+        const line = lines[i]
+        ctx.strokeText(line, 0, -30/vScale - (lines.length-1)/2*LINEHEIGHT + LINEHEIGHT*i)
+        ctx.fillText(line, 0, -30/vScale - (lines.length-1)/2*LINEHEIGHT + LINEHEIGHT*i)
+    }
+
+    ctx.restore()
+
+    if (!option1 || !option2) {
+        // BUTTON
+        ctx.save()
+        ctx.scale(1.5, 1.5)
+        let btn = await (selected? buttonOrangePromise: buttonBluePromise)
+        ctx.drawImage(btn, -buttonWidth/2, 50-buttonHeight/2)
+        ctx.restore()
+        
+        // LABEL
+        applyFontSliders(ctx, canvas, gen, sliders)
+        ctx.strokeText(option1 || option2, 0, 76/vScale)
+        ctx.fillText(option1 || option2, 0, 76/vScale)
+    } else {
+        // BUTTONS
+        const BUTTONSPACE = 170
+        ctx.save()
+        ctx.scale(1.5, 1.5)
+        let btn = await (selected=='first'? buttonOrangePromise: buttonBluePromise)
+        ctx.drawImage(btn, -BUTTONSPACE/1.5-buttonWidth/2, 50-buttonHeight/2)
+        btn = await (selected=='second'? buttonOrangePromise: buttonBluePromise)
+        ctx.drawImage(btn, BUTTONSPACE/1.5-buttonWidth/2, 50-buttonHeight/2)
+        ctx.restore()
+
+        // LABELS
+        applyFontSliders(ctx, canvas, gen, sliders)
+        ctx.strokeText(option1, -BUTTONSPACE, 76/vScale)
+        ctx.fillText(option1, -BUTTONSPACE, 76/vScale)
+        ctx.strokeText(option2, BUTTONSPACE, 76/vScale)
+        ctx.fillText(option2,  BUTTONSPACE, 76/vScale)
     }
 }

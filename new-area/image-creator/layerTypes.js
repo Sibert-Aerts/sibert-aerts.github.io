@@ -15,7 +15,7 @@ const macroTypeName = {
     nounVerbed: '🏆 Noun Verbed',
     youDied: '💀 Death',
     areaName: '📍 Area name',
-    interactBox: '📋 Interact Box',
+    interactBox: '📋 Interact box',
     boss: '👹 Boss health bar',
     poison: '🩸 Poison bar',
 
@@ -1790,7 +1790,7 @@ layerTypes.push({
     id: 'ds1:interact',
     type: MacroType.interactBox,
     game: Game.ds1,
-    preset: 'YES/NO',
+    preset: 'Interact box',
 
     sliders: {
         position: {
@@ -1804,6 +1804,26 @@ layerTypes.push({
         interactBox: {option1: 'YES', option2: 'NO'}
     },
     draw: drawDS1InteractBox
+})
+
+layerTypes.push({
+    id: 'ds2:interact',
+    type: MacroType.interactBox,
+    game: Game.ds2,
+    preset: 'Interact box',
+
+    sliders: {
+        position: {
+            xOffset: 0.005, yOffset: 0.02
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [200, 200, 200],
+            fontSize: 29, fontWeight: 400,
+            vScale: 1, charSpacing: 2,
+        },
+        interactBox: {option1: 'YES', option2: 'NO'}
+    },
+    draw: drawDS2InteractBox
 })
 
 
