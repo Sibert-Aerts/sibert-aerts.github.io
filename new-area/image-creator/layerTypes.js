@@ -1798,7 +1798,7 @@ layerTypes.push({
         },
         font: {
             fontFamily: 'Georgia', textColor: [242, 242, 242],
-            fontSize: 39, fontWeight: 200,
+            fontSize: 39, fontWeight: 400,
             vScale: 1, charSpacing: 2,
         },
         interactBox: {option1: 'YES', option2: 'NO'}

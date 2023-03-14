@@ -1233,10 +1233,10 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
     ctx.drawImage(await boxPromise, -boxWidth/2 - 4, -boxHeight/2)
 
     // Text
+    ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
-    ctx.textBaseline = 'alphabetic'
-    ctx.textAlign = 'center'
-    ctx.fillText(caption, 0, -10/vScale)
+    ctx.fillText(caption, 0, -21/vScale)
+    ctx.restore()
 
     if (!option1 || !option2) {
         if (selected) {
@@ -1245,13 +1245,15 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
             ctx.drawImage(await buttonPromise, -boxWidth/2, -boxHeight/2 + 10)
             ctx.restore()
         }
-        ctx.fillText(option1 || option2, 0, 55/vScale)
+        applyFontSliders(ctx, canvas, gen, sliders)
+        ctx.fillText(option1 || option2, 0, 44/vScale)
     } else {
         if (selected) {
             const xo = (selected=='first')? -280: 280
             ctx.drawImage(await buttonPromise, xo-boxWidth/2, -boxHeight/2)
-        }
-        ctx.fillText(option1, -280, 52/vScale)
-        ctx.fillText(option2,  280, 52/vScale)
+        }        
+        applyFontSliders(ctx, canvas, gen, sliders)
+        ctx.fillText(option1, -280, 42/vScale)
+        ctx.fillText(option2,  280, 42/vScale)
     }
 }
