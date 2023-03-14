@@ -3,8 +3,8 @@
 
 const MacroType = {
     nounVerbed: 'nounVerbed',
-    areaName: 'areaName',
     youDied: 'youDied',
+    areaName: 'areaName',
     interactBox: 'interactBox',
     boss: 'boss',
     poison: 'poison',
@@ -13,8 +13,8 @@ const MacroType = {
 }
 const macroTypeName = {
     nounVerbed: '🏆 Noun Verbed',
-    areaName: '📍 Area name',
     youDied: '💀 Death',
+    areaName: '📍 Area name',
     interactBox: '📋 Interact Box',
     boss: '👹 Boss health bar',
     poison: '🩸 Poison bar',

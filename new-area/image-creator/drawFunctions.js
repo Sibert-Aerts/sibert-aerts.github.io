@@ -15,9 +15,8 @@ class Asset {
         return new Promise( (resolve, reject) => {
             const img = this.img = new Image()
             img.src = this.path
-            this.loading = true
             img.onload = () => resolve(img)
-            img.onerror = () => reject('Failed to load image.')
+            img.onerror = ev => reject(ev)
         })
     }
 }
@@ -473,17 +472,20 @@ async function drawBloodborneAreaName(ctx, canvas, gen, sliders) {
     // had to make the Origin align with the cross of the lines because it's cuter
     ctx.translate(-16, -14)
 
-    // (MOCK BACK-IMAGE)
     const { blotOpacity, mode } = sliders.bbArea
 
+    // Back-image (black blot + crossed white lines)
     ctx.save()
-
     if( mode === 'transparency' ) {
+        const blotPromise = ASSETS.bloodborne.areaBlotTransp.get()
+        const linesPromise = ASSETS.bloodborne.areaLinesTransp.get()
         ctx.globalAlpha = blotOpacity
-        ctx.drawImage(await ASSETS.bloodborne.areaBlotTransp.get(), -535, -112)
+        ctx.drawImage(await blotPromise, -535, -112)
         ctx.globalAlpha = 1
-        ctx.drawImage(await ASSETS.bloodborne.areaLinesTransp.get(), -632, -105)
+        ctx.drawImage(await linesPromise, -632, -105)
     } else {
+        const blotPromise = ASSETS.bloodborne.areaBlot.get()
+        const linesPromise = ASSETS.bloodborne.areaLines.get()
         const invert = () => {
             ctx.save()
             ctx.fillStyle = '#ffffff'
@@ -494,18 +496,16 @@ async function drawBloodborneAreaName(ctx, canvas, gen, sliders) {
             ctx.fillRect(floor(-535*t.a+t.e), floor(-112*t.d+t.f), floor(655*t.a), floor(209*t.d))
             ctx.restore()
         }
-
-        if( blotOpacity > 0 ) {
+        if (blotOpacity > 0) {
             invert()
             ctx.globalAlpha = blotOpacity
             ctx.globalCompositeOperation = 'lighter'
-            ctx.drawImage(await ASSETS.bloodborne.areaBlot.get(), -535, -112)
+            ctx.drawImage(await blotPromise, -535, -112)
             invert()
         }
-
         ctx.globalAlpha = 1
         ctx.globalCompositeOperation = 'lighter'
-        ctx.drawImage(await ASSETS.bloodborne.areaLines.get(), -632, -105)
+        ctx.drawImage(await linesPromise, -632, -105)
     }
     ctx.restore()
 
@@ -863,12 +863,17 @@ async function drawDS2Boss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, damageNumber} = sliders.boss
 
+    // Start loading assets
+    const framePromise = ASSETS.ds2.bossHealthFrame.get()
+    const yellowPromise = ASSETS.ds2.bossHealthYellow.get()
+    const redPromise = ASSETS.ds2.bossHealthRed.get()
+
     // The main healthbar texture
-    ctx.drawImage(await ASSETS.ds2.bossHealthFrame.get(), -346, -14)    
+    ctx.drawImage(await framePromise, -346, -14)    
     // Yellow health bar
-    ctx.drawImage(await ASSETS.ds2.bossHealthYellow.get(), -346+14, -14+9, 664 * Math.min(1, health+recentDamage), 9)
+    ctx.drawImage(await yellowPromise, -346+14, -14+9, 664 * Math.min(1, health+recentDamage), 9)
     // Red health bar
-    ctx.drawImage(await ASSETS.ds2.bossHealthRed.get(), -346+14, -14+9, 664 * health, 9)
+    ctx.drawImage(await redPromise, -346+14, -14+9, 664 * health, 9)
 
     // TEXT
     ctx.strokeStyle = `rgba(0, 0, 0, .5)`
@@ -901,16 +906,21 @@ async function drawDS3Boss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, damageNumber} = sliders.boss
 
+    // Start loading assets
+    const framePromise = ASSETS.ds3.bossHealthFrame.get()
+    const yellowPromise = ASSETS.ds3.bossHealthYellow.get()
+    const redPromise = ASSETS.ds3.bossHealthRed.get()
+
     // The main healthbar texture
-    ctx.drawImage(await ASSETS.ds3.bossHealthFrame.get(), -508, -25)
-    
+    ctx.drawImage(await framePromise, -508, -25)
+
     // Yellow health bar
     let barWidth = 7 + 1002 * Math.min(1, health+recentDamage)
-    ctx.drawImage(await ASSETS.ds3.bossHealthYellow.get(), 0, 0, barWidth, 50, -508, -25, barWidth, 50)
-    
+    ctx.drawImage(await yellowPromise, 0, 0, barWidth, 50, -508, -25, barWidth, 50)
+
     // Red health bar
     barWidth = 7 + 1002 * health
-    ctx.drawImage(await ASSETS.ds3.bossHealthRed.get(), 0, 0, barWidth, 50, -508, -25, barWidth, 50)
+    ctx.drawImage(await redPromise, 0, 0, barWidth, 50, -508, -25, barWidth, 50)
 
     // TEXT
     ctx.shadowOffsetX = 2
@@ -942,26 +952,35 @@ async function drawSekiroBoss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, livesLeft, livesSpent, frameOpacity} = sliders.sekiroBoss
 
+    // Start loading assets
+    const basePromise = ASSETS.sekiro.bossHealthBase.get()
+    const damagePromise = ASSETS.sekiro.bossHealthDamage.get()
+    const redPromise = ASSETS.sekiro.bossHealthRed.get()
+    const tipPromise = ASSETS.sekiro.bossHealthTip.get()
+    const lifePromise = ASSETS.sekiro.bossLife.get()
+    const lostLifePromise = ASSETS.sekiro.bossLostLife.get()
+    const nameBGPromise = ASSETS.sekiro.bossNameBG.get()
+
     ctx.save()
     ctx.scale(.5538, .5538)
     // The main healthbar texture
-    ctx.drawImage(await ASSETS.sekiro.bossHealthBase.get(), 0, 0)
+    ctx.drawImage(await basePromise, 0, 0)
     
     // Damage health bar
     let barWidth = 32 + 740 * Math.min(1, health+recentDamage)
-    ctx.drawImage(await ASSETS.sekiro.bossHealthDamage.get(), 0, 0, barWidth, 71, 0, 0, barWidth, 71)
+    ctx.drawImage(await damagePromise, 0, 0, barWidth, 71, 0, 0, barWidth, 71)
     
     // Red health bar
     barWidth = 32 + 740 * health
-    ctx.drawImage(await ASSETS.sekiro.bossHealthRed.get(), 0, 0, barWidth, 71, 0, 0, barWidth, 71)
-    if( health > 0 ) ctx.drawImage(await ASSETS.sekiro.bossHealthTip.get(), barWidth - 10, 20)
+    ctx.drawImage(await redPromise, 0, 0, barWidth, 71, 0, 0, barWidth, 71)
+    if( health > 0 ) ctx.drawImage(await tipPromise, barWidth - 10, 20)
     ctx.restore()
 
     // Lives
     ctx.save()
     ctx.scale(.45, .45)
     for( let i=0; i<livesLeft+livesSpent; i++ ) {
-        const img = await (i<livesLeft? ASSETS.sekiro.bossLife.get(): ASSETS.sekiro.bossLostLife.get())
+        const img = await (i<livesLeft? lifePromise: lostLifePromise)
         ctx.drawImage(img, 20 + 85*i, -80)
     }
     ctx.restore()
@@ -970,7 +989,7 @@ async function drawSekiroBoss(ctx, canvas, gen, sliders) {
     ctx.save()
     ctx.scale(.4815, .4815)
     ctx.globalAlpha = frameOpacity
-    ctx.drawImage(await ASSETS.sekiro.bossNameBG.get(), 25, 75)
+    ctx.drawImage(await nameBGPromise, 25, 75)
     ctx.restore()
 
     // TEXT
@@ -998,17 +1017,21 @@ async function drawBloodborneBoss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, damageNumber} = sliders.boss
 
+    // Start loading assets
+    const basePromise = ASSETS.bloodborne.bossHealthBase.get()
+    const redPromise = ASSETS.bloodborne.bossHealthRed.get()
+    const capPromise = ASSETS.bloodborne.bossHealthCap.get()
+
     // The main healthbar texture
-    ctx.drawImage(await ASSETS.bloodborne.bossHealthBase.get(), -680, -40)
+    ctx.drawImage(await basePromise, -680, -40)
     
     // Red health bar
     let barWidth = 54 + 1253 * health
-    ctx.drawImage(await ASSETS.bloodborne.bossHealthRed.get(), 0, 0, barWidth, 80, -680, -40, barWidth, 80)
+    ctx.drawImage(await redPromise, 0, 0, barWidth, 80, -680, -40, barWidth, 80)
 
     // Caps
-    const img = await ASSETS.bloodborne.bossHealthCap.get()
-    ctx.drawImage(img, -680+54-6, -16)
-    ctx.drawImage(img, -680+barWidth-6, -16)
+    ctx.drawImage(await capPromise, -680+54-6, -16)
+    ctx.drawImage(await capPromise, -680+barWidth-6, -16)
 
     // TEXT
     ctx.shadowOffsetX = 2
@@ -1040,26 +1063,28 @@ async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, damageNumber} = sliders.boss
 
+    // Start loading assets
+    const basePromise = ASSETS.eldenRing.bossHealthBase.get()
+    const yellowPromise = ASSETS.eldenRing.bossHealthYellow.get()
+    const redPromise = ASSETS.eldenRing.bossHealthRed.get()
+    const tipPromise = ASSETS.eldenRing.bossHealthTip.get()
+    const framePromise = ASSETS.eldenRing.bossHealthFrame.get()
+
     ctx.save()
     ctx.scale(.5, .5) // Elden Ring uses 4K textures
 
     // Backing shadow
-    ctx.drawImage(await ASSETS.eldenRing.bossHealthBase.get(), -1049, -50)
-    
+    ctx.drawImage(await basePromise, -1049, -50)    
     // Yellow health bar
     let barWidth = 50 + 1998 * Math.min(1, health+recentDamage)
-    ctx.drawImage(await ASSETS.eldenRing.bossHealthYellow.get(), 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
-    
+    ctx.drawImage(await yellowPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)    
     // Red health bar
     barWidth = 50 + 1998 * health
-    ctx.drawImage(await ASSETS.eldenRing.bossHealthRed.get(), 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
-
+    ctx.drawImage(await redPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
     // The tip
-    const img = await ASSETS.eldenRing.bossHealthTip.get()
-    ctx.drawImage(img, -1049+barWidth-53, -50)
-    
+    ctx.drawImage(await tipPromise, -1049+barWidth-53, -50)    
     // The frame
-    ctx.drawImage(await ASSETS.eldenRing.bossHealthFrame.get(), -1049, -50)
+    ctx.drawImage(await framePromise, -1049, -50)
 
     ctx.restore()
 
@@ -1097,6 +1122,11 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
 
     const {poison, maxPoison, type, active} = sliders.ds1Poison
 
+    // Start loading assets
+    const framePromise = ASSETS.ds1.poisonBarFrame.get()
+    const endPromise = ASSETS.ds1.poisonBarFrameEnd.get()
+    const iconsPromise = ASSETS.ds1.poisonIcons.get()
+
     ctx.save()
     ctx.scale(.75, .75)
 
@@ -1119,17 +1149,14 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
     ctx.fillRect(0, -frameHeight/2, barWidth, frameHeight)
 
     // The frame
-    const frame = await ASSETS.ds1.poisonBarFrame.get()
-    ctx.drawImage(frame, 0, 0, frameLeft + frameWidth, 100, -frameLeft, -frameTop-frameHeight/2, frameLeft + frameWidth, 100)
-    const end = await ASSETS.ds1.poisonBarFrameEnd.get()
-    ctx.drawImage(end, frameWidth-8, -frameTop-frameHeight/2)
+    ctx.drawImage(await framePromise, 0, 0, frameLeft + frameWidth, 100, -frameLeft, -frameTop-frameHeight/2, frameLeft + frameWidth, 100)
+    ctx.drawImage(await endPromise, frameWidth-8, -frameTop-frameHeight/2)
 
     // The icon
     ctx.restore()
     ctx.save()
     ctx.scale(.5, .5)
-    const icons = await ASSETS.ds1.poisonIcons.get()
-    ctx.drawImage(icons, 0, type*86, 86, 86, -110, -86/2, 86, 86)
+    ctx.drawImage(await iconsPromise, 0, type*86, 86, 86, -110, -86/2, 86, 86)
     ctx.restore()
 }
 
@@ -1157,24 +1184,26 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     // Transparent black backdrop    
     ctx.fillStyle = 'rgba(0, 0, 0, .5)'
     ctx.fillRect(0, -fillHeight/2, frameWidth, fillHeight)
-    
+
+    // Start loading assets
+    const barPromise = ASSETS.eldenRing.poisonBarFill.get()
+    const barCapPromise = ASSETS.eldenRing.poisonBarCap.get()
+    const framePromise = ASSETS.eldenRing.poisonFrameLength.get()
+    const endCapPromise = ASSETS.eldenRing.poisonFrameCapLeft.get()
+    const iconsPromise = ASSETS.eldenRing.poisonIcons.get()
+
     // Bar
-    const bar = await ASSETS.eldenRing.poisonBarFill.get()
-    ctx.drawImage(bar, 0, type*100, fillLeft + barWidth, 100, -fillLeft, -50, fillLeft + barWidth, 100)
-    const barCap = await ASSETS.eldenRing.poisonBarCap.get()
-    ctx.drawImage(barCap, -21.5 + barWidth, -50)
+    ctx.drawImage(await barPromise, 0, type*100, fillLeft + barWidth, 100, -fillLeft, -50, fillLeft + barWidth, 100)
+    ctx.drawImage(await barCapPromise, -21.5 + barWidth, -50)
 
     // The frame
-    const frame = await ASSETS.eldenRing.poisonFrameLength.get()
     const cropWidth = frameWidth + 42
-    ctx.drawImage(frame, 1501-cropWidth, 0, cropWidth, 100, 0, -50, cropWidth, 100)
-    const end = await ASSETS.eldenRing.poisonFrameCapLeft.get()
-    ctx.drawImage(end, -fillLeft, -50)
+    ctx.drawImage(await framePromise, 1501-cropWidth, 0, cropWidth, 100, 0, -50, cropWidth, 100)
+    ctx.drawImage(await endCapPromise, -fillLeft, -50)
     
     // The icon
     ctx.scale(.88, .88)
-    const icons = await ASSETS.eldenRing.poisonIcons.get()
-    ctx.drawImage(icons, 0, type*106, 106, 106, -106, -106/2, 106, 106)
+    ctx.drawImage(await iconsPromise, 0, type*106, 106, 106, -106, -106/2, 106, 106)
     ctx.restore()
 }
 
@@ -1195,10 +1224,13 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
 
     const {option1, option2, selected} = sliders.interactBox
 
+    // Start loading assets
+    const boxPromise = ASSETS.ds1.interactBox.get()
+    const buttonPromise = ASSETS.ds1.interactBoxButton.get()
+
     // The Box
     const boxWidth = 1290, boxHeight = 260
-    const box = await ASSETS.ds1.interactBox.get()
-    ctx.drawImage(box, -boxWidth/2 - 4, -boxHeight/2)
+    ctx.drawImage(await boxPromise, -boxWidth/2 - 4, -boxHeight/2)
 
     // Text
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
@@ -1207,20 +1239,17 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
     ctx.fillText(caption, 0, -10/vScale)
 
     if (!option1 || !option2) {
-        const option = option1 || option2
         if (selected) {
-            const button = await ASSETS.ds1.interactBoxButton.get()
             ctx.save()
             ctx.scale(1, .8)
-            ctx.drawImage(button, -boxWidth/2, -boxHeight/2 + 10)
+            ctx.drawImage(await buttonPromise, -boxWidth/2, -boxHeight/2 + 10)
             ctx.restore()
         }
-        ctx.fillText(option, 0, 55/vScale)
+        ctx.fillText(option1 || option2, 0, 55/vScale)
     } else {
         if (selected) {
-            const button = await ASSETS.ds1.interactBoxButton.get()
             const xo = (selected=='first')? -280: 280
-            ctx.drawImage(button, xo-boxWidth/2, -boxHeight/2)
+            ctx.drawImage(await buttonPromise, xo-boxWidth/2, -boxHeight/2)
         }
         ctx.fillText(option1, -280, 52/vScale)
         ctx.fillText(option2,  280, 52/vScale)
