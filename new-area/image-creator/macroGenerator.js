@@ -56,36 +56,30 @@ const browserIs = {
 
 /** Handles incoming images. */
 class ImageHandler {
-    /** @type MacroGenerator */
-    macroGen
-
-    /** @type HTMLElement */
-    parent
-    /** @type HTMLInputElement */
-    URLinput
-    /** @type HTMLInputElement */
-    fileSelect
-
-    /** @type HTMLImageElement */
-    image = null
-    /** @type string */
-    imageType = null    
-
     /**
      * @param {MacroGenerator} macroGen 
      * @param {HTMLElement} parent
      */
     constructor(macroGen, parent) {
+        /** @type {MacroGenerator} */
         this.macroGen = macroGen
+        /** @type HTMLElement */
         this.parent = parent
 
+        /** @type HTMLImageElement */
+        this.image = null
+        /** @type string */
+        this.imageType = null    
+
         /// URL event bindings
+        /** @type HTMLInputElement */
         this.URLinput = parent.getElementsByTagName('input').namedItem('image-URL')
         this.URLinput.onchange = this.handleImageURL.bind(this)
         this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
         if( this.URLinput.value ) this.handleImageURL()
 
         /// File select event bindings
+        /** @type HTMLInputElement */
         this.fileSelect = parent.getElementsByTagName('input').namedItem('image-upload')
         this.fileSelect.onchange = this.handleFileSelect.bind(this)
 
@@ -178,15 +172,15 @@ class ImageHandler {
 /** @type {{ [name: string]: { new(string) => Converter } }}  */
 const CONVERTERS = {
     string: class {
-        parse = x => x
-        toString = x => x
+        parse(x) { return x }
+        toString(x) { return x }
     },
     float: class {
-        parse = parseFloat
-        toString = x => x.toString()
+        parse(x) { return parseFloat(x) }
+        toString(x) { return x.toString() }
     },
     rgb: class {
-        parse = hexToRGB
+        parse(x) { return hexToRGB(x) }
         toString([r, g, b]){ return RGBToHex(r, g, b) }
     },
     log: class {
@@ -207,24 +201,6 @@ const DEFAULT_CONVERTERS = {
 
 
 class Sliders {
-    /** @type {string} */
-    name
-    /** @type {HTMLElement} */
-    element
-
-    /** @type {HTMLInputElement[]} */
-    sliders = []
-    /** @type {{[name: string]: HTMLInputElement}} */
-    byName = {}
-    /** @type {boolean} */
-    usable = false
-    /** @type {boolean} */
-    visible = false
-    /** @type {{[name: string]: any}} */
-    trueDefaults = {}
-
-    /** @type {Callback} */
-    onchange = null
 
     /**
      * @param {string} name
@@ -232,9 +208,25 @@ class Sliders {
      * @param {string[]} names 
      */
     constructor(element) {
+        /** @type {HTMLElement} */
         this.element = element
         if( !this.element ) return
+        /** @type {string} */
         this.name = this.element.getAttribute('name')
+        
+        /** @type {boolean} */
+        this.usable = false
+        /** @type {boolean} */
+        this.visible = false
+        /** @type {Callback} */
+        this.onchange = null
+
+        /** @type {HTMLInputElement[]} */
+        this.sliders = []
+        /** @type {{[name: string]: HTMLInputElement}} */
+        this.byName = {}
+        /** @type {{[name: string]: any}} */
+        this.trueDefaults = {}
 
         /// Find each slider
         for( const div of this.element.children ) {
@@ -404,44 +396,20 @@ class Sliders {
  *  The class that puts it all to work.
  */
 class MacroGenerator {
-    /** @type {readonly HTMLElement | Document} */
-    element
-    /** @type {readonly HTMLCanvasElement} */
-    canvas
-    /** @type {readonly CanvasRenderingContext2D}  */
-    ctx
-
-    /** @type {readonly HTMLAnchorElement}   */
-    saveLink = makeElem('a')
-    /** @type {readonly HTMLCanvasElement}   */
-    tempCanvas
-
-    /** @type {{ [name: string]: Sliders }} */
-    sliders
-    /** @type {ImageHandler} */
-    imageHandler
-
-    /** @type {HTMLSelectElement} */
-    macroTypeSelect
-    /** @type {HTMLSelectElement} */
-    gameSelect
-    /** @type { {[type in keyof MacroType]: {[game in keyof Game]: HTMLSelectElement}} } */
-    presetSelects
-    /** @type {HTMLElement} */
-    presetHolder
-
-    /** @type {DrawableLayer} */
-    previousLayerType
-
-    /** @type {[DrawableLayer, any][]} */
-    layers = []
-    activeLayer = 0
-
     /**
      * @param {HTMLElement | Document} element
      */
     constructor(element=document) {
+        /** @type {readonly HTMLElement | Document} */
         this.element = element
+        
+        // Fill in some fields
+        /** @type {readonly HTMLAnchorElement}   */
+        this.saveLink = makeElem('a')
+        /** @type {[DrawableLayer, any][]} */
+        this.layers = []
+        /** @type {number} */
+        this.activeLayer = 0
 
         /** my(t, n) = my element `<t>` named `n` */
         /** @returns {HTMLElement} */
@@ -451,10 +419,13 @@ class MacroGenerator {
         const autoRedraw = () => this.autoRedraw()
 
         //// CANVAS
+        /** @type {readonly HTMLCanvasElement} */
         this.canvas = my('canvas', 'canvas')
+        /** @type {readonly CanvasRenderingContext2D}  */
         this.ctx = this.canvas.getContext('2d')
 
         //// TEMP CANVAS
+        /** @type {readonly HTMLCanvasElement}   */
         this.tempCanvas = makeElem('canvas')
         // Needed to make certain effects work on Chrome
         this.tempCanvas.style.width = this.tempCanvas.style.height = '0px'
@@ -465,6 +436,7 @@ class MacroGenerator {
         this.resWarning = my('*', 'resolution-warning')
 
         //// IMAGE HANDLER
+        /** @type {ImageHandler} */
         this.imageHandler = new ImageHandler(this, my('div', 'background-image'))
         this.bgColorSliders = new Sliders(my('div', 'background-color'))
         this.bgColorSliders.onchange = autoRedraw
@@ -500,6 +472,7 @@ class MacroGenerator {
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
 
+        /** @type {{ [name: string]: Sliders }} */
         this.sliders = {}
         for( const elem of this.macroSliders.getElementsByClassName('sliders-container') ) {
             const sliders = new Sliders(elem)
@@ -512,7 +485,7 @@ class MacroGenerator {
 
         //// CANVAS OVERLAY POSITION GRABBY
         this.setupCanvasOverlay()
-        
+
         // This needs to be here idk
         this.onMacroTypeChange(null, false)
 
@@ -696,6 +669,7 @@ class MacroGenerator {
         const {macroType: defaultType, game: defaultGame, preset: defaultPreset} = window.MACROGEN_DEFAULTS 
 
         //// Macro Type
+        /** @type {HTMLSelectElement} */
         this.macroTypeSelect = this.my('select', 'macro-type')
         this.macroTypeSelect.onchange = onchange
 
@@ -705,6 +679,7 @@ class MacroGenerator {
         if( defaultType ) this.macroTypeSelect.value = defaultType
 
         //// Game
+        /** @type {HTMLSelectElement} */
         this.gameSelect = this.my('select', 'macro-type-game')
         this.gameSelect.onchange = onchange
 
@@ -714,7 +689,9 @@ class MacroGenerator {
         if( defaultGame ) this.gameSelect.value = defaultGame
 
         //// Preset (depends on combination of type+game)
+        /** @type { {[type in keyof MacroType]: {[game in keyof Game]: HTMLSelectElement}} } */
         this.presetSelects = {}
+        /** @type {HTMLElement} */
         this.presetHolder = this.my('div', 'macro-type-preset-holder')
 
         for( const type in MacroType ) {
@@ -940,6 +917,7 @@ class MacroGenerator {
     onMacroTypeChange(e, redraw=true) {
         const oldType = this.previousLayerType
         const newType = this.getLayerType()
+        /** @type {DrawableLayer} */
         this.previousLayerType = newType
 
         const [macroType, game] = this.getLayerTypeKeys()

@@ -358,7 +358,7 @@ function generateName() {
         sum = firstType + secondType + thirdType
 
         the = chance(1/2) && (sum < 2)
-        if( isChecked('Sekiro') ) the &&= chance(0.5)
+        if( isChecked('Sekiro') ) the = the && chance(0.5)
         if( sum === 0 && chance(9/10) ) the = true
         if( name.startsWith('The ') ) the = false
 

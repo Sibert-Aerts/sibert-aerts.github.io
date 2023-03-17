@@ -1914,7 +1914,8 @@ const layerIdMap = {}
 for( const type in MacroType ) for( const game in Game )
     layerTypesMap[type] = {[game]: null}
 for( const layer of layerTypes ) {
-    layerTypesMap[layer.type][layer.game] ??= {}
+    if (!layerTypesMap[layer.type][layer.game])
+        layerTypesMap[layer.type][layer.game] = {}
     layerTypesMap[layer.type][layer.game][layer.preset] = layer
     layerIdMap[layer.id] = layer
 }
@@ -1935,10 +1936,3 @@ window.MACROGEN_DEFAULTS = {
     game: randomDefault.game,
     preset: randomDefault.preset,
 }
-
-// window.MACROGEN_DEFAULTS = {
-//     macroType: MacroType.nounVerbed,
-//     game: Game.des,
-//     preset: 'THE DEMON WAS DESTROYED',
-//     caption: 'THE DEMON WAS DESTROYED'
-// }
