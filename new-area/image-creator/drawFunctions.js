@@ -982,7 +982,7 @@ async function drawSekiroBoss(ctx, canvas, gen, sliders) {
     // Lives
     ctx.save()
     ctx.scale(.45, .45)
-    for( let i=0; i<livesLeft+livesSpent; i++ ) {
+    for( let i=0; i<livesLeft+livesSpent && i<100; i++ ) {
         const img = await (i<livesLeft? lifePromise: lostLifePromise)
         ctx.drawImage(img, 20 + 85*i, -80)
     }
