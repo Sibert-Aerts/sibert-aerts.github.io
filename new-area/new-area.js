@@ -64,21 +64,29 @@ var backgrounds = [
     {url: "https://i.imgur.com/BycSJYz.jpg", name: 'Lower Farum Azula Ruins'},
 ]
 
+const backgroundDummy = document.createElement("IMG")
+
 /** Changes the background to the given background object's image, optionally fading. */
-async function setBackground(bg, fade=true) {
-    $('.background-item').removeClass('selected')
-    bg.elem.classList.add('selected')
-    if(fade && !isChecked('disable-anims') ) {
-        $("#background-layer").css("background-image", $("body").css("background-image"))
-        $("#background-layer").removeClass("faded")
-        await sleep(100)
-        $("#background-layer").addClass("faded")
+function setBackground(bg, fade=true) {
+    backgroundDummy.onload = async function() {
+        // Background selection list
+        $('.background-item').removeClass('selected')
+        bg.elem.classList.add('selected')
+
+        if(fade && !isChecked('disable-anims') ) {
+            $("#background-layer").css("background-image", $("body").css("background-image"))
+            $("#background-layer").removeClass("faded")
+            await sleep(100)
+            $("#background-layer").addClass("faded")
+        }
+        document.body.style.backgroundImage = `url(${bg.url})`
     }
-    document.body.style.backgroundImage = `url(${bg.url})`
+    
+    backgroundDummy.src = bg.url
 }
 
 async function randomiseBackground(fade=true) {
-    await setBackground(choose(backgrounds), fade)
+    setBackground(choose(backgrounds), fade)
 }
 
 // Incredibly dumb: updating the area name actually just sets the anchor, this triggers window.onhashchange, calling parseAnchor

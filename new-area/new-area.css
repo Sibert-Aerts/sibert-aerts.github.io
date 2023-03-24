@@ -753,3 +753,9 @@ input.bad-url {
         height: 80px;
     }
 }
+
+@media screen and (min-width: 1920px) {
+    body, .background-layer {
+        background-size: cover;
+    }
+}
