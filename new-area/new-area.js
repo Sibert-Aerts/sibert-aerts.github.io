@@ -68,24 +68,30 @@ const backgroundDummy = document.createElement("IMG")
 
 /** Changes the background to the given background object's image, optionally fading. */
 function setBackground(bg, fade=true) {
-    backgroundDummy.onload = async function() {
-        // Background selection list
-        $('.background-item').removeClass('selected')
-        bg.elem.classList.add('selected')
 
-        if(fade && !isChecked('disable-anims') ) {
-            $("#background-layer").css("background-image", $("body").css("background-image"))
-            $("#background-layer").removeClass("faded")
-            await sleep(100)
-            $("#background-layer").addClass("faded")
-        }
+    // Update background selection list
+    $('.background-item').removeClass('selected')
+    bg.elem.classList.add('selected')
+
+    if (!fade || isChecked('disable-anims')) {
+        // No fade: Instantly set body background
         document.body.style.backgroundImage = `url(${bg.url})`
+        return
     }
     
+    // Yes fade: Wait for image to load, then create a new layer that copies the current bg, and make it fade out
+    backgroundDummy.onload = async function() {
+        const backgroundLayer = $('#background-layer')
+        backgroundLayer.css('background-image', document.body.style.backgroundImage)
+        backgroundLayer.removeClass('faded')
+        await sleep(100)
+        backgroundLayer.addClass('faded')
+        document.body.style.backgroundImage = `url(${bg.url})`
+    }    
     backgroundDummy.src = bg.url
 }
 
-async function randomiseBackground(fade=true) {
+function randomiseBackground(fade=true) {
     setBackground(choose(backgrounds), fade)
 }
 

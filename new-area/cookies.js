@@ -44,10 +44,10 @@ function setCookie(name, value='', exdays=365) {
 }
 
 function showCookieBanner() {
-    Array.from(document.getElementsByClassName('cookie-banner')).forEach(e => e.classList.remove('hidden'))
+    Array.from(byClass('cookie-banner')).forEach(e => e.classList.remove('hidden'))
 }
 function removeCookieBanner() {
-    Array.from(document.getElementsByClassName('cookie-banner')).forEach(e => e.remove())
+    Array.from(byClass('cookie-banner')).forEach(e => e.remove())
 }
 
 function consentToTracking() {

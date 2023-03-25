@@ -1,0 +1,5 @@
+{
+    "include": [
+        "new-area/**/*.js"
+    ]
+}

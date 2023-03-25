@@ -40,6 +40,8 @@
 	<link rel="stylesheet" href="../normal.css">
 	<link rel="stylesheet" href="../soulsy-input.css">
 	<link rel="stylesheet" href="../new-area.css">
+	<script type="text/javascript" src="js/tinyUtils.js"></script>
+	<script type="text/javascript" src="js/imageHandler.js"></script>
 	<script type="text/javascript" src="js/macroGenerator.js"></script>
 	<script type="text/javascript" src="js/drawFunctions.js"></script>
 	<script type="text/javascript" src="js/layerTypes.js"></script>
@@ -636,6 +638,12 @@
 						<input type=file name=image-upload accept="image/*" style=display:inline;width:280px>
 					</div>
 					<div>
+						<span class=input-title style=min-width:100px>Generic screenshot:</span>
+						<select id="generic-screenshot" style=width:100%>
+							<option>None</option>
+						</select>
+					</div>
+					<div>
 						<label class=input-title>Constrain resolution: <input type=checkbox id=limit-resolution checked></label> 
 						<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
 						<div id=resolution-warning hidden>
@@ -664,7 +672,7 @@
 					<div>
 						<span class=input-title>Chromatic Aberration:</span>
 						<button class=reset-button></button>
-						<input type=range name=imgChromatic min=0 max=.1 step=.001 default=0>
+						<input type=range name=imgChromatic min=0 max=.05 step=.001 default=0>
 					</div>
 				</div>
 			</div>
@@ -728,6 +736,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/03/25</b> • Add a background option for selected generic game screenshots <br>
 			<b>2023/03/17</b> • Make scripts ECMA2020 compatible, hopefully supporting more devices (notably iPhones) <br>
 			<b>2023/03/14</b> • Add Dark Souls 2 interact box <br>
 			<b>2023/03/10</b> • Add Dark Souls 1 interact box, add some Elden Ring poison colours <br>

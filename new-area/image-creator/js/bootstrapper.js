@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if( search.get('caption') ) {
-        document.getElementById('image-caption').value = search.get('caption')
+        byId('image-caption').value = search.get('caption')
     }
     
     if( search.get('img') ) {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     //// Construct the global MacroGenerator
-    macroGen = new MacroGenerator(document.getElementById('main-content'))   
+    macroGen = new MacroGenerator(byId('main-content'))   
 })
 
 
@@ -47,17 +47,17 @@ window.addEventListener('load', function() {
 
     //// Hide/show Firefox warning
     if( browserIs.firefox )
-        for( const e of document.getElementsByClassName('firefox-warning'))
+        for( const e of byClass('firefox-warning'))
             e.hidden = false
 
     //// Make the info box tabs' tabbing work
-    const tabs = document.getElementById('info-tabs')
+    const tabs = byId('info-tabs')
     const tabbedDivs = {}
 
     if( tabs ) 
     for( const tab of tabs.children ) {
         const radio = tab.children[0]
-        tabbedDivs[radio.value] = document.getElementById(radio.value)
+        tabbedDivs[radio.value] = byId(radio.value)
         radio.onchange = function() {
             for( const otherTab of tabs.children )
                 otherTab.classList.remove('checked')

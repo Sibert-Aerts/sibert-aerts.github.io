@@ -36,6 +36,8 @@
 	<link rel="stylesheet" href="new-area.css">
 	<script type="text/javascript" src="areas.js"></script>
 	<script type="text/javascript" src="new-area.js"></script>
+	<script type="text/javascript" src="image-creator/js/tinyUtils.js"></script>
+	<script type="text/javascript" src="image-creator/js/imageHandler.js"></script>
 	<script type="text/javascript" src="image-creator/js/macroGenerator.js"></script>
 	<script type="text/javascript" src="image-creator/js/drawFunctions.js"></script>
 	<script type="text/javascript" src="image-creator/js/layerTypes.js"></script>
@@ -45,19 +47,17 @@
 
 		window.addEventListener('DOMContentLoaded', function() {
 			// Set up event to only instantiate the MacroGenerator once the little modal is opened.
-			const parent = byId('image-gen')
 
-			function callback() {
-				parent.removeEventListener('click', callback)
-
+			function onclick() {
 				window.MACROGEN_DEFAULTS = {
 					macroType: 'areaName', game: 'ds1', preset: 'Area Name'
 				}
+				if ($('#name').text()) $('#image-caption').val($('#name').text())
 				macroGen = new MacroGenerator()
 				macroGen.redrawMacro()
 			}
 
-			parent.addEventListener('click', callback)
+			byId('image-gen').addEventListener('click', onclick, {once: true})
 		})
 	
 	</script>
