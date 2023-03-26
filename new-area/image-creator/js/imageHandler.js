@@ -147,7 +147,7 @@ class ImageHandler {
 
 
 ImageHandler.genericScreenshots = {
-    "Dark Souls": [
+    'Dark Souls': [
         {url: 'https://i.imgur.com/QMoXgZI.jpg', name: 'Undead Asylum / Oscar'},
         {url: 'https://i.imgur.com/3kzlCXb.jpg', name: 'Undead Asylum / Exit'},
         {url: 'https://i.imgur.com/1Rozzjq.jpg', name: 'Firelink Shrine'},
@@ -161,5 +161,25 @@ ImageHandler.genericScreenshots = {
         {url: 'https://i.imgur.com/7Uz8znN.jpg', name: 'Darkroot Garden / Sif'},
         {url: 'https://i.imgur.com/7uQ7VmQ.jpg', name: 'Ash Lake / Eternal Dragon'},
         {url: 'https://i.imgur.com/6PO3LFj.jpg', name: 'Kiln of the First Flame'},
-    ]
+    ],
+    'Dark Souls 2': [        
+        {url: 'https://i.imgur.com/TAL6yXo.jpg', name: 'Things Betwixt'},
+        {url: 'https://i.imgur.com/HrXEHe4.jpg', name: 'Majula / Emerald Herald'},
+        {url: 'https://i.imgur.com/rvWaKta.jpg', name: 'Majula / View'},
+        {url: 'https://i.imgur.com/ii5c6fW.jpg', name: 'Heide\'s Tower of Flame'},
+        {url: 'https://i.imgur.com/W9u8WgN.jpg', name: 'Harvest Valley'},
+        {url: 'https://i.imgur.com/3YoSyEz.jpg', name: 'Iron Keep'},
+        {url: 'https://i.imgur.com/bLuGyYa.jpg', name: 'The Gutter'},
+        {url: 'https://i.imgur.com/ISE2cLV.jpg', name: 'The Lost Bastille'},
+        {url: 'https://i.imgur.com/ZaYh8bD.jpg', name: 'Shaded Woods'},
+        {url: 'https://i.imgur.com/tijEJa0.jpg', name: 'Drangleic Castle'},
+        {url: 'https://i.imgur.com/jg9GpDs.jpg', name: 'Shrine of Amana'},
+        {url: 'https://i.imgur.com/cHgV7YF.jpg', name: 'Aldia\'s Keep'},
+        {url: 'https://i.imgur.com/VRl2KlX.jpg', name: 'Dragon Aerie'},
+        {url: 'https://i.imgur.com/5uF0RmB.jpg', name: 'Throne of Want'},
+        {url: 'https://i.imgur.com/BjheI2c.jpg', name: 'Shulva, Sanctum City'},
+        {url: 'https://i.imgur.com/bjKO9nM.jpg', name: 'Brume Tower'},
+        {url: 'https://i.imgur.com/qnvcVew.jpg', name: 'Frozen Eleum Loyce'},
+        {url: 'https://i.imgur.com/GsRhyXD.jpg', name: 'Gender Swap Coffin'},
+    ],
 }
