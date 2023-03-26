@@ -82,6 +82,16 @@ const ASSETS = {
     }
 }
 
+const GRADIENTS = {
+    gay: ['#f00', '#f80', '#fe0', '#0a0', '#26c', '#a0a'],
+    trans: ['#8cf', '#8cf', '#fab', '#fab', '#fff', '#fff', '#fab', '#fab', '#8cf', '#8cf'],
+    bi: ['#f08', '#f08', '#a6a', '#80f', '#80f'],
+    les: ['#f20', '#f64', '#fa8', '#fff', '#f8f', '#f4c', '#f08'],
+    nb: ['#ff2', '#fff', '#84d', '#333'],
+    pan: ['#f2c', '#f2c', '#ff2', '#ff2', '#2cf', '#2cf'],
+    men: ['#2a6', '#6ea', '#8fc', '#fff', '#88f', '#44c', '#22a'],
+}
+
 //========================================================================
 //========================       DRAWABLES       =========================
 //========================================================================
@@ -164,6 +174,16 @@ function putNoise(ctx, x, y, w, h) {
     ctx.putImageData(iData, x, y)
 }
 
+/**
+ * @param {MacroGenerator} gen 
+ * @returns {[HTMLCanvasElement, CanvasRenderingContext2D]}
+ */
+function getTempCanvasAndContext(gen) {
+    const temp = gen.tempCanvas
+    temp.width = gen.canvas.width; temp.height = gen.canvas.height;
+    const tctx = temp.getContext('2d')
+    return [temp, tctx]
+}
 
 
 
@@ -176,19 +196,28 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const gradient = sliders.gradient
     const textColor = sliders.font.textColor
 
     const x0 = xOffset*w, y0 = yOffset*h
     s *= s0
 
+    //// SHADE
+    ctx.save()
     // The shade only moves up or down
     ctx.translate(0, y0)
-    //// SHADE
-    drawShadowBar(ctx, canvas, gen, sliders, s0)    
-    // The text also moves left or right
-    ctx.translate(x0, 0)
+    drawShadowBar(ctx, canvas, gen, sliders, s0)
+    ctx.restore()
+
+    //// RAINBOW: SETUP
+    if (gradient && gradient.gradient) {
+        var trueCanvas=canvas,  trueCtx=ctx;
+        [canvas, ctx] = getTempCanvasAndContext(gen)
+    }
+    ctx.translate(x0, y0)
 
     //// TEXT
+    ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.save()
 
@@ -218,6 +247,26 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     // Draw the regular text on top
     ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
     ctx.fillText(caption, w/2, h/2/vScale )
+    ctx.restore()
+
+    //// RAINBOW: PAYOFF
+    if (gradient && gradient.gradient) {
+        // Make gradient
+        const rs = s0 * gradient.gradientScale
+        const grad = ctx.createLinearGradient((1-rs)*w/2, 0, (1+rs)*w/2, 0)
+        const colors = GRADIENTS[gradient.gradient]
+        for (let i=0; i<colors.length; i++) {
+            grad.addColorStop(i/(colors.length-1), colors[i])
+        }
+
+        // Apply rainbow mask
+        ctx.fillStyle = grad
+        ctx.globalCompositeOperation = 'source-in'
+        ctx.fillRect(-x0, -y0, w, h)
+
+        // Paste onto true canvas
+        trueCtx.drawImage(canvas, 0, 0)
+    }
 }
 
 /** @type {drawFun} Function which draws a Demon's Souls-style NOUN VERBED.  */
@@ -770,9 +819,7 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     }
     
     //// CREATE A TEMP CANVAS TO ACHIEVE OUR COOL EFFECTS (PAIN IN THE ASS)
-    const temp = gen.tempCanvas
-    temp.width = canvas.width; temp.height = canvas.height;
-    const tctx = temp.getContext('2d')
+    const [temp, tctx] = getTempCanvasAndContext(gen)
 
     applyFontSliders(tctx, temp, gen, sliders, s)
     tctx.textBaseline = 'alphabetic'

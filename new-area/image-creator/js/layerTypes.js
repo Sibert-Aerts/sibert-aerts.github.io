@@ -193,7 +193,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
             shadowOffset: -.002, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -221,7 +222,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
             shadowOffset: -.006, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -249,7 +251,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
             shadowOffset: -.004, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -277,7 +280,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
             shadowOffset: -.004, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -305,7 +309,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .7,
             shadowOffset: -.004, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -335,7 +340,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -363,7 +369,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -391,7 +398,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -419,7 +427,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -447,7 +456,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -475,7 +485,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -503,7 +514,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.4, shadowOpacity: .9,
             shadowOffset: -.004, shadowSoftness: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -533,7 +545,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -561,7 +574,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -589,7 +603,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -617,7 +632,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -645,7 +661,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .72,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -673,7 +690,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })
@@ -701,7 +719,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 0.8, shadowOpacity: .66,
             shadowOffset: -.008, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
     draw: drawNounVerbed
 })

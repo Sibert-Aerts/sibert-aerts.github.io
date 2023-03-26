@@ -240,6 +240,29 @@
 					</div>
 				</div>
 
+				<div name=gradient class=sliders-container hidden>
+					<h4 > Gradient </h4>
+					<div class=smol>
+						<span class=input-title>Gradient:</span>
+						<button class=reset-button></button>
+						<select name=gradient default="">
+							<option value="">None</option>
+							<option value=gay>Rainbow</option>
+							<option value=trans>Baby</option>
+							<option value=nb>Electric</option>
+							<option value=men>Blue</option>
+							<option value=les>Orange</option>
+							<option value=bi>Purple</option>
+							<option value=pan>Candy</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Gradient cover:</span>
+						<button class=reset-button></button>
+						<input name=gradientScale type=range min=-2 max=2 step=.1 default=-1 as=log2>
+					</div>
+				</div>
+
 				<div name=melee class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Outline width:</span>
@@ -736,6 +759,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/03/25</b> • Add "gradient" effect option to Dark Souls style Noun Verbed layers <br>
 			<b>2023/03/25</b> • Add a background option for selected generic game screenshots <br>
 			<b>2023/03/17</b> • Make scripts ECMA2020 compatible, hopefully supporting more devices (notably iPhones) <br>
 			<b>2023/03/14</b> • Add Dark Souls 2 interact box <br>

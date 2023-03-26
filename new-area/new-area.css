@@ -591,6 +591,10 @@ canvas.big {
     }
 
     .sliders-container select {
+        width: 100%;
+    }
+    #global-sliders select {
+        width: unset;
         min-width: 200px;
     }
 
