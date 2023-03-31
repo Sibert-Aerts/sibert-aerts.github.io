@@ -15,44 +15,41 @@ class ImageHandler {
         /** @type HTMLImageElement */
         this.image = null
         /** @type string */
-        this.imageType = null    
+        this.imageType = null
+
+        const my = (tag, name) => parent.getElementsByTagName(tag).namedItem(name)
 
         /// URL event bindings
         /** @type HTMLInputElement */
-        this.URLinput = parent.getElementsByTagName('input').namedItem('image-URL')
+        this.URLinput = my('input', 'image-URL')
         this.URLinput.onchange = this.handleImageURL.bind(this)
         this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
         if( this.URLinput.value ) this.handleImageURL()
 
         /// File select event bindings
         /** @type HTMLInputElement */
-        this.fileSelect = parent.getElementsByTagName('input').namedItem('image-upload')
+        this.fileSelect = my('input', 'image-upload')
         this.fileSelect.onchange = this.handleFileSelect.bind(this)
 
         /// Set up generic screenshot select
         /** @type HTMLSelectElement */
-        this.screenshotSelect = parent.getElementsByTagName('select').namedItem('generic-screenshot')
+        this.screenshotSelect = my('select', 'generic-screenshot')
         if (this.screenshotSelect) {
-            // Fill up select element
-            for (const game in ImageHandler.genericScreenshots) {
-                const screenshots = ImageHandler.genericScreenshots[game]
-                const optGroup = makeElem('optgroup')
-                optGroup.label = game
-                this.screenshotSelect.appendChild(optGroup)
-                for (const screenshot of screenshots) {
-                    const option = makeOption('', screenshot.name)
-                    option.screenshot = screenshot
-                    optGroup.appendChild(option)
-                }
-            }
             // Bind onchange
-            this.screenshotSelect.onchange = (e) => {
-                const screenshot = e.target.options[e.target.selectedIndex].screenshot
+            this.screenshotSelect.onchange = () => {
+                const screenshot = this.screenshotSelect.value
                 if (screenshot) {
-                    this._setImageFromURL(screenshot.url, 'jpg')
+                    this._setImageFromURL(screenshot, 'jpg')
                 } else {
                     this.onerror()
                 }
+            }
+            const randomButton = my('button', 'random-screenshot')
+            randomButton.onclick = () => {
+                const options = this.screenshotSelect.options
+                const option = options[Math.floor(Math.random()*options.length)]
+                option.selected = true
+                this.screenshotSelect.onchange()
             }
         }
 
@@ -143,43 +140,4 @@ class ImageHandler {
         this.image = this.imageType = undefined
         this.macroGen.clear()
     }
-}
-
-
-ImageHandler.genericScreenshots = {
-    'Dark Souls': [
-        {url: 'https://i.imgur.com/QMoXgZI.jpg', name: 'Undead Asylum / Oscar'},
-        {url: 'https://i.imgur.com/3kzlCXb.jpg', name: 'Undead Asylum / Exit'},
-        {url: 'https://i.imgur.com/1Rozzjq.jpg', name: 'Firelink Shrine'},
-        {url: 'https://i.imgur.com/JaipfBR.jpg', name: 'Firelink Shrine / Giantdad'},
-        {url: 'https://i.imgur.com/lyAIfjh.jpg', name: 'Lower Undead Burg'},
-        {url: 'https://i.imgur.com/QkCzoDg.jpg', name: 'Demon Ruins'},
-        {url: 'https://i.imgur.com/Da7QbbB.jpg', name: 'Anor Londo'},
-        {url: 'https://i.imgur.com/78DFyIh.jpg', name: 'Anor Londo Entrance'},
-        {url: 'https://i.imgur.com/12Fsxvk.jpg', name: 'Painted World / Bonewheel Basement'},
-        {url: 'https://i.imgur.com/xMYEf5g.jpg', name: 'Painted World'},
-        {url: 'https://i.imgur.com/7Uz8znN.jpg', name: 'Darkroot Garden / Sif'},
-        {url: 'https://i.imgur.com/7uQ7VmQ.jpg', name: 'Ash Lake / Eternal Dragon'},
-        {url: 'https://i.imgur.com/6PO3LFj.jpg', name: 'Kiln of the First Flame'},
-    ],
-    'Dark Souls 2': [        
-        {url: 'https://i.imgur.com/TAL6yXo.jpg', name: 'Things Betwixt'},
-        {url: 'https://i.imgur.com/HrXEHe4.jpg', name: 'Majula / Emerald Herald'},
-        {url: 'https://i.imgur.com/rvWaKta.jpg', name: 'Majula / View'},
-        {url: 'https://i.imgur.com/ii5c6fW.jpg', name: 'Heide\'s Tower of Flame'},
-        {url: 'https://i.imgur.com/W9u8WgN.jpg', name: 'Harvest Valley'},
-        {url: 'https://i.imgur.com/3YoSyEz.jpg', name: 'Iron Keep'},
-        {url: 'https://i.imgur.com/bLuGyYa.jpg', name: 'The Gutter'},
-        {url: 'https://i.imgur.com/ISE2cLV.jpg', name: 'The Lost Bastille'},
-        {url: 'https://i.imgur.com/ZaYh8bD.jpg', name: 'Shaded Woods'},
-        {url: 'https://i.imgur.com/tijEJa0.jpg', name: 'Drangleic Castle'},
-        {url: 'https://i.imgur.com/jg9GpDs.jpg', name: 'Shrine of Amana'},
-        {url: 'https://i.imgur.com/cHgV7YF.jpg', name: 'Aldia\'s Keep'},
-        {url: 'https://i.imgur.com/VRl2KlX.jpg', name: 'Dragon Aerie'},
-        {url: 'https://i.imgur.com/5uF0RmB.jpg', name: 'Throne of Want'},
-        {url: 'https://i.imgur.com/BjheI2c.jpg', name: 'Shulva, Sanctum City'},
-        {url: 'https://i.imgur.com/bjKO9nM.jpg', name: 'Brume Tower'},
-        {url: 'https://i.imgur.com/qnvcVew.jpg', name: 'Frozen Eleum Loyce'},
-        {url: 'https://i.imgur.com/GsRhyXD.jpg', name: 'Gender Swap Coffin'},
-    ],
 }

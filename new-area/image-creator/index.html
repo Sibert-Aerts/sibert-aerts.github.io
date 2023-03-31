@@ -133,7 +133,7 @@
 				<div>
 					<span class="input-title macro-select-title" style=>Macro type:</span>
 					<select name=macro-type></select>
-					<button class="reset-button random-macro-button" name="random-macro" title="Switch to random"></button>
+					<button class="lil-button random-button" name="random-macro" title="Pick random"></button>
 				</div>
 				<div>
 					<span class="input-title macro-select-title">Game:</span>
@@ -170,17 +170,17 @@
 					</div>
 					<div>
 						<span class=input-title>Horizontal:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=xOffset type=range min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
 						<span class=input-title>Vertical:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=yOffset type=range min=-0.60 max=.60 step=0.001 default=0>
 					</div>
 					<div>
 						<span class=input-title>Scale:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=scale type=range min=-3 max=4 step=.005 default=0 as=log2>
 					</div>
 				</div>
@@ -189,32 +189,32 @@
 					<h4 > Text </h4>
 					<div class=smol>
 						<span class=input-title>Font family:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=text name=fontFamily>
 					</div>
 					<div class=smol>
 						<span class=input-title>Color:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=color name=textColor>
 					</div>
 					<div class=smol>
 						<span class=input-title>Size:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=fontSize min=10 max=400 step=1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Weight:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=fontWeight min=100 max=900 step=100>
 					</div>
 					<div class=smol>
 						<span class=input-title>Vertical scale:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=vScale min=-2 max=2 step=.02 as=log1.5>
 					</div>
 					<div class=smol>
 						<span class=input-title>Spacing:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=charSpacing min=-10 max=40 step=1>
 					</div>
 				</div>
@@ -222,7 +222,7 @@
 				<div name=subCaption class=sliders-container hidden>
 					<div>
 						<span class=input-title>Sub-caption:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<textarea name=subCaption rows=3 style=width:100%></textarea>
 					</div>
 				</div>
@@ -230,12 +230,12 @@
 				<div name=outline class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Outline width:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=lineWidth type=range min=0 max=60>
 					</div>
 					<div class=smol>
 						<span class=input-title>Outline color:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=lineColor type=color>
 					</div>
 				</div>
@@ -244,7 +244,7 @@
 					<h4 > Gradient </h4>
 					<div class=smol>
 						<span class=input-title>Gradient:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=gradient default="">
 							<option value=""></option>
 							<option value=gay>Rainbow</option>
@@ -258,7 +258,7 @@
 					</div>
 					<div class=smol>
 						<span class=input-title>Gradient cover:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=gradientScale type=range min=-2 max=2 step=.1 default=-1 as=log2>
 					</div>
 				</div>
@@ -266,12 +266,12 @@
 				<div name=melee class=sliders-container hidden>
 					<div class=smol>
 						<span class=input-title>Outline width:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=lineWidth type=range min=0 max=60>
 					</div>
 					<div class=smol>
 						<span class=input-title>Shadow opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=shadowOpacity type=range min=0 max=1 step=.02>
 					</div>
 				</div>
@@ -280,22 +280,22 @@
 					<h4> Effect </h4>
 					<div class=smol>
 						<span class=input-title>Text opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=textOpacity type=range min=0 max=1 step=.01>
 					</div>
 					<div class=smol>
 						<span class=input-title>Sheen color:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=blurTint type=color default=#ffb299>
 					</div>
 					<div class=smol>
 						<span class=input-title>Sheen size:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=blurSize type=range min=1 max=2 step=.01 default=1.1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Sheen opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=blurOpacity type=range min=0 max=1 step=.01 default=.08>
 					</div>
 				</div>
@@ -304,27 +304,27 @@
 					<h4> Characters </h4>
 					<div>
 						<span class=input-title>Character font:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=text name=symbolFont style="width:100%">
 					</div>
 					<div class=smol>
 						<span class=input-title>Characters:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=text name=symbol>
 					</div>
 					<div class=smol style="min-height:49px">
 						<span class=input-title>Size:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=symbolSize min=50 max=500 step=2>
 					</div>
 					<div class=smol>
 						<span class=input-title>Position:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=symbolPos min=-250 max=250 step=2>
 					</div>
 					<div class=smol>
 						<span class=input-title>Spacing:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=symbolSpace min=-100 max=100 step=1>
 					</div>
 				</div>
@@ -333,34 +333,34 @@
 					<h4> Effect </h4>
 					<div class=smol>
 						<span class=input-title>Text opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=textOpacity min=0 max=1 step=.02 default=.7>
 					</div>
 					<div class=smol>
 						<span class=input-title>Glow color:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=color name=glowColor as=rgb default=#ffffff>
 					</div>
 					<div class=smol>
 						<span class=input-title>Glow size:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=glowSize min=0 max=100 step=1 default=40>
 					</div>
 					<div class=smol>
 						<span class=input-title>Glow opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=glowOpacity min=0 max=5 step=.1 default=1>
 					</div>
 					<div class=hidden>
 						<!-- Hidden -->
 						<span class=input-title>Blend mode:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=text name=blendMode default=lighter>
 					</div>
 					<div class=hidden>
 						<!-- Hidden -->
 						<span class=input-title>Secret factor:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=secretFactor min=0 max=5 default=1>
 					</div>
 				</div>
@@ -369,22 +369,22 @@
 					<h4> Decoration </h4>
 					<div class=smol>
 						<span class=input-title>Line length:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=ulLength type=range min=0 max=.64 step=.01>
 					</div>
 					<div class=smol>
 						<span class=input-title>Line width:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=ulWidth type=range min=0 max=20 step=.5>
 					</div>
 					<div class=smol>
 						<span class=input-title>Line position:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=ulPos type=range min=0 max=100 step=1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Contrast:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=contrast type=range min=0 max=3 step=0.1 default=1>
 					</div>
 				</div>
@@ -393,17 +393,17 @@
 					<h4> Status buildup </h4>
 					<div class=smol>
 						<span class=input-title>Resistance:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=maxPoison type=range min=0 max=1400 step=1 default=400>
 					</div>
 					<div class=smol>
 						<span class=input-title>Buildup:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=poison type=range min=0 max=1400 step=1 default=300>
 					</div>
 					<div class=smol>
 						<span class=input-title>Type:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=type as=float default=1>
 							<option value=0>Bleed</option>
 							<option value=1>Poison</option>
@@ -413,7 +413,7 @@
 					</div>
 					<div class=smol>
 						<span class=input-title>State:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=active default=inactive>
 							<option value=inactive>Inactive</option>
 							<option value=active>Active</option>
@@ -425,17 +425,17 @@
 					<h4> Status buildup </h4>
 					<div class=smol>
 						<span class=input-title>Resistance:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=maxPoison type=range min=0 max=1425 step=1 default=500>
 					</div>
 					<div class=smol>
 						<span class=input-title>Buildup:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=poison type=range min=0 max=1425 step=1 default=350>
 					</div>
 					<div class=smol>
 						<span class=input-title>Type:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=type as=float default=0>
 							<option value=0>Poison</option>
 							<option value=1>Scarlet Rot</option>
@@ -448,7 +448,7 @@
 					</div>
 					<div class=smol>
 						<span class=input-title>State:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=active default=inactive>
 							<option value=inactive>Inactive</option>
 							<option value=active>Active</option>
@@ -460,17 +460,17 @@
 					<h4> Boss </h4>
 					<div>
 						<span class=input-title>Health:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=health type=range min=0 max=1 step=.01 default=1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Recent damage:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=recentDamage type=range min=0 max=1 step=.01 default=0>
 					</div>
 					<div class=smol>
 						<span class=input-title>Damage number:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=damageNumber type=text default="">
 					</div>
 				</div>
@@ -479,27 +479,27 @@
 					<h4> Boss </h4>
 					<div>
 						<span class=input-title>Health:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=health type=range min=0 max=1 step=.01 default=1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Recent damage:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=recentDamage type=range min=0 max=1 step=.01 default=0>
 					</div>
 					<div class=smol>
 						<span class=input-title>Brush opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=frameOpacity type=range min=0 max=1 step=.01 default=.8>
 					</div>
 					<div class=smol>
 						<span class=input-title>Lives:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=livesLeft type=number min=0 default=1 as=float>
 					</div>
 					<div class=smol>
 						<span class=input-title>Spent lives:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=livesSpent type=number min=0 default=0 as=float>
 					</div>
 				</div>
@@ -508,17 +508,17 @@
 					<h4> Text background </h4>
 					<div>
 						<span class=input-title>Opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=opacity type=range min=0 max=1 step=.01 default=0.6>
 					</div>
 					<div class=smol>
 						<span class=input-title>Width:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=frameWidth type=range min=.1 max=2 step=.02 default=1>
 					</div>
 					<div class=smol>
 						<span class=input-title>Height:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=frameHeight type=range min=.1 max=4 step=.02 default=1>
 					</div>
 				</div>
@@ -527,17 +527,17 @@
 					<h4> Frame </h4>
 					<div>
 						<span class=input-title>Opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=opacity type=range min=0 max=1 step=.01>
 					</div>
 					<div class=smol>
 						<span class=input-title>Width:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=frameWidth type=range min=0 max=2 step=.01>
 					</div>
 					<div class=smol>
 						<span class=input-title>Height:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=frameHeight type=range min=0 max=.5 step=.005>
 					</div>
 				</div>
@@ -546,13 +546,13 @@
 					<h4> Decoration </h4>
 					<div>
 						<span class=input-title>Blot opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=blotOpacity type=range min=0 max=1 step=.01>
 					</div>
 					<div class=hidden>
 						<!-- Hidden -->
 						<span class=input-title>Effect:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=mode default="transparency">
 							<option value="transparency">Safe</option>
 							<option value="blend">Authentic</option>
@@ -564,22 +564,22 @@
 					<h4> Shadow bar </h4>
 					<div class=smol>
 						<span class=input-title>Size:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=shadowSize type=range min=0 max=8 step=.02>
 					</div>
 					<div class=smol>
 						<span class=input-title>Opacity:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=shadowOpacity type=range min=0 max=1 step=.01>
 					</div>
 					<div class=smol>
 						<span class=input-title>Offset:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=shadowOffset type=range min=-0.2 max=0.2 step=.002>
 					</div>
 					<div class=smol>
 						<span class=input-title>Softness:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=shadowSoftness type=range min=0 max=2 step=.01>
 					</div>
 				</div>
@@ -588,17 +588,17 @@
 					<h4> Interact Box </h4>
 					<div class=smol>
 						<span class=input-title>First option:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=option1 type=text default=YES>
 					</div>
 					<div class=smol>
 						<span class=input-title>Second option:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input name=option2 type=text default=NO>
 					</div>
 					<div>
 						<span class=input-title>Selected:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<select name=selected default=first>
 							<option value="">None</option>
 							<option value=first>First</option>
@@ -662,12 +662,70 @@
 					</div>
 					<div>
 						<span class=input-title style=min-width:100px>Generic screenshot:</span>
+						<button class="lil-button random-button" name="random-screenshot" title="Pick random"></button>
 						<select id="generic-screenshot" style=width:100%>
-							<option>(None)</option>
+							<option value="">(None)</option>
+							<optgroup label="Dark Souls">
+								<option value="https://i.imgur.com/QMoXgZI.jpg">Undead Asylum / Oscar</option>
+								<option value="https://i.imgur.com/3kzlCXb.jpg">Undead Asylum / Exit</option>
+								<option value="https://i.imgur.com/1Rozzjq.jpg">Firelink Shrine</option>
+								<option value="https://i.imgur.com/JaipfBR.jpg">Firelink Shrine / Giantdad</option>
+								<option value="https://i.imgur.com/lyAIfjh.jpg">Lower Undead Burg</option>
+								<option value="https://i.imgur.com/QkCzoDg.jpg">Demon Ruins</option>
+								<option value="https://i.imgur.com/Da7QbbB.jpg">Anor Londo</option>
+								<option value="https://i.imgur.com/78DFyIh.jpg">Anor Londo Entrance</option>
+								<option value="https://i.imgur.com/12Fsxvk.jpg">Painted World / Bonewheel Basement</option>
+								<option value="https://i.imgur.com/xMYEf5g.jpg">Painted World</option>
+								<option value="https://i.imgur.com/7Uz8znN.jpg">Darkroot Garden / Sif</option>
+								<option value="https://i.imgur.com/7uQ7VmQ.jpg">Ash Lake / Eternal Dragon</option>
+								<option value="https://i.imgur.com/6PO3LFj.jpg">Kiln of the First Flame</option>
+							</optgroup>
+							<optgroup label="Dark Souls II">
+								<option value="https://i.imgur.com/TAL6yXo.jpg">Things Betwixt</option>
+								<option value="https://i.imgur.com/HrXEHe4.jpg">Majula / Emerald Herald</option>
+								<option value="https://i.imgur.com/rvWaKta.jpg">Majula / View</option>
+								<option value="https://i.imgur.com/ii5c6fW.jpg">Heide's Tower of Flame</option>
+								<option value="https://i.imgur.com/W9u8WgN.jpg">Harvest Valley</option>
+								<option value="https://i.imgur.com/3YoSyEz.jpg">Iron Keep</option>
+								<option value="https://i.imgur.com/bLuGyYa.jpg">The Gutter</option>
+								<option value="https://i.imgur.com/ISE2cLV.jpg">The Lost Bastille</option>
+								<option value="https://i.imgur.com/ZaYh8bD.jpg">Shaded Woods</option>
+								<option value="https://i.imgur.com/tijEJa0.jpg">Drangleic Castle</option>
+								<option value="https://i.imgur.com/jg9GpDs.jpg">Shrine of Amana</option>
+								<option value="https://i.imgur.com/cHgV7YF.jpg">Aldia's Keep</option>
+								<option value="https://i.imgur.com/VRl2KlX.jpg">Dragon Aerie</option>
+								<option value="https://i.imgur.com/5uF0RmB.jpg">Throne of Want</option>
+								<option value="https://i.imgur.com/BjheI2c.jpg">Shulva, Sanctum City</option>
+								<option value="https://i.imgur.com/bjKO9nM.jpg">Brume Tower</option>
+								<option value="https://i.imgur.com/qnvcVew.jpg">Frozen Eleum Loyce</option>
+								<option value="https://i.imgur.com/GsRhyXD.jpg">Gender Swap Coffin</option>
+							</optgroup>
+							<optgroup label="Dark Souls III">
+								<option value="https://i.imgur.com/l4e0EyO.jpg">Cemetery of Ash / Ashen One's Grave</option>
+								<option value="https://i.imgur.com/jVwB6v2.jpg">Cemetery of Ash / Firelink Shrine View</option>
+								<option value="https://i.imgur.com/ng5F4cT.jpg">Firelink Shrine</option>
+								<option value="https://i.imgur.com/MWMYXwc.jpg">High Wall of Lothric / Above</option>
+								<option value="https://i.imgur.com/GLWDaHa.jpg">High Wall of Lothric / Below</option>
+								<option value="https://i.imgur.com/S6VGPzR.jpg">High Wall of Lothric / World View</option>
+								<option value="https://i.imgur.com/M4ZtlVr.jpg">The Undead Settlement</option>
+								<option value="https://i.imgur.com/wSsmwTR.jpg">Cathedral of the Deep</option>
+								<option value="https://i.imgur.com/iyiCXM6.jpg">Smouldering Lake</option>
+								<option value="https://i.imgur.com/wNlxTXW.jpg">Irithyll of the Boreal Valley</option>
+								<option value="https://i.imgur.com/rciYPm7.jpg">Anor Londo</option>
+								<option value="https://i.imgur.com/Mm1qVTF.jpg">The Forsaken Capital</option>
+								<option value="https://i.imgur.com/QQGB5th.jpg">Archdragon Peak</option>
+								<option value="https://i.imgur.com/Hp3PdfH.jpg">Lothric Castle</option>
+								<option value="https://i.imgur.com/ot9MMj7.jpg">Grand Archives</option>
+								<option value="https://i.imgur.com/hixoVuS.jpg">Kiln of the First Flame</option>
+								<option value="https://i.imgur.com/uBZDSHw.jpg">Painted World of Ariandel</option>
+								<option value="https://i.imgur.com/ebmKxsb.jpg">The Dreg Heap</option>
+								<option value="https://i.imgur.com/OfC0MvO.jpg">The Ringed City</option>
+								<option value="https://i.imgur.com/PKamC4K.jpg">The Ringed City / End of Time</option>
+							</optgroup>
 						</select>
 					</div>
 					<div>
-						<label class=input-title>Constrain resolution: <input type=checkbox id=limit-resolution checked></label> 
+						<label class=input-title><input type=checkbox id=limit-resolution checked> Constrain resolution</label> 
 						<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
 						<div id=resolution-warning hidden>
 							Warning: Selected image is very large, automatic re-rendering will be delayed slightly to save on processing.
@@ -679,22 +737,22 @@
 					<h4> Background image filters </h4>
 					<div>
 						<span class=input-title>Saturation:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=imgSaturate min=0 max=200 step=1 default=100>
 					</div>
 					<div>
 						<span class=input-title>Contrast:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=imgContrast min=0 max=200 step=1 default=100>
 					</div>
 					<div>
 						<span class=input-title>Brightness:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=imgBrightness min=0 max=200 step=1 default=100>
 					</div>
 					<div>
 						<span class=input-title>Chromatic Aberration:</span>
-						<button class=reset-button></button>
+						<button class="lil-button reset-button"></button>
 						<input type=range name=imgChromatic min=0 max=.05 step=.001 default=0>
 					</div>
 				</div>
@@ -759,7 +817,8 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
-			<b>2023/03/26</b> • Add some generic Dark Souls 2 screenshots <br>
+			<b>2023/03/31</b> • Add generic Dark Souls 3 screenshots <br>
+			<b>2023/03/26</b> • Add generic Dark Souls 2 screenshots <br>
 			<b>2023/03/26</b> • Add "gradient" effect option to Dark Souls style Noun Verbed layers <br>
 			<b>2023/03/25</b> • Add a background option for selected generic game screenshots <br>
 			<b>2023/03/17</b> • Make scripts ECMA2020 compatible, hopefully supporting more devices (notably iPhones) <br>

@@ -598,31 +598,34 @@ canvas.big {
         min-width: 200px;
     }
 
-.reset-button {
-    float: right;
-    margin: 4px 2px 0 0;
-    border: none; padding: none;
+.lil-button {
+    border: none; padding: 0;
     cursor: pointer;
 
     width: 16px; height: 16px;
     background: none;
     background-image: url(graphics/soulsy-icons.png);
     background-size: 3200% 300%;
-    background-position-x: -200%;   /* 🔄 */
     background-position-y: -100%;   /* Orange */
 }
-    .reset-button:hover {
-        background-position-y: 0;       /* White */
+    .lil-button:hover {
+        background-position-y: 0;   /* White */
     }
-    .reset-button:disabled {
+    .lil-button:disabled {
         cursor: initial;
-        background-position-y: -200%;   /* Greyish */
+        background-position-y: -200%; /* Greyish */
     }
 
-.random-macro-button {
-    float: none;
-    background-position-x: -1700%;   /* Orange 🔀 */
-}
+    .lil-button.reset-button {
+        float: right;
+        margin: 4px 2px 0 0;
+        background-position-x: -200%;   /* 🔄 */
+    }
+    .lil-button.random-button {
+        vertical-align: middle;
+        margin-bottom: 4px;
+        background-position-x: -1700%;  /* 🔀 */
+    }
 
 #layers-container {
     width: 100%;

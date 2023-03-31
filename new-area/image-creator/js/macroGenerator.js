@@ -305,9 +305,8 @@ class MacroGenerator {
         this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = redraw
 
-        for (const randomMacroButton of element.getElementsByClassName('random-macro-button')) {
-            randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
-        }
+        const randomMacroButton = my('button', 'random-macro') 
+        randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
 
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
