@@ -336,20 +336,31 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, glowColor, glowSize, glowOpacity } = sliders.glowy
+    const gradient = sliders.gradient
+    let textColor = sliders.font.textColor
 
     const x0 = xOffset * w
     const y0 = yOffset * h
     s *= s0
 
+    //// RAINBOW: SETUP
+    if (gradient && gradient.gradient) {
+        var trueCanvas=canvas,  trueCtx=ctx;
+        [canvas, ctx] = getTempCanvasAndContext(gen)
+        ctx.fillStyle = '#000'
+        ctx.fillRect(0, 0, w, h)
+        textColor = [255, 255, 255]
+    }
     ctx.translate(x0, y0)
 
     //// TEXT
+    ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
     ctx.filter = `blur(${s/2}px)`
 
     /// First: Just draw the text, no glow
-    const [r, g, b] = sliders.font.textColor
+    const [r, g, b] = textColor
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
     ctx.fillText(caption, w/2, h/2/vScale)
     ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
@@ -368,6 +379,27 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
         ctx.fillText(caption, w/2, h/2/vScale)
         opacity--
+    }
+    ctx.restore()
+    
+    //// RAINBOW: PAYOFF
+    if (gradient && gradient.gradient) {
+        // Make gradient
+        const rs = s0 * gradient.gradientScale
+        const grad = ctx.createLinearGradient((1-rs)*w/2, 0, (1+rs)*w/2, 0)
+        const colors = GRADIENTS[gradient.gradient]
+        for (let i=0; i<colors.length; i++) {
+            grad.addColorStop(i/(colors.length-1), colors[i])
+        }
+
+        // Apply rainbow mask
+        ctx.fillStyle = grad
+        ctx.globalCompositeOperation = 'multiply'
+        ctx.fillRect(-x0, -y0, w, h)
+
+        // Paste onto true canvas
+        trueCtx.globalCompositeOperation = 'lighter' // blend mode: Add
+        trueCtx.drawImage(canvas, 0, 0)
     }
 }
 

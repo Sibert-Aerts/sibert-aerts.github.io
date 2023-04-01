@@ -746,7 +746,8 @@ layerTypes.push({
         glowy: {
             textOpacity: .5, glowColor: [144, 208, 166],
             glowSize: 17, glowOpacity: 1.1,
-        }
+        },
+        gradient: {},
     },
     draw: drawGlowyText
 })
@@ -770,7 +771,8 @@ layerTypes.push({
         glowy: {
             textOpacity: .26, glowColor: [156, 45, 17],
             glowSize: 12, glowOpacity: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawGlowyText
 })
@@ -1243,7 +1245,8 @@ layerTypes.push({
         glowy: {
             textOpacity: .3, glowColor: [149, 24, 24],
             glowSize: 22, glowOpacity: 1.2,
-        }
+        },
+        gradient: {},
     },
     draw: drawGlowyText
 })

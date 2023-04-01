@@ -1,7 +1,4 @@
 
-
-* link back to the area name generator lol?
-
 * Demon's Souls area name
 
 * Macro types:
@@ -16,7 +13,7 @@
     * Cropping?
 
     * Layer controls
-        * Give all layers their own grabbies, at the same time, maybe with (move up/down) buttons too
+        * Give all layers their own grabbies, at the same time
         * Ability to save layers as preset or something, and export/import presets
 
 * BUGS:
