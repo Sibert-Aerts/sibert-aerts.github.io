@@ -138,6 +138,6 @@ class ImageHandler {
 
     onerror() {
         this.image = this.imageType = undefined
-        this.macroGen.clear()
+        this.macroGen.onNoMoreBackgroundImage()
     }
 }

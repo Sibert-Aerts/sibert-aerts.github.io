@@ -304,6 +304,15 @@ class MacroGenerator {
         this.adjustCaseCheckbox.onchange = redraw
         this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = redraw
+        this.maxResXInput = my('input', 'max-res-x')
+        this.maxResXInput.onchange = redraw
+        this.maxResYInput = my('input', 'max-res-y')
+        this.maxResYInput.onchange = redraw
+        my('button', 'max-res-reset').onclick = () => {
+            this.maxResXInput.value = 1920
+            this.maxResYInput.value = 1080
+            this.redrawMacro()
+        }
 
         const randomMacroButton = my('button', 'random-macro') 
         randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
@@ -846,8 +855,7 @@ class MacroGenerator {
     }
     
     /** Called when there is no longer an image to draw. */
-    clear() {
-        this.canvas.width = 1920; this.canvas.height = 1080
+    onNoMoreBackgroundImage() {
         this.imageSliders.hide()
         this.redrawMacro()
     }
@@ -899,8 +907,15 @@ class MacroGenerator {
     }
 
     /** Redraw the underlying image, if any. */
-    drawImage() {
-        if( !this.imageHandler.image ) return
+    drawBackgroundImage() {
+        const maxResX = parseInt(this.maxResXInput.value) || 1920
+        const maxResY = parseInt(this.maxResYInput.value) || 1080
+
+        if( !this.imageHandler.image ) {
+            this.canvas.width = maxResX
+            this.canvas.height = maxResY
+            return
+        }            
 
         const image = this.imageHandler.image
         const ctx = this.ctx
@@ -908,8 +923,8 @@ class MacroGenerator {
         let scale = 1
 
         if( this.resolutionCheckbox.checked ) {
-            // Constrain image to be no larger than 1920x1080
-            scale = Math.min(1920/image.width, 1080/image.height, 1)
+            // Constrain image to be no larger than desired
+            scale = Math.min(maxResX/image.width, maxResY/image.height, 1)
             this.resizeCanvas(image.width*scale, image.height*scale)
             ctx.scale(scale, scale)
 
@@ -919,70 +934,70 @@ class MacroGenerator {
 
         this.drawFlatColor()
         
-        if( this.imageSliders.usable ) {
-            const {imgSaturate, imgContrast, imgBrightness, imgChromatic} = this.imageSliders.getValues()
-            const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
-            const bgColorStr = `rgba(${bgColor.join()}, ${bgColorOpacity}`
+        if( !this.imageSliders.usable ) {
+            ctx.drawImage(image, 0, 0)
+            return
+        }
 
-            let filter
-            // The way these filters work is a little weird, I like it better when the order varies like this
-            if( (imgContrast-100)*(imgBrightness-100) < 0 )
-                filter = `saturate(${imgSaturate}%) brightness(${imgBrightness}%) contrast(${imgContrast}%)`
-            else
-                filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
+        const {imgSaturate, imgContrast, imgBrightness, imgChromatic} = this.imageSliders.getValues()
+        const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
+        const bgColorStr = `rgba(${bgColor.join()}, ${bgColorOpacity}`
 
-            if( imgChromatic > 0 ) {
-                this.tempCanvas.width = canvas.width
-                this.tempCanvas.height = canvas.height
-                const tempCtx = this.tempCanvas.getContext('2d')
-                tempCtx.scale(scale, scale)
+        let filter
+        // The way these filters work is a little weird, I like it better when the order varies like this
+        if( (imgContrast-100)*(imgBrightness-100) < 0 )
+            filter = `saturate(${imgSaturate}%) brightness(${imgBrightness}%) contrast(${imgContrast}%)`
+        else
+            filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
 
-                // Draw image to tempCanvas
-                tempCtx.globalCompositeOperation = 'source-over'
-                tempCtx.fillStyle = bgColorStr
-                tempCtx.fillRect(0, 0, canvas.width, canvas.height)
-                tempCtx.filter = filter
-                tempCtx.drawImage(image, 0, 0)
-                // Multiply by orangeish
-                tempCtx.globalCompositeOperation = 'multiply'
-                tempCtx.fillStyle = '#ff8000'
-                tempCtx.filter = 'none'
-                tempCtx.fillRect(0, 0, image.width, image.height)
-                
-                // Draw to actual canvas
-                ctx.resetTransform()
-                ctx.drawImage(this.tempCanvas, 0, 0)
+        if( imgChromatic > 0 ) {
+            this.tempCanvas.width = canvas.width
+            this.tempCanvas.height = canvas.height
+            const tempCtx = this.tempCanvas.getContext('2d')
+            tempCtx.scale(scale, scale)
 
-                // Draw image to tempCanvas
-                tempCtx.globalCompositeOperation = 'source-over'
-                tempCtx.fillStyle = bgColorStr
-                tempCtx.fillRect(0, 0, canvas.width, canvas.height)
-                tempCtx.filter = filter
-                tempCtx.drawImage(image, 0, 0)
-                // Multiply by blueish
-                tempCtx.globalCompositeOperation = 'multiply'
-                tempCtx.fillStyle = '#007fff'
-                tempCtx.filter = 'none'
-                tempCtx.fillRect(0, 0, image.width, image.height)
+            // Draw image to tempCanvas
+            tempCtx.globalCompositeOperation = 'source-over'
+            tempCtx.fillStyle = bgColorStr
+            tempCtx.fillRect(0, 0, canvas.width, canvas.height)
+            tempCtx.filter = filter
+            tempCtx.drawImage(image, 0, 0)
+            // Multiply by orangeish
+            tempCtx.globalCompositeOperation = 'multiply'
+            tempCtx.fillStyle = '#ff8000'
+            tempCtx.filter = 'none'
+            tempCtx.fillRect(0, 0, image.width, image.height)
+            
+            // Draw to actual canvas
+            ctx.resetTransform()
+            ctx.drawImage(this.tempCanvas, 0, 0)
 
-                // Add to actual canvas, slightly aberrated
-                ctx.globalCompositeOperation = 'lighter'
-                ctx.resetTransform()
-                ctx.scale(1+imgChromatic, 1)
-                ctx.drawImage(this.tempCanvas, -canvas.width*imgChromatic/2, 0)
-                ctx.globalCompositeOperation = 'source-over'
-            }
-            else
-            {
-                ctx.filter = filter
-                ctx.drawImage(image, 0, 0)
-            }
-            ctx.filter = 'none'
+            // Draw image to tempCanvas
+            tempCtx.globalCompositeOperation = 'source-over'
+            tempCtx.fillStyle = bgColorStr
+            tempCtx.fillRect(0, 0, canvas.width, canvas.height)
+            tempCtx.filter = filter
+            tempCtx.drawImage(image, 0, 0)
+            // Multiply by blueish
+            tempCtx.globalCompositeOperation = 'multiply'
+            tempCtx.fillStyle = '#007fff'
+            tempCtx.filter = 'none'
+            tempCtx.fillRect(0, 0, image.width, image.height)
 
-
-        } else {
+            // Add to actual canvas, slightly aberrated
+            ctx.globalCompositeOperation = 'lighter'
+            ctx.resetTransform()
+            ctx.scale(1+imgChromatic, 1)
+            ctx.drawImage(this.tempCanvas, -canvas.width*imgChromatic/2, 0)
+            ctx.globalCompositeOperation = 'source-over'
+        }
+        else
+        {
+            ctx.filter = filter
             ctx.drawImage(image, 0, 0)
         }
+        ctx.filter = 'none'
+
     }
 
     /** 
@@ -996,7 +1011,7 @@ class MacroGenerator {
         this.drawFlatColor()
     
         // May alter the resolution
-        this.drawImage()
+        this.drawBackgroundImage()
         this.updateCanvasOverlay()
 
         // UI changes

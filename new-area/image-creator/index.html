@@ -725,8 +725,12 @@
 						</select>
 					</div>
 					<div>
-						<label class=input-title><input type=checkbox id=limit-resolution checked> Constrain resolution</label> 
-						<span class=help style="margin-left:1em">(Decreases strain on your system)</span>
+						<label class=input-title><input type=checkbox id=limit-resolution checked> Constrain resolution to</label>
+						<input type=number id=max-res-x value=1920 step=10 style="width:6em;">
+						×
+						<input type=number id=max-res-y value=1080 step=10 style="width:6em;">
+						<button class="lil-button reset-button" id=max-res-reset></button>
+						<!-- <span class=help style="margin-left:1em">(Decreases strain on your system)</span> -->
 						<div id=resolution-warning hidden>
 							Warning: Selected image is very large, automatic re-rendering will be delayed slightly to save on processing.
 						</div>
