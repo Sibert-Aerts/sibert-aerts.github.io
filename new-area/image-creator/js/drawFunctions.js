@@ -82,15 +82,45 @@ const ASSETS = {
     }
 }
 
+// List of colour gradients as arrays of (short) hex codes, eyeballed by me
 const GRADIENTS = {
-    gay: ['#f00', '#f80', '#fe0', '#0a0', '#26c', '#a0a'],
-    trans: ['#8cf', '#8cf', '#fab', '#fab', '#fff', '#fff', '#fab', '#fab', '#8cf', '#8cf'],
-    bi: ['#f08', '#f08', '#a6a', '#80f', '#80f'],
-    les: ['#f20', '#f64', '#fa8', '#fff', '#f8f', '#f4c', '#f08'],
-    nb: ['#ff2', '#fff', '#84d', '#333'],
-    pan: ['#f2c', '#f2c', '#ff2', '#ff2', '#2cf', '#2cf'],
-    men: ['#2a6', '#6ea', '#8fc', '#fff', '#88f', '#44c', '#22a'],
+    gay:    ['#f00', '#f80', '#fe0', '#0a0', '#26c', '#a0a'],
+    trans:  ['#8cf', '#8cf', '#fab', '#fab', '#fff', '#fff', '#fab', '#fab', '#8cf', '#8cf'],
+    bi:     ['#f08', '#f08', '#a6a', '#80f', '#80f'],
+    les:    ['#f20', '#f64', '#fa8', '#fff', '#f8f', '#f4c', '#f08'],
+    nb:     ['#ff2', '#fff', '#84d', '#333'],
+    pan:    ['#f2c', '#f2c', '#ff2', '#ff2', '#2cf', '#2cf'],
+    men:    ['#2a6', '#6ea', '#8fc', '#fff', '#88f', '#44c', '#22a'],
 }
+
+// The same colour gradients but formatted as [r,g,b] arrays
+const GRADIENTS_RGB = {}
+for (const key in GRADIENTS) {
+    GRADIENTS_RGB[key] = []
+    for (const hex of GRADIENTS[key]) {
+        GRADIENTS_RGB[key].push( [parseInt(hex[1], 16)*17, parseInt(hex[2], 16)*17, parseInt(hex[3], 16)*17] )
+    }
+}
+
+/**
+ * Makes a horizontal gradient around x=y=0 from an array of colors.
+ *  May specify opacity.
+*/
+function makeGradient(ctx, colors, width, x=0, opacity=1) {
+    const gradient = ctx.createLinearGradient(x-width/2, 0, x+width/2, 0)
+    for (let i=0; i<colors.length; i++) {
+        const [r, g, b] = colors[i]
+        gradient.addColorStop(i/(colors.length-1), `rgba(${r}, ${g}, ${b}, ${opacity}`)
+    }
+    return gradient
+}
+
+function makePresetGradient(ctx, key, width, x=0, opacity=1, mul=undefined) {
+    let colors = GRADIENTS_RGB[key]
+    if (mul) colors = colors.map(c => RGBMul(c, mul).map(byteClamp))
+    return makeGradient(ctx, colors, width, x, opacity)
+}
+
 
 //========================================================================
 //========================       DRAWABLES       =========================
@@ -138,7 +168,7 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     let caption = sliders.caption
 
     // TODO: the chrome version doesn't scale with font size while the other one does!
-    if( window.chrome ) {
+    if( browserIs.chrome ) {
         //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
         canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
         ctx.translate(charSpacing*s/2, 0)
@@ -158,20 +188,6 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     ctx.scale(1, vScale)
 
     return [caption, vScale]
-}
-
-/** @param {CanvasRenderingContext2D} ctx */
-function putNoise(ctx, x, y, w, h) {
-	const iData = ctx.createImageData(w, h)
-    const data = iData.data
-    const len = data.length
-	for(let i=0; i<len; i += 4) {
-		data[i  ] = Math.random() * 255
-		data[i+1] = Math.random() * 255
-		data[i+2] = Math.random() * 255
-        data[i+3] = 255
-    }
-    ctx.putImageData(iData, x, y)
 }
 
 /**
@@ -199,21 +215,17 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     const gradient = sliders.gradient
     const textColor = sliders.font.textColor
 
-    const x0 = xOffset*w, y0 = yOffset*h
+    const x0 = xOffset*w + w/2, y0 = yOffset*h + h/2
     s *= s0
 
     //// SHADE
     ctx.save()
     // The shade only moves up or down
-    ctx.translate(0, y0)
+    ctx.translate(0, y0 - h/2)
     drawShadowBar(ctx, canvas, gen, sliders, s0)
     ctx.restore()
 
     //// RAINBOW: SETUP
-    if (gradient && gradient.gradient) {
-        var trueCanvas=canvas,  trueCtx=ctx;
-        [canvas, ctx] = getTempCanvasAndContext(gen)
-    }
     ctx.translate(x0, y0)
 
     //// TEXT
@@ -223,50 +235,43 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
 
     //// Emulate the zoom blur effect
     const zoomSteps = Math.floor(20*blurSize * Math.pow(s, 1/4))
-    // zoomFactor**zoomSteps = blurSize
-    const zoomFactor = Math.pow(blurSize, 1/zoomSteps)
     // Zoom blur vertical distance
     const VOFFSET = 1
     const voff = VOFFSET*s/(blurSize-1)
-    const blurColor = RGBMul(textColor, blurTint).map(byteClamp)
 
-    for( let i=0; i<=zoomSteps; i++ ) {
-        if( i ) ctx.scale(zoomFactor, zoomFactor)
-        // `product` ranges from 1 up to and including blurSize
-        const product = Math.pow(blurSize, i/zoomSteps)
-        // `fatProduct` ranges from 1 up to and including ±2
-        const fatProduct = Math.pow(product, 1/Math.log2(blurSize))
+    const gradientKey = gradient && gradient.gradient
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth, 0, 1, blurTint)
+    } else {
+        const blurColor = RGBMul(textColor, blurTint).map(byteClamp)
+        ctx.fillStyle = `rgb(${blurColor.join()})`
+    }
 
-        ctx.filter = `blur(${Math.floor(s*product**4)}px)`
-        ctx.fillStyle = `rgba(${blurColor.join()}, ${blurOpacity / fatProduct})`
-        ctx.fillText(caption, w/2/product, ((h/2-voff)/product+voff)/vScale)
+    // Draw the zoom blur as a bunch of layers, back-to-front for proper effect
+    for (let i=zoomSteps; i>=0; i--) {
+        ctx.save()
+        // `scaleFactor` ranges from 1 up to and including blurSize
+        const scaleFactor = Math.pow(blurSize, i/zoomSteps)
+        if (i) ctx.scale(scaleFactor, scaleFactor)
+        // `fatProduct` ranges from 1 up to and including approx. 2
+        const fatProduct = Math.pow(scaleFactor, 1/Math.log2(blurSize))
+
+        ctx.filter = `blur(${Math.floor(s*scaleFactor**4)}px)`
+        ctx.globalAlpha = blurOpacity / fatProduct
+        ctx.fillText(caption, 0, voff*(scaleFactor-1)/vScale)
+        ctx.restore()
     }
     
     ctx.restore()
 
     // Draw the regular text on top
-    ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
-    ctx.fillText(caption, w/2, h/2/vScale )
-    ctx.restore()
-
-    //// RAINBOW: PAYOFF
-    if (gradient && gradient.gradient) {
-        // Make gradient
-        const rs = s0 * gradient.gradientScale
-        const grad = ctx.createLinearGradient((1-rs)*w/2, 0, (1+rs)*w/2, 0)
-        const colors = GRADIENTS[gradient.gradient]
-        for (let i=0; i<colors.length; i++) {
-            grad.addColorStop(i/(colors.length-1), colors[i])
-        }
-
-        // Apply rainbow mask
-        ctx.fillStyle = grad
-        ctx.globalCompositeOperation = 'source-in'
-        ctx.fillRect(-x0, -y0, w, h)
-
-        // Paste onto true canvas
-        trueCtx.drawImage(canvas, 0, 0)
+    if (gradientKey) {
+        ctx.fillStyle = makePresetGradient(ctx, gradient.gradient, gradientWidth, 0, textOpacity)
+    } else {
+        ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
     }
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws a Demon's Souls-style NOUN VERBED.  */
