@@ -9,7 +9,6 @@
 * FEATURES:
     * Implement line breaks good
 
-    * Set "preferred resolution" for yourself instead of 1920x1080 by default
     * Cropping?
 
     * Layer controls

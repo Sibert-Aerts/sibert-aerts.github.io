@@ -1036,7 +1036,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .7, shadowOpacity: .65,
             shadowOffset: -0.006, shadowSoftness: 1.05,
-        }
+        },
+        gradient: {},
     },
     draw: drawEldenNounVerbed
 })
@@ -1064,7 +1065,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .7, shadowOpacity: .65,
             shadowOffset: -0.006, shadowSoftness: 1.05,
-        }
+        },
+        gradient: {},
     },
     draw: drawEldenNounVerbed
 })
@@ -1092,7 +1094,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .7, shadowOpacity: .65,
             shadowOffset: -0.006, shadowSoftness: 1.05,
-        }
+        },
+        gradient: {},
     },
     draw: drawEldenNounVerbed
 })
@@ -1172,7 +1175,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1, shadowOpacity: .6,
             shadowOffset: -0.015, shadowSoftness: 1,
-        }
+        },
+        gradient: {},
     },
     draw: drawYouDied
 })
@@ -1196,7 +1200,8 @@ layerTypes.push({
         shadow: {
             shadowSize: 1.26, shadowOpacity: .9,
             shadowOffset: -.006, shadowSoftness: 1.16,
-        }
+        },
+        gradient: {},
     },
     draw: drawYouDied
 })
@@ -1220,7 +1225,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .66, shadowOpacity: .6,
             shadowOffset: -0.015, shadowSoftness: 1.24,
-        }
+        },
+        gradient: {},
     },
 
     draw: drawYouDied
@@ -1329,7 +1335,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .7, shadowOpacity: .65,
             shadowOffset: -0.006, shadowSoftness: 1.05,
-        }
+        },
+        gradient: {},
     },
 
     draw: drawYouDied
@@ -1867,7 +1874,8 @@ layerTypes.push({
         },
         melee: {
             lineWidth: 10, shadowOpacity: .5
-        }
+        },
+        gradient: {},
     },
     draw: drawMelee
 })
@@ -1890,7 +1898,8 @@ layerTypes.push({
         shadow: {
             shadowSize: .4, shadowOpacity: .5,
             shadowOffset: 0, shadowSoftness: 0,
-        }
+        },
+        gradient: {},
     },
     draw: drawYouDied
 })
@@ -1913,7 +1922,8 @@ layerTypes.push({
         },
         outline: {
             lineWidth: 20, lineColor: [0, 0, 0]
-        }
+        },
+        gradient: {},
     },
     draw: drawOutlined
 })

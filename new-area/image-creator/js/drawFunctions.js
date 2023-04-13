@@ -10,9 +10,8 @@ class Asset {
 
     /** @returns {Promise<HTMLImageElement>} */
     get() {
-        if( this.img )
-            return new Promise(resolve => resolve(this.img))
-        return new Promise( (resolve, reject) => {
+        if( this.img ) return this.img
+        return new Promise((resolve, reject) => {
             const img = this.img = new Image()
             img.src = this.path
             img.onload = () => resolve(img)
@@ -189,17 +188,6 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
 }
 
 /**
- * @param {MacroGenerator} gen 
- * @returns {[HTMLCanvasElement, CanvasRenderingContext2D]}
- */
-function getTempCanvasAndContext(gen) {
-    const temp = gen.tempCanvas
-    temp.width = gen.canvas.width
-    temp.height = gen.canvas.height
-    return [temp, temp.getContext('2d')]
-}
-
-/**
  * @param {CanvasRenderingContext2D} ctx 
  */
 function storeAndRemoveAlpha(ctx) {
@@ -223,6 +211,7 @@ function restoreAlpha(ctx, originalAlphas) {
     ctx.putImageData(imageData, 0, 0)
 }
 
+
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
 function drawNounVerbed(ctx, canvas, gen, sliders) {
     // CONSTANTS
@@ -235,7 +224,8 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     const gradient = sliders.gradient
     const textColor = sliders.font.textColor
 
-    const x0 = xOffset*w + w/2, y0 = yOffset*h + h/2
+    const x0 = xOffset*w + w/2
+    const y0 = yOffset*h + h/2
     s *= s0
 
     //// SHADE
@@ -365,7 +355,7 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     if (gradientKey) {
         var gradientWidth = gradient.gradientScale * 1920 * s
         var trueCanvas=canvas, trueCtx=ctx;
-        [canvas, ctx] = getTempCanvasAndContext(gen)
+        [canvas, ctx] = gen.getTempCanvasAndContext()
         textColor = [255, 255, 255]
     }
     ctx.translate(x0, y0)
@@ -427,6 +417,8 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const gradient = sliders.gradient
+    const gradientKey = gradient && gradient.gradient
     const textColor = sliders.font.textColor
 
     const x0 = xOffset * w + w/2
@@ -439,11 +431,17 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     drawShadowBar(ctx, canvas, gen, sliders, s0)   
     ctx.translate(x0, 0)
 
+
     //// TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     
     // Regular text
-    ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth, 0, textOpacity)
+    } else {
+        ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
+    }
     ctx.fillText(caption, 0, 0)
     
     // Ghost effect goes on top
@@ -453,7 +451,12 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     const scaleX = blurSize, scaleY = 1+(blurSize-1)/2
     ctx.scale(scaleX, scaleY)
 
-    ctx.fillStyle = `rgba(${blurTint.join()}, ${blurOpacity})`
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth, 0, blurOpacity, blurTint)
+    } else {
+        ctx.fillStyle = `rgba(${blurTint.join()}, ${blurOpacity})`
+    }
     ctx.fillText(caption, 0, 0)
 }
 
@@ -723,7 +726,9 @@ function drawYouDied(ctx, canvas, gen, sliders) {
     let s = h/1080
 
     // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = sliders.position    
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const gradient = sliders.gradient
+    const gradientKey = gradient && gradient.gradient
     const x0 = xOffset*w + w/2
     const y0 = yOffset*h + h/2
     s *= s0
@@ -735,7 +740,11 @@ function drawYouDied(ctx, canvas, gen, sliders) {
     ctx.translate(x0, 0)
 
     //// TEXT
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)    
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
+    }
     ctx.fillText(caption, 0, 0)
 }
 
@@ -806,6 +815,8 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
 
 }
 
+// ===================================================== SPECIAL ====================================================
+
 /** @type {drawFun} Function which draws simple outlined text. */
 function drawOutlined(ctx, canvas, gen, sliders) {
     // CONSTANTS
@@ -814,19 +825,25 @@ function drawOutlined(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate(xOffset*w, yOffset*h)
+    const gradient = sliders.gradient
+    const gradientKey = gradient && gradient.gradient
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
 
     // TEXT
     const { lineWidth, lineColor } = sliders.outline
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
+    }
     if( lineWidth > 0 ) {
         ctx.strokeStyle = `rgb(${lineColor})`
         ctx.lineWidth = lineWidth * s
         ctx.miterLimit = 5
-        ctx.strokeText(caption, w/2, h/2/vScale)
+        ctx.strokeText(caption, 0, 0)
     }
-    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws SSBM styled text. */
@@ -837,7 +854,11 @@ async function drawMelee(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate((xOffset+.5)*w, (yOffset+.5)*h)
+    const x0 = xOffset*w + w/2
+    const y0 = yOffset*h + h/2
+    const gradient = sliders.gradient
+    const gradientKey = gradient && gradient.gradient
+    ctx.translate(x0, y0)
     s *= s0
 
     const { textColor, fontSize } = sliders.font
@@ -865,7 +886,7 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     }
     
     //// CREATE A TEMP CANVAS TO ACHIEVE OUR COOL EFFECTS (PAIN IN THE ASS)
-    const [temp, tctx] = getTempCanvasAndContext(gen)
+    const [temp, tctx] = gen.getTempCanvasAndContext()
 
     applyFontSliders(tctx, temp, gen, sliders, s)
     tctx.textBaseline = 'alphabetic'
@@ -876,9 +897,17 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     //// INNER GRADIENT TEXT
     const grad = tctx.createLinearGradient(0, -48*fxScale, 0, 0)
     grad.addColorStop(0, '#000000')
-    grad.addColorStop(1, RGBToHex(...textColor))
+    grad.addColorStop(1, gradientKey? '#ffffff': `rgb(${textColor})`)
     tctx.fillStyle = grad
     tctx.fillText(caption, 0, 0)
+
+    //// OPTIONAL GRADIENT COLOURING
+    if (gradientKey) {
+        tctx.globalCompositeOperation = 'multiply'
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        tctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
+        tctx.fillRect(-x0, -y0, w, h)
+    }
 
     //// FLAME EFFECT
     tctx.save()

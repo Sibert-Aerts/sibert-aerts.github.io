@@ -860,6 +860,16 @@ class MacroGenerator {
         this.redrawMacro()
     }
 
+    /** 
+     * @returns {[HTMLCanvasElement, CanvasRenderingContext2D]}
+    */
+    getTempCanvasAndContext() {        
+        const temp = this.tempCanvas
+        temp.width = this.canvas.width
+        temp.height = this.canvas.height
+        return [temp, temp.getContext('2d')]
+    }
+
     /** Wipes all `ctx` and `canvas` properties that may affect how things are drawn to the canvas. */
     resetDrawingState() {    
         // On Chrome the canvas styling may affect drawing
@@ -950,9 +960,7 @@ class MacroGenerator {
             filter = `saturate(${imgSaturate}%) contrast(${imgContrast}%) brightness(${imgBrightness}%)`
 
         if( imgChromatic > 0 ) {
-            this.tempCanvas.width = canvas.width
-            this.tempCanvas.height = canvas.height
-            const tempCtx = this.tempCanvas.getContext('2d')
+            const [tempCanvas, tempCtx] = this.getTempCanvasAndContext()
             tempCtx.scale(scale, scale)
 
             // Draw image to tempCanvas
@@ -969,7 +977,7 @@ class MacroGenerator {
             
             // Draw to actual canvas
             ctx.resetTransform()
-            ctx.drawImage(this.tempCanvas, 0, 0)
+            ctx.drawImage(tempCanvas, 0, 0)
 
             // Draw image to tempCanvas
             tempCtx.globalCompositeOperation = 'source-over'
@@ -987,7 +995,7 @@ class MacroGenerator {
             ctx.globalCompositeOperation = 'lighter'
             ctx.resetTransform()
             ctx.scale(1+imgChromatic, 1)
-            ctx.drawImage(this.tempCanvas, -canvas.width*imgChromatic/2, 0)
+            ctx.drawImage(tempCanvas, -canvas.width*imgChromatic/2, 0)
             ctx.globalCompositeOperation = 'source-over'
         }
         else
