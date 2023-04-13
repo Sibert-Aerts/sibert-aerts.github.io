@@ -912,8 +912,7 @@ class MacroGenerator {
         const maxResY = parseInt(this.maxResYInput.value) || 1080
 
         if( !this.imageHandler.image ) {
-            this.canvas.width = maxResX
-            this.canvas.height = maxResY
+            this.resizeCanvas(maxResX, maxResY)
             return
         }            
 

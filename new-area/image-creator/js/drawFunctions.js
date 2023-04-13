@@ -196,12 +196,34 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
  */
 function getTempCanvasAndContext(gen) {
     const temp = gen.tempCanvas
-    temp.width = gen.canvas.width; temp.height = gen.canvas.height;
-    const tctx = temp.getContext('2d')
-    return [temp, tctx]
+    temp.width = gen.canvas.width
+    temp.height = gen.canvas.height
+    return [temp, temp.getContext('2d')]
 }
 
+/**
+ * @param {CanvasRenderingContext2D} ctx 
+ */
+function storeAndRemoveAlpha(ctx) {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+    const data = imageData.data
+    const originalAlphas = new Uint8ClampedArray(data.length/4)
+    for (let i=3, j=0; i<data.length; i+=4, j++) {
+        originalAlphas[j] = data[i]
+        data[i] = 255
+    }
+    ctx.putImageData(imageData, 0, 0)
+    return originalAlphas
+}
 
+function restoreAlpha(ctx, originalAlphas) {
+    const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+    const data = imageData.data
+    for (let i=3, j=0; j<originalAlphas.length; i+=4, j++) {
+        data[i] = originalAlphas[j]
+    }
+    ctx.putImageData(imageData, 0, 0)
+}
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
 function drawNounVerbed(ctx, canvas, gen, sliders) {
@@ -225,11 +247,9 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     drawShadowBar(ctx, canvas, gen, sliders, s0)
     ctx.restore()
 
-    //// RAINBOW: SETUP
     ctx.translate(x0, y0)
 
     //// TEXT
-    ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.save()
 
@@ -344,16 +364,16 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     const gradient = sliders.gradient
     let textColor = sliders.font.textColor
 
-    const x0 = xOffset * w
-    const y0 = yOffset * h
+    const x0 = xOffset * w + w/2
+    const y0 = yOffset * h + h/2
     s *= s0
 
     //// RAINBOW: SETUP
-    if (gradient && gradient.gradient) {
-        var trueCanvas=canvas,  trueCtx=ctx;
+    const gradientKey = gradient && gradient.gradient
+    if (gradientKey) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        var trueCanvas=canvas, trueCtx=ctx;
         [canvas, ctx] = getTempCanvasAndContext(gen)
-        ctx.fillStyle = '#000'
-        ctx.fillRect(0, 0, w, h)
         textColor = [255, 255, 255]
     }
     ctx.translate(x0, y0)
@@ -367,9 +387,9 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     /// First: Just draw the text, no glow
     const [r, g, b] = textColor
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
-    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, 0, 0)
     ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
-    ctx.fillText(caption, w/2-s, h/2/vScale)
+    ctx.fillText(caption, -s, 0)
 
     /// Then: Draw the text black (invisible) multiple times to get more glow.
     ctx.fillStyle = `#000000`
@@ -382,25 +402,23 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
         ctx.shadowBlur = glowSizeEps * Math.max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
-        ctx.fillText(caption, w/2, h/2/vScale)
+        ctx.fillText(caption, 0, 0)
         opacity--
     }
     ctx.restore()
     
     //// RAINBOW: PAYOFF
-    if (gradient && gradient.gradient) {
-        // Make gradient
-        const rs = s0 * gradient.gradientScale
-        const grad = ctx.createLinearGradient((1-rs)*w/2, 0, (1+rs)*w/2, 0)
-        const colors = GRADIENTS[gradient.gradient]
-        for (let i=0; i<colors.length; i++) {
-            grad.addColorStop(i/(colors.length-1), colors[i])
-        }
-
+    if (gradientKey) {
+        // Turns out the combination of multiply-then-add attempted has unusual behaviour due to
+        //  how transparency and blend modes (don't quite) work together, resulting in some ugly artifacts. 
+        // I solve it by first completely removing transparency from the temp layer,
+        //  and putting it back after the multiply. (Inefficient since this is not hardware accelerated.)
+        const originalAlphas = storeAndRemoveAlpha(ctx)
         // Apply rainbow mask
-        ctx.fillStyle = grad
+        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
         ctx.globalCompositeOperation = 'multiply'
         ctx.fillRect(-x0, -y0, w, h)
+        restoreAlpha(ctx, originalAlphas)
 
         // Paste onto true canvas
         trueCtx.globalCompositeOperation = 'lighter' // blend mode: Add
