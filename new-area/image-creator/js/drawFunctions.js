@@ -1,4 +1,4 @@
-const {floor} = Math
+const {min, max, floor, sqrt} = Math
 
 
 const _assetPath = document.location.href.replace(/new-area\/.*$/, 'new-area/image-creator/assets/')
@@ -130,22 +130,20 @@ function makePresetGradient(ctx, key, width, x=0, opacity=1, mul=undefined) {
  * @typedef {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator, sliders: any) => void} drawFun
  */
 
-/** PARTIAL: Draws a horizontal shadow bar at y=50%. */
+/** PARTIAL: Draws a horizontal shadow bar at y=0. */
 function drawShadowBar(ctx, canvas, gen, sliders, s0) {
     const w = canvas.width, h = canvas.height
     const { shadowSize, shadowOpacity, shadowOffset, shadowSoftness } = sliders.shadow
 
-    if( shadowSize === 0 ) return
+    if (shadowSize <= 0) return
 
     const shadowHeight = shadowSize * .25*h * s0
-    const targetCenter = .5 + shadowOffset
-    const SCALECENTER = .5
-    // Voodoo to account for the manual scaling factor
-    const shadowCenter = (targetCenter*s0 - SCALECENTER*(s0-1)) * h
-    const top = shadowCenter-shadowHeight/2, bottom = shadowCenter+shadowHeight/2
+    const shadowCenter = shadowOffset * s0 * h
+    const top = shadowCenter - shadowHeight/2
+    const bottom = shadowCenter + shadowHeight/2
 
-    const softnessLow  = Math.min(1, shadowSoftness)
-    const softnessHigh = Math.max(1, shadowSoftness) - 1
+    const softnessLow  = min(1, shadowSoftness)
+    const softnessHigh = max(1, shadowSoftness) - 1
 
     const gradient = ctx.createLinearGradient(0, top, 0, bottom)
     gradient.addColorStop(0, '#0000')
@@ -155,7 +153,7 @@ function drawShadowBar(ctx, canvas, gen, sliders, s0) {
     ctx.fillStyle = gradient
 
     if( softnessHigh > 0 )
-        ctx.filter = `blur(${Math.floor(shadowHeight*softnessHigh/4)}px)`
+        ctx.filter = `blur(${floor(shadowHeight*softnessHigh/4)}px)`
 
     ctx.fillRect(-shadowHeight/2, top, w+shadowHeight, shadowHeight)    
     ctx.filter = 'none'
@@ -170,13 +168,13 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     // TODO: the chrome version doesn't scale with font size while the other one does!
     if( browserIs.chrome ) {
         //// If on Chrome: This feature works (but does cause the horizontal centering to misalign)
-        canvas.style.letterSpacing = Math.floor(charSpacing*s) + 'px'
+        canvas.style.letterSpacing = floor(charSpacing*s) + 'px'
         ctx.translate(charSpacing*s/2, 0)
         // TODO: this throws off the glow-blur centering
 
     } else if( charSpacing > 0 ) {
         //// Otherwise: simply inject little hair spaces in between each character
-        const space = ' '.repeat(Math.floor(charSpacing/5))
+        const space = ' '.repeat(floor(charSpacing/5))
         caption = caption.split('').join(space)
     }
 
@@ -241,20 +239,17 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     s *= s0
 
     //// SHADE
-    ctx.save()
     // The shade only moves up or down
-    ctx.translate(0, y0 - h/2)
+    ctx.translate(0, y0)
     drawShadowBar(ctx, canvas, gen, sliders, s0)
-    ctx.restore()
-
-    ctx.translate(x0, y0)
+    ctx.translate(x0, 0)
 
     //// TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.save()
 
     //// Emulate the zoom blur effect
-    const zoomSteps = Math.floor(20*blurSize * Math.pow(s, 1/4))
+    const zoomSteps = floor(20*blurSize * Math.pow(s, 1/4))
     // Zoom blur vertical distance
     const VOFFSET = 1
     const voff = VOFFSET*s/(blurSize-1)
@@ -277,7 +272,7 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
         // `fatProduct` ranges from 1 up to and including approx. 2
         const fatProduct = Math.pow(scaleFactor, 1/Math.log2(blurSize))
 
-        ctx.filter = `blur(${Math.floor(s*scaleFactor**4)}px)`
+        ctx.filter = `blur(${floor(s*scaleFactor**4)}px)`
         ctx.globalAlpha = blurOpacity / fatProduct
         ctx.fillText(caption, 0, voff*(scaleFactor-1)/vScale)
         ctx.restore()
@@ -302,18 +297,15 @@ function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    const x0 = xOffset*w, y0 = yOffset*h
+    const x0 = xOffset*w + w/2
+    const y0 = yOffset*h + h/2
     s *= s0
 
+    //// SHADE
     // The shade only moves up or down
     ctx.translate(0, y0)
-    //// SHADE
-    drawShadowBar(ctx, canvas, gen, sliders, s0)    
-    // The text also moves left or right
+    drawShadowBar(ctx, canvas, gen, sliders, s0)
     ctx.translate(x0, 0)
-
-    // buhh
-    ctx.translate(w/2, h/2)
 
     //// DECOR LINE THINGIES
     const lineWidth = 1.53*h*s0
@@ -396,11 +388,11 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     ctx.shadowOffsetX = ctx.shadowOffsetY = 0
 
     // glowSize === 0 normally hides the glow even though it's a totally cromulent amount of glow to want
-    const glowSizeEps = Math.max(.0001, glowSize)
+    const glowSizeEps = max(.0001, glowSize)
 
     for( let opacity=glowOpacity; opacity > 0; ) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
-        ctx.shadowBlur = glowSizeEps * Math.max(opacity, 1)
+        ctx.shadowBlur = glowSizeEps * max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
         ctx.fillText(caption, 0, 0)
         opacity--
@@ -437,15 +429,14 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
     const textColor = sliders.font.textColor
 
-    const x0 = xOffset * w
-    const y0 = yOffset * h
+    const x0 = xOffset * w + w/2
+    const y0 = yOffset * h + h/2
     s *= s0
 
+    //// SHADE
     // The shade only moves up or down
     ctx.translate(0, y0)
-    //// SHADE
     drawShadowBar(ctx, canvas, gen, sliders, s0)   
-    // The text also moves left or right
     ctx.translate(x0, 0)
 
     //// TEXT
@@ -453,7 +444,7 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     
     // Regular text
     ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
-    ctx.fillText(caption, w/2, h/2/vScale )
+    ctx.fillText(caption, 0, 0)
     
     // Ghost effect goes on top
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
@@ -463,7 +454,7 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     ctx.scale(scaleX, scaleY)
 
     ctx.fillStyle = `rgba(${blurTint.join()}, ${blurOpacity})`
-    ctx.fillText(caption, w/2/scaleX, h/2/scaleY/vScale)
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws an Area Name. */
@@ -492,8 +483,8 @@ function drawAreaName(ctx, canvas, gen, sliders) {
         const colorTuple = sliders.font.textColor.join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
-        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
-        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
         grad.addColorStop(1,   `rgba(${colorTuple}, 0)`)
 
         ctx.fillStyle = grad
@@ -511,7 +502,7 @@ function drawAreaName(ctx, canvas, gen, sliders) {
     // Apply contrast by just redrawing the same text so the shadow overlaps
     //      0.85 * 1.17 ~= 1
     for( let c = contrast; c >= 0; ) {
-        ctx.shadowColor = `rgba(0, 0, 0, ${.85 * Math.min(c, 1.17)})`
+        ctx.shadowColor = `rgba(0, 0, 0, ${.85 * min(c, 1.17)})`
         ctx.fillText(caption, w/2, h/2/vScale)
         c -= 1.17
     }
@@ -538,8 +529,8 @@ function drawDS2AreaName(ctx, canvas, gen, sliders) {
         const colorTuple = sliders.font.textColor.join()
         const grad = ctx.createLinearGradient(left, 0, right, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
-        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
-        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * Math.max(1, contrast)})`)
+        grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
+        grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
         grad.addColorStop(1,   `rgba(${colorTuple}, 0)`)
 
         ctx.fillStyle = `rgba(${lineColor}, ${contrast/3})`
@@ -639,7 +630,7 @@ async function drawSekiroAreaName(ctx, canvas, gen, sliders) {
     const { frameWidth, frameHeight, opacity } = sliders.sekiroFrame
 
     // If needed, use a much larger resolution image for the backdrop
-    const useLargeImage = s*s0*Math.max(frameHeight, frameWidth) > 1.01
+    const useLargeImage = s*s0*max(frameHeight, frameWidth) > 1.01
     let img = await (useLargeImage? ASSETS.sekiro.areaNameBGLarge.get(): ASSETS.sekiro.areaNameBG.get())
     const magicFactor = .5541
     if( useLargeImage ) ctx.scale( magicFactor, magicFactor )
@@ -703,7 +694,7 @@ function drawEldenAreaName(ctx, canvas, gen, sliders) {
         grad2.addColorStop(0.8, `rgba(194, 194, 168, ${opacity*2})`)
         grad2.addColorStop(1,   `rgba(194, 194, 168, 0)`)
         ctx.fillStyle = grad2
-        ctx.filter = `blur(${Math.sqrt(2*s)}px)`
+        ctx.filter = `blur(${sqrt(2*s)}px)`
         ctx.fillRect(left, lineY, rectWidth, 1*s)
         ctx.fillRect(left, lineY, rectWidth, 1*s)
 
@@ -733,19 +724,19 @@ function drawYouDied(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position    
-    const x0 = xOffset*w, y0 = yOffset*h
+    const x0 = xOffset*w + w/2
+    const y0 = yOffset*h + h/2
     s *= s0
 
+    //// SHADE
     // The shade only moves up or down
     ctx.translate(0, y0)
-    // SHADE
     drawShadowBar(ctx, canvas, gen, sliders, s0)
-    // The text also moves left or right
     ctx.translate(x0, 0)
 
-    // TEXT
+    //// TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)    
-    ctx.fillText(caption, w/2, h/2/vScale)
+    ctx.fillText(caption, 0, 0)
 }
 
 /** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
@@ -770,7 +761,7 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     // First: the characters
     ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
     ctx.textBaseline = 'middle'
-    ctx.filter = `blur(${Math.sqrt(s)/2}px)`
+    ctx.filter = `blur(${sqrt(s)/2}px)`
 
     function drawSymbols() {
         const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
@@ -785,7 +776,7 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
 
     for( let opacity=glowOpacity; opacity > 0; ) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
-        ctx.shadowBlur = glowSize * Math.max(opacity, 1)
+        ctx.shadowBlur = glowSize * max(opacity, 1)
         ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
         drawSymbols()
         opacity--
@@ -930,7 +921,7 @@ async function drawDS1Boss(ctx, canvas, gen, sliders) {
     yellowGrad.addColorStop(.6, '#37330b')
     yellowGrad.addColorStop(.9, '#4a4613')
     ctx.fillStyle = yellowGrad
-    ctx.fillRect(-670, -6, 1335 * Math.min(1, health+recentDamage), 25)
+    ctx.fillRect(-670, -6, 1335 * min(1, health+recentDamage), 25)
 
     // Red health bar
     const redGrad = ctx.createLinearGradient(0, -6, 0, 25)
@@ -976,7 +967,7 @@ async function drawDS2Boss(ctx, canvas, gen, sliders) {
     // The main healthbar texture
     ctx.drawImage(await framePromise, -346, -14)    
     // Yellow health bar
-    ctx.drawImage(await yellowPromise, -346+14, -14+9, 664 * Math.min(1, health+recentDamage), 9)
+    ctx.drawImage(await yellowPromise, -346+14, -14+9, 664 * min(1, health+recentDamage), 9)
     // Red health bar
     ctx.drawImage(await redPromise, -346+14, -14+9, 664 * health, 9)
 
@@ -1020,7 +1011,7 @@ async function drawDS3Boss(ctx, canvas, gen, sliders) {
     ctx.drawImage(await framePromise, -508, -25)
 
     // Yellow health bar
-    let barWidth = 7 + 1002 * Math.min(1, health+recentDamage)
+    let barWidth = 7 + 1002 * min(1, health+recentDamage)
     ctx.drawImage(await yellowPromise, 0, 0, barWidth, 50, -508, -25, barWidth, 50)
 
     // Red health bar
@@ -1072,7 +1063,7 @@ async function drawSekiroBoss(ctx, canvas, gen, sliders) {
     ctx.drawImage(await basePromise, 0, 0)
     
     // Damage health bar
-    let barWidth = 32 + 740 * Math.min(1, health+recentDamage)
+    let barWidth = 32 + 740 * min(1, health+recentDamage)
     ctx.drawImage(await damagePromise, 0, 0, barWidth, 71, 0, 0, barWidth, 71)
     
     // Red health bar
@@ -1181,7 +1172,7 @@ async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
     // Backing shadow
     ctx.drawImage(await basePromise, -1049, -50)    
     // Yellow health bar
-    let barWidth = 50 + 1998 * Math.min(1, health+recentDamage)
+    let barWidth = 50 + 1998 * min(1, health+recentDamage)
     ctx.drawImage(await yellowPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)    
     // Red health bar
     barWidth = 50 + 1998 * health
@@ -1238,7 +1229,7 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
     // Calculate important things
     const frameLeft = 80, frameTop = 36, frameHeight = 30
     const frameWidth = maxPoison
-    const barWidth = Math.min(maxPoison, poison)
+    const barWidth = min(maxPoison, poison)
 
     // Solid grey background    
     ctx.fillStyle = 'rgb(71, 71, 71)'
@@ -1284,7 +1275,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     // Calculate important things
     const fillLeft = 38, fillTop = 36, fillHeight = 28
     const frameWidth = maxPoison
-    const barWidth = Math.min(maxPoison, poison)
+    const barWidth = min(maxPoison, poison)
 
     // Transparent black backdrop    
     ctx.fillStyle = 'rgba(0, 0, 0, .5)'
