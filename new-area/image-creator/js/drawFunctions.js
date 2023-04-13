@@ -84,7 +84,7 @@ const ASSETS = {
 // List of colour gradients as arrays of (short) hex codes, eyeballed by me
 const GRADIENTS = {
     gay:    ['#f00', '#f80', '#fe0', '#0a0', '#26c', '#a0a'],
-    trans:  ['#8cf', '#8cf', '#fab', '#fab', '#fff', '#fff', '#fab', '#fab', '#8cf', '#8cf'],
+    trans:  ['#7bf', '#7bf', '#f9a', '#f9a', '#fff', '#fff', '#f9a', '#f9a', '#7bf', '#7bf'],
     bi:     ['#f08', '#f08', '#a6a', '#80f', '#80f'],
     les:    ['#f20', '#f64', '#fa8', '#fff', '#f8f', '#f4c', '#f08'],
     nb:     ['#ff2', '#fff', '#84d', '#333'],
@@ -211,6 +211,7 @@ function restoreAlpha(ctx, originalAlphas) {
     ctx.putImageData(imageData, 0, 0)
 }
 
+// =============================================== NOUN VERBED/GENERAL ==============================================
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
 function drawNounVerbed(ctx, canvas, gen, sliders) {
@@ -459,6 +460,74 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     }
     ctx.fillText(caption, 0, 0)
 }
+
+/** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
+function drawSekiroText(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate(xOffset * w, yOffset * h)
+    s *= s0
+
+    //// TEXT
+    const textColor = sliders.font.textColor
+    const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = sliders.sekiro
+    const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = sliders.glowy
+    
+    // Trick to make the japanese font work (for lack of an explicit API)
+    byId('adobe-font-trick').innerText = symbol    
+
+    // First: the characters
+    ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
+    ctx.textBaseline = 'middle'
+    ctx.filter = `blur(${sqrt(s)/2}px)`
+
+    function drawSymbols() {
+        const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
+        for(let i = 0; i < symbol.length; i++ ) {
+            ctx.fillText(symbol[i], w/2, baseY + i*(symbolSize+symbolSpace)*s)
+        }
+    }
+    
+    /// First: Draw the characters black (invisible) multiple times to get more glow.
+    ctx.globalCompositeOperation = blendMode
+    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
+
+    for( let opacity=glowOpacity; opacity > 0; ) {
+        // Extending the blur size for over-opacity gives a nicer, smoother effect
+        ctx.shadowBlur = glowSize * max(opacity, 1)
+        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
+        drawSymbols()
+        opacity--
+    }
+    /// Turn off the shadow and blend mode to draw the characters normal
+    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
+    ctx.shadowBlur = 0
+    ctx.fillStyle = `rgb(${textColor.join()})`
+    drawSymbols()
+
+    /// Finally: Do the same with the caption    
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+
+    ctx.globalCompositeOperation = blendMode
+    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
+    ctx.shadowBlur = glowSize / 5
+    for( let opacity=glowOpacity*textOpacity*secretFactor; opacity > 0; ) {
+        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
+        ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
+        opacity--
+    }
+
+    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
+    ctx.shadowBlur = 0
+    ctx.fillStyle = `rgb(${textColor.join()}, ${textOpacity})`
+    ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
+}
+
+// ==================================================== AREA NAME ===================================================
 
 /** @type {drawFun} Function which draws an Area Name. */
 function drawAreaName(ctx, canvas, gen, sliders) {
@@ -719,6 +788,8 @@ function drawEldenAreaName(ctx, canvas, gen, sliders) {
 
 }
 
+// ==================================================== YOU DIED ====================================================
+
 /** @type {drawFun} Function which draws an YOU DIED. */
 function drawYouDied(ctx, canvas, gen, sliders) {
     // CONSTANTS
@@ -746,73 +817,6 @@ function drawYouDied(ctx, canvas, gen, sliders) {
         ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
     }
     ctx.fillText(caption, 0, 0)
-}
-
-/** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
-function drawSekiroText(ctx, canvas, gen, sliders) {
-    // CONSTANTS
-    const w = canvas.width, h = canvas.height
-    let s = h/1080
-
-    // USER INPUT
-    const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate(xOffset * w, yOffset * h)
-    s *= s0
-
-    //// TEXT
-    const textColor = sliders.font.textColor
-    const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = sliders.sekiro
-    const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = sliders.glowy
-    
-    // Trick to make the japanese font work (for lack of an explicit API)
-    byId('adobe-font-trick').innerText = symbol    
-
-    // First: the characters
-    ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
-    ctx.textBaseline = 'middle'
-    ctx.filter = `blur(${sqrt(s)/2}px)`
-
-    function drawSymbols() {
-        const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
-        for(let i = 0; i < symbol.length; i++ ) {
-            ctx.fillText(symbol[i], w/2, baseY + i*(symbolSize+symbolSpace)*s)
-        }
-    }
-    
-    /// First: Draw the characters black (invisible) multiple times to get more glow.
-    ctx.globalCompositeOperation = blendMode
-    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
-
-    for( let opacity=glowOpacity; opacity > 0; ) {
-        // Extending the blur size for over-opacity gives a nicer, smoother effect
-        ctx.shadowBlur = glowSize * max(opacity, 1)
-        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
-        drawSymbols()
-        opacity--
-    }
-    /// Turn off the shadow and blend mode to draw the characters normal
-    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
-    ctx.shadowBlur = 0
-    ctx.fillStyle = `rgb(${textColor.join()})`
-    drawSymbols()
-
-    /// Finally: Do the same with the caption    
-    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
-
-    ctx.globalCompositeOperation = blendMode
-    ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
-    ctx.shadowBlur = glowSize / 5
-    for( let opacity=glowOpacity*textOpacity*secretFactor; opacity > 0; ) {
-        ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
-        ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
-        opacity--
-    }
-
-    ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
-    ctx.shadowBlur = 0
-    ctx.fillStyle = `rgb(${textColor.join()}, ${textOpacity})`
-    ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
-
 }
 
 // ===================================================== SPECIAL ====================================================
