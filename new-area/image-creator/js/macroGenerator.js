@@ -305,17 +305,18 @@ class MacroGenerator {
         this.resolutionCheckbox = my('input', 'limit-resolution')
         this.resolutionCheckbox.onchange = redraw
         this.maxResXInput = my('input', 'max-res-x')
-        this.maxResXInput.onchange = redraw
+        if (this.maxResXInput) this.maxResXInput.onchange = redraw
         this.maxResYInput = my('input', 'max-res-y')
-        this.maxResYInput.onchange = redraw
-        my('button', 'max-res-reset').onclick = () => {
+        if (this.maxResYInput) this.maxResYInput.onchange = redraw
+        const maxResResetButton = my('button', 'max-res-reset')
+        if (maxResResetButton) maxResResetButton.onclick = () => {
             this.maxResXInput.value = 1920
             this.maxResYInput.value = 1080
             this.redrawMacro()
         }
 
         const randomMacroButton = my('button', 'random-macro') 
-        randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
+        if (randomMacroButton) randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
 
         //// SLIDERS
         this.macroSliders = element.getElementsByTagName('DIV').namedItem('macro-sliders')
@@ -918,8 +919,8 @@ class MacroGenerator {
 
     /** Redraw the underlying image, if any. */
     drawBackgroundImage() {
-        const maxResX = parseInt(this.maxResXInput.value) || 1920
-        const maxResY = parseInt(this.maxResYInput.value) || 1080
+        const maxResX = parseInt(this.maxResXInput?.value) || 1920
+        const maxResY = parseInt(this.maxResYInput?.value) || 1080
 
         if( !this.imageHandler.image ) {
             this.resizeCanvas(maxResX, maxResY)
