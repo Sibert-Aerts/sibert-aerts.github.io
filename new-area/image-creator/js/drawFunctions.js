@@ -313,15 +313,14 @@ function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
     ctx.fillRect(left, 50*s, lineWidth, 2*s)
 
     //// CAPTION
+    ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.fillText(caption, 0, -5*s/vScale)
+    ctx.restore()
     
     //// SUBCAPTION
     const fontFamily = sliders.font.fontFamily
     const { subCaption } = sliders.subCaption
-
-    ctx.resetTransform()
-    ctx.translate(x0 + w/2, y0 + h/2)
     ctx.scale(1.1, 1)
 
     canvas.style.letterSpacing = `${s}px`
