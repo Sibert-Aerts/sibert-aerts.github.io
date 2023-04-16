@@ -187,6 +187,32 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     return [caption, vScale]
 }
 
+/** Draw text containing line breaks as multiple lines. */
+function drawMultilineText(ctx, text, {x=0, y=0, lineHeight=0, align='center', strokeFirst=false}={}) {
+    const lines = text.split('\n')
+    let y0 = y
+    if (align=='center') {
+        y0 -= (lines.length-1)/2 * lineHeight
+    } else if (align === 'bottom') {
+        y0 -= (lines.length-1) * lineHeight
+    }
+    if (strokeFirst) {
+        for (let i=0; i<lines.length; i++) {
+            ctx.strokeText(lines[i], x, y0 + lineHeight*i)
+        }
+    }
+    for (let i=0; i<lines.length; i++) {
+        ctx.fillText(lines[i], x, y0 + lineHeight*i)
+    }
+}
+
+/** Draw multiple lines of text above one another, no bells and whistles. */
+function drawMultilineTextRaw(ctx, lines, x, y, lineHeight) {
+    for (let i=0; i<lines.length; i++) {
+        ctx.fillText(lines[i], x, y + lineHeight*i)
+    }
+}
+
 /**
  * @param {CanvasRenderingContext2D} ctx 
  */
@@ -211,6 +237,7 @@ function restoreAlpha(ctx, originalAlphas) {
     ctx.putImageData(imageData, 0, 0)
 }
 
+
 // =============================================== NOUN VERBED/GENERAL ==============================================
 
 /** @type {drawFun} Function which draws a Souls-style NOUN VERBED.  */
@@ -222,8 +249,8 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const { textColor, fontSize } = sliders.font
     const gradient = sliders.gradient
-    const textColor = sliders.font.textColor
 
     const x0 = xOffset*w + w/2
     const y0 = yOffset*h + h/2
@@ -237,6 +264,8 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
 
     //// TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+    const lines = caption.split('\n')
+    const linesY0 = -(lines.length-1)/2 * fontSize * s
     ctx.save()
 
     //// Emulate the zoom blur effect
@@ -250,8 +279,7 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
         var gradientWidth = gradient.gradientScale * 1920 * s
         ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth, 0, 1, blurTint)
     } else {
-        const blurColor = RGBMul(textColor, blurTint).map(byteClamp)
-        ctx.fillStyle = `rgb(${blurColor.join()})`
+        ctx.fillStyle = `rgb(${RGBMul(textColor, blurTint).map(byteClamp)})`
     }
 
     // Draw the zoom blur as a bunch of layers, back-to-front for proper effect
@@ -265,7 +293,7 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
 
         ctx.filter = `blur(${floor(s*scaleFactor**4)}px)`
         ctx.globalAlpha = blurOpacity / fatProduct
-        ctx.fillText(caption, 0, voff*(scaleFactor-1)/vScale)
+        drawMultilineTextRaw(ctx, lines, 0, linesY0 + voff*(scaleFactor-1)/vScale, fontSize*s*0.9)
         ctx.restore()
     }
     
@@ -275,9 +303,9 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
     if (gradientKey) {
         ctx.fillStyle = makePresetGradient(ctx, gradient.gradient, gradientWidth, 0, textOpacity)
     } else {
-        ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
+        ctx.fillStyle = `rgba(${textColor}, ${textOpacity})`
     }
-    ctx.fillText(caption, 0, 0)
+    drawMultilineTextRaw(ctx, lines, 0, linesY0, fontSize*s*0.9)
 }
 
 /** @type {drawFun} Function which draws a Demon's Souls-style NOUN VERBED.  */
@@ -329,10 +357,7 @@ function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
 
-    const lines = subCaption.split('\n')
-    for(let i=0; i<lines.length; i++) {
-        ctx.fillText(lines[i], 0, 86*s + i*32*s)
-    }
+    drawMultilineText(ctx, subCaption, {y: 86*s, lineHeight: 32*s, align: 'top'})
 }
 
 /** @type {drawFun} Function which draws Bloodborne's iconic glowy style text.  */
@@ -344,8 +369,8 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, glowColor, glowSize, glowOpacity } = sliders.glowy
+    let { textColor, fontSize } = sliders.font
     const gradient = sliders.gradient
-    let textColor = sliders.font.textColor
 
     const x0 = xOffset * w + w/2
     const y0 = yOffset * h + h/2
@@ -370,9 +395,9 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
     /// First: Just draw the text, no glow
     const [r, g, b] = textColor
     ctx.fillStyle = `rgba(${0}, ${g}, ${0}, ${textOpacity})`
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: fontSize*s, align: 'top'})
     ctx.fillStyle = `rgba(${r}, ${0}, ${b}, ${textOpacity})`
-    ctx.fillText(caption, -s, 0)
+    drawMultilineText(ctx, caption, {lineHeight: fontSize*s, align: 'top', x: -s})
 
     /// Then: Draw the text black (invisible) multiple times to get more glow.
     ctx.fillStyle = `#000000`
@@ -385,7 +410,7 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
         ctx.shadowBlur = glowSizeEps * max(opacity, 1)
         ctx.shadowColor = `rgb(${glowColor.join()}, ${opacity})`
-        ctx.fillText(caption, 0, 0)
+        drawMultilineText(ctx, caption, {lineHeight: fontSize*s, align: 'top'})
         opacity--
     }
     ctx.restore()
@@ -418,9 +443,9 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { textOpacity, blurTint, blurSize, blurOpacity } = sliders.zoomBlur
+    const { textColor, fontSize } = sliders.font
     const gradient = sliders.gradient
     const gradientKey = gradient && gradient.gradient
-    const textColor = sliders.font.textColor
 
     const x0 = xOffset * w + w/2
     const y0 = yOffset * h + h/2
@@ -443,7 +468,7 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     } else {
         ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
     }
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: fontSize*s})
     
     // Ghost effect goes on top
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
@@ -458,7 +483,7 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     } else {
         ctx.fillStyle = `rgba(${blurTint.join()}, ${blurOpacity})`
     }
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: fontSize*s})
 }
 
 /** @type {drawFun} Function which draws a Sekiro style japanese-character-decorated caption. */
@@ -527,9 +552,10 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
 }
 
+
 // ==================================================== AREA NAME ===================================================
 
-/** @type {drawFun} Function which draws an Area Name. */
+/** @type {drawFun} Function which draws an Area Name (DS1/DS3 style). */
 function drawAreaName(ctx, canvas, gen, sliders) {
     // CONSTANTS
     const w = canvas.width, h = canvas.height
@@ -537,7 +563,7 @@ function drawAreaName(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate(xOffset * w, yOffset * h)
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
     
     // Shadow style
@@ -549,11 +575,9 @@ function drawAreaName(ctx, canvas, gen, sliders) {
     const { ulLength, ulWidth, ulPos, contrast } = sliders.area
 
     if( ulLength > 0 ) {
-        const left = (.5-ulLength)*w, right = (.5+ulLength)*w
-
         // The gradient
         const colorTuple = sliders.font.textColor.join()
-        const grad = ctx.createLinearGradient(left, 0, right, 0)
+        const grad = ctx.createLinearGradient(-ulLength*w, 0, ulLength*w, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
         grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
         grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
@@ -562,7 +586,7 @@ function drawAreaName(ctx, canvas, gen, sliders) {
         ctx.fillStyle = grad
         ctx.shadowColor = `rgba(0, 0, 0, ${contrast/2})`
         ctx.beginPath()
-        ctx.ellipse(w/2, h/2+ulPos*s, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
+        ctx.ellipse(0, ulPos*s, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
         ctx.fill()
     }
 
@@ -575,7 +599,7 @@ function drawAreaName(ctx, canvas, gen, sliders) {
     //      0.85 * 1.17 ~= 1
     for( let c = contrast; c >= 0; ) {
         ctx.shadowColor = `rgba(0, 0, 0, ${.85 * min(c, 1.17)})`
-        ctx.fillText(caption, w/2, h/2/vScale)
+        drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s*0.8, align: 'bottom'})
         c -= 1.17
     }
 }
@@ -590,16 +614,14 @@ function drawDS2AreaName(ctx, canvas, gen, sliders) {
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const { ulLength, ulWidth, ulPos, contrast } = sliders.area
     const { lineWidth, lineColor } = sliders.outline
-    ctx.translate(xOffset*w, yOffset*h)
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
     
     // UNDERLINE
     if( ulLength > 0 ) {
-        const left = (.5-ulLength)*w, right = (.5+ulLength)*w
-
         // The gradient
         const colorTuple = sliders.font.textColor.join()
-        const grad = ctx.createLinearGradient(left, 0, right, 0)
+        const grad = ctx.createLinearGradient(-ulLength*w, 0, ulLength*w, 0)
         grad.addColorStop(0,   `rgba(${colorTuple}, 0)`)
         grad.addColorStop(0.1, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
         grad.addColorStop(0.9, `rgba(${colorTuple}, ${.75 * max(1, contrast)})`)
@@ -609,12 +631,12 @@ function drawDS2AreaName(ctx, canvas, gen, sliders) {
         const eps = lineWidth*s/2
         const dy = ulPos*s
         ctx.beginPath()
-        ctx.ellipse(w/2, h/2+dy, ulLength*w+eps, s*ulWidth/2+eps, 0, 0, 2*Math.PI)
+        ctx.ellipse(0, dy, ulLength*w+eps, s*ulWidth/2+eps, 0, 0, 2*Math.PI)
         ctx.fill()
 
         ctx.fillStyle = grad
         ctx.beginPath()
-        ctx.ellipse(w/2, h/2+dy, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
+        ctx.ellipse(0, dy, ulLength*w, s*ulWidth/2, 0, 0, 2*Math.PI)
         ctx.fill()
     }
 
@@ -625,8 +647,7 @@ function drawDS2AreaName(ctx, canvas, gen, sliders) {
     ctx.strokeStyle = `rgba(${lineColor}, ${contrast/3})`
     ctx.lineWidth = lineWidth * s
     ctx.miterLimit = 5
-    ctx.strokeText(caption, w/2, h/2/vScale)
-    ctx.fillText(caption, w/2, h/2/vScale)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s, align: 'bottom', strokeFirst: true})
 }
 
 /** @type {drawFun} Function which draws a Bloodborne-style Area Name. */
@@ -637,7 +658,7 @@ async function drawBloodborneAreaName(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     ctx.scale(s*s0, s*s0)
     // had to make the Origin align with the cross of the lines because it's cuter
     ctx.translate(-16, -14)
@@ -683,7 +704,7 @@ async function drawBloodborneAreaName(ctx, canvas, gen, sliders) {
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'right'
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize, align: 'bottom'})
 }
 
 /** @type {drawFun} Function which draws an Area Name. */
@@ -694,7 +715,7 @@ async function drawSekiroAreaName(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     ctx.scale(s*s0, s*s0)
 
     // Pixcture
@@ -722,8 +743,7 @@ async function drawSekiroAreaName(ctx, canvas, gen, sliders) {
     ctx.shadowColor = `rgba(0, 0, 0, 1)`
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textBaseline = 'alphabetic'
-
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize})
 }
 
 /** @type {drawFun} Function which draws an Elden Ring-style Area Name. */
@@ -734,7 +754,7 @@ function drawEldenAreaName(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate(xOffset * w, yOffset * h)
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
 
     // FRAME
@@ -745,8 +765,8 @@ function drawEldenAreaName(ctx, canvas, gen, sliders) {
         const rectWidth = frameWidth*h*s0
         const rectHeight = frameHeight*h*s0
 
-        const left = .5*w - rectWidth/2, right = .5*w + rectWidth/2
-        const top = (.5 + .01*s0)*h - rectHeight
+        const left = -rectWidth/2, right =rectWidth/2
+        const top = .01*s0*h - rectHeight
         const lineY = top + rectHeight + .002*h*s0
 
         // The main rectangle
@@ -783,10 +803,11 @@ function drawEldenAreaName(ctx, canvas, gen, sliders) {
     ctx.shadowBlur = 8*s
     ctx.shadowColor = `rgba(0, 0, 0, .7)`
     // Twice to get the slightly darker shadow
-    ctx.fillText(caption, w/2, h/2/vScale)
-    ctx.fillText(caption, w/2, h/2/vScale)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s, align: 'bottom'})
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s, align: 'bottom'})
 
 }
+
 
 // ==================================================== YOU DIED ====================================================
 
@@ -816,8 +837,9 @@ function drawYouDied(ctx, canvas, gen, sliders) {
         var gradientWidth = gradient.gradientScale * 1920 * s
         ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
     }
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s})
 }
+
 
 // ===================================================== SPECIAL ====================================================
 
@@ -830,24 +852,22 @@ function drawOutlined(ctx, canvas, gen, sliders) {
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
     const gradient = sliders.gradient
-    const gradientKey = gradient && gradient.gradient
     ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
 
     // TEXT
     const { lineWidth, lineColor } = sliders.outline
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
-    if (gradientKey) {
+    if (gradient && gradient.gradient) {
         var gradientWidth = gradient.gradientScale * 1920 * s
-        ctx.fillStyle = makePresetGradient(ctx, gradientKey, gradientWidth)
+        ctx.fillStyle = makePresetGradient(ctx, gradient.gradient, gradientWidth)
     }
     if( lineWidth > 0 ) {
         ctx.strokeStyle = `rgb(${lineColor})`
         ctx.lineWidth = lineWidth * s
         ctx.miterLimit = 5
-        ctx.strokeText(caption, 0, 0)
     }
-    ctx.fillText(caption, 0, 0)
+    drawMultilineText(ctx, caption, {lineHeight: sliders.font.fontSize*s, strokeFirst: lineWidth>0})
 }
 
 /** @type {drawFun} Function which draws SSBM styled text. */
@@ -928,6 +948,7 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     ctx.resetTransform()
     ctx.drawImage(temp, 0, 0)
 }
+
 
 // ================================================ BOSS HEALTH BARS ================================================
 
@@ -1418,13 +1439,7 @@ async function drawDS2InteractBox(ctx, canvas, gen, sliders) {
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
 
     // Multi-line block of text
-    const lines = caption.split('\n')
-    const LINEHEIGHT = sliders.font.fontSize * 1.25
-    for (let i=0; i<lines.length; i++) {
-        const line = lines[i]
-        ctx.strokeText(line, 0, -30/vScale - (lines.length-1)/2*LINEHEIGHT + LINEHEIGHT*i)
-        ctx.fillText(line, 0, -30/vScale - (lines.length-1)/2*LINEHEIGHT + LINEHEIGHT*i)
-    }
+    drawMultilineText(ctx, caption, {y: -30/vScale, lineHeight: sliders.font.fontSize * 1.25})
 
     ctx.restore()
 
