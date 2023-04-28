@@ -19,9 +19,9 @@
 
 a {
     text-decoration: underline;
-    color: white;
+    color: #ffc55a;
 }
-    a:hover { color: orange }
+    a:hover { color: #ff7700 }
 
 body {
     min-height: 100vh;
@@ -240,6 +240,12 @@ body {
     .credit.left {
         font-family: adobe-garamond-pro, Minion Pro, Georgia, serif;
         font-size: 18px;
+    }
+    .credit a {
+        color: white;
+    }
+    .credit a:hover {
+        color: orange;
     }
     .credit > .dash {
         margin-left: 10px;
