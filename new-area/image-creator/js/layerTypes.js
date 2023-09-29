@@ -1816,10 +1816,10 @@ layerTypes.push({
 //////// Interact Box
 
 layerTypes.push({
-    id: 'ds1:interact',
+    id: 'ds1:interact-yn',
     type: MacroType.interactBox,
     game: Game.ds1,
-    preset: 'Interact box',
+    preset: 'Yes / No',
 
     sliders: {
         position: {
@@ -1836,10 +1836,26 @@ layerTypes.push({
 })
 
 layerTypes.push({
-    id: 'ds2:interact',
+    id: 'ds1:interact-ok',
+    type: MacroType.interactBox,
+    game: Game.ds1,
+    preset: 'OK',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.345
+        },
+        font: layerTypes.at(-1).sliders.font,
+        interactBox: {option1: 'OK', option2: ''}
+    },
+    draw: drawDS1InteractBox
+})
+
+layerTypes.push({
+    id: 'ds2:interact-yn',
     type: MacroType.interactBox,
     game: Game.ds2,
-    preset: 'Interact box',
+    preset: 'Yes / No',
 
     sliders: {
         position: {
@@ -1851,6 +1867,22 @@ layerTypes.push({
             vScale: 1, charSpacing: 2,
         },
         interactBox: {option1: 'YES', option2: 'NO'}
+    },
+    draw: drawDS2InteractBox
+})
+
+layerTypes.push({
+    id: 'ds2:interact-ok',
+    type: MacroType.interactBox,
+    game: Game.ds2,
+    preset: 'OK',
+
+    sliders: {
+        position: {
+            xOffset: 0.005, yOffset: 0.02
+        },
+        font: layerTypes.at(-1).sliders.font,
+        interactBox: {option1: 'OK', option2: ''}
     },
     draw: drawDS2InteractBox
 })
