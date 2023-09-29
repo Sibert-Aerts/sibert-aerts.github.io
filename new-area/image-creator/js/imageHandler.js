@@ -20,8 +20,8 @@ class ImageHandler {
         /** @type HTMLInputElement */
         this.URLinput = my('input', 'image-URL')
         this.URLinput.onchange = this.handleImageURL.bind(this)
-        this.URLinput.onkeyup = e => { if (e.code==='Enter') this.handleImageURL() }
-        if( this.URLinput.value ) this.handleImageURL()
+        this.URLinput.onkeyup = e => { if (e.code === 'Enter') this.handleImageURL() }
+        if (this.URLinput.value) this.handleImageURL()
 
         /// File select event bindings
         /** @type HTMLInputElement */
@@ -44,7 +44,7 @@ class ImageHandler {
             const randomButton = my('button', 'image-select-random')
             randomButton.onclick = () => {
                 const options = this.imageSelect.options
-                const option = options[1+Math.floor(Math.random()*(options.length-1))]
+                const option = options[1 + Math.floor(Math.random() * (options.length - 1))]
                 option.selected = true
                 this.imageSelect.onchange()
             }
@@ -59,8 +59,8 @@ class ImageHandler {
     handleFileSelect() {
         this.image = this.imageType = null
 
-        if( !this.fileSelect.files.length ) {
-            if( this.URLinput.value )
+        if (!this.fileSelect.files.length) {
+            if (this.URLinput.value)
                 this.handleImageURL()
             else
                 this._onerror()
@@ -89,8 +89,8 @@ class ImageHandler {
         this.image = this.imageType = null
         this.URLinput.classList.remove('bad-url')
 
-        if( !this.URLinput.value ) {
-            if( this.fileSelect.files.length )
+        if (!this.URLinput.value) {
+            if (this.fileSelect.files.length)
                 this.handleFileSelect()
             else
                 this._onerror()
@@ -115,9 +115,9 @@ class ImageHandler {
         /** @type DataTransferItemList */
         const clipboardItems = e.clipboardData.items
         const items = Array.from(clipboardItems).filter(item => item.type.startsWith('image'))
-        if ( !items.length ) return
+        if (!items.length) return
         const file = items[0].getAsFile()
-        
+
         var reader = new FileReader()
         reader.onload = e => {
             this.image = new Image()

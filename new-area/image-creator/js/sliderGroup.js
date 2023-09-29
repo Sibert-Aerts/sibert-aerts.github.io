@@ -161,7 +161,7 @@ class SimpleSlider extends Slider {
         else
             this.inputElement.value = this.converter.toString(value)
     }
-    setDefault(value) {        
+    setDefault(value) {
         let strValue
         if (value === undefined) strValue = this.trueDefault
         else strValue = this.converter.toString(value)

@@ -702,7 +702,7 @@ class MacroGenerator {
         if( !this.imageHandler.image ) {
             this.resizeCanvas(maxResX, maxResY)
             return
-        }            
+        }
 
         const image = this.imageHandler.image
         const ctx = this.ctx
@@ -726,7 +726,7 @@ class MacroGenerator {
             return
         }
 
-        const {imgSaturate, imgContrast, imgBrightness, imgChromatic} = this.imageSliders.getValues()
+        const { imgSaturate, imgContrast, imgBrightness, imgChromatic } = this.imageSliders.getValues()
         const { bgColor, bgColorOpacity } = this.bgColorSliders.getValues()
         const bgColorStr = `rgba(${bgColor.join()}, ${bgColorOpacity}`
 

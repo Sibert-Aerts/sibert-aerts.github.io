@@ -42,6 +42,7 @@ const gameName = {
  * @prop {keyof MacroType} type
  * @prop {keyof Game} game
  * @prop {string} preset
+ * @prop {bool} preventAsRandomDefault
  * 
  * @prop {'all caps' | 'title case' | undefined} preferCase
  * @prop {object} sliders
@@ -68,8 +69,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 100, fontFamily: 'Cormorant Garamond',
@@ -95,8 +96,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 110, fontFamily: 'Cormorant Garamond',
@@ -122,8 +123,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 117, fontFamily: 'Cormorant Garamond',
@@ -149,8 +150,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 115, fontFamily: 'Cormorant Garamond',
@@ -178,8 +179,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: .002, yOffset: 0.032, scale: 1 
+        position: {
+            xOffset: .002, yOffset: 0.032, scale: 1
         },
         font: {
             fontSize: 92, fontFamily: 'adobe-garamond-pro',
@@ -207,7 +208,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.001, yOffset: 0.038, scale: 1
         },
         font: {
@@ -236,7 +237,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0.001, yOffset: 0.037, scale: 1
         },
         font: {
@@ -265,7 +266,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0.001, yOffset: 0.037, scale: 1
         },
         font: {
@@ -294,7 +295,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0.001, yOffset: 0.037, scale: 1
         },
         font: {
@@ -325,7 +326,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.007, yOffset: 0.216, scale: 1
         },
         font: {
@@ -354,7 +355,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.003, yOffset: 0.217, scale: 1
         },
         font: {
@@ -383,7 +384,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.005, yOffset: 0.219, scale: 1
         },
         font: {
@@ -412,7 +413,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.009, yOffset: 0.217, scale: 1
         },
         font: {
@@ -441,7 +442,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.005, yOffset: 0.220, scale: 1
         },
         font: {
@@ -470,7 +471,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.004, yOffset: 0.225, scale: 1
         },
         font: {
@@ -499,7 +500,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -0.013, yOffset: 0.221, scale: 1
         },
         font: {
@@ -735,7 +736,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0, yOffset: -.258, scale: 1
         },
         font: {
@@ -760,7 +761,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: -.003, yOffset: -.265, scale: 1
         },
         font: {
@@ -787,7 +788,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: .001, yOffset: -.097, scale: 1
         },
         font: {
@@ -816,7 +817,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: .001, yOffset: -.006, scale: 1
         },
         font: {
@@ -845,7 +846,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0, yOffset: .016, scale: 1
         },
         font: {
@@ -874,7 +875,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: .001, yOffset: -.006, scale: 1
         },
         font: {
@@ -903,7 +904,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: .001, yOffset: -.006, scale: 1
         },
         font: {
@@ -932,7 +933,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: .002, yOffset: -.006, scale: 1
         },
         font: {
@@ -961,7 +962,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0, yOffset: -.006, scale: 1
         },
         font: {
@@ -990,7 +991,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0, yOffset: -.006, scale: 1
         },
         font: {
@@ -1110,8 +1111,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 115, fontFamily: 'Cormorant Garamond',
@@ -1137,8 +1138,8 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.007, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.007, scale: 1
         },
         font: {
             fontSize: 115, fontFamily: 'Cormorant Garamond',
@@ -1240,7 +1241,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0, yOffset: -.265, scale: 1
         },
         font: {
@@ -1265,7 +1266,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0.001, yOffset: -.065
         },
         font: {
@@ -1294,7 +1295,7 @@ layerTypes.push({
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
+        position: {
             xOffset: 0.001, yOffset: -.065
         },
         font: {
@@ -1401,8 +1402,8 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { 
-            xOffset: 0.001, yOffset: 0.008, scale: 1 
+        position: {
+            xOffset: 0.001, yOffset: 0.008, scale: 1
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [248, 248, 248],
@@ -1424,8 +1425,8 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { 
-            xOffset: 0.398, yOffset: 0.386, scale: 1 
+        position: {
+            xOffset: 0.398, yOffset: 0.386, scale: 1
         },
         font: {
             fontFamily: 'Spectral', textColor: [202, 203, 202],
@@ -1464,8 +1465,8 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { 
-            xOffset: 0.001, yOffset: -0.013, scale: 1 
+        position: {
+            xOffset: 0.001, yOffset: -0.013, scale: 1
         },
         font: {
             fontFamily: 'adobe-garamond-pro', textColor: [202, 204, 203],
@@ -1485,8 +1486,8 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0.023, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0.023, scale: 1
         },
         font: {
             fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
@@ -1508,8 +1509,8 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { 
-            xOffset: -.002, yOffset: -.086, scale: 1 
+        position: {
+            xOffset: -.002, yOffset: -.086, scale: 1
         },
         font: {
             fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
@@ -1830,7 +1831,7 @@ layerTypes.push({
             fontSize: 39, fontWeight: 400,
             vScale: 1, charSpacing: 2,
         },
-        interactBox: {option1: 'YES', option2: 'NO'}
+        interactBox: { option1: 'YES', option2: 'NO' }
     },
     draw: drawDS1InteractBox
 })
@@ -1846,7 +1847,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.345
         },
         font: layerTypes.at(-1).sliders.font,
-        interactBox: {option1: 'OK', option2: ''}
+        interactBox: { option1: 'OK', option2: '' }
     },
     draw: drawDS1InteractBox
 })
@@ -1866,7 +1867,7 @@ layerTypes.push({
             fontSize: 29, fontWeight: 400,
             vScale: 1, charSpacing: 2,
         },
-        interactBox: {option1: 'YES', option2: 'NO'}
+        interactBox: { option1: 'YES', option2: 'NO' }
     },
     draw: drawDS2InteractBox
 })
@@ -1882,7 +1883,7 @@ layerTypes.push({
             xOffset: 0.005, yOffset: 0.02
         },
         font: layerTypes.at(-1).sliders.font,
-        interactBox: {option1: 'OK', option2: ''}
+        interactBox: { option1: 'OK', option2: '' }
     },
     draw: drawDS2InteractBox
 })
@@ -1898,7 +1899,7 @@ layerTypes.push({
 
     preferCase: 'title case',
     sliders: {
-        position: { },
+        position: {},
         font: {
             fontFamily: 'Arial Black', textColor: [100, 60, 230],
             fontSize: 120, fontWeight: 900,
@@ -1917,10 +1918,11 @@ layerTypes.push({
     type: MacroType.special,
     game: Game.ds1,
     preset: 'Snapchat',
+    preventAsRandomDefault: true,
 
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
             fontFamily: 'Helvetica, Arial, sans-serif', textColor: [255, 255, 255],
@@ -1941,11 +1943,12 @@ layerTypes.push({
     type: MacroType.special,
     game: Game.ds1,
     preset: 'Impact macro',
+    preventAsRandomDefault: true,
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
             fontFamily: 'Impact, "Arial Black"', textColor: [255, 255, 255],
@@ -1965,11 +1968,12 @@ layerTypes.push({
     type: MacroType.special,
     game: Game.ds1,
     preset: 'Just an image',
+    preventAsRandomDefault: true,
 
     preferCase: 'all caps',
     sliders: {
-        position: { 
-            xOffset: 0, yOffset: 0, scale: 1 
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
         },
         simpleImage: {},
     },
@@ -1991,9 +1995,9 @@ const layerTypesMap = {}
  */
 const layerIdMap = {}
 
-for( const type in MacroType ) for( const game in Game )
-    layerTypesMap[type] = {[game]: null}
-for( const layer of layerTypes ) {
+for (const type in MacroType) for (const game in Game)
+    layerTypesMap[type] = { [game]: null }
+for (const layer of layerTypes) {
     if (!layerTypesMap[layer.type][layer.game])
         layerTypesMap[layer.type][layer.game] = {}
     layerTypesMap[layer.type][layer.game][layer.preset] = layer
@@ -2006,9 +2010,9 @@ for( const layer of layerTypes ) {
 
 let randomDefault
 
-while( true ) {
-    randomDefault = layerTypes[ Math.floor(Math.random()*layerTypes.length) ]
-    if( randomDefault.id !== 'sp:snapchat' && randomDefault.id !== 'sp:impact' ) break
+while (true) {
+    randomDefault = layerTypes[Math.floor(Math.random() * layerTypes.length)]
+    if (!randomDefault.preventAsRandomDefault) break
 }
 
 window.MACROGEN_DEFAULTS = {
