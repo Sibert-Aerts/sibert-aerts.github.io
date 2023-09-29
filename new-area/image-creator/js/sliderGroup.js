@@ -43,6 +43,116 @@ const DEFAULT_CONVERTERS = {
     color: 'rgb',
 }
 
+
+/**
+ * Class representing a user input value in the Macro Generator,
+ *  the state it has, and the specific HTML element(s) that are used to control it.
+ */
+class Slider extends EventTarget {
+    /**
+     * @param {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} inputElement
+     * @param {HTMLButtonElement | undefined} resetButton
+     */
+    constructor(inputElement, resetButton) {
+        super()
+        if (inputElement) {
+            this.inputElement = inputElement
+            // Echo the inputElement's change events
+            this.inputElement.addEventListener('change', e => this.dispatchEvent(new Event('change')))
+            /** @type {string} */
+            this.name = this.inputElement.name
+
+            /// Create our converter instance
+            let as = inputElement.getAttribute('as') || DEFAULT_CONVERTERS[inputElement.type] || 'string'
+            for (const conv in CONVERTERS)
+                if (as.startsWith(conv)) { this.converter = new CONVERTERS[conv](as); break }
+
+            /// Assign and remember our "true default" (=HTML-assigned default)
+            const trueDefault = inputElement.getAttribute('default')
+            inputElement.value = this.default = this.trueDefault = trueDefault
+            if (inputElement.type === 'checkbox')
+                inputElement.checked = inputElement.value
+        }
+
+        /// Hook up reset button
+        if (resetButton) {
+            this.resetButton = resetButton
+            resetButton.disabled = true
+            resetButton.onclick = () => {
+                this.reset()
+                this.dispatchEvent(new Event('change'))
+                this.resetButton.disabled = true
+            }
+        }
+    }
+
+    /**
+     * @param {HTMLElement} div 
+     * @returns {Slider | undefined}
+     */
+    static fromDiv(div) {
+        // Find input element
+        const inputElement = (
+            div.getElementsByTagName('input')[0]
+            || div.getElementsByTagName('textarea')[0]
+            || div.getElementsByTagName('select')[0]
+        )
+        if (!inputElement) return
+        // Find reset button
+        const resetButton = div.getElementsByClassName('reset-button')[0]
+        return new Slider(inputElement, resetButton)
+    }
+
+    /** Reset the Slider to its default value, disabling the reset button. */
+    reset() {
+        if (this.inputElement) {
+            if (this.inputElement.type === 'checkbox')
+                this.inputElement.checked = this.default
+            else
+                this.inputElement.value = this.default
+        }
+        if (this.resetButton)
+            this.resetButton.disabled = true
+    }
+
+    /** Get the Slider's current value. */
+    get() {
+        if (this.inputElement) {
+            if (this.inputElement.type === 'checkbox')
+                return this.inputElement.checked
+            return this.converter.parse(this.inputElement.value)
+        }
+    }
+
+    /** Set the Slider's current value. */
+    set(value) {
+        if (this.inputElement) {
+            if (this.inputElement.type === 'checkbox')
+                this.inputElement.checked = value
+            else
+                this.inputElement.value = this.converter.toString(value)
+        }
+    }
+
+    /** Swap out the Slider's default value, also changing its current value if it is in an unchanged state. */
+    setDefault(value) {
+        if (this.inputElement) {
+            let val
+            if (value === undefined) val = this.trueDefault
+            else val = this.converter.toString(value)
+
+            this.default = val
+            if (this.resetButton.disabled) {
+                if (this.inputElement.type === 'checkbox')
+                    this.inputElement.checked = val
+                else
+                    this.inputElement.value = val
+            }
+        }
+    }
+}
+
+
 /**
  * Class representing a collection of interactive HTML inputs, "Sliders" for simplicity.
  *  An input can be a standard HTML <input> of various types, or a <select> or <textbox>, or others.
@@ -50,7 +160,6 @@ const DEFAULT_CONVERTERS = {
  *  This class provides methods for getting/setting/resetting all grouped inputs at once.
  */
 class SliderGroup {
-
     /**
      * @param {string} name
      * @param {HTMLElement} parent 
@@ -64,7 +173,7 @@ class SliderGroup {
         this.name = this.element.getAttribute('name')
 
         /** @type {boolean} */
-        this.usable = false
+        this.usable = true // Note: Early return might leave this undefined
         /** @type {boolean} */
         this.visible = false
         /** @type {Callback} */
@@ -80,55 +189,21 @@ class SliderGroup {
         /// Find each slider
         for (const div of this.element.children) {
             if (div.tagName !== 'DIV') continue
-
-            const slider =
-                div.getElementsByTagName('input')[0] || div.getElementsByTagName('textarea')[0] || div.getElementsByTagName('select')[0]
-            if (!slider) return
+            const slider = Slider.fromDiv(div)
+            if (!slider) continue
 
             /// Add to our collections
             this.sliders.push(slider)
             this.byName[slider.name] = slider
-            slider.onchange = e => {
+            slider.addEventListener('change', e => {
                 if (slider.resetButton) slider.resetButton.disabled = false
                 this.onchange(e)
-            }
-            /// Assign its converter instance
-            let as = slider.getAttribute('as') || DEFAULT_CONVERTERS[slider.type] || 'string'
-            for (const conv in CONVERTERS)
-                if (as.startsWith(conv)) { slider.converter = new CONVERTERS[conv](as); break }
+            })
+            // Track trueDefaults
+            if (slider.trueDefault !== null)
+                this.trueDefaults[slider.name] = slider.converter.parse(slider.trueDefault)
 
-            /// Assign and remember its "true default" (=HTML-assigned default)
-            const trueDefault = slider.getAttribute('default')
-            slider.value = slider.default = slider.trueDefault = trueDefault
-            if (trueDefault !== null)
-                this.trueDefaults[slider.name] = slider.converter.parse(trueDefault)
-
-            if (slider.type === 'checkbox') slider.checked = slider.value
-            slider.reset = function () {
-                if (this.type === 'checkbox')
-                    this.checked = this.default
-                else
-                    this.value = this.default
-                if (this.resetButton)
-                    this.resetButton.disabled = true
-            }
-
-            /// Hook up reset button
-            /** @type {HTMLButtonElement} */
-            const resetButton = div.getElementsByClassName('reset-button')[0]
-            if (resetButton) {
-                slider.resetButton = resetButton
-                resetButton.disabled = true
-
-                resetButton.onclick = () => {
-                    slider.reset()
-                    slider.onchange()
-                    resetButton.disabled = true
-                }
-            }
         }
-        // If we make it through the whole thing without an early return, we're usable!
-        this.usable = true
     }
 
     hide() {
@@ -142,10 +217,7 @@ class SliderGroup {
 
     /** Get a specific slider's value. */
     get(key) {
-        const slider = this.byName[key]
-        if (slider.type === 'checkbox')
-            return slider.checked
-        return slider.converter.parse(slider.value)
+        return this.byName[key].get()
     }
 
     /**
@@ -154,25 +226,19 @@ class SliderGroup {
      */
     getValues() {
         const values = {}
-        for (const slider of this.sliders) {
-            if (slider.type === 'checkbox')
-                values[slider.name] = slider.checked
-            else
-                values[slider.name] = slider.converter.parse(slider.value)
-        }
+        for (const slider of this.sliders)
+            values[slider.name] = slider.get()
         return values
     }
 
     /**
+     *  Change the values for the given Sliders.
      *  @param  {{ [name: string]: any }} values
      */
     setValues(values) {
         for (const name in values) {
             const slider = this.byName[name]
-            if (slider.type === 'checkbox')
-                slider.checked = values[name]
-            else
-                slider.value = slider.converter.toString(values[name])
+            slider.set(values[name])
             if (slider.resetButton)
                 slider.resetButton.disabled = false
         }
@@ -185,12 +251,8 @@ class SliderGroup {
     getChangedValues() {
         const values = {}
         for (const slider of this.sliders) {
-            if (slider.resetButton?.disabled)
-                continue
-            if (slider.type === 'checkbox')
-                values[slider.name] = slider.checked
-            else
-                values[slider.name] = slider.converter.parse(slider.value)
+            if (slider.resetButton?.disabled) continue
+            values[slider.name] = slider.get()
         }
         return values
     }
@@ -202,10 +264,7 @@ class SliderGroup {
     setChangedValues(values) {
         for (const slider of this.sliders) {
             if (slider.name in values) {
-                if (slider.type === 'checkbox')
-                    slider.checked = values[slider.name]
-                else
-                    slider.value = slider.converter.toString(values[slider.name])
+                slider.set(values[slider.name])
                 if (slider.resetButton)
                     slider.resetButton.disabled = false
             } else {
@@ -220,17 +279,7 @@ class SliderGroup {
     setDefaults(values) {
         for (const slider of this.sliders) {
             if (slider.resetButton) {
-                let val
-                if (!(slider.name in values)) val = slider.trueDefault
-                else val = slider.converter.toString(values[slider.name])
-
-                slider.default = val
-                if (slider.resetButton.disabled) {
-                    if (slider.type === 'checkbox')
-                        slider.checked = val
-                    else
-                        slider.value = val
-                }
+                slider.setDefault(values[slider.name])
             }
         }
 
