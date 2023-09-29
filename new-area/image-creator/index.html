@@ -608,6 +608,21 @@
 					</div>
 				</div>
 
+				<div name=simpleImage class=sliders-container hidden>
+					<h4> Image </h4>
+					<div class=image-slider name=image>
+						<button class="lil-button reset-button"></button><br>
+						<div>
+							<span class=input-title style=min-width:100px>Image URL:</span>
+							<input type=text name=image-URL style="min-width:280px">
+						</div>
+						<div>
+							<span class=input-title style=min-width:100px>Image Upload:</span>
+							<input type=file name=image-upload accept="image/*" style=display:inline;width:280px>
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 			<div id=layers class=sliders-container hidden>
@@ -663,8 +678,8 @@
 					</div>
 					<div>
 						<span class=input-title style=min-width:100px>Generic screenshot:</span>
-						<button class="lil-button random-button" name="random-screenshot" title="Pick random"></button>
-						<select id="generic-screenshot" style=width:100%>
+						<button class="lil-button random-button" name="image-select-random" title="Pick random"></button>
+						<select name="image-select" style=width:100%>
 							<option value="">(None)</option>
 							<optgroup label="Dark Souls">
 								<option value="https://i.imgur.com/QMoXgZI.jpg">Undead Asylum / Oscar</option>
@@ -822,6 +837,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/09/29</b> • Add "just an image" layer <br>
 			<b>2023/04/16</b> • Most macro types now properly handle multiline text <br>
 			<b>2023/04/13</b> • Add and improve "gradient" effect option to several layer types <br>
 			<b>2023/04/01</b> • Add "gradient" effect option to Bloodborne style Noun Verbed layers <br>

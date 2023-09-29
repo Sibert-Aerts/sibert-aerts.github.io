@@ -3,21 +3,18 @@
 /** Handles incoming images. */
 class ImageHandler {
     /**
-     * @param {MacroGenerator} macroGen 
-     * @param {HTMLElement} parent
+     * @param {HTMLElement} element
      */
-    constructor(macroGen, parent) {
-        /** @type MacroGenerator */
-        this.macroGen = macroGen
+    constructor(element, globalPaste=false) {
         /** @type HTMLElement */
-        this.parent = parent
+        this.element = element
 
         /** @type HTMLImageElement */
         this.image = null
         /** @type string */
         this.imageType = null
 
-        const my = (tag, name) => parent.getElementsByTagName(tag).namedItem(name)
+        const my = (tag, name) => element.getElementsByTagName(tag).namedItem(name)
 
         /// URL event bindings
         /** @type HTMLInputElement */
@@ -31,31 +28,31 @@ class ImageHandler {
         this.fileSelect = my('input', 'image-upload')
         this.fileSelect.onchange = this.handleFileSelect.bind(this)
 
-        /// Set up generic screenshot select
+        /// Set up preset image select
         /** @type HTMLSelectElement */
-        this.screenshotSelect = my('select', 'generic-screenshot')
-        if (this.screenshotSelect) {
+        this.imageSelect = my('select', 'image-select')
+        if (this.imageSelect) {
             // Bind onchange
-            this.screenshotSelect.onchange = () => {
-                const screenshot = this.screenshotSelect.value
+            this.imageSelect.onchange = () => {
+                const screenshot = this.imageSelect.value
                 if (screenshot) {
                     this._setImageFromURL(screenshot, 'jpg')
                 } else {
-                    this.onerror()
+                    this._onerror()
                 }
             }
-            const randomButton = my('button', 'random-screenshot')
+            const randomButton = my('button', 'image-select-random')
             randomButton.onclick = () => {
-                const options = this.screenshotSelect.options
-                const option = options[Math.floor(Math.random()*options.length)]
+                const options = this.imageSelect.options
+                const option = options[1+Math.floor(Math.random()*(options.length-1))]
                 option.selected = true
-                this.screenshotSelect.onchange()
+                this.imageSelect.onchange()
             }
         }
 
         /// Paste event bindings
-        // Currently binds to document because there's no other ImageHandler to need to contest with
-        document.addEventListener('paste', this.handlePaste.bind(this))
+        if (globalPaste)
+            document.addEventListener('paste', this.handlePaste.bind(this))
     }
 
     /** File Selector callback function. */
@@ -66,13 +63,13 @@ class ImageHandler {
             if( this.URLinput.value )
                 this.handleImageURL()
             else
-                this.onerror()
+                this._onerror()
             return
         }
         const reader = new FileReader()
         reader.onload = e => {
             this.image = new Image()
-            this.image.onload = this.onload.bind(this)
+            this.image.onload = this._onload.bind(this)
             this.image.src = e.target.result
         }
         reader.readAsDataURL(this.fileSelect.files[0])
@@ -82,7 +79,7 @@ class ImageHandler {
     _setImageFromURL(url, type=undefined) {
         this.image = new Image()
         this.image.crossOrigin = 'Anonymous'
-        this.image.onload = this.onload.bind(this)
+        this.image.onload = this._onload.bind(this)
         this.imageType = type || url.match(/\.(\w+)$/)?.[1]
         this.image.src = url
     }
@@ -96,17 +93,17 @@ class ImageHandler {
             if( this.fileSelect.files.length )
                 this.handleFileSelect()
             else
-                this.onerror()
+                this._onerror()
             return
         }
         this.image = new Image()
         this.image.crossOrigin = 'Anonymous'
 
-        this.image.onload = this.onload.bind(this)
+        this.image.onload = this._onload.bind(this)
         this.image.onerror = e => {
             console.error('Failed to load provided image URL:', this.URLinput.value, e)
             this.URLinput.classList.add('bad-url')
-            this.onerror()
+            this._onerror()
         }
         // Attempt to pull image type from URL
         this.imageType = this.URLinput.value.match(/\.(\w+)$/)?.[1]
@@ -124,20 +121,19 @@ class ImageHandler {
         var reader = new FileReader()
         reader.onload = e => {
             this.image = new Image()
-            this.image.onload = this.onload.bind(this)
+            this.image.onload = this._onload.bind(this)
             this.image.src = e.target.result
         }
         reader.readAsDataURL(file)
         this.imageType = file.type
     }
 
-    onload() {
-        this.macroGen.imageSliders.show()
-        this.macroGen.redrawMacro()
+    _onload() {
+        if (this.onload) this.onload()
     }
 
-    onerror() {
+    _onerror() {
         this.image = this.imageType = undefined
-        this.macroGen.onNoMoreBackgroundImage()
+        if (this.onerror) this.onerror()
     }
 }

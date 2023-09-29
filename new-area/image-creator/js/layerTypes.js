@@ -1960,12 +1960,28 @@ layerTypes.push({
     draw: drawOutlined
 })
 
+layerTypes.push({
+    id: 'sp:image',
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'Just an image',
+
+    preferCase: 'all caps',
+    sliders: {
+        position: { 
+            xOffset: 0, yOffset: 0, scale: 1 
+        },
+        simpleImage: {},
+    },
+    draw: drawImage
+})
+
 
 //// Populate objects storing the different layers.
 
 /** 
  * Object containing all types of drawable layers, indexed by type > game > preset
- * @type { {[type in keyof MacroType] : {[type in keyof Game]: {[preset: string]: DrawableLayer }? }} } } 
+ * @type { {[type in keyof MacroType] : {[type in keyof Game]: {[preset: string]: DrawableLayer }? }} }
  */
 const layerTypesMap = {}
 

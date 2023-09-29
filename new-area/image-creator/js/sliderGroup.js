@@ -45,35 +45,15 @@ const DEFAULT_CONVERTERS = {
 
 
 /**
- * Class representing a user input value in the Macro Generator,
+ * Class representing a HTML user input value in the Macro Generator,
  *  the state it has, and the specific HTML element(s) that are used to control it.
  */
 class Slider extends EventTarget {
     /**
-     * @param {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} inputElement
      * @param {HTMLButtonElement | undefined} resetButton
      */
-    constructor(inputElement, resetButton) {
+    constructor(resetButton) {
         super()
-        if (inputElement) {
-            this.inputElement = inputElement
-            // Echo the inputElement's change events
-            this.inputElement.addEventListener('change', e => this.dispatchEvent(new Event('change')))
-            /** @type {string} */
-            this.name = this.inputElement.name
-
-            /// Create our converter instance
-            let as = inputElement.getAttribute('as') || DEFAULT_CONVERTERS[inputElement.type] || 'string'
-            for (const conv in CONVERTERS)
-                if (as.startsWith(conv)) { this.converter = new CONVERTERS[conv](as); break }
-
-            /// Assign and remember our "true default" (=HTML-assigned default)
-            const trueDefault = inputElement.getAttribute('default')
-            inputElement.value = this.default = this.trueDefault = trueDefault
-            if (inputElement.type === 'checkbox')
-                inputElement.checked = inputElement.value
-        }
-
         /// Hook up reset button
         if (resetButton) {
             this.resetButton = resetButton
@@ -91,71 +71,157 @@ class Slider extends EventTarget {
      * @returns {Slider | undefined}
      */
     static fromDiv(div) {
-        // Find input element
-        const inputElement = (
+        // Find reset button
+        const resetButton = div.getElementsByClassName('reset-button')[0]
+
+        // Case 1: Image input widget
+        if (div.classList.contains('image-slider'))
+            return new ImageHandlerSlider(div, resetButton)
+
+        // Case 2: Simple input element
+        const simpleInputElement = (
             div.getElementsByTagName('input')[0]
             || div.getElementsByTagName('textarea')[0]
             || div.getElementsByTagName('select')[0]
         )
-        if (!inputElement) return
-        // Find reset button
-        const resetButton = div.getElementsByClassName('reset-button')[0]
-        return new Slider(inputElement, resetButton)
+        if (simpleInputElement)
+            return new SimpleSlider(simpleInputElement, resetButton)
     }
 
-    /** Reset the Slider to its default value, disabling the reset button. */
+    /** Reset the Slider to its default value, also disabling the reset button. Does not trigger change. */
     reset() {
-        if (this.inputElement) {
-            if (this.inputElement.type === 'checkbox')
-                this.inputElement.checked = this.default
-            else
-                this.inputElement.value = this.default
-        }
         if (this.resetButton)
             this.resetButton.disabled = true
     }
 
     /** Get the Slider's current value. */
     get() {
-        if (this.inputElement) {
-            if (this.inputElement.type === 'checkbox')
-                return this.inputElement.checked
-            return this.converter.parse(this.inputElement.value)
-        }
+        throw new Error('Not implemented')
     }
 
-    /** Set the Slider's current value. */
+    /** Set the Slider's current value. Does not trigger change. */
     set(value) {
-        if (this.inputElement) {
-            if (this.inputElement.type === 'checkbox')
-                this.inputElement.checked = value
-            else
-                this.inputElement.value = this.converter.toString(value)
-        }
+        throw new Error('Not implemented')
     }
 
-    /** Swap out the Slider's default value, also changing its current value if it is in an unchanged state. */
+    /** Swap out the Slider's default value, also changing its current value if it is in an unchanged state. Does not trigger change. */
     setDefault(value) {
-        if (this.inputElement) {
-            let val
-            if (value === undefined) val = this.trueDefault
-            else val = this.converter.toString(value)
+        throw new Error('Not implemented')
+    }
+}
 
-            this.default = val
-            if (this.resetButton.disabled) {
-                if (this.inputElement.type === 'checkbox')
-                    this.inputElement.checked = val
-                else
-                    this.inputElement.value = val
-            }
+
+/**
+ * Represents an HTML <input>, <textarea> or <select> element.
+ */
+class SimpleSlider extends Slider {
+    /**
+     * @param {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} inputElement
+     * @param {HTMLButtonElement | undefined} resetButton
+     */
+    constructor(inputElement, resetButton) {
+        super(resetButton)
+        this.inputElement = inputElement
+        // Echo the inputElement's change events
+        this.inputElement.addEventListener('change', e => this.dispatchEvent(new Event('change')))
+        /** @type {string} */
+        this.name = this.inputElement.name
+
+        /// Create our converter instance
+        let as = inputElement.getAttribute('as') || DEFAULT_CONVERTERS[inputElement.type] || 'string'
+        for (const conv in CONVERTERS)
+            if (as.startsWith(conv)) { this.converter = new CONVERTERS[conv](as); break }
+
+        /// Assign and remember our "true default" (=HTML-assigned default)
+        const trueDefault = inputElement.getAttribute('default')
+        this.default = this.trueDefault = trueDefault
+        if (trueDefault !== null)
+            this.parsedTrueDefault = this.converter.parse(trueDefault)
+        if (inputElement.type === 'checkbox')
+            inputElement.checked = trueDefault
+        else
+            inputElement.value = trueDefault
+    }
+
+    reset() {
+        super.reset()
+        if (this.inputElement.type === 'checkbox')
+            this.inputElement.checked = this.default
+        else
+            this.inputElement.value = this.default
+    }
+    get() {
+        if (this.inputElement.type === 'checkbox')
+            return this.inputElement.checked
+        return this.converter.parse(this.inputElement.value)
+    }
+    set(value) {
+        if (this.inputElement.type === 'checkbox')
+            this.inputElement.checked = value
+        else
+            this.inputElement.value = this.converter.toString(value)
+    }
+    setDefault(value) {        
+        let strValue
+        if (value === undefined) strValue = this.trueDefault
+        else strValue = this.converter.toString(value)
+
+        this.default = strValue
+        if (this.resetButton.disabled) {
+            if (this.inputElement.type === 'checkbox')
+                this.inputElement.checked = strValue
+            else
+                this.inputElement.value = strValue
         }
     }
 }
 
 
 /**
- * Class representing a collection of interactive HTML inputs, "Sliders" for simplicity.
- *  An input can be a standard HTML <input> of various types, or a <select> or <textbox>, or others.
+ * Slider wrapping an ImageHandler.
+ */
+class ImageHandlerSlider extends Slider {
+    /**
+     * @param {HTMLElement} element
+     */
+    constructor(element, resetButton) {
+        super(resetButton)
+        this.imageHandler = new ImageHandler(element)
+        this.imageHandler.onload = this.imageHandler.onerror = () => this.dispatchEvent(new Event('change'))
+        this.name = element.getAttribute('name')
+        this.trueDefault = true
+        this.parsedTrueDefault = {
+            image: undefined,
+            url: "",
+            files: null,
+        }
+    }
+
+    reset() {
+        super.reset()
+        this.set(this.parsedTrueDefault)
+        this.imageHandler.fileSelect.value = ""
+    }
+    get() {
+        return {
+            image: this.imageHandler.image,
+            url: this.imageHandler.URLinput.value,
+            files: this.imageHandler.fileSelect.files,
+        }
+    }
+    set(value) {
+        this.imageHandler.image = value.image
+        this.imageHandler.URLinput.value = value.url
+        this.imageHandler.fileSelect.files = value.files
+    }
+    setDefault(value) {
+        // Do nothing.
+    }
+}
+
+
+/**
+ * Class representing a collection of Sliders.
  *  This class finds them, groups them, tracks their name and manages their state.
  *  This class provides methods for getting/setting/resetting all grouped inputs at once.
  */
@@ -173,7 +239,7 @@ class SliderGroup {
         this.name = this.element.getAttribute('name')
 
         /** @type {boolean} */
-        this.usable = true // Note: Early return might leave this undefined
+        this.usable = true // Note: An early return leaves this falsey
         /** @type {boolean} */
         this.visible = false
         /** @type {Callback} */
@@ -201,7 +267,7 @@ class SliderGroup {
             })
             // Track trueDefaults
             if (slider.trueDefault !== null)
-                this.trueDefaults[slider.name] = slider.converter.parse(slider.trueDefault)
+                this.trueDefaults[slider.name] = slider.parsedTrueDefault
 
         }
     }

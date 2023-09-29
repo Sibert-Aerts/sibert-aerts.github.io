@@ -49,7 +49,12 @@ class MacroGenerator {
 
         //// IMAGE HANDLER
         /** @type {ImageHandler} */
-        this.imageHandler = new ImageHandler(this, my('div', 'background-image'))
+        this.imageHandler = new ImageHandler(my('div', 'background-image'), true)
+        this.imageHandler.onload = () => {            
+            this.imageSliders.show()
+            this.redrawMacro()
+        }
+        this.imageHandler.onerror = () => this.onNoMoreBackgroundImage()
         this.bgColorSliders = new SliderGroup(my('div', 'background-color'))
         this.bgColorSliders.onchange = autoRedraw
 
@@ -182,13 +187,13 @@ class MacroGenerator {
 
         const SCALEGRABDIST = 40
         const getScale = e => 
-            Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-this.canvas.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
+            Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
 
         /** Adjust the grabbies' position based on the Slider values. */
         const updateGrabbies = () => {
             const { xOffset, yOffset, scale } = this.sliders.position.getValues()
             const left = (xOffset+.5)*this.canvas.clientWidth
-            const top =  (yOffset+.5)*this.canvas.clientHeight + this.canvas.offsetTop
+            const top =  (yOffset+.5)*this.canvas.clientHeight
             updatePosGrabby(left, top)
             updateScaleGrabby(left, top, scale)
             updateLayeringGrabbies(left, top)
@@ -224,9 +229,9 @@ class MacroGenerator {
 
             if( grabState.type === GrabType.position )
             {
-                updatePosGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop)
-                updateScaleGrabby(e.offsetX, e.offsetY + this.canvas.offsetTop, this.sliders.position.get('scale'))
-                updateLayeringGrabbies(e.offsetX, e.offsetY + this.canvas.offsetTop)
+                updatePosGrabby(e.offsetX, e.offsetY)
+                updateScaleGrabby(e.offsetX, e.offsetY, this.sliders.position.get('scale'))
+                updateLayeringGrabbies(e.offsetX, e.offsetY)
             }
             else if ( grabState.type === GrabType.scale )
             {
@@ -240,7 +245,7 @@ class MacroGenerator {
             {
                 this.sliders.position.setValues({
                     xOffset: posGrabby.offsetLeft/this.canvas.clientWidth-.5,
-                    yOffset: (posGrabby.offsetTop-this.canvas.offsetTop)/this.canvas.clientHeight-.5
+                    yOffset: posGrabby.offsetTop/this.canvas.clientHeight-.5
                 })
             }
             else if ( grabState.type === GrabType.scale )

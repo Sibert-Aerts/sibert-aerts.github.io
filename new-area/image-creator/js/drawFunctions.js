@@ -949,6 +949,25 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     ctx.drawImage(temp, 0, 0)
 }
 
+/** @type {drawFun} Function which draws SSBM styled text. */
+async function drawImage(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    /** @type {HTMLImageElement} */
+    const image = sliders.simpleImage.image.image
+    // NOTE: 
+    if (image)
+        ctx.drawImage(image, -image.width/2, -image.height/2)
+    
+}
+
 
 // ================================================ BOSS HEALTH BARS ================================================
 
