@@ -10,10 +10,11 @@ var macroGen
 document.addEventListener('DOMContentLoaded', function () {
 
     //// Load the URL ?search param info
-    const search = new URLSearchParams(this.location.search)
+    const searchParams = new URLSearchParams(this.location.search)
 
-    if (search.get('macro')) {
-        split = search.get('macro').split(',')
+    // 'macro' param pre-selects a specific macro, either by ID or by "<macrotype>,<game>,<preset>"
+    if (searchParams.get('macro')) {
+        split = searchParams.get('macro').split(',')
         if (split.length === 1) {
             const macro = layerIdMap[split[0]]
             if (macro)
@@ -27,12 +28,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    if (search.get('caption')) {
-        byId('image-caption').value = search.get('caption')
+    // 'caption' param prefills the caption input
+    if (searchParams.get('caption')) {
+        byId('image-caption').value = searchParams.get('caption')
     }
 
-    if (search.get('img')) {
-        document.getElementsByName('image-URL')[0].value = search.get('img')
+    // 'img' param prefills the background image URL input
+    if (searchParams.get('img')) {
+        document.querySelector('#background-image [name=image-URL]').value = searchParams.get('img')
+    }
+
+    // If no pre-selected macro type: Pick a random one
+    if (!window.MACROGEN_DEFAULTS) {
+        let randomDefault
+        while (true) {
+            randomDefault = layerTypes[Math.floor(Math.random() * layerTypes.length)]
+            if (!randomDefault.preventAsRandomDefault) break
+        }
+        window.MACROGEN_DEFAULTS = {
+            macroType: randomDefault.type,
+            game: randomDefault.game,
+            preset: randomDefault.preset,
+        }
     }
 
     //// Construct the global MacroGenerator

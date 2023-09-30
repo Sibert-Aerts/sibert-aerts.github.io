@@ -2003,20 +2003,3 @@ for (const layer of layerTypes) {
     layerTypesMap[layer.type][layer.game][layer.preset] = layer
     layerIdMap[layer.id] = layer
 }
-
-
-
-// Hack: Put the desired "default macro type" somewhere...
-
-let randomDefault
-
-while (true) {
-    randomDefault = layerTypes[Math.floor(Math.random() * layerTypes.length)]
-    if (!randomDefault.preventAsRandomDefault) break
-}
-
-window.MACROGEN_DEFAULTS = {
-    macroType: randomDefault.type,
-    game: randomDefault.game,
-    preset: randomDefault.preset,
-}
