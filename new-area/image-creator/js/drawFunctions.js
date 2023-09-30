@@ -1,7 +1,7 @@
 const {min, max, floor, sqrt} = Math
 
 
-const _assetPath = document.location.href.replace(/new-area\/.*$/, 'new-area/image-creator/assets/')
+const _assetPath = location.href.replace(/new-area\/.*$/, 'new-area/image-creator/assets/')
 
 class Asset {
     constructor(path) {
@@ -10,12 +10,12 @@ class Asset {
 
     /** @returns {Promise<HTMLImageElement>} */
     get() {
-        if( this.img ) return this.img
+        if (this.img) return this.img
         return new Promise((resolve, reject) => {
-            const img = this.img = new Image()
+            const img = new Image()
             img.src = this.path
-            img.onload = () => resolve(img)
-            img.onerror = ev => reject(ev)
+            img.onload = () => { this.img = img; resolve(img) }
+            img.onerror = reject
         })
     }
 }
@@ -30,6 +30,8 @@ const ASSETS = {
         poisonBarFrameEnd: new Asset('ds1/poison bar frame end.png'),
         interactBox: new Asset('ds1/interact box.png'),
         interactBoxButton: new Asset('ds1/interact box button.png'),
+        itemPickupBox: new Asset('ds1/item pickup.png'),
+        itemPickupPlatter: new Asset('ds1/item pickup platter.png'),
     },
     ds2: {
         bossHealthFrame: new Asset('ds2/boss health frame.png'),
@@ -1377,7 +1379,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
 }
 
 
-// ================================================ POP-UP BOXES ================================================
+// ================================================ INTERACTION BOXES ================================================
 
 /** @type {drawFun} Function which draws a DS1 interact box. */
 async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
@@ -1491,5 +1493,56 @@ async function drawDS2InteractBox(ctx, canvas, gen, sliders) {
         ctx.fillText(option1, -BUTTONSPACE, 76/vScale)
         ctx.strokeText(option2, BUTTONSPACE, 76/vScale)
         ctx.fillText(option2,  BUTTONSPACE, 76/vScale)
+    }
+}
+
+
+// ================================================ ITEM PICKUP BOXES ================================================
+
+/** @type {drawFun} Function which draws a DS1 item pickup box. */
+async function drawDS1ItemPickupBox(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+    ctx.scale(.75, .75)
+
+    const { image: imageValues, quantity, imageSize, showPlatter } = sliders.ds1Pickup
+
+    // Start loading assets
+    const boxPromise = ASSETS.ds1.itemPickupBox.get()
+    const platterPromise = ASSETS.ds1.itemPickupPlatter.get()
+
+    // The Box
+    const boxWidth = 1300, boxHeight = 250
+    ctx.drawImage(await boxPromise, -boxWidth/2, -boxHeight/2)
+
+    // Text
+    ctx.save()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+    ctx.textBaseline = 'alphabetic'
+    ctx.textAlign = 'left'
+    drawMultilineText(ctx, caption, {x: -335, y: -8/vScale, lineHeight: 60/vScale, align: 'top'})
+    ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
+    ctx.fillText(quantity, 445, -8/vScale)
+    ctx.restore()
+
+    // Platter
+    if (showPlatter) {
+        ctx.drawImage(await platterPromise, -500, 21)
+    }
+
+    // Item image
+    const image = imageValues.image
+    if (image) {
+        const imageScale = rectInsideRect(imageSize, imageSize, image.width, image.height)
+        const drawnWidth = image.width*imageScale, drawnHeight = image.height*imageScale
+        ctx.drawImage(image, -drawnWidth/2 -430, -drawnHeight/2 -10, drawnWidth, drawnHeight)
     }
 }

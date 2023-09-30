@@ -5,8 +5,9 @@ const MacroType = {
     nounVerbed: 'nounVerbed',
     youDied: 'youDied',
     areaName: 'areaName',
-    interactBox: 'interactBox',
     boss: 'boss',
+    itemPickupBox: 'itemPickupBox',
+    interactBox: 'interactBox',
     poison: 'poison',
 
     special: 'special'
@@ -15,8 +16,9 @@ const macroTypeName = {
     nounVerbed: '🏆 Noun Verbed',
     youDied: '💀 Death',
     areaName: '📍 Area name',
-    interactBox: '📋 Interact box',
     boss: '👹 Boss health bar',
+    itemPickupBox: '🎁 Item pickup',
+    interactBox: '📋 Interact box',
     poison: '🩸 Poison bar',
 
     special: '✨ Non-FromSoft',
@@ -1886,6 +1888,29 @@ layerTypes.push({
         interactBox: { option1: 'OK', option2: '' }
     },
     draw: drawDS2InteractBox
+})
+
+
+//////// Item Pickup Box
+
+layerTypes.push({
+    id: 'ds1:pickup',
+    type: MacroType.itemPickupBox,
+    game: Game.ds1,
+    preset: 'Item pickup',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.21,
+        },
+        font: {
+            fontFamily: 'Georgia', textColor: [242, 242, 242],
+            fontSize: 39, fontWeight: 400,
+            vScale: 1, charSpacing: 2,
+        },
+        ds1Pickup: {}
+    },
+    draw: drawDS1ItemPickupBox
 })
 
 

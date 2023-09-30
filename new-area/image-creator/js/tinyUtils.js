@@ -4,6 +4,11 @@
 
 const byteClamp = x => (isNaN(x))? 0 : (x > 255)? 255 : (x<0)? 0 : Math.floor(x)
 
+/** Uniformly rescale (givenW, givenH) such that it fits inside (boundW, boundH). */
+function rectInsideRect(boundW, boundH, givenW, givenH) {
+    return Math.min(boundW/givenW, boundH/givenH)
+}
+
 function titleCase(string) {
     if (!string) return string
     let first = true

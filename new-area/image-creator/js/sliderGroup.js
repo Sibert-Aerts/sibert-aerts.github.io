@@ -199,8 +199,7 @@ class ImageHandlerSlider extends Slider {
 
     reset() {
         super.reset()
-        this.set(this.parsedTrueDefault)
-        this.imageHandler.fileSelect.value = ""
+        this.imageHandler.clear()
     }
     get() {
         return {

@@ -1,5 +1,10 @@
 // Author: Sibert Aerts (Rezuaq)
 
+
+// Magic local image URL fixer so relative images work both in File: and HTTP(S): locations
+const _magicRootURL = location.href.replace(/new-area\/.*$/, '')
+
+
 /** Handles incoming images. */
 class ImageHandler {
     /**
@@ -33,26 +38,31 @@ class ImageHandler {
         this.imageSelect = my('select', 'image-select')
         if (this.imageSelect) {
             // Bind onchange
-            this.imageSelect.onchange = () => {
-                const screenshot = this.imageSelect.value
-                if (screenshot) {
-                    this._setImageFromURL(screenshot, 'jpg')
-                } else {
-                    this._onerror()
-                }
-            }
+            this.imageSelect.onchange = this.handleDropdownSelect.bind(this)
+            this.imageSelect.imageRoot = this.imageSelect.getAttribute('root') || ''
+            // Hook up randomization button
             const randomButton = my('button', 'image-select-random')
-            randomButton.onclick = () => {
-                const options = this.imageSelect.options
-                const option = options[1 + Math.floor(Math.random() * (options.length - 1))]
-                option.selected = true
-                this.imageSelect.onchange()
+            if (randomButton) {
+                randomButton.onclick = () => {
+                    const options = this.imageSelect.options
+                    const option = options[1 + Math.floor(Math.random() * (options.length - 1))]
+                    option.selected = true
+                    this.imageSelect.onchange()
+                }
             }
         }
 
         /// Paste event bindings
         if (globalPaste)
             document.addEventListener('paste', this.handlePaste.bind(this))
+    }
+
+    clear() {
+        this.image = undefined
+        this.URLinput.value = ''
+        this.fileSelect.value = ''
+        if (this.imageSelect)
+            this.imageSelect.value = ''
     }
 
     /** File Selector callback function. */
@@ -78,10 +88,16 @@ class ImageHandler {
 
     _setImageFromURL(url, type=undefined) {
         this.image = new Image()
-        this.image.crossOrigin = 'Anonymous'
         this.image.onload = this._onload.bind(this)
         this.imageType = type || url.match(/\.(\w+)$/)?.[1]
-        this.image.src = url
+        if (url.startsWith('/')) {
+            // Special case: Image hosted on this website, requires a bit of magic to still work in File: mode
+            url = _magicRootURL + this.imageSelect.imageRoot + url
+            this.image.src = url
+        } else {
+            this.image.crossOrigin = 'Anonymous'
+            this.image.src = url
+        }
     }
 
     /** Image URL callback function. */
@@ -108,6 +124,15 @@ class ImageHandler {
         // Attempt to pull image type from URL
         this.imageType = this.URLinput.value.match(/\.(\w+)$/)?.[1]
         this.image.src = this.URLinput.value
+    }
+
+    handleDropdownSelect() {
+        const screenshot = this.imageSelect.value
+        if (screenshot) {
+            this._setImageFromURL(screenshot, 'jpg')
+        } else {
+            this._onerror()
+        }
     }
 
     /** Callback that checks if the user is pasting an image onto the page. */
