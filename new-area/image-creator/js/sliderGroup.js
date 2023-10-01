@@ -187,19 +187,32 @@ class ImageHandlerSlider extends Slider {
     constructor(element, resetButton) {
         super(resetButton)
         this.imageHandler = new ImageHandler(element)
-        this.imageHandler.onload = this.imageHandler.onerror = () => this.dispatchEvent(new Event('change'))
+        this.imageHandler.onload = this.imageHandler.onerror = () => {
+            console.log(this.isDefault)
+            this.dispatchEvent(new Event('change'))
+            if (this.isDefault) this.isDefault--
+        }
         this.name = element.getAttribute('name')
+        this.default = {}
         this.trueDefault = true
         this.parsedTrueDefault = {
             image: undefined,
             url: "",
             files: null,
         }
+        this.isDefault = 2
     }
 
     reset() {
         super.reset()
         this.imageHandler.clear()
+        if (this.default.select) {
+            this.imageHandler.imageSelect.value = this.default.select
+            this.imageHandler.imageSelect.dispatchEvent(new Event('change'))
+            // NOTE: There's something ugly going on here where this change event 'dirties' this Slider's defaultiness.
+            //  I have half-solved it now by making isDefault last for TWO imageHandler.onload triggers, but it's not perfect at all.
+        }
+        this.isDefault = 2
     }
     get() {
         return {
@@ -214,7 +227,14 @@ class ImageHandlerSlider extends Slider {
         this.imageHandler.fileSelect.files = value.files
     }
     setDefault(value) {
-        // Do nothing.
+        this.default = {}
+        if (!value) return
+        if ('select' in value) {
+            this.default.select = value.select
+        }
+        if (this.isDefault) {
+            this.reset()
+        }
     }
 }
 

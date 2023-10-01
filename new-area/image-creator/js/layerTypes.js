@@ -1910,6 +1910,7 @@ layerTypes.push({
         },
         itemPickup: {
             imageSize: 160,
+            image: {'select': '/ds1/items/annex key.png'},
         }
     },
     draw: drawDS1ItemPickupBox
@@ -1931,7 +1932,8 @@ layerTypes.push({
             vScale: 1, charSpacing: 0,
         },
         itemPickup: {
-            imageSize: 80,
+            imageSize: 90,
+            image: {'select': '/ds3/items/estus flask.png'},
         }
     },
     draw: drawDS3ItemPickupBox
