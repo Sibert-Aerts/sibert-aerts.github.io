@@ -31,7 +31,7 @@ const ASSETS = {
         interactBox: new Asset('ds1/interact box.png'),
         interactBoxButton: new Asset('ds1/interact box button.png'),
         itemPickupBox: new Asset('ds1/item pickup.png'),
-        itemPickupPlatter: new Asset('ds1/item pickup platter.png'),
+        itemPickupDish: new Asset('ds1/item pickup dish.png'),
     },
     ds2: {
         bossHealthFrame: new Asset('ds2/boss health frame.png'),
@@ -55,6 +55,8 @@ const ASSETS = {
         bossHealthFrame: new Asset('ds3/boss health frame.png'),
         bossHealthRed: new Asset('ds3/boss health red.png'),
         bossHealthYellow: new Asset('ds3/boss health yellow.png'),
+        itemPickupBox: new Asset('ds3/item pickup box.png'),
+        itemPickupDish: new Asset('ds3/item pickup dish.png'),
     },
     sekiro: {
         areaNameBG: new Asset('sekiro/area name bg.png'),
@@ -1511,11 +1513,11 @@ async function drawDS1ItemPickupBox(ctx, canvas, gen, sliders) {
     ctx.scale(s*s0, s*s0)
     ctx.scale(.75, .75)
 
-    const { image: imageValues, quantity, imageSize, showPlatter } = sliders.ds1Pickup
+    const { image: imageValues, quantity, imageSize, showDish, imageVertical } = sliders.itemPickup
 
     // Start loading assets
     const boxPromise = ASSETS.ds1.itemPickupBox.get()
-    const platterPromise = ASSETS.ds1.itemPickupPlatter.get()
+    const dishPromise = ASSETS.ds1.itemPickupDish.get()
 
     // The Box
     const boxWidth = 1300, boxHeight = 250
@@ -1533,9 +1535,9 @@ async function drawDS1ItemPickupBox(ctx, canvas, gen, sliders) {
     ctx.fillText(quantity, 445, -8/vScale)
     ctx.restore()
 
-    // Platter
-    if (showPlatter) {
-        ctx.drawImage(await platterPromise, -500, 21)
+    // Dish
+    if (showDish) {
+        ctx.drawImage(await dishPromise, -500, 21)
     }
 
     // Item image
@@ -1543,6 +1545,60 @@ async function drawDS1ItemPickupBox(ctx, canvas, gen, sliders) {
     if (image) {
         const imageScale = rectInsideRect(imageSize, imageSize, image.width, image.height)
         const drawnWidth = image.width*imageScale, drawnHeight = image.height*imageScale
-        ctx.drawImage(image, -drawnWidth/2 -430, -drawnHeight/2 -10, drawnWidth, drawnHeight)
+        const imageX = -drawnWidth/2 -430
+        const imageY = -drawnHeight/2 + 42 - imageSize/3 + imageVertical // Slightly moves up as image gets bigger
+        ctx.drawImage(image, imageX, imageY, drawnWidth, drawnHeight)
+    }
+}
+
+/** @type {drawFun} Function which draws a DS1 item pickup box. */
+async function drawDS3ItemPickupBox(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+
+    const { image: imageValues, quantity, imageSize, imageVertical, showDish } = sliders.itemPickup
+
+    // Start loading assets
+    const boxPromise = ASSETS.ds3.itemPickupBox.get()
+    const dishPromise = ASSETS.ds3.itemPickupDish.get()
+
+    // The Box
+    const boxWidth = 1000, boxHeight = 150
+    ctx.drawImage(await boxPromise, -boxWidth/2, -boxHeight/2)
+
+    // Text
+    ctx.save()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+    ctx.textAlign = 'left'
+    drawMultilineText(ctx, caption, {x: -202, y: 6/vScale, lineHeight: sliders.font.fontSize*1.1/vScale})
+    ctx.textAlign = 'right'
+    canvas.style.fontVariantNumeric = 'lining-nums'
+    ctx.font = ctx.font // Force the number thing to apply
+    ctx.fillText(quantity, 320, 6/vScale)
+    ctx.restore()
+
+    // Dish
+    if (showDish) {
+        ctx.save()
+        const dishScale = .61
+        ctx.scale(dishScale, dishScale)
+        ctx.drawImage(await dishPromise, -300/dishScale, 24/dishScale)
+        ctx.restore()
+    }
+
+    // Item image
+    const image = imageValues.image
+    if (image) {
+        const imageScale = rectInsideRect(imageSize, imageSize, image.width, image.height)
+        const drawnWidth = image.width*imageScale, drawnHeight = image.height*imageScale
+        const imageX = -drawnWidth/2 - 268
+        const imageY = -drawnHeight/2 + 30 - imageSize/3 + imageVertical // Slightly moves up as image gets bigger
+        ctx.drawImage(image, imageX, imageY, drawnWidth, drawnHeight)
     }
 }

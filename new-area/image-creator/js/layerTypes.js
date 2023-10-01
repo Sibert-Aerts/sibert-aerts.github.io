@@ -1908,9 +1908,33 @@ layerTypes.push({
             fontSize: 39, fontWeight: 400,
             vScale: 1, charSpacing: 2,
         },
-        ds1Pickup: {}
+        itemPickup: {
+            imageSize: 160,
+        }
     },
     draw: drawDS1ItemPickupBox
+})
+
+layerTypes.push({
+    id: 'ds3:pickup',
+    type: MacroType.itemPickupBox,
+    game: Game.ds3,
+    preset: 'Item pickup',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.28,
+        },
+        font: {
+            fontFamily: 'adobe-garamond-pro', textColor: [194, 194, 192],
+            fontSize: 29, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        itemPickup: {
+            imageSize: 80,
+        }
+    },
+    draw: drawDS3ItemPickupBox
 })
 
 

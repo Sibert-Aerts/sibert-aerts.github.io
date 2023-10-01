@@ -608,8 +608,16 @@
 					</div>
 				</div>
 
-				<div name=ds1Pickup class=sliders-container hidden>
+				<div name=itemPickup class=sliders-container hidden>
 					<h4> Item Pickup </h4>
+					<div class=smol>
+						<br>
+						<label>
+							<input name=showDish type=checkbox default=true>
+							<span class=input-title>Show dish</span>
+						</label>
+						<button class="lil-button reset-button"></button>
+					</div>
 					<div class=smol>
 						<span class=input-title>Quantity:</span>
 						<button class="lil-button reset-button"></button>
@@ -620,16 +628,18 @@
 						<button class="lil-button reset-button"></button><br>
 						<div>
 							<span class=input-title style=min-width:80px;text-align:right>Select:</span>
-							<select name="image-select" root="/new-area/image-creator/assets/ds1/items" style=width:300px>
+							<select name="image-select" root="/new-area/image-creator/assets" style=width:300px>
 								<option value="">(None)</option>
-								<option value="/estus flask.png">Estus flask</option>
-								<option value="/annex key.png">Annex key</option>
-								<option value="/charcoal pine resin.png">Charcoal pine resin</option>
-								<option value="/claymore.png">Claymore</option>
-								<option value="/dragon crest shield.png">Dragon Crest Shield</option>
-								<option value="/elite knight helmet.png">Elite Knight Helmet</option>
-								<option value="/ring of favor and protection.png">Ring of favor and protection</option>
-								<option value="/boss soul.png">Boss Soul</option>
+								<optgroup label="Dark Souls">
+									<option value="/ds1/items/estus flask.png">Estus flask</option>
+									<option value="/ds1/items/annex key.png">Annex key</option>
+									<option value="/ds1/items/charcoal pine resin.png">Charcoal pine resin</option>
+									<option value="/ds1/items/claymore.png">Claymore</option>
+									<option value="/ds1/items/dragon crest shield.png">Dragon Crest Shield</option>
+									<option value="/ds1/items/elite knight helmet.png">Elite Knight Helmet</option>
+									<option value="/ds1/items/ring of favor and protection.png">Ring of favor and protection</option>
+									<option value="/ds1/items/boss soul.png">Boss Soul</option>
+								</optgroup>
 							</select>
 						</div>
 						<div>
@@ -644,14 +654,12 @@
 					<div class=smol>
 						<span class=input-title>Image size:</span>
 						<button class="lil-button reset-button"></button>
-						<input name=imageSize type=range min=50 max=250 default=160>
+						<input name=imageSize type=range min=30 max=250 default=160>
 					</div>
 					<div class=smol>
-						<label>
-							<input name=showPlatter type=checkbox default=true>
-							<span class=input-title>Show platter</span>
-						</label>
+						<span class=input-title>Image vertical:</span>
 						<button class="lil-button reset-button"></button>
+						<input name=imageVertical type=range min=-50 max=50 default=0>
 					</div>
 				</div>
 
@@ -884,6 +892,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/10/01</b> • Add Dark Souls 3 item pickup box <br>
 			<b>2023/09/30</b> • Add Dark Souls 1 item pickup box <br>
 			<b>2023/09/29</b> • Add "just an image" layer <br>
 			<b>2023/04/16</b> • Most macro types now properly handle multiline text <br>
