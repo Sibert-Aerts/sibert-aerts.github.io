@@ -405,7 +405,7 @@
 					<div class=smol>
 						<span class=input-title>Type:</span>
 						<button class="lil-button reset-button"></button>
-						<select name=type as=float default=1>
+						<select name=type as=int default=1>
 							<option value=0>Bleed</option>
 							<option value=1>Poison</option>
 							<option value=2>Toxic</option>
@@ -437,7 +437,7 @@
 					<div class=smol>
 						<span class=input-title>Type:</span>
 						<button class="lil-button reset-button"></button>
-						<select name=type as=float default=0>
+						<select name=type as=int default=0>
 							<option value=0>Poison</option>
 							<option value=1>Scarlet Rot</option>
 							<option value=2>Bleed</option>
@@ -496,12 +496,12 @@
 					<div class=smol>
 						<span class=input-title>Lives:</span>
 						<button class="lil-button reset-button"></button>
-						<input name=livesLeft type=number min=0 default=1 as=float>
+						<input name=livesLeft type=number min=0 default=1 as=int>
 					</div>
 					<div class=smol>
 						<span class=input-title>Spent lives:</span>
 						<button class="lil-button reset-button"></button>
-						<input name=livesSpent type=number min=0 default=0 as=float>
+						<input name=livesSpent type=number min=0 default=0 as=int>
 					</div>
 				</div>
 
@@ -608,7 +608,7 @@
 					</div>
 				</div>
 
-				<div name=itemPickup class=sliders-container hidden>
+				<div name=itemPickupDS1DS3 class=sliders-container hidden>
 					<h4> Item Pickup </h4>
 					<div class=smol>
 						<br>
@@ -623,6 +623,47 @@
 						<button class="lil-button reset-button"></button>
 						<input name=quantity type=text default=1>
 					</div>
+				</div>
+
+				<div name=itemPickupER class=sliders-container hidden>
+					<h4> Item Pickup </h4>
+					<div class=smol>
+						<span class=input-title>Rarity:</span>
+						<button class="lil-button reset-button"></button>
+						<select name="rarity" default="Black">
+							<option value="Black">Black</option>
+							<option value="Purple">Purple</option>
+							<option value="Gold">Gold</option>
+						</select>
+					</div>
+					<div class=smol>
+						<span class=input-title>Item Category:</span>
+						<button class="lil-button reset-button"></button>
+						<select name=itemCategory as=int default=18>
+							<option value=18>Consumables</option>
+							<option value=11>Keys</option>
+							<option value=14>Crafting Ingredients</option>
+							<option value=12>Upgrade Materials</option>
+							<option value=8>Ashes of War</option>
+							<option value=13>Spirit Ashes</option>
+							<option value=3>Talismans</option>
+							<option value=7>Armaments</option>
+							<option value=4>Shields</option>
+							<option value=17>Bows and Crossbows</option>
+							<option value=5>Arrows</option>
+							<option value=6>Head Armor</option>
+							<option value=2>Chest Armor</option>
+							<option value=16>Arm Armor</option>
+							<option value=15>Leg Armor</option>
+							<option value=1>Gestures</option>
+							<option value=9>Sorcery Scrolls</option>
+							<option value=10>Incantation Prayerbooks</option>
+							<option value=0>Advice</option>
+						</select>
+					</div>
+				</div>
+					
+				<div name=itemPickupImage class=sliders-container hidden>
 					<div class=image-slider name=image>
 						<span class=input-title>Image:</span>
 						<button class="lil-button reset-button"></button><br>
@@ -906,6 +947,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2023/10/03</b> • Add Elden Ring item pickup box <br>
 			<b>2023/10/01</b> • Add Dark Souls 3 item pickup box <br>
 			<b>2023/09/30</b> • Add Dark Souls 1 item pickup box <br>
 			<b>2023/09/29</b> • Add "just an image" layer <br>

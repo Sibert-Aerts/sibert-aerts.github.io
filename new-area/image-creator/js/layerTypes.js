@@ -1908,7 +1908,8 @@ layerTypes.push({
             fontSize: 39, fontWeight: 400,
             vScale: 1, charSpacing: 2,
         },
-        itemPickup: {
+        itemPickupDS1DS3: {},
+        itemPickupImage: {
             imageSize: 160,
             image: {'select': '/ds1/items/annex key.png'},
         }
@@ -1931,12 +1932,37 @@ layerTypes.push({
             fontSize: 29, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
-        itemPickup: {
+        itemPickupDS1DS3: {},
+        itemPickupImage: {
             imageSize: 90,
             image: {'select': '/ds3/items/estus flask.png'},
         }
     },
     draw: drawDS3ItemPickupBox
+})
+
+layerTypes.push({
+    id: 'er:pickup',
+    type: MacroType.itemPickupBox,
+    game: Game.er,
+    preset: 'Item pickup',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0.192,
+        },
+        font: {
+            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [185, 190, 185],
+            fontSize: 24, fontWeight: 400,
+            vScale: 1, charSpacing: 0,
+        },
+        itemPickupER: {},
+        itemPickupImage: {
+            imageSize: 160,
+            image: {'select': '/ds3/items/estus flask.png'},
+        }
+    },
+    draw: drawERItemPickupBox
 })
 
 

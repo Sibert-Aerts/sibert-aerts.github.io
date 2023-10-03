@@ -82,6 +82,11 @@ const ASSETS = {
         poisonBarFill: new Asset('eldenRing/poison bar fill.png'),
         poisonBarCap: new Asset('eldenRing/poison bar cap.png'),
         poisonIcons: new Asset('eldenRing/poison icons.png'),
+
+        itemPickupBoxBlack: new Asset('eldenRing/item pickup box black.png'),
+        itemPickupBoxPurple: new Asset('eldenRing/item pickup box purple.png'),
+        itemPickupBoxGold: new Asset('eldenRing/item pickup box gold.png'),
+        itemCategoryBadges: new Asset('eldenRing/item category badges.png'),
     }
 }
 
@@ -1513,7 +1518,8 @@ async function drawDS1ItemPickupBox(ctx, canvas, gen, sliders) {
     ctx.scale(s*s0, s*s0)
     ctx.scale(.75, .75)
 
-    const { image: imageValues, quantity, imageSize, showDish, imageVertical } = sliders.itemPickup
+    const { quantity, showDish } = sliders.itemPickupDS1DS3
+    const { image: imageValues, imageSize, imageVertical } = sliders.itemPickupImage
 
     // Start loading assets
     const boxPromise = ASSETS.ds1.itemPickupBox.get()
@@ -1562,7 +1568,8 @@ async function drawDS3ItemPickupBox(ctx, canvas, gen, sliders) {
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
 
-    const { image: imageValues, quantity, imageSize, imageVertical, showDish } = sliders.itemPickup
+    const { quantity, showDish } = sliders.itemPickupDS1DS3
+    const { image: imageValues, imageSize, imageVertical } = sliders.itemPickupImage
 
     // Start loading assets
     const boxPromise = ASSETS.ds3.itemPickupBox.get()
@@ -1599,6 +1606,55 @@ async function drawDS3ItemPickupBox(ctx, canvas, gen, sliders) {
         const drawnWidth = image.width*imageScale, drawnHeight = image.height*imageScale
         const imageX = -drawnWidth/2 - 268
         const imageY = -drawnHeight/2 + 30 - imageSize/3 + imageVertical // Slightly moves up as image gets bigger
+        ctx.drawImage(image, imageX, imageY, drawnWidth, drawnHeight)
+    }
+}
+
+/** @type {drawFun} Function which draws a DS1 item pickup box. */
+async function drawERItemPickupBox(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = w/1920
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
+    
+    const { rarity, itemCategory } = sliders.itemPickupER
+    const { image: imageValues, imageSize, imageVertical } = sliders.itemPickupImage
+    
+    // Start loading assets
+    const boxPromise = ASSETS.eldenRing['itemPickupBox' + rarity].get()
+    const itemCategoryBadgesPromise = ASSETS.eldenRing.itemCategoryBadges.get()
+
+    // The Box
+    const boxWidth = 1500, boxHeight = 600
+    ctx.save()
+    ctx.scale(0.5, 0.5)
+    ctx.drawImage(await boxPromise, -boxWidth/2, -boxHeight/2)
+    ctx.restore()
+
+    // Item Category Badge
+    ctx.save()
+    ctx.scale(0.5, 0.5)
+    ctx.drawImage(await itemCategoryBadgesPromise, itemCategory*150, 0, 150, 150, -605, -232, 150, 150)
+    ctx.restore()
+
+    // Text
+    ctx.save()
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+    ctx.textAlign = 'center'
+    drawMultilineText(ctx, caption, {x: 0, y: -80/vScale, lineHeight: sliders.font.fontSize*1.1/vScale})
+    ctx.restore()
+
+    // Item image
+    const image = imageValues.image
+    if (image) {
+        const imageScale = rectInsideRect(imageSize, imageSize, image.width, image.height)
+        const drawnWidth = image.width*imageScale, drawnHeight = image.height*imageScale
+        const imageX = -drawnWidth/2
+        const imageY = 30 + imageVertical - drawnHeight/2
         ctx.drawImage(image, imageX, imageY, drawnWidth, drawnHeight)
     }
 }

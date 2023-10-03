@@ -17,6 +17,10 @@ const CONVERTERS = {
         parse(x) { return x }
         toString(x) { return x }
     },
+    int: class {
+        parse(x) { return parseInt(x) }
+        toString(x) { return x.toString() }
+    },
     float: class {
         parse(x) { return parseFloat(x) }
         toString(x) { return x.toString() }
@@ -188,7 +192,6 @@ class ImageHandlerSlider extends Slider {
         super(resetButton)
         this.imageHandler = new ImageHandler(element)
         this.imageHandler.onload = this.imageHandler.onerror = () => {
-            console.log(this.isDefault)
             this.dispatchEvent(new Event('change'))
             if (this.isDefault) this.isDefault--
         }
