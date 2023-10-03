@@ -1898,6 +1898,7 @@ layerTypes.push({
     type: MacroType.itemPickupBox,
     game: Game.ds1,
     preset: 'Item pickup',
+    preferCase: 'title case',
 
     sliders: {
         position: {
@@ -1922,6 +1923,7 @@ layerTypes.push({
     type: MacroType.itemPickupBox,
     game: Game.ds3,
     preset: 'Item pickup',
+    preferCase: 'title case',
 
     sliders: {
         position: {
@@ -1946,6 +1948,7 @@ layerTypes.push({
     type: MacroType.itemPickupBox,
     game: Game.er,
     preset: 'Item pickup',
+    preferCase: 'title case',
 
     sliders: {
         position: {
@@ -1959,7 +1962,7 @@ layerTypes.push({
         itemPickupER: {},
         itemPickupImage: {
             imageSize: 160,
-            image: {'select': '/ds3/items/estus flask.png'},
+            image: {'select': '/eldenRing/items/red flask.png'},
         }
     },
     draw: drawERItemPickupBox

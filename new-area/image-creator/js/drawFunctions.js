@@ -210,9 +210,7 @@ function drawMultilineText(ctx, text, {x=0, y=0, lineHeight=0, align='center', s
             ctx.strokeText(lines[i], x, y0 + lineHeight*i)
         }
     }
-    for (let i=0; i<lines.length; i++) {
-        ctx.fillText(lines[i], x, y0 + lineHeight*i)
-    }
+    drawMultilineTextRaw(ctx, lines, x, y0, lineHeight)
 }
 
 /** Draw multiple lines of text above one another, no bells and whistles. */
@@ -503,8 +501,8 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
 
     // USER INPUT
     const { xOffset, yOffset, scale: s0 } = sliders.position
-    ctx.translate(xOffset * w, yOffset * h)
-    s *= s0
+    ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
+    ctx.scale(s*s0, s*s0)
 
     //// TEXT
     const textColor = sliders.font.textColor
@@ -515,17 +513,12 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     byId('adobe-font-trick').innerText = symbol    
 
     // First: the characters
-    ctx.font = `800 ${symbolSize*s}px ${symbolFont || 'serif'}`
+    ctx.font = `800 ${symbolSize}px ${symbolFont || 'serif'}`
     ctx.textBaseline = 'middle'
-    ctx.filter = `blur(${sqrt(s)/2}px)`
+    ctx.filter = `blur(${sqrt(s*s0)/2}px)`
 
-    function drawSymbols() {
-        const baseY = (h/2 + symbolPos*s) - (symbol.length-1)*(symbolSize+symbolSpace)*s
-        for(let i = 0; i < symbol.length; i++ ) {
-            ctx.fillText(symbol[i], w/2, baseY + i*(symbolSize+symbolSpace)*s)
-        }
-    }
-    
+    const symbolsMultiline = Array.from(symbol).join('\n')
+
     /// First: Draw the characters black (invisible) multiple times to get more glow.
     ctx.globalCompositeOperation = blendMode
     ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
@@ -534,31 +527,32 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
         // Extending the blur size for over-opacity gives a nicer, smoother effect
         ctx.shadowBlur = glowSize * max(opacity, 1)
         ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
-        drawSymbols()
+        drawMultilineText(ctx, symbolsMultiline, {y: symbolPos, lineHeight: symbolSize+symbolSpace, align: 'bottom'})
         opacity--
     }
     /// Turn off the shadow and blend mode to draw the characters normal
     ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
     ctx.shadowBlur = 0
     ctx.fillStyle = `rgb(${textColor.join()})`
-    drawSymbols()
+    drawMultilineText(ctx, symbolsMultiline, {y: symbolPos, lineHeight: symbolSize+symbolSpace, align: 'bottom'})
 
     /// Finally: Do the same with the caption    
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+    const lines = caption.split('\n')
 
     ctx.globalCompositeOperation = blendMode
     ctx.fillStyle = (blendMode === 'lighter')? `#000000`: `rgb(${glowColor.join()})`
     ctx.shadowBlur = glowSize / 5
     for( let opacity=glowOpacity*textOpacity*secretFactor; opacity > 0; ) {
         ctx.shadowColor = `rgba(${glowColor.join()}, ${opacity})`
-        ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
+        drawMultilineTextRaw(ctx, lines, 0, (0.196*h*s0) /vScale, sliders.font.fontSize*1.1)
         opacity--
     }
 
     ctx.globalCompositeOperation = 'source-over' // blend mode: Normal
     ctx.shadowBlur = 0
     ctx.fillStyle = `rgb(${textColor.join()}, ${textOpacity})`
-    ctx.fillText(caption, w/2, (h/2 + 0.196*h*s0) /vScale)
+    drawMultilineTextRaw(ctx, lines, 0, (0.196*h*s0) /vScale, sliders.font.fontSize*1.1)
 }
 
 
@@ -1645,7 +1639,7 @@ async function drawERItemPickupBox(ctx, canvas, gen, sliders) {
     ctx.save()
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textAlign = 'center'
-    drawMultilineText(ctx, caption, {x: 0, y: -80/vScale, lineHeight: sliders.font.fontSize*1.1/vScale})
+    drawMultilineText(ctx, caption, {x: 0, y: -80/vScale, lineHeight: sliders.font.fontSize*1.1/vScale, align: 'top'})
     ctx.restore()
 
     // Item image
