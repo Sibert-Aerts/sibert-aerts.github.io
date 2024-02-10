@@ -25,14 +25,14 @@ a {
 
 body {
     min-height: 100vh;
-    display: flex; 
-    flex-direction: column; 
+    display: flex;
+    flex-direction: column;
 
     font-family: adobe-garamond-pro, Minion Pro, Georgia, serif;
     font-weight: 400;
     font-style: normal;
     color: white;
-    
+
     background-attachment: fixed;
     background-position-x: center;
 }
@@ -140,7 +140,7 @@ body {
 #generate-input-wrapper {
     margin-left: 10%;
     width: 90%;
-    
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -285,7 +285,7 @@ body {
     z-index: -1;
     background-attachment: fixed;
     background-position-x: center;
-    
+
     opacity: 1;
     -webkit-transition: opacity 0s ease;
     transition: opacity 0s ease;
@@ -306,7 +306,7 @@ body {
 .emoji-button {
     background: none;
     border: none;
-    
+
     font-family: Arial;
     font-size: 18px;
     font-weight: bolder;
@@ -326,7 +326,7 @@ body {
     float: right;
 }
 
-/* 
+/*
  *
  * IMAGE GENERATOR STUFF
  *
@@ -386,7 +386,7 @@ canvas.big {
         width: calc(100% + 32px);
         margin: 0 -16px 0 -16px;
     }
-    
+
     .sliders-pane {
         float: left;
         width: 100%;
@@ -679,7 +679,7 @@ input.bad-url {
 .cookie-banner > * { margin-left: 2em }
 
 
-/* 
+/*
  *   ADAPTIVE SCREEN SIZE STUFF - NEEDS TO BE AT THE BOTTOM SO IT TAKES PRECEDENCE!
  */
  @media screen and (max-width: 720px) { /** EVERYTHING AT MOST 720px WIDE: PHONES */
@@ -750,7 +750,7 @@ input.bad-url {
     #generate-button, .save-buttons {
         font-size: 20px;
     }
-    
+
 }
 
 @media screen and (min-width: 1000px) {  /** EVERYTHING AT LEAST 1000px WIDE */
@@ -771,4 +771,12 @@ input.bad-url {
     body, .background-layer {
         background-size: cover;
     }
+}
+
+/* FONTS */
+
+@font-face {
+    /* Had to 'mangle' the font name because CSS HATES it when it starts with a number? */
+    font-family: '_3270 Regular';
+    src: url(image-creator/assets/font/3270-Regular.ttf);
 }

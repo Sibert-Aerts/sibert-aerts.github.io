@@ -69,7 +69,7 @@ const ASSETS = {
         bossLife: new Asset('sekiro/boss life.png'),
         bossLostLife: new Asset('sekiro/boss lost life.png'),
         bossNameBG: new Asset('sekiro/boss name bg.png'),
-    },    
+    },
     eldenRing: {
         bossHealthBase: new Asset('eldenRing/boss health base.png'),
         bossHealthYellow: new Asset('eldenRing/boss health yellow.png'),
@@ -134,7 +134,7 @@ function makePresetGradient(ctx, key, width, x=0, opacity=1, mul=undefined) {
 //========================       DRAWABLES       =========================
 //========================================================================
 
-/** 
+/**
  * @typedef {(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, gen: MacroGenerator, sliders: any) => void} drawFun
  */
 
@@ -163,7 +163,7 @@ function drawShadowBar(ctx, canvas, gen, sliders, s0) {
     if( softnessHigh > 0 )
         ctx.filter = `blur(${floor(shadowHeight*softnessHigh/4)}px)`
 
-    ctx.fillRect(-shadowHeight/2, top, w+shadowHeight, shadowHeight)    
+    ctx.fillRect(-shadowHeight/2, top, w+shadowHeight, shadowHeight)
     ctx.filter = 'none'
 }
 
@@ -190,7 +190,7 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
     ctx.fillStyle = `rgb(${textColor.join()})`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    
+
     ctx.scale(1, vScale)
 
     return [caption, vScale]
@@ -221,7 +221,7 @@ function drawMultilineTextRaw(ctx, lines, x, y, lineHeight) {
 }
 
 /**
- * @param {CanvasRenderingContext2D} ctx 
+ * @param {CanvasRenderingContext2D} ctx
  */
 function storeAndRemoveAlpha(ctx) {
     const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -303,7 +303,7 @@ function drawNounVerbed(ctx, canvas, gen, sliders) {
         drawMultilineTextRaw(ctx, lines, 0, linesY0 + voff*(scaleFactor-1)/vScale, fontSize*s*0.9)
         ctx.restore()
     }
-    
+
     ctx.restore()
 
     // Draw the regular text on top
@@ -352,7 +352,7 @@ function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     ctx.fillText(caption, 0, -5*s/vScale)
     ctx.restore()
-    
+
     //// SUBCAPTION
     const { fontFamily, textColor } = sliders.font
     const { subCaption } = sliders.subCaption
@@ -421,11 +421,11 @@ function drawGlowyText(ctx, canvas, gen, sliders) {
         opacity--
     }
     ctx.restore()
-    
+
     //// RAINBOW: PAYOFF
     if (gradientKey) {
         // Turns out the combination of multiply-then-add attempted has unusual behaviour due to
-        //  how transparency and blend modes (don't quite) work together, resulting in some ugly artifacts. 
+        //  how transparency and blend modes (don't quite) work together, resulting in some ugly artifacts.
         // I solve it by first completely removing transparency from the temp layer,
         //  and putting it back after the multiply. (Inefficient since this is not hardware accelerated.)
         const originalAlphas = storeAndRemoveAlpha(ctx)
@@ -461,13 +461,13 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
     //// SHADE
     // The shade only moves up or down
     ctx.translate(0, y0)
-    drawShadowBar(ctx, canvas, gen, sliders, s0)   
+    drawShadowBar(ctx, canvas, gen, sliders, s0)
     ctx.translate(x0, 0)
 
 
     //// TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
-    
+
     // Regular text
     if (gradientKey) {
         var gradientWidth = gradient.gradientScale * 1920 * s
@@ -476,7 +476,7 @@ function drawEldenNounVerbed(ctx, canvas, gen, sliders) {
         ctx.fillStyle = `rgba(${textColor.join()}, ${textOpacity})`
     }
     drawMultilineText(ctx, caption, {lineHeight: fontSize*s})
-    
+
     // Ghost effect goes on top
     ctx.globalCompositeOperation = 'lighter' // blend mode: Add
     ctx.shadowBlur = 1
@@ -508,9 +508,9 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     const textColor = sliders.font.textColor
     const { symbolFont, symbol, symbolSize, symbolPos, symbolSpace } = sliders.sekiro
     const { textOpacity, glowColor, glowSize, glowOpacity, blendMode, secretFactor } = sliders.glowy
-    
+
     // Trick to make the japanese font work (for lack of an explicit API)
-    byId('adobe-font-trick').innerText = symbol    
+    byId('adobe-font-trick').innerText = symbol
 
     // First: the characters
     ctx.font = `800 ${symbolSize}px ${symbolFont || 'serif'}`
@@ -536,7 +536,7 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     ctx.fillStyle = `rgb(${textColor.join()})`
     drawMultilineText(ctx, symbolsMultiline, {y: symbolPos, lineHeight: symbolSize+symbolSpace, align: 'bottom'})
 
-    /// Finally: Do the same with the caption    
+    /// Finally: Do the same with the caption
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
     const lines = caption.split('\n')
 
@@ -568,7 +568,7 @@ function drawAreaName(ctx, canvas, gen, sliders) {
     const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
-    
+
     // Shadow style
     ctx.shadowOffsetX = 2*s
     ctx.shadowOffsetY = 1*s
@@ -619,7 +619,7 @@ function drawDS2AreaName(ctx, canvas, gen, sliders) {
     const { lineWidth, lineColor } = sliders.outline
     ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
     s *= s0
-    
+
     // UNDERLINE
     if( ulLength > 0 ) {
         // The gradient
@@ -736,7 +736,7 @@ async function drawSekiroAreaName(ctx, canvas, gen, sliders) {
     const offsetFactor = useLargeImage? 1: magicFactor
     ctx.drawImage(img, -1254*offsetFactor, (-185 - 60/frameHeight)*offsetFactor)
     ctx.restore()
-    
+
     // Shadow style
     ctx.shadowOffsetX = 2
     ctx.shadowOffsetY = 1
@@ -896,7 +896,7 @@ async function drawMelee(ctx, canvas, gen, sliders) {
     //// THE TWO OUTLINES
     if( lineWidth > 0 ) {
         ctx.miterLimit = 3
-        
+
         ctx.shadowBlur = 0
         ctx.shadowColor = `rgba(0, 0, 0, ${shadowOpacity})`
         ctx.shadowOffsetX = ctx.shadowOffsetY = 15*s
@@ -904,14 +904,14 @@ async function drawMelee(ctx, canvas, gen, sliders) {
         ctx.strokeStyle = `#000000`
         ctx.lineWidth = 3.2 * lineWidth * s
         ctx.strokeText(caption, 0, 0)
-        
+
         ctx.shadowOffsetX = ctx.shadowOffsetY = 0
 
         ctx.strokeStyle = `#ffffff`
         ctx.lineWidth = lineWidth * s
         ctx.strokeText(caption, 0, 0)
     }
-    
+
     //// CREATE A TEMP CANVAS TO ACHIEVE OUR COOL EFFECTS (PAIN IN THE ASS)
     const [temp, tctx] = gen.getTempCanvasAndContext()
 
@@ -965,10 +965,57 @@ async function drawImage(ctx, canvas, gen, sliders) {
 
     /** @type {HTMLImageElement} */
     const image = sliders.simpleImage.image.image
-    // NOTE: 
+    // NOTE:
     if (image)
         ctx.drawImage(image, -image.width/2, -image.height/2)
-    
+
+}
+
+/** @type {drawFun} Function which draws a Lethal Company loot indicator. */
+function drawLethalCompanyLoot(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
+    ctx.scale(s*s0, s*s0)
+
+    // VALUES
+    const { textColor, fontWeight, fontSize, fontFamily } = sliders.font
+    const { value } = sliders.lethalLoot
+
+    // CIRCLES
+    function drawCircle(radius, strokeStyle) {
+        ctx.strokeStyle = strokeStyle
+        ctx.lineWidth = 4
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+    drawCircle(78,  '#44ff0060')
+    drawCircle(88,  '#44ff0060')
+    drawCircle(136, '#44ff0060')
+    drawCircle(212, '#44ff0030')
+    drawCircle(232, '#44ff0030')
+    drawCircle(242, '#44ff0030')
+
+    // RECTANGLES
+    ctx.fillStyle = '#22991188'
+    ctx.fillRect(70, -92, 490, 80)
+    ctx.fillRect(70, 0, 358, 49)
+
+    // TEXT
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = `rgb(${textColor.join()}, .8)`
+    ctx.fillText(caption, 70, -40)
+
+    // SMALLER TEXT
+    ctx.font = `${fontWeight} ${fontSize*0.7}px ${fontFamily}`
+    ctx.fillText(`Value: ${value}`, 70, 30)
 }
 
 
@@ -987,10 +1034,10 @@ async function drawDS1Boss(ctx, canvas, gen, sliders) {
 
     const {health, recentDamage, damageNumber} = sliders.boss
 
-    // Transparent grey background    
+    // Transparent grey background
     ctx.fillStyle = 'rgba(20, 20, 20, .5)'
     ctx.fillRect(-670, -6, 1335, 25)
-    
+
     // Yellow health bar
     const yellowGrad = ctx.createLinearGradient(0, -6, 0, 25)
     yellowGrad.addColorStop(0, '#6b651e')
@@ -1015,7 +1062,7 @@ async function drawDS1Boss(ctx, canvas, gen, sliders) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -655, -30/vScale)
-    
+
     ctx.textAlign = 'right'
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
@@ -1041,7 +1088,7 @@ async function drawDS2Boss(ctx, canvas, gen, sliders) {
     const redPromise = ASSETS.ds2.bossHealthRed.get()
 
     // The main healthbar texture
-    ctx.drawImage(await framePromise, -346, -14)    
+    ctx.drawImage(await framePromise, -346, -14)
     // Yellow health bar
     ctx.drawImage(await yellowPromise, -346+14, -14+9, 664 * min(1, health+recentDamage), 9)
     // Red health bar
@@ -1057,7 +1104,7 @@ async function drawDS2Boss(ctx, canvas, gen, sliders) {
     ctx.textAlign = 'left'
     ctx.strokeText(caption, -345, -18/vScale)
     ctx.fillText(caption, -345, -18/vScale)
-    
+
     ctx.textAlign = 'right'
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
@@ -1104,7 +1151,7 @@ async function drawDS3Boss(ctx, canvas, gen, sliders) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -496, -17/vScale)
-    
+
     ctx.textAlign = 'right'
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
@@ -1137,11 +1184,11 @@ async function drawSekiroBoss(ctx, canvas, gen, sliders) {
     ctx.scale(.5538, .5538)
     // The main healthbar texture
     ctx.drawImage(await basePromise, 0, 0)
-    
+
     // Damage health bar
     let barWidth = 32 + 740 * min(1, health+recentDamage)
     ctx.drawImage(await damagePromise, 0, 0, barWidth, 71, 0, 0, barWidth, 71)
-    
+
     // Red health bar
     barWidth = 32 + 740 * health
     ctx.drawImage(await redPromise, 0, 0, barWidth, 71, 0, 0, barWidth, 71)
@@ -1196,7 +1243,7 @@ async function drawBloodborneBoss(ctx, canvas, gen, sliders) {
 
     // The main healthbar texture
     ctx.drawImage(await basePromise, -680, -40)
-    
+
     // Red health bar
     let barWidth = 54 + 1253 * health
     ctx.drawImage(await redPromise, 0, 0, barWidth, 80, -680, -40, barWidth, 80)
@@ -1215,7 +1262,7 @@ async function drawBloodborneBoss(ctx, canvas, gen, sliders) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -640, -23/vScale)
-    
+
     ctx.textAlign = 'right'
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
@@ -1246,15 +1293,15 @@ async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
     ctx.scale(.5, .5) // Elden Ring uses 4K textures
 
     // Backing shadow
-    ctx.drawImage(await basePromise, -1049, -50)    
+    ctx.drawImage(await basePromise, -1049, -50)
     // Yellow health bar
     let barWidth = 50 + 1998 * min(1, health+recentDamage)
-    ctx.drawImage(await yellowPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)    
+    ctx.drawImage(await yellowPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
     // Red health bar
     barWidth = 50 + 1998 * health
     ctx.drawImage(await redPromise, 0, 0, barWidth, 100, -1049, -50, barWidth, 100)
     // The tip
-    ctx.drawImage(await tipPromise, -1049+barWidth-53, -50)    
+    ctx.drawImage(await tipPromise, -1049+barWidth-53, -50)
     // The frame
     ctx.drawImage(await framePromise, -1049, -50)
 
@@ -1270,7 +1317,7 @@ async function drawEldenRingBoss(ctx, canvas, gen, sliders) {
     ctx.textBaseline = 'alphabetic'
     ctx.textAlign = 'left'
     ctx.fillText(caption, -500, -15/vScale)
-    
+
     ctx.textAlign = 'right'
     canvas.style.fontVariantNumeric = 'lining-nums'
     ctx.font = ctx.font // Force the number thing to apply
@@ -1307,10 +1354,10 @@ async function drawDS1Poison(ctx, canvas, gen, sliders) {
     const frameWidth = maxPoison
     const barWidth = min(maxPoison, poison)
 
-    // Solid grey background    
+    // Solid grey background
     ctx.fillStyle = 'rgb(71, 71, 71)'
     ctx.fillRect(0, -frameHeight/2, frameWidth, frameHeight)
-    
+
     // Bar (gradient)
     const colours = active==='active'? ['#70641f', '#3a3310', '#574e19']: ['#3c006b', '#20003a', '#32005a']
     const gradient = ctx.createLinearGradient(0, -frameHeight/2, 0, frameHeight/2)
@@ -1353,7 +1400,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     const frameWidth = maxPoison
     const barWidth = min(maxPoison, poison)
 
-    // Transparent black backdrop    
+    // Transparent black backdrop
     ctx.fillStyle = 'rgba(0, 0, 0, .5)'
     ctx.fillRect(0, -fillHeight/2, frameWidth, fillHeight)
 
@@ -1372,7 +1419,7 @@ async function drawERPoison(ctx, canvas, gen, sliders) {
     const cropWidth = frameWidth + 42
     ctx.drawImage(await framePromise, 1501-cropWidth, 0, cropWidth, 100, 0, -50, cropWidth, 100)
     ctx.drawImage(await endCapPromise, -fillLeft, -50)
-    
+
     // The icon
     ctx.scale(.88, .88)
     ctx.drawImage(await iconsPromise, 0, type*106, 106, 106, -106, -106/2, 106, 106)
@@ -1423,7 +1470,7 @@ async function drawDS1InteractBox(ctx, canvas, gen, sliders) {
         if (selected) {
             const xo = (selected=='first')? -280: 280
             ctx.drawImage(await buttonPromise, xo-boxWidth/2, -boxHeight/2)
-        }        
+        }
         applyFontSliders(ctx, canvas, gen, sliders)
         ctx.fillText(option1, -280, 42/vScale)
         ctx.fillText(option2,  280, 42/vScale)
@@ -1472,7 +1519,7 @@ async function drawDS2InteractBox(ctx, canvas, gen, sliders) {
         let btn = await (selected? buttonOrangePromise: buttonBluePromise)
         ctx.drawImage(btn, -buttonWidth/2, 50-buttonHeight/2)
         ctx.restore()
-        
+
         // LABEL
         applyFontSliders(ctx, canvas, gen, sliders)
         ctx.strokeText(option1 || option2, 0, 76/vScale)
@@ -1614,10 +1661,10 @@ async function drawERItemPickupBox(ctx, canvas, gen, sliders) {
     const { xOffset, yOffset, scale: s0 } = sliders.position
     ctx.translate((xOffset+.5) * w, (yOffset+.5) * h)
     ctx.scale(s*s0, s*s0)
-    
+
     const { rarity, itemCategory } = sliders.itemPickupER
     const { image: imageValues, imageSize, imageVertical } = sliders.itemPickupImage
-    
+
     // Start loading assets
     const boxPromise = ASSETS.eldenRing['itemPickupBox' + rarity].get()
     const itemCategoryBadgesPromise = ASSETS.eldenRing.itemCategoryBadges.get()

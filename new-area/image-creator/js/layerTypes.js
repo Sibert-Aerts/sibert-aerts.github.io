@@ -37,18 +37,18 @@ const gameName = {
     er:  'Elden Ring',
 }
 
-/** 
+/**
  * @typedef {Object} DrawableLayer
- * 
+ *
  * @prop {string} id
  * @prop {keyof MacroType} type
  * @prop {keyof Game} game
  * @prop {string} preset
  * @prop {bool} preventAsRandomDefault
- * 
+ *
  * @prop {'all caps' | 'title case' | undefined} preferCase
  * @prop {object} sliders
- * 
+ *
  * @prop {drawFun} draw()
  */
 
@@ -1994,6 +1994,26 @@ layerTypes.push({
 })
 
 layerTypes.push({
+    id: 'sp:lethal-loot',
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'Lethal Company Loot',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontFamily: '_3270 Regular', textColor: [80, 255, 0],
+            fontSize: 40, fontWeight: 300,
+            vScale: 1, charSpacing: 0,
+        },
+        lethalLoot: {},
+    },
+    draw: drawLethalCompanyLoot,
+})
+
+layerTypes.push({
     id: 'sp:snapchat',
     type: MacroType.special,
     game: Game.ds1,
@@ -2063,15 +2083,15 @@ layerTypes.push({
 
 //// Populate objects storing the different layers.
 
-/** 
+/**
  * Object containing all types of drawable layers, indexed by type > game > preset
  * @type { {[type in keyof MacroType] : {[type in keyof Game]: {[preset: string]: DrawableLayer }? }} }
  */
 const layerTypesMap = {}
 
-/** 
+/**
  * Object containing all types of drawable layers, indexed by id
- * @type { {[id: string] : DrawableLayer } 
+ * @type { {[id: string] : DrawableLayer }
  */
 const layerIdMap = {}
 

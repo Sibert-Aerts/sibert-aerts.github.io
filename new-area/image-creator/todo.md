@@ -3,8 +3,9 @@
 
 * Macro types:
     * !! TOXIC !! (status infliction warning)
-    * Character dialogue 
+    * Character dialogue
     * [requires assets] Notification box ("xyz has returned to their world, etc.")
+    * multiplayer name tags w/ health bar ("Dark Spirit / Kirk, Knight of Thorns / [=============   ]")
 
 * FEATURES:
     * Implement line breaks good

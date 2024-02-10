@@ -28,7 +28,7 @@
 		family=Spectral:wght@200;300;400;500;600;700;800
 		&family=Cormorant+Garamond:wght@300;400;500;600;700
 		&display=swap" rel="stylesheet">
-	
+
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
 	<!-- Script to make it easier to opt-in and opt-out -->
@@ -46,7 +46,7 @@
 	<script type="text/javascript" src="js/macroGenerator.js"></script>
 	<script type="text/javascript" src="js/drawFunctions.js"></script>
 	<script type="text/javascript" src="js/layerTypes.js"></script>
-	
+
 	<!-- Specific page-setup script -->
 	<script type="text/javascript" src="js/bootstrapper.js"></script>
 
@@ -57,14 +57,14 @@
 	<meta name=twitter:title    content="FromSoft Image Macro Creator">
 	<meta name=twitter:description content="Create convincing looking image macros based on FromSoft games.">
 	<meta name=twitter:image    content=https://i.imgur.com/5G0zd3M.png> <!-- TEMP IMAGE? -->
-		
+
 </head>
 
 <body style="background-image: url(https://i.imgur.com/Fcq8N5o.jpg); background-color: #544b4f;">
 
 <div id=main style="margin-bottom: 100px">
 	<div id=main-content class=content>
-		
+
 		<div class=canvas-pane>
 			<h1>FromSoftware image macro creator</h1>
 
@@ -86,12 +86,12 @@
 				</div>
 				<canvas id=canvas class=big width=1920px height=1080px>
 			</div>
-			
+
 			<div style="text-align:center">
 				<div class=info>
 					Canvas resolution: <span id="canv-res-x"></span> × <span id="canv-res-y"></span>px
 				</div>
-				
+
 				<div class=save-buttons>
 					<button class=soulsy-box onclick=macroGen.redrawMacro() hidden>Render changes</button>
 					<button style=margin-left:20px class=soulsy-box onclick=macroGen.saveImage()>Download image</button>
@@ -102,7 +102,7 @@
 		<div id=sliders-pane class=sliders-pane>
 
 			<div id=sliders-tabs class='tabs editor-tabs'>
-				<label class='tab'> 
+				<label class='tab'>
 					<input type=radio name=tabs value=layers>
 					<div class="icon icon-layers"></div>
 				</label>
@@ -110,19 +110,19 @@
 					<input type=radio name=tabs value=all checked>
 					<div class="icon icon-all"></div>
 				</label>
-				<label class=tab> 
+				<label class=tab>
 					<input type=radio name=tabs value=global-sliders>
 					<div class="icon icon-selects"></div>
 				</label>
-				<label class=tab> 
+				<label class=tab>
 					<input type=radio name=tabs value=macro-sliders>
 					<div class="icon icon-sliders"></div>
 				</label>
-				<label class=tab> 
+				<label class=tab>
 					<input type=radio name=tabs value=background-stuff>
 					<div class="icon icon-background"></div>
 				</label>
-				<label class='tab hidden'> 
+				<label class='tab hidden'>
 					<input type=radio name=tabs value=settings>
 					<div class="icon icon-settings"></div>
 				</label>
@@ -662,7 +662,7 @@
 						</select>
 					</div>
 				</div>
-					
+
 				<div name=itemPickupImage class=sliders-container hidden>
 					<div class=image-slider name=image>
 						<span class=input-title>Image:</span>
@@ -752,11 +752,19 @@
 					</div>
 				</div>
 
+				<div name=lethalLoot class=sliders-container hidden>
+					<div class=smol>
+						<span class=input-title>Value:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=value type=text default="■100">
+					</div>
+				</div>
+
 			</div>
 
 			<div id=layers class=sliders-container hidden>
 				<h3> Layers </h3>
-				
+
 				<div id=layers-controls>
 					<button class="soulsy-box" name="moveUp" title="Move layer up" disabled>
 						<div class="icon icon-move-up"></div>
@@ -881,7 +889,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<div id=image class=sliders-container hidden>
 					<h4> Background image filters </h4>
 					<div>
@@ -911,11 +919,11 @@
 			<div id=settings class=sliders-container hidden>
 				<h3> Settings </h3>
 				Nothing yet sorry
-				
+
 			</div>
 
 		</div>
-		
+
 	</div>
 
 	<div class=content style="margin:1% auto; width:800px; min-height: 400px; font-size:14px; font-family:Arial, Helvetica, sans-serif">
@@ -966,6 +974,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2024/02/10</b> • Add prototype Lethal Company loot indicator <br>
 			<b>2023/10/03</b> • Add Elden Ring item pickup box <br>
 			<b>2023/10/01</b> • Add Dark Souls 3 item pickup box <br>
 			<b>2023/09/30</b> • Add Dark Souls 1 item pickup box <br>
@@ -985,8 +994,8 @@
 			<b>2022/10/15</b> • Added Elden Ring style poison bar presets (WIP)<br>
 			<b>2022/10/07</b> • Added Dark Souls style poison bar presets <br>
 			<b>2022/10/07</b> • Added Elden Ring style boss health bar presets <br>
-			<b>2022/08/18</b> • Upgraded Bloodborne style area names to use actual graphics <br> 
-			<b>2022/08/17</b> • Added Bloodborne style boss health bar preset <br> 
+			<b>2022/08/18</b> • Upgraded Bloodborne style area names to use actual graphics <br>
+			<b>2022/08/17</b> • Added Bloodborne style boss health bar preset <br>
 			<b>2022/08/17</b> • Added Sekiro style boss health bar presets, complete Sekiro area name preset <br>
 			<b>2022/08/16</b> • Added the brush effect to Sekiro area names <br>
 			<b>2022/08/16</b> • Added Dark Souls 2 and 3 style boss health bar presets <br>
@@ -1005,7 +1014,7 @@
 			<h2 style="margin:0 .5em .5em">About font families</h2>
 			The app uses several typefaces to match or emulate those used in the different games.
 			<br><br>
-			For the <b>Dark Souls</b> games, the app uses <a href="https://fonts.adobe.com/fonts/adobe-garamond">Adobe Garamond</a>, 
+			For the <b>Dark Souls</b> games, the app uses <a href="https://fonts.adobe.com/fonts/adobe-garamond">Adobe Garamond</a>,
 			which may be used on webpages for free through Adobe.
 			The actual font FromSoftware used for these games is unclear,
 			but Adobe Garamond matches it very closely, in particular for Dark Souls III.
@@ -1015,16 +1024,16 @@
 			<br><br>
 			For <b>Demon's Souls</b>, the font is closer to <i>Pinnacle JY</i> or <i>ITC Galliard</i>, neither of which I could find a
 			free-to-use equivalent of, instead using Google font <a href=https://fonts.google.com/specimen/Cormorant+Garamond>Cormorant Garamond</a>.
-			The main differences are that the capital "W" is styled differently, and the shape of some lower case letters. 
+			The main differences are that the capital "W" is styled differently, and the shape of some lower case letters.
 			<br><br>
 			<b>Bloodborne</b> uses the Japanese font <a href="https://en.morisawa.co.jp/fonts/specimen/2673">Reimin Y10</a>
 			for all of its UI, including the noun verbed overlays, even in English.
 			Sadly this font is not available under any free licenses, and for this app it is substituted by several
 			other fonts that are hopefully available on your devices.
 			<br><br>
-			For its decorative Japanese characters, including the iconic 死 pop-up, <b>Sekiro</b> uses 
+			For its decorative Japanese characters, including the iconic 死 pop-up, <b>Sekiro</b> uses
 			<a href="https://j-font.com/font/detail.php?font_id=7745&pageno=1">白舟極太楷書</a>.
-			This font is not fully available under a free license, however Adobe offers a subset of it 
+			This font is not fully available under a free license, however Adobe offers a subset of it
 			<a href="https://fonts.adobe.com/fonts/hot-gfkaishokk">HOT-GFKaishokk</a> free for web use,
 			which is why the app does not properly render every character in any of the in-game phrases.
 			<br><br>
@@ -1039,7 +1048,7 @@
 			<h2 style="margin:0 .5em .5em">Disclaimer</h2>
 			This web page is a fan creation, DEMON'S SOULS, DARK SOULS, BLOODBORNE, SEKIRO: SHADOWS DIE TWICE and ELDEN RING
 			belong to FromSoftware, Sony Interactive Entertainment, Bandai Namco Entertainment, Activision Publishing, and other respective owners.
-			<br><br>			
+			<br><br>
 			<h2 style="margin:0 .5em .5em">Use of generated graphics</h2>
 			As far as I am concerned all graphics that people make with this tool are free for them to use without need for credit,
 			there are however two caveats:
@@ -1048,7 +1057,7 @@
 			and others may be implicitly licensed through your operating system.
 			<br>
 			• Some macros may employ extracted game textures.
-			<br><br>			
+			<br><br>
 			Graphics generated using either of these are obviously beyond my authority to yield the rights to.
 			I therefore recommended against using these in commercial products such as games or merchandise.
 		</div>
@@ -1060,7 +1069,7 @@
 <div class='cookie-banner hidden'>
 	<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
 	<button class="soulsy-box" onclick=denyTracking()>Deny cookies</button>
-	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>	
+	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>
 </div>
 
 
@@ -1089,11 +1098,11 @@
 		</div>
 	</div>
 
-	
+
 	<div class="cookie-banner phantom hidden" style="position:initial">
 		<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
 		<button class="soulsy-box">Deny cookies</button>
-		<button class="soulsy-box">Accept cookies</button>	
+		<button class="soulsy-box">Accept cookies</button>
 	</div>
 </div>
 
