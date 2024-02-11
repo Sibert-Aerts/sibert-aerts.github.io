@@ -984,38 +984,42 @@ function drawLethalCompanyLoot(ctx, canvas, gen, sliders) {
 
     // VALUES
     const { textColor, fontWeight, fontSize, fontFamily } = sliders.font
-    const { value } = sliders.lethalLoot
+    const { subCaption, tint, hiddenTint, opacity, boxLength, circleRadius } = sliders.lethalCompany
 
     // CIRCLES
     function drawCircle(radius, strokeStyle) {
         ctx.strokeStyle = strokeStyle
-        ctx.lineWidth = 4
+        ctx.lineWidth = 4*circleRadius
         ctx.beginPath();
-        ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+        ctx.arc(0, 0, radius*circleRadius, 0, 2 * Math.PI);
         ctx.stroke();
     }
-    drawCircle(78,  '#44ff0060')
-    drawCircle(88,  '#44ff0060')
-    drawCircle(136, '#44ff0060')
-    drawCircle(212, '#44ff0030')
-    drawCircle(232, '#44ff0030')
-    drawCircle(242, '#44ff0030')
+
+    drawCircle(78,  `rgba(${tint.join()}, ${opacity*2})`)
+    drawCircle(88,  `rgba(${tint.join()}, ${opacity*2})`)
+    drawCircle(136, `rgba(${tint.join()}, ${opacity*2})`)
+    drawCircle(212, `rgba(${tint.join()}, ${opacity})`)
+    drawCircle(232, `rgba(${tint.join()}, ${opacity})`)
+    drawCircle(242, `rgba(${tint.join()}, ${opacity})`)
 
     // RECTANGLES
-    ctx.fillStyle = '#22991188'
-    ctx.fillRect(70, -92, 490, 80)
-    ctx.fillRect(70, 0, 358, 49)
+    ctx.fillStyle = `rgba(${RGBMul(tint, hiddenTint).join()}, ${opacity*2.5})`
+    ctx.fillRect(70, -92, 490*boxLength, 80)
+    if (subCaption)
+        ctx.fillRect(70, 0, 358*boxLength, 49)
 
     // TEXT
     const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders)
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
-    ctx.fillStyle = `rgb(${textColor.join()}, .8)`
-    ctx.fillText(caption, 70, -40)
+    ctx.fillStyle = `rgb(${textColor.join()}, ${max(opacity*4, .8)})`
+    ctx.fillText(caption, 70, -40/vScale)
 
-    // SMALLER TEXT
-    ctx.font = `${fontWeight} ${fontSize*0.7}px ${fontFamily}`
-    ctx.fillText(`Value: ${value}`, 70, 30)
+    // SUBCAPTION
+    if (subCaption) {
+        ctx.font = `${fontWeight} ${fontSize*0.7}px ${fontFamily}`
+        ctx.fillText(subCaption, 70, 30/vScale)
+    }
 }
 
 

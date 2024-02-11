@@ -2008,7 +2008,30 @@ layerTypes.push({
             fontSize: 40, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
-        lethalLoot: {},
+        lethalCompany: {},
+    },
+    draw: drawLethalCompanyLoot,
+})
+
+layerTypes.push({
+    id: 'sp:lethal-enemy',
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'Lethal Company Enemy',
+
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: 0, scale: 1
+        },
+        font: {
+            fontFamily: '_3270 Regular', textColor: [0, 0, 0],
+            fontSize: 40, fontWeight: 300,
+            vScale: 1, charSpacing: 0,
+        },
+        lethalCompany: {
+            subCaption: ' ', tint: [255, 0, 0],
+            circleRadius: 0.5, hiddenTint: [255, 255, 255],
+        },
     },
     draw: drawLethalCompanyLoot,
 })

@@ -752,11 +752,38 @@
 					</div>
 				</div>
 
-				<div name=lethalLoot class=sliders-container hidden>
+				<div name=lethalCompany class=sliders-container hidden>
+					<h4> Lethal Company </h4>
 					<div class=smol>
-						<span class=input-title>Value:</span>
+						<span class=input-title>Subcaption:</span>
 						<button class="lil-button reset-button"></button>
-						<input name=value type=text default="■100">
+						<input name=subCaption type=text default="Value: ■100">
+					</div>
+					<div class=smol>
+						<span class=input-title>Tint:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=tint type=color default=#44ff00>
+					</div>
+					<div class=hidden>
+						<!-- Hidden -->
+						<span class=input-title>Hidden Tint:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=hiddenTint type=color default=#888888>
+					</div>
+					<div class=smol>
+						<span class=input-title>Opacity:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=opacity type=range min=0 max=1 step=.01 default=.2>
+					</div>
+					<div class=smol>
+						<span class=input-title>Box Length:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=boxLength type=range as=log2 min=-2 max=2 step=.1 default=0>
+					</div>
+					<div class=smol>
+						<span class=input-title>Circle Radius:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=circleRadius type=range as=log2 min=-2 max=2 step=.1 default=0>
 					</div>
 				</div>
 
@@ -974,6 +1001,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2024/02/11</b> • Expand Lethal Company loot/enemy indicator settings and presets <br>
 			<b>2024/02/10</b> • Add prototype Lethal Company loot indicator <br>
 			<b>2023/10/03</b> • Add Elden Ring item pickup box <br>
 			<b>2023/10/01</b> • Add Dark Souls 3 item pickup box <br>
