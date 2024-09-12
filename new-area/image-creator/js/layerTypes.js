@@ -1028,7 +1028,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro',
             vScale: 1, charSpacing: 0,
             fontWeight: 300, textColor: [220, 175, 45]
         },
@@ -1057,7 +1057,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro',
             vScale: 1, charSpacing: 0,
             fontWeight: 300, textColor: [220, 135, 56]
         },
@@ -1086,7 +1086,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontSize: 88, fontFamily: 'Agmena Pro, adobe-garamond-pro',
+            fontSize: 88, fontFamily: 'Agmena Pro',
             vScale: 1, charSpacing: 0,
             fontWeight: 300, textColor: [230, 140, 65]
         },
@@ -1492,7 +1492,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.023, scale: 1
         },
         font: {
-            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
+            fontFamily: 'Agmena Pro', textColor: [255, 255, 255],
             fontSize: 90, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
@@ -1515,7 +1515,7 @@ layerTypes.push({
             xOffset: -.002, yOffset: -.086, scale: 1
         },
         font: {
-            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [255, 255, 255],
+            fontFamily: 'Agmena Pro', textColor: [255, 255, 255],
             fontSize: 51, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
@@ -1713,7 +1713,7 @@ layerTypes.push({
             xOffset: 0, yOffset: .308, scale: 1.4
         },
         font: {
-            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [185, 190, 185],
+            fontFamily: 'Agmena Pro', textColor: [185, 190, 185],
             fontSize: 24, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
@@ -1955,7 +1955,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0.192,
         },
         font: {
-            fontFamily: 'Agmena Pro, adobe-garamond-pro', textColor: [185, 190, 185],
+            fontFamily: 'Agmena Pro', textColor: [185, 190, 185],
             fontSize: 24, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
@@ -1981,7 +1981,7 @@ layerTypes.push({
     sliders: {
         position: {},
         font: {
-            fontFamily: 'Arial Black', textColor: [100, 60, 230],
+            fontFamily: 'Arial Black', fontFamilyFallback: 'Noto Sans JP', textColor: [100, 60, 230],
             fontSize: 120, fontWeight: 900,
             vScale: 1.2, charSpacing: 0,
         },
@@ -2004,7 +2004,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontFamily: '_3270 Regular', textColor: [80, 255, 0],
+            fontFamily: '_3270 Regular', fontFamilyFallback: 'Noto Sans JP', textColor: [80, 255, 0],
             fontSize: 40, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
@@ -2024,7 +2024,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontFamily: '_3270 Regular', textColor: [0, 0, 0],
+            fontFamily: '_3270 Regular', fontFamilyFallback: 'Noto Sans JP', textColor: [0, 0, 0],
             fontSize: 40, fontWeight: 300,
             vScale: 1, charSpacing: 0,
         },
@@ -2048,7 +2048,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontFamily: 'Helvetica, Arial, sans-serif', textColor: [255, 255, 255],
+            fontFamily: 'Helvetica, Arial, sans-serif', fontFamilyFallback: 'Noto Sans JP', textColor: [255, 255, 255],
             fontSize: 60, fontWeight: 400,
             vScale: 1, charSpacing: 0,
         },
@@ -2074,7 +2074,7 @@ layerTypes.push({
             xOffset: 0, yOffset: 0, scale: 1
         },
         font: {
-            fontFamily: 'Impact, "Arial Black"', textColor: [255, 255, 255],
+            fontFamily: 'Impact, "Arial Black"', fontFamilyFallback: 'Noto Sans JP', textColor: [255, 255, 255],
             fontSize: 140, fontWeight: 500,
             vScale: 1, charSpacing: 0,
         },

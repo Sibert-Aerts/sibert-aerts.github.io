@@ -169,7 +169,7 @@ function drawShadowBar(ctx, canvas, gen, sliders, s0) {
 
 /** PARTIAL: Sets the appropriate ctx properties. */
 function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
-    const { fontSize, textColor, fontFamily, vScale, charSpacing, fontWeight } = sliders.font
+    const { fontSize, textColor, fontFamily, fontFamilyFallback, vScale, charSpacing, fontWeight } = sliders.font
 
     let caption = sliders.caption
 
@@ -186,7 +186,7 @@ function applyFontSliders(ctx, canvas, gen, sliders, s=1) {
         caption = caption.split('').join(space)
     }
 
-    ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}`
+    ctx.font = `${fontWeight} ${fontSize*s}px ${fontFamily}, ${fontFamilyFallback}`
     ctx.fillStyle = `rgb(${textColor.join()})`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
@@ -354,12 +354,12 @@ function drawDeSNounVerbed(ctx, canvas, gen, sliders) {
     ctx.restore()
 
     //// SUBCAPTION
-    const { fontFamily, textColor } = sliders.font
+    const { fontFamily, fontFamilyFallback, textColor } = sliders.font
     const { subCaption } = sliders.subCaption
     ctx.scale(1.1, 1)
 
     canvas.style.letterSpacing = `${s}px`
-    ctx.font = `600 ${24*s}px ${fontFamily}`
+    ctx.font = `600 ${24*s}px ${fontFamily}, ${fontFamilyFallback}`
     ctx.fillStyle = `rgb(${textColor.join()})`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
@@ -983,7 +983,7 @@ function drawLethalCompanyLoot(ctx, canvas, gen, sliders) {
     ctx.scale(s*s0, s*s0)
 
     // VALUES
-    const { textColor, fontWeight, fontSize, fontFamily } = sliders.font
+    const { textColor, fontWeight, fontSize, fontFamily, fontFamilyFallback } = sliders.font
     const { subCaption, tint, hiddenTint, opacity, boxLength, circleRadius } = sliders.lethalCompany
 
     // CIRCLES
@@ -1017,7 +1017,7 @@ function drawLethalCompanyLoot(ctx, canvas, gen, sliders) {
 
     // SUBCAPTION
     if (subCaption) {
-        ctx.font = `${fontWeight} ${fontSize*0.7}px ${fontFamily}`
+        ctx.font = `${fontWeight} ${fontSize*0.7}px ${fontFamily}, ${fontFamilyFallback}`
         ctx.fillText(subCaption, 70, 30/vScale)
     }
 }
