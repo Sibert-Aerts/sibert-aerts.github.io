@@ -1,0 +1,23 @@
+---
+---
+
+@import "jekyll-theme-slate";
+
+
+// Why would they put all this crap on the general img tag... remove it
+img.rezuaq-header-logo {
+    padding: 0;
+    margin: 0;
+    margin-left: -10%;
+    margin-top: -5%;
+    margin-bottom: -20%;
+    border: unset;
+    max-width: 120%;
+    box-shadow: none;
+}
+@media screen and (max-width: 992px) {
+    img.rezuaq-header-logo {
+        max-width: 100%;
+        margin-left: 0;
+    }
+}

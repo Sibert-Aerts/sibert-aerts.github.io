@@ -1,3 +1,11 @@
+
 title: Rezuaq.be
 tagline:
-theme: jekyll-theme-slate
+
+remote_theme: pages-themes/slate
+# theme: jekyll-theme-slate
+# theme: minima
+layout: default
+
+plugins:
+  - jekyll-remote-theme
