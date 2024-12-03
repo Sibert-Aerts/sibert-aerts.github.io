@@ -26,5 +26,6 @@ Welcome to my webzone, under long awaited construction
 
 ## Find me elsewhere
 * 🐙 [github](https://github.com/sibert-aerts)
+* 🦋 [bluesky](https://bsky.app/profile/rezuaq.be)
 * 🕊 [twitter](https://twitter.com/rezuaq)
 * ✝ [tumblr](https://rezuaq.tumblr.com)
