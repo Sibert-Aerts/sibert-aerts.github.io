@@ -9,3 +9,7 @@ layout: default
 
 plugins:
   - jekyll-remote-theme
+
+sass:
+  load_paths:
+    - ./assets/css
