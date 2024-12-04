@@ -2,22 +2,70 @@
 ---
 
 @import "jekyll-theme-slate";
+@import "./scrim.scss";
 
-
-// Why would they put all this crap on the general img tag... remove it
-img.rezuaq-header-logo {
-    padding: 0;
-    margin: 0;
-    margin-left: -10%;
-    margin-top: -5%;
-    margin-bottom: -20%;
-    border: unset;
-    max-width: 120%;
-    box-shadow: none;
+body {
+    position: relative;
+    z-index: 0;
 }
-@media screen and (max-width: 992px) {
-    img.rezuaq-header-logo {
-        max-width: 100%;
-        margin-left: 0;
+
+#header_wrap {
+    background: linear-gradient(to top, #000, #080808);
+    overflow: hidden;
+    z-index: 2;
+}
+
+.rezuaq-logo-wrap {
+    position: relative;
+
+    // Why would they put all this crap on the regular img tag...
+    img {
+        padding: 0;
+        margin: 0;
+        margin-left: -10%;
+        margin-top: -5%;
+        margin-bottom: -20%;
+        border: unset;
+        max-width: 120%;
+        box-shadow: none;
     }
+
+    .dot-be {
+        position: absolute;
+        right: -10%;
+        bottom: 15%;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #fff;
+        font-weight: 100;
+    }
+
+    @media screen and (max-width: 992px) {
+        img {
+            max-width: 100%;
+            margin-left: 0;
+        }
+        .dot-be {
+            right: -1%;
+            bottom: 0;
+            font-size: 10pt;
+        }
+    }
+}
+
+#main_content_wrap {
+    position: relative;
+    border: none;
+    background: #fff;
+    z-index: -2;
+}
+
+a {
+    color: #ff0088;
+}
+
+#footer_wrap {
+    background: #000;
+}
+footer p {
+    color: #fff;
 }

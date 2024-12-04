@@ -25,7 +25,10 @@
             <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
             {% endcomment %}
 
-            <img src="/assets/img/rezuaq logo w.svg" class="rezuaq-header-logo" />
+            <div class="rezuaq-logo-wrap">
+                <img src="/assets/img/rezuaq logo w.svg" alt="Rezuaq" />
+                <span class="dot-be">.be</span>
+            </div>
 
             {% if site.show_downloads %}
                 <section id="downloads">
@@ -34,6 +37,15 @@
                 </section>
             {% endif %}
         </header>
+    </div>
+
+    <!-- FAKE HEADER -->
+    <div class="outer" style="position: absolute; top: 0; pointer-events: none; z-index: -1;">
+        <div class="inner" style="padding: 50px 10px 30px 10px">
+            <div class="rezuaq-logo-wrap">
+                <img src="/assets/img/rezuaq logo b.svg" />
+            </div>
+        </div>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -47,14 +59,15 @@
     <div id="footer_wrap" class="outer">
         <footer class="inner">
             {% if site.github.is_project_page %}
-            <p class="copyright">
-                {{ site.title | default: site.github.repository_name }} maintained by
-                <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>
-            </p>
+                <p class="copyright">
+                    {{ site.title | default: site.github.repository_name }} maintained by
+                    <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>
+                </p>
             {% endif %}
             <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
         </footer>
     </div>
+
 </body>
 
 </html>
