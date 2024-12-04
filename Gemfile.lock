@@ -73,7 +73,7 @@ GEM
     terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
     unicode-display_width (2.5.0)
-    webrick (1.8.1)
+    webrick (1.8.2)
 
 PLATFORMS
   x64-mingw-ucrt
@@ -83,7 +83,7 @@ DEPENDENCIES
   jekyll-remote-theme (~> 0.4.2)
   jekyll-seo-tag
   kramdown-parser-gfm (~> 1.1.0)
-  webrick (~> 1.7)
+  webrick (~> 1.8)
 
 BUNDLED WITH
    2.5.10
