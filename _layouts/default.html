@@ -68,6 +68,87 @@
         </footer>
     </div>
 
+    <!-- SVG FILTERS -->
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style="position: absolute; width: 0; height: 0; visibility: hidden"
+    >
+        <defs>
+            <filter id="displacementFilter">
+                <feTurbulence
+                    type="turbulence"
+                    baseFrequency="0.01"
+                    numOctaves="1"
+                    result="turbulence"
+                />
+                <feOffset in="SourceGraphic" result="offset">
+                    <animate
+                        attributeName="dx"
+                        values="0;-100;0"
+                        calcMode="spline"
+                        keyTimes="0;0.9;1"
+                        keySplines="0 1 0.5 1; 0.5 0 0.8 1"
+                        dur="5s"
+                        begin="indefinite"
+                    />
+                    <animate
+                        attributeName="dy"
+                        values="0;-100;0"
+                        calcMode="spline"
+                        keyTimes="0;0.9;1"
+                        keySplines="0 1 0.5 1; 0.5 0 0.8 1"
+                        dur="5s"
+                        begin="indefinite"
+                    />
+                </feOffset>
+                <feDisplacementMap
+                    in="offset"
+                    in2="turbulence"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                >
+                    <animate
+                        attributeName="scale"
+                        values="0;400;0"
+                        calcMode="spline"
+                        keyTimes="0;0.9;1"
+                        keySplines="0 1 0.5 1; 0.5 0 0.8 1"
+                        dur="5s"
+                        begin="indefinite"
+                    />
+                </feDisplacementMap>
+            </filter>
+        </defs>
+    </svg>
+
 </body>
+
+<script>
+
+    Array.from(document.getElementsByClassName("rezuaq-logo-wrap")).forEach(w => {
+        w.addEventListener("click", () => {
+            const dur = 2 + Math.random() * 6 + "s"; // [2, 8]s
+            const freq = 1/(1 + Math.random() * 2.3)**5; // approx. [0.002, 0.4]
+            const octaves = Math.floor(1 + Math.random() * 5);
+
+            const filter = document.getElementById("displacementFilter");
+
+            Array.from(filter.getElementsByTagName("feTurbulence")).forEach(f => {
+                f.setAttribute("baseFrequency", freq);
+                f.setAttribute("numOctaves", octaves);
+            });
+
+            Array.from(filter.querySelectorAll("feOffset > animate")).forEach(a => {
+                a.setAttribute("values", `0;${ -400/2/octaves };0`);
+            });
+
+            Array.from(filter.getElementsByTagName("animate")).forEach(a => {
+                a.setAttribute("dur", dur);
+                a.beginElement();
+            });
+        })
+    })
+
+</script>
 
 </html>

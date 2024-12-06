@@ -28,6 +28,8 @@ body {
         border: unset;
         max-width: 120%;
         box-shadow: none;
+
+        filter: url(#displacementFilter);
     }
 
     .dot-be {
