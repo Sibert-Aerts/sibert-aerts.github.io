@@ -1,9 +1,9 @@
 ---
-title: Welcome to my Webzone
+title: Main
 layout: default
 ---
 
-Welcome to my webzone, under long overdue construction
+Welcome to my webzone, currently undergoing long overdue construction
 
 ## Finished pages
 * [🖼️ FromSoftware image macro creator](/new-area/image-creator)

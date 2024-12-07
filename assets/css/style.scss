@@ -4,32 +4,49 @@
 @import "jekyll-theme-slate";
 @import "scrim.scss";
 
+// GENERIC
+
+a {
+    color: #ff0088;
+}
+
+small {
+    font-size: smaller;
+}
+
+
+//
+
 body {
     position: relative;
-    z-index: 0;
+    color: white;
+    background-color: black;
 }
 
 #header_wrap {
+    position: relative;
+    z-index: 100;
     background: linear-gradient(to top, #000, #080808);
-    overflow: hidden;
-    z-index: 2;
+    mix-blend-mode: difference;
+    .inner {
+        padding: 0;
+    }
 }
 
 .rezuaq-logo-wrap {
     position: relative;
+    z-index: 10;
 
     // Why would they put all this crap on the regular img tag...
     img {
         padding: 0;
-        margin: 0;
-        margin-left: -10%;
-        margin-top: -5%;
-        margin-bottom: -20%;
+        margin: 10px -10% -17% -10%;
         border: unset;
         max-width: 120%;
         box-shadow: none;
 
-        filter: url(#displacementFilter);
+        filter: url(#animatedLogoFilter);
+        pointer-events: none;
     }
 
     .dot-be {
@@ -41,14 +58,13 @@ body {
         font-weight: 100;
     }
 
-    @media screen and (max-width: 992px) {
+    @media screen and (max-width: 991px) { // <lg
         img {
             max-width: 100%;
-            margin-left: 0;
+            margin: 10px 0 -14% 0;
         }
         .dot-be {
             right: -1%;
-            bottom: 0;
             font-size: 10pt;
         }
     }
@@ -56,13 +72,34 @@ body {
 
 #main_content_wrap {
     position: relative;
+    overflow: hidden;
     border: none;
-    background: #fff;
-    z-index: -2;
+    color: black;
+    background: white;
 }
-
-a {
-    color: #ff0088;
+.background-bar {
+    position: absolute;
+    z-index: 10;
+    top: -50px;
+    bottom: -50px;
+    width: 20vw;
+    &.left { left: -10vw; }
+    &.right { right: -10vw; }
+    &::before {
+        position: absolute;
+        left: 25%; right: 25%;
+        height: 100%;
+        content: '';
+        background-color: black;
+    }
+    filter: url(#warbly-200);
+    @media screen and (max-width: 991px) { // <lg
+        filter: url(#warbly-100);
+    }
+    @media screen and (max-width: 767px) { // <md
+        display: none;
+    }
+    pointer-events: none;
 }
 
 #footer_wrap {

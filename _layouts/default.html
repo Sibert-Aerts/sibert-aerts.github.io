@@ -20,15 +20,15 @@
                 <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
             {% endif %}
 
-            {% comment %}
-            <h1 id="project_title">{{ site.title | default: site.github.repository_name }}</h1>
-            <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
-            {% endcomment %}
-
             <div class="rezuaq-logo-wrap">
                 <img src="/assets/img/rezuaq logo w.svg" alt="Rezuaq" />
                 <span class="dot-be">.be</span>
             </div>
+
+            {% comment %}
+            <h1 id="project_title">{{ site.title | default: site.github.repository_name }}</h1>
+            <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
+            {% endcomment %}
 
             {% if site.show_downloads %}
                 <section id="downloads">
@@ -39,20 +39,13 @@
         </header>
     </div>
 
-    <!-- FAKE HEADER -->
-    <div class="outer" style="position: absolute; top: 0; pointer-events: none; z-index: -1;">
-        <div class="inner" style="padding: 50px 10px 30px 10px">
-            <div class="rezuaq-logo-wrap">
-                <img src="/assets/img/rezuaq logo b.svg" />
-            </div>
-        </div>
-    </div>
-
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
         <section id="main_content" class="inner">
             {{ content }}
         </section>
+        <div class="background-bar left"></div>
+        <div class="background-bar right"></div>
     </div>
 
     <!-- FOOTER  -->
@@ -74,7 +67,7 @@
         style="position: absolute; width: 0; height: 0; visibility: hidden"
     >
         <defs>
-            <filter id="displacementFilter">
+            <filter id="animatedLogoFilter">
                 <feTurbulence
                     type="turbulence"
                     baseFrequency="0.01"
@@ -118,6 +111,39 @@
                     />
                 </feDisplacementMap>
             </filter>
+
+            <filter id="warbly-200">
+                <feTurbulence
+                    type="turbulence"
+                    baseFrequency="0.02"
+                    numOctaves="3"
+                    result="turbulence"
+                />
+                <feOffset in="SourceGraphic" result="offset" dx="-40" dy="-40" />
+                <feDisplacementMap
+                    in="offset"
+                    in2="turbulence"
+                    scale="200"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                />
+            </filter>
+            <filter id="warbly-100">
+                <feTurbulence
+                    type="turbulence"
+                    baseFrequency="0.02"
+                    numOctaves="3"
+                    result="turbulence"
+                />
+                <feOffset in="SourceGraphic" result="offset" dx="-20" dy="-20" />
+                <feDisplacementMap
+                    in="offset"
+                    in2="turbulence"
+                    scale="100"
+                    xChannelSelector="R"
+                    yChannelSelector="G"
+                />
+            </filter>
         </defs>
     </svg>
 
@@ -128,10 +154,10 @@
     Array.from(document.getElementsByClassName("rezuaq-logo-wrap")).forEach(w => {
         w.addEventListener("click", () => {
             const dur = 2 + Math.random() * 6 + "s"; // [2, 8]s
-            const freq = 1/(1 + Math.random() * 2.3)**5; // approx. [0.002, 0.4]
-            const octaves = Math.floor(1 + Math.random() * 5);
+            const freq = 0.4 ** (1 + (Math.random() + Math.random()) * 3) // approx. [0.002, 0.4]
+            const octaves = Math.floor(1 + Math.random() * 5); // [1, 5]
 
-            const filter = document.getElementById("displacementFilter");
+            const filter = document.getElementById("animatedLogoFilter");
 
             Array.from(filter.getElementsByTagName("feTurbulence")).forEach(f => {
                 f.setAttribute("baseFrequency", freq);
@@ -139,7 +165,8 @@
             });
 
             Array.from(filter.querySelectorAll("feOffset > animate")).forEach(a => {
-                a.setAttribute("values", `0;${ -400/2/octaves };0`);
+                // Idk why this formula works to counteract the effect of the displacement 'moving' the entire subject
+                a.setAttribute("values", `0;${ -400/(2+octaves) };0`);
             });
 
             Array.from(filter.getElementsByTagName("animate")).forEach(a => {
