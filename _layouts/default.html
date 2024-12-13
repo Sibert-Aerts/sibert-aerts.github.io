@@ -8,20 +8,19 @@
     <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
 
     {% seo %}
-    {% include head-custom.html %}
 </head>
 
 <body>
 
     <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
+    <div id="header_wrap" class="w-100">
+        <header>
             {% if site.github.is_project_page %}
                 <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
             {% endif %}
 
             <div class="rezuaq-logo-wrap">
-                <img src="/assets/img/rezuaq logo w.svg" alt="Rezuaq" />
+                <img class="rezuaq" src="/assets/img/rezuaq logo w.svg" alt="Rezuaq" />
                 <span class="dot-be">.be</span>
             </div>
 
@@ -40,8 +39,8 @@
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-        <section id="main_content" class="inner">
+    <div id="main_content_wrap" class="w-100">
+        <section id="main_content" class="container-slim">
             {{ content }}
         </section>
         <div class="background-bar left"></div>
@@ -49,23 +48,18 @@
     </div>
 
     <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-        <footer class="inner">
+    <div id="footer_wrap" class="w-100">
+        <footer class="container-slim text-center">
             {% if site.github.is_project_page %}
-                <p class="copyright">
                     {{ site.title | default: site.github.repository_name }} maintained by
                     <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>
-                </p>
             {% endif %}
-            <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+            Published with <a href="https://pages.github.com">GitHub Pages</a>
         </footer>
     </div>
 
     <!-- SVG FILTERS -->
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        style="position: absolute; width: 0; height: 0; visibility: hidden"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; width: 0; height: 0; visibility: hidden">
         <defs>
             <filter id="animatedLogoFilter">
                 <feTurbulence

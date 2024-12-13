@@ -1,0 +1,136 @@
+/* Custom pseudo Bootstrap-like css */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    @media (max-width: 575.98px) {
+        font-size: .9rem;
+    }
+}
+
+// Headings
+
+h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+    margin-top: .25em;
+    margin-bottom: .5em;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+h1, .h1 { font-size: calc(1.375rem + 1.5vw); }
+@media (min-width: 1200px) {
+    h1, .h1 { font-size: 2.5rem; }
+}
+
+h2, .h2 { font-size: calc(1.325rem + 0.9vw); }
+@media (min-width: 1200px) {
+    h2, .h2 { font-size: 2rem; }
+}
+
+h3, .h3 { font-size: calc(1.3rem + 0.6vw); }
+@media (min-width: 1200px) {
+    h3, .h3 { font-size: 1.75rem; }
+}
+
+h4, .h4 { font-size: calc(1.275rem + 0.3vw); }
+@media (min-width: 1200px) {
+    h4, .h4 { font-size: 1.5rem; }
+}
+
+h5, .h5 { font-size: 1.25rem; }
+
+h6, .h6 { font-size: 1rem; }
+
+// Text elements
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+small {
+    font-size: 0.875em;
+}
+
+a {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+// Lists
+
+ol, ul {
+  padding-left: 2rem;
+}
+ol {
+    list-style: decimal;
+}
+ul {
+    list-style: square;
+}
+
+ol, ul, dl {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+ol ol, ul ul, ol ul, ul ol {
+  margin-bottom: 0;
+}
+
+// Special containers
+.container, .container-slim {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: .75rem;
+    padding-right: .75rem;
+}
+@media (min-width: 576px) {
+    .container, .container-slim { max-width: 540px; }
+}
+@media (min-width: 768px) {
+    .container, .container-slim { max-width: 720px; }
+}
+@media (min-width: 992px) {
+    .container { max-width: 960px; }
+    .container-slim { max-width: 960px; }
+}
+@media (min-width: 1200px) {
+    .container { max-width: 1140px; }
+}
+@media (min-width: 1400px) {
+    .container { max-width: 1320px; }
+}
+// Special shape styling
+
+.w-100 {
+    width: 100% !important;
+}
+
+
+// Special text styling
+
+.text-center {
+    text-align: center;
+}
+.small-caps {
+    font-variant: small-caps;
+}
+.all-small-caps {
+    font-variant: all-small-caps;
+}
