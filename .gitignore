@@ -6,3 +6,4 @@ new-area/image-creator/node experiment/*
 
 # Jekyll
 _site
+.sass-cache/*

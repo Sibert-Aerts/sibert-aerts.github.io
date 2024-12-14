@@ -1,6 +1,5 @@
 /* Custom Bootstrap-based Sass file */
 
-@use "sass:math";
 @import "rezstrap-breakpoints.scss";
 
 
@@ -145,7 +144,7 @@ ol ol, ul ul, ol ul, ul ol {
         @for $i from 1 through 12 {
             .col#{$infix}-#{$i} {
                 flex: 0 0 auto;
-                width: percentage(math.div($i, 12));
+                width: percentage($i / 12);
             }
         }
     }
