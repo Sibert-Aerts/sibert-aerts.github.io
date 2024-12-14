@@ -89,23 +89,110 @@ body {
         background-color: black;
     }
     filter: url(#warbly-200);
-    @media screen and (max-width: 991.98px) { // <lg
+    @include breakpoint-up-to(lg) {
         filter: url(#warbly-100);
     }
-    @media screen and (max-width: 767.98px) { // <md
+    @include breakpoint-up-to(sm) {
         display: none;
     }
     pointer-events: none;
 }
+
 #main_content {
     padding: 3em 6em;
-    @media screen and (max-width: 991.98px) { // <lg
+    @include breakpoint-up-to(lg) {
         padding-left: 4em;
         padding-right: 4em;
     }
-    @media screen and (max-width: 767.98px) { // <md
+    @include breakpoint-up-to(sm) {
         padding-left: .5rem;
         padding-right: .5rem;
+    }
+
+    > .wide-row {
+        margin-left: -10em;
+        margin-right: -10em;
+        @include breakpoint-up-to(xl) {
+            margin-left: calc(var(--rs-gutter-x) * -0.5);
+            margin-right: calc(var(--rs-gutter-x) * -0.5);
+        }
+    }
+}
+
+.link-tile-row {
+    --rs-gutter-y: 1em;
+}
+a.link-tile {
+    position: relative;
+    margin: 4px;
+    max-width: 100%;
+    color: white;
+    background-size: cover;
+    background-position: center;
+
+    width: 160px;
+    height: 160px;
+
+    &.small {
+        width: 100px;
+        height: 100px;
+    }
+    &.big {
+        width: 350px;
+        height: 200px;
+        @include breakpoint-up-to(md) {
+            height: 160px;
+        }
+    }
+
+    &.sheen::after {
+        content: "";
+        position: absolute;
+        top: 0; bottom: 0;
+        left: 0; right: 0;
+        opacity: 0.5;
+        background: linear-gradient(160deg, #fff2, #fff0 25%, #fff0 50%, #fff2 51%, #fff0 75%);
+        pointer-events: none;
+    }
+
+    &:hover {
+        text-decoration: unset;
+        outline: 1px solid #ff0088;
+        &.sheen::after {
+            opacity: 1;
+        }
+        .title {
+            background: #ff0088;
+        }
+        .cover {
+            background-color: unset;
+            backdrop-filter: unset;
+        }
+    }
+    .title {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: .25em;
+        text-align: center;
+        background: #000;
+    }
+    .desc {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: .5em;
+        padding-top: 1em;
+        font-weight: 400;
+        text-align: center;
+        font-size: 0.875em;
+        background: linear-gradient(to top, #000e, #0000);
+    }
+    .cover {
+        background-color: #4446;
+        backdrop-filter: saturate(0.25);
     }
 }
 

@@ -1,0 +1,71 @@
+/* Custom Bootstrap-based Sass file */
+
+$grid-breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px
+) !default;
+
+$nontrivial-grid-breakpoints: sm, md, lg, xl, xxl;
+
+// Name of the next breakpoint, or null for the last breakpoint.
+@function breakpoint-next($name) {
+    $grid-breakpoints: map-keys($grid-breakpoints);
+    $n: index($grid-breakpoints, $name);
+    @if not $n {
+        @error "breakpoint `#{$name}` not found in `#{$grid-breakpoints}`";
+    }
+    @return if($n < length($breakpoint-names), nth($breakpoint-names, $n + 1), null);
+}
+
+// Returns a blank string if smallest breakpoint, otherwise returns the name with a dash in front.
+@function breakpoint-infix($name) {
+    @return if(breakpoint-min($name) == null, "", "-#{$name}");
+}
+
+// Minimum breakpoint width. Null for the smallest (first) breakpoint.
+@function breakpoint-min($name) {
+    $min: map-get($grid-breakpoints, $name);
+    @return if($min != 0, $min, null);
+}
+
+// Maximum breakpoint width.
+@function breakpoint-max($name) {
+    $max: map-get($grid-breakpoints, $name);
+    @return if($max and $max > 0, $max - .02, null);
+}
+
+// Media of at least the minimum breakpoint width. No query for the smallest breakpoint.
+@mixin breakpoint-and-up($name) {
+    $min: breakpoint-min($name);
+    @if $min { @media (min-width: $min) { @content; } }
+    @else { @content; }
+}
+
+// Media of at most the maximum breakpoint width, non-inclusive.
+@mixin breakpoint-up-to($name) {
+    $max: breakpoint-max($name);
+    @if $max { @media (max-width: $max) { @content; } }
+    @else { @content; }
+}
+
+// Media between the breakpoint's minimum and maximum widths.
+// No minimum for the smallest breakpoint, and no maximum for the largest one.
+// Makes the @content apply only to the given breakpoint, not viewports any wider or narrower.
+@mixin breakpoint-only($name) {
+    $min: breakpoint-min($name);
+    $next: breakpoint-next($name);
+    $max: breakpoint-max($next);
+    @if $min != null and $max != null {
+        @media (min-width: $min) and (max-width: $max) { @content; }
+    }
+    @else if $max == null {
+        @include breakpoint-and-up($name) { @content; }
+    }
+    @else if $min == null {
+        @include breakpoint-up-to($next) { @content; }
+    }
+}

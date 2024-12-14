@@ -1,4 +1,8 @@
-/* Custom pseudo Bootstrap-like css */
+/* Custom Bootstrap-based Sass file */
+
+@use "sass:math";
+@import "rezstrap-breakpoints.scss";
+
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -30,28 +34,17 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 }
 
 h1, .h1 { font-size: calc(1.375rem + 1.5vw); }
-@media (min-width: 1200px) {
-    h1, .h1 { font-size: 2.5rem; }
-}
-
 h2, .h2 { font-size: calc(1.325rem + 0.9vw); }
-@media (min-width: 1200px) {
-    h2, .h2 { font-size: 2rem; }
-}
-
-h3, .h3 { font-size: calc(1.3rem + 0.6vw); }
-@media (min-width: 1200px) {
-    h3, .h3 { font-size: 1.75rem; }
-}
-
+h3, .h3 { font-size: calc(1.300rem + 0.6vw); }
 h4, .h4 { font-size: calc(1.275rem + 0.3vw); }
-@media (min-width: 1200px) {
+h5, .h5 { font-size: 1.25rem; }
+h6, .h6 { font-size: 1rem; }
+@include breakpoint-and-up(xl) {
+    h1, .h1 { font-size: 2.5rem; }
+    h2, .h2 { font-size: 2rem; }
+    h3, .h3 { font-size: 1.75rem; }
     h4, .h4 { font-size: 1.5rem; }
 }
-
-h5, .h5 { font-size: 1.25rem; }
-
-h6, .h6 { font-size: 1rem; }
 
 // Text elements
 
@@ -92,7 +85,8 @@ ol ol, ul ul, ol ul, ul ol {
   margin-bottom: 0;
 }
 
-// Special containers
+// Containers
+
 .container, .container-slim {
     width: 100%;
     margin-left: auto;
@@ -116,12 +110,94 @@ ol ol, ul ul, ol ul, ul ol {
 @media (min-width: 1400px) {
     .container { max-width: 1320px; }
 }
-// Special shape styling
 
-.w-100 {
-    width: 100% !important;
+// Rows and columns
+
+.row {
+    --rs-gutter-x: 1rem;
+    --rs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--rs-gutter-y) * -1);
+    margin-right: calc(var(--rs-gutter-x) * -.5);
+    margin-left: calc(var(--rs-gutter-x) * -.5);
+    > * {
+        flex-shrink: 0;
+        width: 100%;
+        max-width: 100%;
+        margin-top: var(--rs-gutter-y);
+        padding-right: calc(var(--rs-gutter-x) * .5);
+        padding-left: calc(var(--rs-gutter-x) * .5);
+    }
 }
 
+.g-0, .gx-0 { --bs-gutter-x: 0; }
+.g-0, .gy-0 { --bs-gutter-y: 0; }
+
+@each $bp in map-keys($grid-breakpoints) {
+    $infix: breakpoint-infix($bp);
+    @include breakpoint-and-up($bp) {
+        .col#{$infix} { flex: 1 0 0%; }
+        .col#{$infix}-auto {
+            flex: 0 0 auto;
+            width: auto;
+        }
+        @for $i from 1 through 12 {
+            .col#{$infix}-#{$i} {
+                flex: 0 0 auto;
+                width: percentage(math.div($i, 12));
+            }
+        }
+    }
+}
+
+// Display
+
+.d-inline-flex { display: inline-flex !important; }
+.d-block { display: block !important; }
+.d-inline { display: inline !important; }
+.d-none { display: none !important; }
+
+// Flex
+
+.d-flex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.justify-content-start { justify-content: flex-start !important; }
+.justify-content-end { justify-content: flex-end !important; }
+.justify-content-center { justify-content: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.justify-content-around { justify-content: space-around !important; }
+.justify-content-evenly { justify-content: space-evenly !important; }
+
+.align-items-start { align-items: flex-start !important; }
+.align-items-end { align-items: flex-end !important; }
+.align-items-center { align-items: center !important; }
+.align-items-baseline { align-items: baseline !important; }
+.align-items-stretch { align-items: stretch !important; }
+
+.align-content-start { align-content: flex-start !important; }
+.align-content-end { align-content: flex-end !important; }
+.align-content-center { align-content: center !important; }
+.align-content-between { align-content: space-between !important; }
+.align-content-around { align-content: space-around !important; }
+.align-content-stretch { align-content: stretch !important; }
+
+// Special shape styling
+
+.w-100 { width: 100% !important; }
+.h-100 { height: 100% !important; }
+.cover {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+}
 
 // Special text styling
 
