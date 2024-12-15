@@ -127,20 +127,21 @@ a.link-tile {
     margin: 4px;
     max-width: 100%;
     color: white;
-    background-size: cover;
-    background-position: center;
+    background-size: contain;
+    background-position-x: center;
 
     width: 160px;
     height: 160px;
 
     &.small {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
     }
     &.big {
         width: 350px;
-        height: 200px;
-        @include breakpoint-up-to(md) {
+        height: 240px;
+        @include breakpoint-up-to(lg) {
+            background-size: cover;
             height: 160px;
         }
     }
@@ -191,8 +192,8 @@ a.link-tile {
         background: linear-gradient(to top, #000e, #0000);
     }
     .cover {
-        background-color: #4446;
-        backdrop-filter: saturate(0.25);
+        background-color: #8886;
+        backdrop-filter: saturate(0.75);
     }
 }
 
