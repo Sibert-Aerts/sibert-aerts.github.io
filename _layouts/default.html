@@ -40,9 +40,16 @@
 
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="w-100">
+        {% if page.show_nav_home != false %}
+        <section id="main_navbar" class="container-slim">
+            <a href="/">« Home</a>
+        </section>
+        {% endif %}
+
         <section id="main_content" class="container-slim">
             {{ content }}
         </section>
+
         <div class="background-bar left"></div>
         <div class="background-bar right"></div>
     </div>
@@ -50,11 +57,27 @@
     <!-- FOOTER  -->
     <div id="footer_wrap" class="w-100">
         <footer class="container-slim text-center">
+
+            {% if page.show_footer_socials != false %}
+            <div class="d-inline-block" style="vertical-align: middle; margin-right: 2em; line-height: 0;">
+                <a href="https://github.com/sibert-aerts" title="Github" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/github.png)"></a>
+                <a href="https://bsky.app/profile/rezuaq.be" title="Bluesky" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/bluesky.png)"></a>
+                <a href="https://twitter.com/rezuaq" title="Twitter" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/twitter.png)"></a>
+                <a href="https://rezuaq.tumblr.com" title="Tumblr" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/tumblr.png)"></a>
+                <a href="https://ko-fi.com/rezuaq" title="Ko-fi" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/ko-fi.png)"></a>
+                <a href="mailto:rezuaq@gmail.com" title="Email" class="link-tile tiny" style="background-image: url(/assets/img/link-thumbs/socials/email.png)"></a>
+            </div>
+            {% endif %}
+
             {% if site.github.is_project_page %}
                     {{ site.title | default: site.github.repository_name }} maintained by
                     <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>
             {% endif %}
-            Published with <a href="https://pages.github.com">GitHub Pages</a>
+
+            <small style="vertical-align: middle">
+                Published with <a href="https://pages.github.com">GitHub Pages</a>
+            </small>
+
         </footer>
     </div>
 

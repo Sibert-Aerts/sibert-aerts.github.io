@@ -50,6 +50,16 @@ h6, .h6 { font-size: 1rem; }
 p {
     margin-top: 0;
     margin-bottom: 1rem;
+    > img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+    }
+}
+
+em {
+    font-style: italic;
 }
 
 small {
@@ -152,16 +162,17 @@ ol ol, ul ul, ol ul, ul ol {
 
 // Display
 
-.d-inline-flex { display: inline-flex !important; }
 .d-block { display: block !important; }
+.d-flex { display: block !important; }
 .d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-inline-flex { display: inline-flex !important; }
 .d-none { display: none !important; }
 
 // Flex
 
-.d-flex {
+.flex {
     display: flex;
-    flex-direction: row;
     flex-wrap: wrap;
 }
 

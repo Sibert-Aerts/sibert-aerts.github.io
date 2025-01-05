@@ -8,8 +8,10 @@
 
 // GENERIC
 
+$rez-pink: #ff0088;
+
 a {
-    color: #ff0088;
+    color: $rez-pink;
     font-weight: 500;
 }
 
@@ -98,6 +100,35 @@ body {
     pointer-events: none;
 }
 
+#main_navbar {
+    padding: 0 6em;
+    margin-bottom: -2em;
+    @include breakpoint-up-to(lg) {
+        padding-left: 4em;
+        padding-right: 4em;
+    }
+    @include breakpoint-up-to(sm) {
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
+    a {
+        display: inline-block;
+        margin-left: -1em;
+        padding: 0 .1em;
+        color: black;
+        transform-origin: center left;
+        -webkit-font-smoothing: subpixel-antialiased;
+        transform: scaleX(1.5);
+
+        font-weight: 700;
+        &:hover {
+            color: white;
+            background-color: $rez-pink;
+            text-decoration: unset;
+        }
+    }
+}
+
 #main_content {
     padding: 3em 6em;
     @include breakpoint-up-to(lg) {
@@ -123,6 +154,7 @@ body {
     --rs-gutter-y: 1em;
 }
 a.link-tile {
+    display: inline-block;
     position: relative;
     margin: 4px;
     max-width: 100%;
@@ -133,6 +165,10 @@ a.link-tile {
     width: 160px;
     height: 160px;
 
+    &.tiny {
+        width: 30px;
+        height: 30px;
+    }
     &.small {
         width: 60px;
         height: 60px;
@@ -140,6 +176,7 @@ a.link-tile {
     &.big {
         width: 350px;
         height: 240px;
+        background-position-y: 2em;
         @include breakpoint-up-to(lg) {
             background-size: cover;
             height: 160px;
@@ -158,12 +195,12 @@ a.link-tile {
 
     &:hover {
         text-decoration: unset;
-        outline: 1px solid #ff0088;
+        outline: 1px solid $rez-pink;
         &.sheen::after {
             opacity: 1;
         }
         .title {
-            background: #ff0088;
+            background: $rez-pink;
         }
         .cover {
             background-color: unset;
@@ -199,8 +236,8 @@ a.link-tile {
 
 #footer_wrap {
     background: #000;
-    padding: 1.5em 3em;
+    padding: 1em 3em;
 }
-footer p {
-    color: #fff;
+footer {
+    line-height: 1.5em;
 }
