@@ -22,7 +22,7 @@
 
 	<!-- Garamond font, care of Adobe. -->
 	<link rel="stylesheet" href="https://use.typekit.net/lke6kpb.css">
-	
+
 	<!-- Google Analytics to track traffic -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGGJHJ3DR"></script>
 	<!-- Script to make it easier to opt-in and opt-out -->
@@ -60,7 +60,7 @@
 
 			byId('image-gen').addEventListener('click', onclick, {once: true})
 		})
-	
+
 	</script>
 
 	<!-- Twitter Card info -->
@@ -70,7 +70,7 @@
 	<meta name=twitter:title content="FromSoft Area Name Generator">
 	<meta name=twitter:description content="Discover randomly generated areas from FromSoftware games, or make image macros.">
 	<meta name=twitter:image content=https://i.imgur.com/5cqsQZv.png>
-		
+
 </head>
 
 <body>
@@ -80,7 +80,7 @@
 
 <div id=main>
 	<div class='main content' style="padding-bottom: 25px">
-		
+
 		<div id=stars class=unselectable>&nbsp;</div>
 
 		<div id=name-underline-wrapper class=faded-out>
@@ -164,11 +164,11 @@
 								<input type=text id=image-caption value="Area Name" size=32 style="float:right">
 								<input name=adjustCase type=checkbox hidden>
 							</div>
-							
+
 							<div hidden id="layers-container"></div>
 
 						</div>
-					
+
 						<div id=background-image class=sliders-container>
 							<div>
 								<span class=input-title>Image URL:</span>
@@ -311,7 +311,7 @@
 									<input name=frameHeight type=range min=.1 max=4 step=.02 default=1>
 								</div>
 							</div>
-							
+
 							<div name=erFrame class=sliders-container hidden>
 								<div>
 									<span class=input-title>Frame opacity:</span>
@@ -329,7 +329,7 @@
 									<input name=frameHeight type=range min=0 max=.5 step=.005>
 								</div>
 							</div>
-			
+
 						</div>
 
 					</div>
@@ -361,19 +361,19 @@
 				e.g. "Lothric Town" works, so "Town" fits in here, "Lothric World" does not, so "World" is excluded.
 			</div>
 			<textarea name=secondaryLocations cols=90 rows=2></textarea><br><br>
-			
+
 			<span class=input-title>Personal names:</span> <span class=example>e.g. "Quelaag;Aldia;Ariandel"</span> <br>
 			<textarea name=properNames cols=90 rows=1></textarea><br><br>
-			
+
 			<span class=input-title>Possessives:</span> <span class=example>e.g. "No-Man's;Duke's;The King's"</span> <br>
 			<textarea name=possessives cols=90 rows=1></textarea><br>
 			<span class=input-title>Prefixes:</span> <span class=example>e.g. "Blight;Byrgen"</span> <span class=help>(These are glued directly onto a place name e.g. Blightcity)</span> <br>
 			<textarea name=prefixes cols=90 rows=1></textarea><br>
 			<span class=input-title>Positional descriptors:</span> <span class=example>e.g. "Northern;Upper;Inner"</span> <br>
 			<textarea name=positionals cols=90 rows=1></textarea><br>
-			<span class=input-title>Adjectives:</span> <span class=example>e.g. "New;Great;Frozen"</span> <span class=help>(Don't include anything from the previous three boxes.)</span> <br> 
+			<span class=input-title>Adjectives:</span> <span class=example>e.g. "New;Great;Frozen"</span> <span class=help>(Don't include anything from the previous three boxes.)</span> <br>
 			<textarea name=adjectives cols=90 rows=2></textarea><br><br>
-			
+
 			<span class=input-title>Appendices:</span> <span class=example>e.g. "of the Giants;Betwixt;of Flame"</span> <br>
 			<textarea name=appendices cols=90 rows=2></textarea>
 		</div>
@@ -401,9 +401,9 @@
 
 				<label><input id="fade-out-check" type="checkbox"></input> Fade out automatically</label><br>
 				<label>Seconds before automatically fading out: &nbsp;<input id="fade-out-time" type="text" size="2" value="3.5"></input></label>
-				
+
 				<br>
-				
+
 				<button id=chromaButton style="margin-top:-15px; float:right" class="soulsy-box" onClick=toggleChroma()>chroma</button>
 			</div>
 		</div>
@@ -414,7 +414,7 @@
 <div class='cookie-banner hidden'>
 	<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
 	<button class="soulsy-box" onclick=denyTracking()>Deny cookies</button>
-	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>	
+	<button class="soulsy-box" onclick=consentToTracking()>Accept cookies</button>
 </div>
 
 <div id=footer>
@@ -428,7 +428,7 @@
 		</div>
 
 		<div class="credit right">
-			<a href="http://twitter.com/rezuaq" target=_blank>Created by Rezuaq</a>
+			<a href="http://rezuaq.be" target=_blank>Created by Rezuaq</a>
 			<span class=dash>-</span>
 			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area" target=_blank>On Github</a>
 			<span class=dash>-</span>
@@ -436,11 +436,11 @@
 			<span class=dash>-</span>
 			<a href="http://imgur.com/a/xrxes" target=_blank>Background images</a>
 		</div>
-		
+
 		<div class="cookie-banner phantom hidden" style="position:initial">
 			<div>This page uses Google Analytics to track traffic and page views. Cookies can always be disabled at the bottom of the page. </div>
 			<button class="soulsy-box">Deny cookies</button>
-			<button class="soulsy-box">Accept cookies</button>	
+			<button class="soulsy-box">Accept cookies</button>
 		</div>
 	</div>
 </div>
