@@ -555,6 +555,58 @@ function drawSekiroText(ctx, canvas, gen, sliders) {
     drawMultilineTextRaw(ctx, lines, 0, (0.196*h*s0) /vScale, sliders.font.fontSize*1.1)
 }
 
+/** @type {drawFun} Function which draws a GTA V (Enhanced) style noun-verbed. */
+function drawGTAVNounVerbed(ctx, canvas, gen, sliders) {
+    // CONSTANTS
+    const w = canvas.width, h = canvas.height
+    let s = h/1080
+
+    // USER INPUT
+    const { xOffset, yOffset, scale: s0 } = sliders.position
+    const subCaption = sliders.subCaption.subCaption
+    const gradient = sliders.gradient
+    const {shadowSize, shadowOffset, shadowOpacity} = sliders.gtavShadow
+    s *= s0
+
+    // BACKGROUND SHADOW
+    ctx.save()
+    ctx.translate(0, yOffset*h + h/2 + shadowOffset*h)
+
+    ctx.beginPath();
+    ctx.moveTo(w, -130 * s * shadowSize);
+    ctx.lineTo(w, 130 * s * shadowSize);
+    ctx.lineTo(0, 89 * s * shadowSize);
+    ctx.lineTo(0, -89 * s * shadowSize);
+
+    const bgGradient = ctx.createLinearGradient(0, 0, w, 0)
+    bgGradient.addColorStop(0, `rgba(0, 0, 0, ${shadowOpacity * 0.4})`)
+    bgGradient.addColorStop(1, `rgba(0, 0, 0, ${shadowOpacity * 1.4})`)
+    ctx.fillStyle = bgGradient
+    ctx.fill()
+
+    // MAIN CAPTION TEXT
+    ctx.restore()
+    ctx.translate(xOffset*w + w/2, yOffset*h + h/2)
+    ctx.globalAlpha = sliders.textOpacity.textOpacity;
+    const [caption, vScale] = applyFontSliders(ctx, canvas, gen, sliders, s)
+    if (gradient && gradient.gradient) {
+        var gradientWidth = gradient.gradientScale * 1920 * s
+        ctx.fillStyle = makePresetGradient(ctx, gradient.gradient, gradientWidth)
+    }
+    drawMultilineText(ctx, caption, {y: subCaption? -s*10: 0, lineHeight: sliders.font.fontSize*s*0.8})
+
+    // SUBCAPTION TEXT
+    if (subCaption) {
+        ctx.globalAlpha = 1;
+        canvas.style.letterSpacing = `${s}px`
+        ctx.font = `300 ${26*s}px Arial`
+        ctx.fillStyle = 'white'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'alphabetic'
+        drawMultilineText(ctx, subCaption, {y: 65*s, lineHeight: 32*s, align: 'top'})
+    }
+}
+
 
 // ==================================================== AREA NAME ===================================================
 

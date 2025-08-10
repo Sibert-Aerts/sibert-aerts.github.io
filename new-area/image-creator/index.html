@@ -86,7 +86,7 @@
 					<div name=layering-up class="grabby layering-grabby" hidden></div>
 					<div name=layering-down class="grabby layering-grabby layering-down-grabby" hidden></div>
 				</div>
-				<canvas id=canvas class=big width=1920px height=1080px>
+				<canvas id=canvas style=font-variant:none class=big width=1920px height=1080px>
 			</div>
 
 			<div style="text-align:center">
@@ -224,6 +224,14 @@
 						<span class=input-title>Spacing:</span>
 						<button class="lil-button reset-button"></button>
 						<input type=range name=charSpacing min=-10 max=40 step=1>
+					</div>
+				</div>
+
+				<div name=textOpacity class=sliders-container hidden>
+					<div class=smol>
+						<span class=input-title>Text opacity:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=textOpacity type=range min=0 max=1 step=.01>
 					</div>
 				</div>
 
@@ -565,6 +573,25 @@
 							<option value="transparency">Safe</option>
 							<option value="blend">Authentic</option>
 						</select>
+					</div>
+				</div>
+
+				<div name=gtavShadow class=sliders-container hidden>
+					<h4> Shadow bar </h4>
+					<div class=smol>
+						<span class=input-title>Size:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=shadowSize type=range min=0 max=8 step=.02>
+					</div>
+					<div class=smol>
+						<span class=input-title>Opacity:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=shadowOpacity type=range min=0 max=2.5 step=.01>
+					</div>
+					<div>
+						<span class=input-title>Offset:</span>
+						<button class="lil-button reset-button"></button>
+						<input name=shadowOffset type=range min=-0.2 max=0.2 step=.002>
 					</div>
 				</div>
 
@@ -1008,6 +1035,7 @@
 		<div id=changes-info hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2025/08/10</b> • Add Grand Theft Auto V style 'Wasted' and 'Mission Passed' presets <br>
 			<b>2024/09/12</b> • Add fallback Japanese serif/sans-serif fonts <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/issues/3" target="_blank">(Github issue #3)</a> <br>
 			<b>2024/02/11</b> • Expand Lethal Company loot/enemy indicator settings and presets <br>
 			<b>2024/02/10</b> • Add prototype Lethal Company loot indicator <br>

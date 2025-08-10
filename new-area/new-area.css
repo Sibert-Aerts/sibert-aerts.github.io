@@ -780,3 +780,7 @@ input.bad-url {
     font-family: '_3270 Regular';
     src: url(image-creator/assets/font/3270-Regular.ttf);
 }
+@font-face {
+    font-family: 'Pricedown';
+    src: url(image-creator/assets/font/pricedown\ bl.ttf);
+}

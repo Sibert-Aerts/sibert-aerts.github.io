@@ -1997,7 +1997,7 @@ layerTypes.push({
     id: 'sp:lethal-loot',
     type: MacroType.special,
     game: Game.ds1,
-    preset: 'Lethal Company Loot',
+    preset: 'Lethal Company: Loot',
 
     sliders: {
         position: {
@@ -2017,7 +2017,7 @@ layerTypes.push({
     id: 'sp:lethal-enemy',
     type: MacroType.special,
     game: Game.ds1,
-    preset: 'Lethal Company Enemy',
+    preset: 'Lethal Company: Enemy',
 
     sliders: {
         position: {
@@ -2034,6 +2034,56 @@ layerTypes.push({
         },
     },
     draw: drawLethalCompanyLoot,
+})
+
+layerTypes.push({
+    id: 'sp:gtav-passed',
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'GTA V: Mission Passed',
+    preventAsRandomDefault: true,
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: -0.025, scale: 1
+        },
+        font: {
+            fontFamily: 'Pricedown', fontFamilyFallback: 'Noto Sans JP', textColor: [255, 207, 77],
+            fontSize: 122, fontWeight: 500,
+            vScale: 1, charSpacing: 0,
+        },
+        textOpacity: {textOpacity: 0.5},
+        subCaption: {subCaption: ''},
+        gradient: {},
+        gtavShadow: {shadowSize: 1, shadowOffset: 0, shadowOpacity: 0.5},
+    },
+    draw: drawGTAVNounVerbed,
+})
+
+layerTypes.push({
+    id: 'sp:gtav-wasted',
+    type: MacroType.special,
+    game: Game.ds1,
+    preset: 'GTA V: Wasted',
+    preventAsRandomDefault: true,
+
+    preferCase: 'title case',
+    sliders: {
+        position: {
+            xOffset: 0, yOffset: -0.011, scale: 1
+        },
+        font: {
+            fontFamily: 'Pricedown', fontFamilyFallback: 'Noto Sans JP', textColor: [255, 58, 58],
+            fontSize: 135, fontWeight: 500,
+            vScale: 1, charSpacing: 0,
+        },
+        textOpacity: {textOpacity: 0.5},
+        subCaption: {subCaption: ''},
+        gradient: {},
+        gtavShadow: {shadowSize: 1, shadowOffset: 0, shadowOpacity: 0.5},
+    },
+    draw: drawGTAVNounVerbed,
 })
 
 layerTypes.push({

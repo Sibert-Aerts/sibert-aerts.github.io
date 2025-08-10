@@ -14,7 +14,7 @@ class MacroGenerator {
     constructor(element=document) {
         /** @type {readonly HTMLElement | Document} */
         this.element = element
-        
+
         // Fill in some fields
         /** @type {readonly HTMLAnchorElement}   */
         this.saveLink = makeElem('a')
@@ -50,7 +50,7 @@ class MacroGenerator {
         //// IMAGE HANDLER
         /** @type {ImageHandler} */
         this.imageHandler = new ImageHandler(my('div', 'background-image'), true)
-        this.imageHandler.onload = () => {            
+        this.imageHandler.onload = () => {
             this.imageSliders.show()
             this.redrawMacro()
         }
@@ -92,7 +92,7 @@ class MacroGenerator {
             this.redrawMacro()
         }
 
-        const randomMacroButton = my('button', 'random-macro') 
+        const randomMacroButton = my('button', 'random-macro')
         if (randomMacroButton) randomMacroButton.onclick = this.selectRandomLayerType.bind(this)
 
         //// SLIDERS
@@ -105,7 +105,7 @@ class MacroGenerator {
             this.sliders[sliders.name] = sliders
             sliders.onchange = autoRedraw
         }
-        
+
         this.imageSliders = new SliderGroup(my('div', 'image'))
         this.imageSliders.onchange = autoRedraw
 
@@ -123,7 +123,7 @@ class MacroGenerator {
         const tabs = my('div', 'sliders-tabs')
         const tabbedDivs = {}
 
-        if( tabs ) 
+        if( tabs )
         for( const tab of tabs.children ) {
             const radio = tab.children[0]
             if( radio.value !== 'all' )
@@ -186,7 +186,7 @@ class MacroGenerator {
         const grabMap = [null, posGrabby, scaleGrabby]
 
         const SCALEGRABDIST = 40
-        const getScale = e => 
+        const getScale = e =>
             Math.hypot(posGrabby.offsetLeft-e.offsetX, posGrabby.offsetTop-e.offsetY) / Math.hypot(SCALEGRABDIST, SCALEGRABDIST)
 
         /** Adjust the grabbies' position based on the Slider values. */
@@ -292,7 +292,7 @@ class MacroGenerator {
     createMacroTypeSelects() {
         const onchange = e => this.onMacroTypeChange(e)
 
-        const {macroType: defaultType, game: defaultGame, preset: defaultPreset} = window.MACROGEN_DEFAULTS 
+        const {macroType: defaultType, game: defaultGame, preset: defaultPreset} = window.MACROGEN_DEFAULTS
 
         //// Macro Type
         /** @type {HTMLSelectElement} */
@@ -338,7 +338,7 @@ class MacroGenerator {
 
         if( defaultPreset ) this.presetSelects[defaultType][defaultGame].value = defaultPreset
     }
-    
+
     /* ======================= MULTI-LAYERS ======================= */
 
     /** Create layer controls */
@@ -349,7 +349,7 @@ class MacroGenerator {
         const layer = this.getLayerType()
         const sliders = this.getChangedSliderValues()
         this.addLayer({layer, sliders})
-        
+
         if( !layerControls ) return
 
         const getButton = name => layerControls.children.namedItem(name)
@@ -374,24 +374,24 @@ class MacroGenerator {
 
             const oldData = this.layers[this.activeLayer]
             layerContainer.removeChild(oldData.button)
-            
+
             this.layers.splice(this.activeLayer, 1)
             if( this.activeLayer === this.layers.length )
                 this.activeLayer--
             this.layers[this.activeLayer].activate()
             this.redrawMacro()
-            
+
             if( this.layers.length <= 1 )
                 deleteButton.disabled = true
         })
         moveUpButton.addEventListener('click', () => {
             if( this.activeLayer === 0 ) return
             const i = this.activeLayer
-            
+
             const data = this.layers[i]
             const otherData = this.layers[i-1];
             [this.layers[i], this.layers[i-1]] = [otherData, data]
-            layerContainer.insertBefore(data.button, otherData.button)            
+            layerContainer.insertBefore(data.button, otherData.button)
 
             this.activeLayer--
             this.redrawMacro()
@@ -400,11 +400,11 @@ class MacroGenerator {
         moveDownButton.addEventListener('click', () => {
             if( this.activeLayer === this.layers.length-1 ) return
             const i = this.activeLayer
-            
+
             const data = this.layers[i]
             const otherData = this.layers[i+1];
             [this.layers[i], this.layers[i+1]] = [otherData, data]
-            layerContainer.insertBefore(otherData.button, data.button)            
+            layerContainer.insertBefore(otherData.button, data.button)
 
             this.activeLayer++
             this.redrawMacro()
@@ -422,7 +422,7 @@ class MacroGenerator {
         if( !this.layerButtons ) return
         const i = this.activeLayer
         const data = this.layers[i]
-        
+
         this.layerButtons.moveUpButton.disabled = (i === 0)
         this.layerButtons.moveDownButton.disabled = (i === this.layers.length-1)
         const hideIcon = this.layerButtons.hideButton.children[0]
@@ -528,14 +528,14 @@ class MacroGenerator {
         }
         return vals
     }
-    
+
     setChangedSliderValues(vals) {
-        this.captionInput.value = vals.caption 
+        this.captionInput.value = vals.caption
         this.adjustCaseCheckbox.checked = vals.adjustCase
         for( const slider in this.sliders ) {
             this.sliders[slider].setChangedValues(vals[slider])
         }
-    }   
+    }
 
     /* ======================= LAYER (TYPE) SWITCHING ======================= */
 
@@ -560,7 +560,7 @@ class MacroGenerator {
         //// Hide/Show relevant selects (if any)
         const usingSpecial = (macroType === MacroType.special)
         setPhantom(this.gameSelect.parentNode, usingSpecial)
-        
+
         //// Show relevant Preset selects
         for( const typeKey in MacroType ) for( const gameKey in Game )
             if( this.presetSelects[typeKey][gameKey] && (typeKey !== macroType || gameKey !== game ))
@@ -624,24 +624,24 @@ class MacroGenerator {
         // Value chosen so that 1080 * 1920 is approximately the threshold
         return (this.canvas.width*this.canvas.height >= 2100000)
     }
-    
+
     /** Resize the canvas only if necessary. */
     resizeCanvas(width, height) {
         if( this.canvas.width !== width || this.canvas.height !== height ) {
             this.canvas.width = width; this.canvas.height = height
         }
     }
-    
+
     /** Called when there is no longer an image to draw. */
     onNoMoreBackgroundImage() {
         this.imageSliders.hide()
         this.redrawMacro()
     }
 
-    /** 
+    /**
      * @returns {[HTMLCanvasElement, CanvasRenderingContext2D]}
     */
-    getTempCanvasAndContext() {        
+    getTempCanvasAndContext() {
         const temp = this.tempCanvas
         temp.width = this.canvas.width
         temp.height = this.canvas.height
@@ -649,7 +649,7 @@ class MacroGenerator {
     }
 
     /** Wipes all `ctx` and `canvas` properties that may affect how things are drawn to the canvas. */
-    resetDrawingState() {    
+    resetDrawingState() {
         // On Chrome the canvas styling may affect drawing
         this.canvas.style.letterSpacing = '0px'
         this.canvas.style.fontVariantNumeric = 'normal'
@@ -670,7 +670,7 @@ class MacroGenerator {
         ctx.globalAlpha = 1
     }
 
-    /** 
+    /**
      * Call after minor input changes;
      * Calls redrawMacro() only if the underlying canvas isn't too huge for this feature to be laggy.
      */
@@ -720,7 +720,7 @@ class MacroGenerator {
         }
 
         this.drawFlatColor()
-        
+
         if( !this.imageSliders.usable ) {
             ctx.drawImage(image, 0, 0)
             return
@@ -752,7 +752,7 @@ class MacroGenerator {
             tempCtx.fillStyle = '#ff8000'
             tempCtx.filter = 'none'
             tempCtx.fillRect(0, 0, image.width, image.height)
-            
+
             // Draw to actual canvas
             ctx.resetTransform()
             ctx.drawImage(tempCanvas, 0, 0)
@@ -785,7 +785,7 @@ class MacroGenerator {
 
     }
 
-    /** 
+    /**
      * Call after major changes;
      * Blanks the canvas, redraws the selected image if any, and draws the text on top.
      */
@@ -794,7 +794,7 @@ class MacroGenerator {
         this.resetDrawingState()
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         this.drawFlatColor()
-    
+
         // May alter the resolution
         this.drawBackgroundImage()
         this.updateCanvasOverlay()
@@ -803,7 +803,7 @@ class MacroGenerator {
         this.resWarning.hidden = !this.tooBig()
         this.resView.x.textContent = canvas.width
         this.resView.y.textContent = canvas.height
-    
+
         for (let i=this.layers.length-1; i >= 0; i--) {
             const layerData = this.layers[i]
             if (layerData.hidden) continue
@@ -823,7 +823,7 @@ class MacroGenerator {
                     sliders[slider] = { ...this.sliders[slider].trueDefaults, ...layer.sliders[slider], ...layerData.sliders[slider] }
                 }
             }
-            
+
             await layerData.layer.draw(ctx, this.canvas, this, sliders)
         }
     }
@@ -840,7 +840,7 @@ class MacroGenerator {
         // Set the file name and put the image data
         const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z0-9 ]/g, '') || 'macro'
         this.saveLink.setAttribute('download', fileName + '.' + imageType)
-        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType))        
+        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType))
         this.saveLink.click()
     }
 }
