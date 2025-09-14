@@ -678,6 +678,10 @@ input.bad-url {
 }
 .cookie-banner > * { margin-left: 2em }
 
+.inline-icon {
+    height: 1.5em;
+    vertical-align: bottom;
+}
 
 /*
  *   ADAPTIVE SCREEN SIZE STUFF - NEEDS TO BE AT THE BOTTOM SO IT TAKES PRECEDENCE!

@@ -991,7 +991,11 @@
 
 		<div id=info-tabs class=tabs>
 			<label class='tab checked'>
-				<input type=radio name=info-tabs value=call-info checked>
+				<input type=radio name=info-tabs value=links-info checked>
+				Links
+			</label>
+			<label class=tab>
+				<input type=radio name=info-tabs value=call-info>
 				Contact
 			</label>
 			<label class=tab>
@@ -1008,17 +1012,43 @@
 			</label>
 		</div>
 
-		<div id=call-info>
-			<h2 style="margin:0 .5em .5em">Visit the subreddit</h2>
-			If you want a place to share images you've made, make suggestions, or bring up issues,
-			feel free to leave a post on the
-			<a href="https://reddit.com/r/fromSoftMacroCreator" target=_blank>/r/fromSoftMacroCreator subreddit</a>.
+		<div id=links-info style="padding: 1em 0">
+			<div style="margin-bottom: 2em">
+				<h2 style="margin:0 .5em .5em">Want to give back?</h2>
+				I made this project for fun and have no intentions of running advertisements,<br />
+				if you'd like you can send me a tip on
+				<a href=https://ko-fi.com/rezuaq><img src="../graphics/kofi-transp-32.png" class="inline-icon" /> Ko-fi</a>.
+			</div>
+			<div style="margin-bottom: 2em">
+				<h2 style="margin:0 .5em .5em">Similar projects</h2>
+				<div>
+					<a href="../index.html" target="_blank">
+						<img src="../graphics/favicon.ico" class="inline-icon" /> Area Name Generator
+					</a>
+					- My earlier project for generating randomized FromSoft area names.
+				</div>
+				<div>
+					<a href="https://deathgenerator.com/" target="_blank">
+						<img src="../graphics/foone-transp-32.png" class="inline-icon" /> The Death Generator
+					</a>
+					- A site to easily create pixel-accurate image macros based on a variety of classic games.
+				</div>
+				<div>
+					<a href="https://chromewebstore.google.com/detail/elden-email/bjaildeadgclghcjhocdbginfpjihmgm" target="_blank">
+						<img src="../graphics/chromews-transp-32.png" class="inline-icon" /> Elden Email
+					</a>
+					- A browser extension that shows an Elden Ring-style overlay when you send an email.
+				</div>
+			</div>
+			<div>
+				<h2 style="margin:0 .5em .5em">Visit the subreddit</h2>
+				If you want a place to share images you've made, make suggestions, or bring up issues,
+				feel free to leave a post on the
+				<a href="https://reddit.com/r/fromSoftMacroCreator" target=_blank>/r/fromSoftMacroCreator subreddit</a>.
+			</div>
+		</div>
 
-			<br><br>
-			<h2 style="margin:0 .5em .5em">Want to give back?</h2>
-			I made this page for fun, but if you'd like, you can send me a tip on <a href=https://ko-fi.com/rezuaq>Ko-fi</a>.
-
-			<br><br>
+		<div id=call-info style="padding: 1em 0" hidden>
 			<h2 style="margin:0 .5em .5em">Want to contribute?</h2>
 			If you're familiar with HTML canvas and interested in extending the set of available macros (possibly to include more than just FromSoft games),
 			you are free to contribute through Github, and/or to contact me if you need help or have any questions.<br>
@@ -1029,12 +1059,12 @@
 			Website: <a href=https://rezuaq.be target=_blank>Rezuaq</a><br>
 			Discord: rezuaq<br>
 			Github: <a href=https://github.com/Sibert-Aerts/sibert-aerts.github.io/issues/new target=_blank>New Github issue</a><br>
-
 		</div>
 
-		<div id=changes-info hidden>
+		<div id=changes-info style="padding: 1em 0" hidden>
 			<h2 style="margin:0 .5em .5em">Changelog</h2>
 
+			<b>2025/09/14</b> • Added 'Links' tab directing to related projects, added 'Nomenclature' section to 'Legal' tab <br>
 			<b>2025/08/10</b> • Add Grand Theft Auto V style 'Wasted' and 'Mission Passed' presets <br>
 			<b>2024/09/12</b> • Add fallback Japanese serif/sans-serif fonts <a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/issues/3" target="_blank">(Github issue #3)</a> <br>
 			<b>2024/02/11</b> • Expand Lethal Company loot/enemy indicator settings and presets <br>
@@ -1074,7 +1104,7 @@
 
 		</div>
 
-		<div id=font-info hidden>
+		<div id=font-info style="padding: 1em 0" hidden>
 			<h2 style="margin:0 .5em .5em">About font families</h2>
 			The app uses several typefaces to match or emulate those used in the different games.
 			<br><br>
@@ -1108,7 +1138,7 @@
 			If, hypothetically, you have it installed on your computer, it's available as "Agmena Pro".
 		</div>
 
-		<div id=legal-info hidden>
+		<div id=legal-info style="padding: 1em 0" hidden>
 			<h2 style="margin:0 .5em .5em">Disclaimer</h2>
 			This web page is a fan creation, DEMON'S SOULS, DARK SOULS, BLOODBORNE, SEKIRO: SHADOWS DIE TWICE and ELDEN RING
 			belong to FromSoftware, Sony Interactive Entertainment, Bandai Namco Entertainment, Activision Publishing, and other respective owners.
@@ -1124,6 +1154,10 @@
 			<br><br>
 			Graphics generated using either of these are obviously beyond my authority to yield the rights to.
 			I therefore recommended against using these in commercial products such as games or merchandise.
+			<br><br>
+			<h2 style="margin:0 .5em .5em">Nomenclature</h2>
+			The term "image macro" is how old people refer to an image featuring humorous text superimposed over a pre-existing image,
+			in youthful terminology this may also be known as a "meme".
 		</div>
 	</div>
 
@@ -1156,9 +1190,7 @@
 			<span class=dash>-</span>
 			<a href="https://github.com/Sibert-Aerts/sibert-aerts.github.io/tree/master/new-area/image-creator" target=_blank>On Github</a>
 			<span class=dash>-</span>
-			<a href="../index.html" target=_blank>Area Name Generator</a>
-			<span class=dash>-</span>
-			<a href="https://ko-fi.com/rezuaq" target=_blank>Buy me a coffee</a>
+			<a href="https://ko-fi.com/rezuaq" target=_blank><img src="../graphics/kofi-transp-32.png" class="inline-icon" /> Buy me a coffee</a>
 		</div>
 	</div>
 
