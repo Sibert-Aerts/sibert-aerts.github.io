@@ -202,9 +202,12 @@ a.link-tile {
         .title {
             background: $rez-pink;
         }
-        .cover {
+        .gray-cover {
             background-color: unset;
             backdrop-filter: unset;
+        }
+        .pink-cover {
+            opacity: 1;
         }
     }
     .title {
@@ -228,9 +231,14 @@ a.link-tile {
         font-size: 0.875em;
         background: linear-gradient(to top, #000e, #0000);
     }
-    .cover {
+    .gray-cover {
         background-color: #8886;
         backdrop-filter: saturate(0.75);
+    }
+    .pink-cover {
+        background-color: $rez-pink;
+        mix-blend-mode: lighten;
+        opacity: 0;
     }
 }
 
