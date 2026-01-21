@@ -52,7 +52,7 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
-    rexml (3.3.9)
+    rexml (3.4.2)
     rouge (3.30.0)
     safe_yaml (1.0.5)
     sass (3.7.4)
@@ -60,7 +60,6 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    wdm (0.2.0)
     webrick (1.8.2)
 
 PLATFORMS
@@ -71,7 +70,6 @@ DEPENDENCIES
   jekyll (= 3.10.0)
   jekyll-seo-tag
   kramdown-parser-gfm (~> 1.1.0)
-  wdm (>= 0.1.0)
   webrick (~> 1.8)
 
 BUNDLED WITH
