@@ -837,11 +837,22 @@ class MacroGenerator {
         if( imageType === 'jpg' ) imageType = 'jpeg'
         else if( imageType !== 'jpeg' ) imageType = 'png'
 
-        // Set the file name and put the image data
+        // Determine file name
         const fileName = this.captionInput.value.replaceAll(/[^a-zA-Z0-9 ]/g, '') || 'macro'
-        this.saveLink.setAttribute('download', fileName + '.' + imageType)
-        this.saveLink.setAttribute('href', canvas.toDataURL('image/' + imageType))
-        this.saveLink.click()
+
+        // Magic method to download the canvas contents to disk in a way that iOS/Safari likes?
+        const xhr = new XMLHttpRequest();
+        xhr.responseType = 'blob';
+        xhr.onload = () => {
+            const objectURL = window.URL.createObjectURL(xhr.response);
+            this.saveLink.setAttribute('download', fileName + '.' + imageType)
+            this.saveLink.setAttribute('href', objectURL)
+            this.saveLink.click();
+            // Need to release object URLs to free memory, so we do it after 10 seconds?
+            setTimeout(() => window.URL.revokeObjectURL(objectURL), 10000);
+        };
+        xhr.open('GET', canvas.toDataURL('image/' + imageType));
+        xhr.send();
     }
 }
 
